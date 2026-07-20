@@ -137,6 +137,14 @@ automation is out of scope by design.
 > exactly this). OpenRater is an independent project with no
 > affiliation to NAIC, SERFF, ISO/Verisk, AAIS, NCCI, or any insurer.
 
+## Privacy Policy
+
+OpenRater is local-first: your filings, workbooks, and rate plans stay
+on your machine, the engine binds to `127.0.0.1` only, and the app
+collects no telemetry. The full policy — data collection, usage and
+storage, third-party sharing, retention, and contact — is
+[docs/PRIVACY.md](./docs/PRIVACY.md).
+
 ## License
 
 Apache-2.0 — see [LICENSE](./LICENSE) and [NOTICE](./NOTICE).
