@@ -23,8 +23,8 @@ jobs:
           - os: windows-latest
             label: win32-x64
     runs-on: ${{ matrix.os }}
-    # Bound stalled runners and unusually slow packaging jobs.
-    timeout-minutes: 90
+    # Allow time for the Apple notary queue while bounding stalled jobs.
+    timeout-minutes: 180
     steps:
       - uses: actions/checkout@v4
 

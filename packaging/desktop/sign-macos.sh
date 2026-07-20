@@ -12,8 +12,8 @@
 #   NOTARY_PASSWORD         an app-specific password
 #
 # Missing secrets exit successfully so local development builds remain
-# available. Release builds sign nested code before outer code, then
-# submit a zip of the signed root for notarization. Bare executables
+# available. Release builds find and sign every Mach-O file before
+# submitting a zip of the signed root for notarization. Bare executables
 # cannot be stapled, so Gatekeeper verifies the ticket online at first
 # launch.
 set -e
@@ -46,16 +46,20 @@ sign() {
     --keychain "$KEYCHAIN" --sign "$MACOS_SIGN_IDENTITY" "$1"
 }
 
-echo "── sign inner Mach-Os (PyInstaller one-dir), inner-first"
-find "$ROOT/server" -type f \( -name '*.so' -o -name '*.dylib' \) \
-  -print0 | while IFS= read -r -d '' f; do sign "$f"; done
-sign "$ROOT/server/openrater-server"
-
-echo "── sign the bundled Node runtime"
-sign "$ROOT/runtime/node"
-for lib in "$ROOT"/lib/libnode*.dylib; do
-  [ -e "$lib" ] && sign "$lib"
+echo "── sign every Mach-O in the bundle, deepest-first"
+# Apple rejects any unsigned Mach-O, including helper binaries without a
+# conventional extension. Inspect file contents and sign nested code first.
+MACHO_LIST="$RUNNER_TEMP/macho.list"
+: > "$MACHO_LIST"
+find "$ROOT" -type f | while IFS= read -r f; do
+  if file -b "$f" 2>/dev/null | grep -q 'Mach-O'; then
+    printf '%s\t%s\n' "$(printf '%s' "$f" | tr -cd '/' | wc -c)" "$f" \
+      >> "$MACHO_LIST"
+  fi
 done
+COUNT=$(wc -l < "$MACHO_LIST" | tr -d ' ')
+echo "   $COUNT Mach-O files to sign"
+sort -rn "$MACHO_LIST" | cut -f2- | while IFS= read -r f; do sign "$f"; done
 
 echo "── re-pack the signed root"
 VERSION=$(node -p "require('./services/mcp/package.json').version")
@@ -63,10 +67,39 @@ PLATFORM=$(node -p "process.platform + '-' + process.arch")
 ARTIFACT="$OUT/openrater-$VERSION-$PLATFORM.mcpb"
 npx --yes @anthropic-ai/mcpb pack "$ROOT" "$ARTIFACT"
 
-echo "── notarize (ticket is server-side; bare binaries aren't stapled)"
+echo "── notarize: submit, then poll (ticket is server-side)"
+# Polling uses short, independent requests so a transient network error or
+# a slow Apple queue does not discard an otherwise valid submission.
 ditto -c -k --keepParent "$ROOT" "$RUNNER_TEMP/notarize.zip"
-xcrun notarytool submit "$RUNNER_TEMP/notarize.zip" \
+SUBMIT_JSON=$(xcrun notarytool submit "$RUNNER_TEMP/notarize.zip" \
   --apple-id "$NOTARY_APPLE_ID" --team-id "$NOTARY_TEAM_ID" \
-  --password "$NOTARY_PASSWORD" --wait
+  --password "$NOTARY_PASSWORD" --output-format json --no-wait)
+echo "$SUBMIT_JSON"
+SUBMIT_ID=$(printf '%s' "$SUBMIT_JSON" | python3 -c "import json,sys;print(json.load(sys.stdin).get('id',''))")
+[ -n "$SUBMIT_ID" ] || { echo "notarize: submit returned no id"; exit 1; }
+echo "── submission $SUBMIT_ID — polling for up to 150 minutes"
+
+NOTARY_STATUS="In Progress"
+i=0
+while [ "$i" -lt 300 ]; do
+  i=$((i + 1))
+  sleep 30
+  INFO=$(xcrun notarytool info "$SUBMIT_ID" \
+    --apple-id "$NOTARY_APPLE_ID" --team-id "$NOTARY_TEAM_ID" \
+    --password "$NOTARY_PASSWORD" --output-format json 2>/dev/null) || {
+      echo "   poll $i: transient error — retrying"; continue; }
+  NOTARY_STATUS=$(printf '%s' "$INFO" | python3 -c "import json,sys;print(json.load(sys.stdin).get('status',''))" 2>/dev/null)
+  echo "   poll $i: $NOTARY_STATUS"
+  case "$NOTARY_STATUS" in Accepted | Invalid | Rejected) break ;; esac
+done
+
+echo "── notarization: $NOTARY_STATUS (submission $SUBMIT_ID)"
+if [ "$NOTARY_STATUS" != "Accepted" ]; then
+  echo "── Not accepted — Apple's detailed findings:"
+  xcrun notarytool log "$SUBMIT_ID" \
+    --apple-id "$NOTARY_APPLE_ID" --team-id "$NOTARY_TEAM_ID" \
+    --password "$NOTARY_PASSWORD" || true
+  exit 1
+fi
 
 echo "sign-macos: signed + notarized $ARTIFACT"
