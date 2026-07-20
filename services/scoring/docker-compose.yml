@@ -1,0 +1,36 @@
+# Local run for the OpenRater scoring service.
+#
+#   In-memory queue (zero deps):   docker compose up --build
+#   Redis-backed queue:            QUEUE_DRIVER=redis docker compose --profile redis up --build
+#
+# The same container can use alternate queue and result-store adapters when
+# those adapters are implemented.
+name: rater-scoring
+services:
+  scoring:
+    build:
+      context: ../.. # repo root — workspace deps are bundled
+      dockerfile: services/scoring/Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      PORT: "8080"
+      HOST: "0.0.0.0"
+      QUEUE_DRIVER: "${QUEUE_DRIVER:-memory}"
+      REDIS_URL: "redis://redis:6379"
+      STORE_DRIVER: "fs"
+      STORE_DIR: "/data"
+      WORKER_CONCURRENCY: "2"
+      # API_LAB_BASE: "http://host.docker.internal:8001"  # for source:plan_id (follow-up)
+    volumes:
+      - scoring-data:/data
+
+  # Started only with `--profile redis`. Pair with QUEUE_DRIVER=redis.
+  redis:
+    image: redis:7-alpine
+    profiles: ["redis"]
+    ports:
+      - "6379:6379"
+
+volumes:
+  scoring-data:

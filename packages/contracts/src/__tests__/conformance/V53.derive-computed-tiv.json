@@ -1,0 +1,38 @@
+{
+  "name": "V53.derive-computed-tiv",
+  "description": "derive.computed sums two money inputs into a derived field (tiv = building_limit + bpp_limit), the E03 computed-appetite-field primitive.",
+  "plan": {
+    "id": "v53.derive-computed",
+    "version": "1.0.0",
+    "name": "Computed TIV",
+    "line": "bop",
+    "effective": "2026-01-01",
+    "nodes": [
+      {
+        "id": "tiv_calc",
+        "kind": "derive.computed",
+        "params": {
+          "fieldName": "tiv",
+          "expr": {
+            "kind": "op",
+            "op": "+",
+            "left": { "kind": "input", "name": "building_limit" },
+            "right": { "kind": "input", "name": "bpp_limit" }
+          }
+        },
+        "position": { "x": 0, "y": 0 }
+      },
+      {
+        "id": "out_tiv",
+        "kind": "output",
+        "params": { "fieldName": "tiv", "fieldType": "money" },
+        "position": { "x": 200, "y": 0 }
+      }
+    ],
+    "edges": [
+      { "from": { "node": "tiv_calc", "port": "value" }, "to": { "node": "out_tiv", "port": "value" } }
+    ]
+  },
+  "externalInputs": { "building_limit": 850000, "bpp_limit": 210000 },
+  "expectedOutputs": { "tiv": 1060000 }
+}

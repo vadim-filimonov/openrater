@@ -1,0 +1,165 @@
+/**
+ * Brief 45 PR 45.2 — FactorTooltip styles.
+ *
+ * Floating panel with rich content: title + value + deviation +
+ * percentile + chain refs. Renders via portal into document.body.
+ */
+
+.rater-factor-tooltip {
+  position: absolute;
+  z-index: var(--rater-z-tooltip, 1000);
+  background: var(--rater-surface-2);
+  border: 1px solid var(--rater-hairline-strong);
+  border-radius: var(--rater-r-8, 8px);
+  padding: 10px 12px;
+  min-width: 220px;
+  max-width: 320px;
+  pointer-events: none;
+  user-select: none;
+  font-family: var(--rater-fonts-sans);
+
+  box-shadow:
+    0 14px 40px -10px rgba(0, 0, 0, 0.5),
+    0 1px 0 rgba(255, 255, 255, 0.04) inset;
+
+  opacity: 0;
+  animation: rater-factor-tooltip-in var(--rater-d-240, 240ms)
+    var(--rater-ease-soft, cubic-bezier(0.32, 0.72, 0, 1)) forwards;
+}
+
+@keyframes rater-factor-tooltip-in {
+  from {
+    opacity: 0;
+    transform: translateY(2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rater-factor-tooltip {
+    animation-duration: 1ms;
+  }
+}
+
+.rater-factor-tooltip__title {
+  font-size: 12px;
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-strong);
+  margin-bottom: 6px;
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rater-factor-tooltip__val-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 4px;
+  gap: 8px;
+}
+
+.rater-factor-tooltip__val {
+  font-family: var(--rater-fonts-sans);
+  font-feature-settings: "tnum";
+  font-variant-numeric: tabular-nums;
+  font-size: 22px;
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-strong);
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+}
+
+.rater-factor-tooltip__dev {
+  font-size: 11px;
+  font-weight: var(--rater-fw-medium);
+  font-feature-settings: "tnum";
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.rater-factor-tooltip__dev.is-up {
+  color: var(--rater-cat-loading-text);
+}
+.rater-factor-tooltip__dev.is-down {
+  color: var(--rater-cat-input-text);
+}
+.rater-factor-tooltip__dev.is-neutral {
+  color: var(--rater-text-muted);
+}
+
+.rater-factor-tooltip__baseline-label {
+  font-size: 10px;
+  letter-spacing: var(--rater-tracking-label);
+  color: var(--rater-text-subtle);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.rater-factor-tooltip__pct {
+  font-size: 11px;
+  color: var(--rater-text-muted);
+  margin-bottom: 8px;
+}
+
+.rater-factor-tooltip__pct strong {
+  color: var(--rater-text-default);
+  font-weight: var(--rater-fw-medium);
+}
+
+.rater-factor-tooltip__pct-detail {
+  color: var(--rater-text-subtle);
+}
+
+.rater-factor-tooltip__chains {
+  padding-top: 6px;
+  border-top: 1px solid var(--rater-hairline-soft);
+}
+
+.rater-factor-tooltip__chains-label {
+  font-size: 10px;
+  color: var(--rater-text-subtle);
+  letter-spacing: var(--rater-tracking-label);
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.rater-factor-tooltip__chains-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.rater-factor-tooltip__chain-pill {
+  font-size: 11px;
+}
+.rater-factor-tooltip__chain-pill code {
+  font-family: var(--rater-fonts-mono);
+  font-size: 11px;
+  color: var(--rater-text-strong);
+  background: var(--rater-surface-canvas);
+  padding: 1px 6px;
+  border-radius: var(--rater-r-4, 4px);
+  white-space: nowrap;
+}
+
+.rater-factor-tooltip__chain-overflow {
+  font-size: 10px;
+  color: var(--rater-text-subtle);
+  padding: 1px 4px;
+  align-self: center;
+}
+
+/* When the tooltip flips into the bottom placement, soften the
+   top edge so the arrow direction (if added in v2) reads right. */
+.rater-factor-tooltip[data-placement="bottom"] {
+  /* No transform shift — the animation already handles motion */
+}

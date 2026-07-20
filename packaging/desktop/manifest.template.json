@@ -1,0 +1,111 @@
+{
+  "manifest_version": "0.3",
+  "name": "openrater",
+  "display_name": "OpenRater",
+  "version": "{{VERSION}}",
+  "description": "Drop in a rating manual, get a working rate plan — quote risks in chat, rate whole spreadsheets, and see every number's math in the included app.",
+  "long_description": "OpenRater turns a rate filing or rating manual — the PDF — into a working rating engine on your computer. It is two things at once: this chat, and a real app that opens in your browser. Claude drives; the app shows.\n\nHow it works: drop your manual into the chat → Claude fills out an Excel workbook you review → OpenRater checks it and builds your rate plan. From there, ask for a quote on any risk, or rate a whole spreadsheet of risks at once (one row per risk) and get premiums back with the math shown, step by step, cited to the page of your filing.\n\nThe plan is yours: open it in the app to see and change any factor table, band, or eligibility rule. And when OpenRater can't rate something honestly — an unknown class code, a construct your filing uses that it can't express — it refuses and names why. It never invents a number.\n\nA fully fictional sample program (Meridian Mutual's Shopfront BOP, with its own 17-page filing) comes pre-loaded, so you can watch the whole loop work before trusting it with your documents. Everything stays on your machine: the engine binds to 127.0.0.1 only and never calls any AI service itself — Claude only ever reads and transcribes; the math is deterministic.",
+  "author": {
+    "name": "Vadim Filimonov"
+  },
+  "server": {
+    "type": "node",
+    "entry_point": "mcp/index.mjs",
+    "mcp_config": {
+      "command": "node",
+      "args": [
+        "${__dirname}/mcp/index.mjs"
+      ],
+      "env": {
+        "RATER_BUNDLE_ROOT": "${__dirname}"
+      }
+    }
+  },
+  "tools": [
+    {
+      "name": "get_transcription_spec",
+      "description": "The workbook contract an AI follows to transcribe a filing"
+    },
+    {
+      "name": "get_workbook_template",
+      "description": "Copy the empty starter workbook"
+    },
+    {
+      "name": "get_capability_registry",
+      "description": "What the platform can and cannot express"
+    },
+    {
+      "name": "list_plans",
+      "description": "The rating plans on this machine"
+    },
+    {
+      "name": "get_plan",
+      "description": "One plan with its provenance"
+    },
+    {
+      "name": "get_plan_input_schema",
+      "description": "The inputs a plan needs to quote"
+    },
+    {
+      "name": "validate_workbook",
+      "description": "Deterministic spec check of a workbook (no build)"
+    },
+    {
+      "name": "build_plan_from_workbook",
+      "description": "Build a rating plan from a clean workbook"
+    },
+    {
+      "name": "get_build_report",
+      "description": "Citations, gaps ledger, verified test vectors"
+    },
+    {
+      "name": "export_plan_workbook",
+      "description": "Export the exact workbook that built a plan (sha256-stamped)"
+    },
+    {
+      "name": "reingest_diff",
+      "description": "Preview a revised workbook as a cell-grain diff"
+    },
+    {
+      "name": "apply_reingest",
+      "description": "Apply a reviewed re-ingest diff"
+    },
+    {
+      "name": "quote_risk",
+      "description": "Quote one risk with the full trace"
+    },
+    {
+      "name": "rerate_book",
+      "description": "Re-rate a CSV book (rows stay in files, out of chat)"
+    },
+    {
+      "name": "open_in_openrater",
+      "description": "Deep link into the local review UI"
+    },
+    {
+      "name": "runtime_status",
+      "description": "The doctor: engine health and next actions"
+    }
+  ],
+  "keywords": [
+    "insurance",
+    "rating",
+    "actuarial",
+    "underwriting",
+    "rate filing"
+  ],
+  "license": "Apache-2.0",
+  "compatibility": {
+    "platforms": [
+      "darwin",
+      "win32"
+    ],
+    "runtimes": {
+      "node": ">=18"
+    }
+  },
+  "icon": "icon.png",
+  "privacy_policies": [
+    "https://github.com/vadim-filimonov/openrater/blob/main/docs/PRIVACY.md"
+  ]
+}

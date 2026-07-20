@@ -1,0 +1,463 @@
+/* ============================================================================
+ * <ModifierEditor> — Brief 39 PR 39.3.
+ *
+ * One editor, three modes (Schedule / Flat / Provision). Schedule
+ * is the rich case with categories + cap. All three share the
+ * outer card shell, head, kind picker, citation field, action row.
+ * ========================================================================== */
+
+.rater-modifier-editor {
+  background: var(--rater-surface-1);
+  border: 1px solid var(--rater-hairline-base);
+  border-radius: var(--rater-r-8);
+  overflow: hidden;
+  width: 100%;
+  max-width: 640px;
+  font-family: var(--rater-fonts-sans);
+  color: var(--rater-text-default);
+}
+
+/* ── Head ──────────────────────────────────────────────────────── */
+.rater-modifier-editor__head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--rater-hairline-soft);
+}
+
+.rater-modifier-editor__head-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--rater-r-6);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--rater-fonts-mono);
+  font-size: var(--rater-t-13, 13px);
+  background: color-mix(in srgb, var(--rater-cat-math) 18%, transparent);
+  color: var(--rater-cat-math-text);
+  flex-shrink: 0;
+}
+
+.rater-modifier-editor__head-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.rater-modifier-editor__head-title {
+  margin: 0;
+  font-size: var(--rater-t-14, 14px);
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-strong);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rater-modifier-editor__head-sub {
+  font-size: var(--rater-t-11, 11px);
+  color: var(--rater-text-subtle);
+  font-family: var(--rater-fonts-mono);
+}
+
+/* ── Body ─────────────────────────────────────────────────────── */
+.rater-modifier-editor__body {
+  padding: 16px 18px;
+}
+
+.rater-modifier-editor__field {
+  margin-bottom: 14px;
+}
+
+.rater-modifier-editor__field-label {
+  display: block;
+  font-size: var(--rater-t-11, 11px);
+  color: var(--rater-text-subtle);
+  text-transform: uppercase;
+  letter-spacing: var(--rater-tracking-label);
+  margin-bottom: 6px;
+  font-weight: var(--rater-fw-semibold);
+}
+
+.rater-modifier-editor__field-hint {
+  font-size: var(--rater-t-11, 11px);
+  color: var(--rater-text-subtle);
+  margin-top: 6px;
+  line-height: 1.55;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.rater-modifier-editor__field-hint code,
+.rater-modifier-editor__field-hint strong {
+  font-family: var(--rater-fonts-mono);
+  font-size: var(--rater-t-11, 11px);
+  color: var(--rater-text-default);
+  background: var(--rater-surface-canvas);
+  padding: 1px 5px;
+  border-radius: var(--rater-r-4);
+}
+
+.rater-modifier-editor__input {
+  width: 100%;
+  background: var(--rater-surface-canvas);
+  border: 1px solid var(--rater-hairline-base);
+  border-radius: var(--rater-r-6);
+  padding: 8px 10px;
+  color: var(--rater-text-default);
+  font-family: inherit;
+  font-size: var(--rater-t-13, 13px);
+  outline: none;
+}
+
+.rater-modifier-editor__input.is-mono {
+  font-family: var(--rater-fonts-mono);
+}
+
+.rater-modifier-editor__input.is-narrow {
+  width: auto;
+  min-width: 88px;
+  max-width: 140px;
+}
+
+.rater-modifier-editor__input:focus-visible {
+  border-color: var(--rater-cat-math);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--rater-cat-math) 30%, transparent);
+}
+
+/* ── Kind picker (4 buttons; was 3 pre-Phase H.6) ─────────────── */
+.rater-modifier-editor__kind-picker {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+
+.rater-modifier-editor__kind-btn {
+  background: var(--rater-surface-2);
+  border: 1px solid var(--rater-hairline-soft);
+  border-radius: var(--rater-r-8);
+  padding: 12px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  color: var(--rater-text-muted);
+  font-family: inherit;
+  transition: all 100ms ease-out;
+}
+
+.rater-modifier-editor__kind-btn:hover {
+  border-color: var(--rater-hairline-strong);
+}
+
+.rater-modifier-editor__kind-btn:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: 1px;
+}
+
+.rater-modifier-editor__kind-btn.is-selected {
+  background: color-mix(in srgb, var(--rater-cat-math) 12%, transparent);
+  border-color: color-mix(in srgb, var(--rater-cat-math) 40%, transparent);
+  color: var(--rater-cat-math-text);
+}
+
+.rater-modifier-editor__kind-glyph {
+  font-family: var(--rater-fonts-mono);
+  font-size: var(--rater-t-16, 16px);
+  font-weight: var(--rater-fw-bold);
+}
+
+.rater-modifier-editor__kind-label {
+  font-size: var(--rater-t-11, 11px);
+  font-weight: var(--rater-fw-semibold);
+  text-transform: uppercase;
+  letter-spacing: var(--rater-tracking-label);
+}
+
+.rater-modifier-editor__kind-hint {
+  font-size: var(--rater-t-10, 10px);
+  color: var(--rater-text-subtle);
+  font-weight: var(--rater-fw-regular);
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+/* ── Categories table (Schedule mode) ─────────────────────────── */
+.rater-modifier-editor__cat-table {
+  border: 1px solid var(--rater-hairline-soft);
+  border-radius: var(--rater-r-6);
+  overflow: hidden;
+  margin-top: 6px;
+}
+
+.rater-modifier-editor__cat-head {
+  display: grid;
+  grid-template-columns: 1.6fr 60px 60px 1.4fr 64px 28px;
+  gap: 6px;
+  padding: 8px 12px;
+  background: var(--rater-surface-2);
+  font-size: var(--rater-t-10, 10px);
+  text-transform: uppercase;
+  letter-spacing: var(--rater-tracking-label);
+  color: var(--rater-text-subtle);
+  font-weight: var(--rater-fw-semibold);
+}
+
+.rater-modifier-editor__cat-row {
+  display: grid;
+  grid-template-columns: 1.6fr 60px 60px 1.4fr 64px 28px;
+  gap: 6px;
+  padding: 8px 12px;
+  border-top: 1px solid var(--rater-hairline-soft);
+  align-items: center;
+}
+
+.rater-modifier-editor__cat-row .rater-modifier-editor__input {
+  font-size: var(--rater-t-12, 12px);
+  padding: 6px 8px;
+}
+
+.rater-modifier-editor__cat-reason {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--rater-t-11, 11px);
+  color: var(--rater-text-muted);
+  cursor: pointer;
+  user-select: none;
+}
+
+.rater-modifier-editor__cat-reason input[type="checkbox"] {
+  accent-color: var(--rater-cat-lookup);
+}
+
+.rater-modifier-editor__cat-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--rater-surface-2);
+  border: 1px solid var(--rater-hairline-soft);
+  border-radius: var(--rater-r-4);
+  color: var(--rater-text-subtle);
+  cursor: pointer;
+  width: 28px;
+  height: 28px;
+  justify-self: end;
+}
+
+.rater-modifier-editor__cat-remove:hover {
+  background: color-mix(in srgb, var(--rater-feedback-error) 14%, var(--rater-surface-2));
+  border-color: color-mix(in srgb, var(--rater-feedback-error) 32%, transparent);
+  color: var(--rater-feedback-error);
+}
+
+.rater-modifier-editor__cat-foot {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: color-mix(in srgb, var(--rater-cat-math) 6%, transparent);
+  border-top: 1px solid var(--rater-hairline-soft);
+  font-size: var(--rater-t-12, 12px);
+}
+
+.rater-modifier-editor__cat-foot[data-state="exceeds"] {
+  background: color-mix(in srgb, var(--rater-cat-lookup) 8%, transparent);
+}
+
+.rater-modifier-editor__cat-foot-label {
+  color: var(--rater-text-muted);
+  font-size: var(--rater-t-11, 11px);
+  text-transform: uppercase;
+  letter-spacing: var(--rater-tracking-label);
+  font-weight: var(--rater-fw-semibold);
+}
+
+.rater-modifier-editor__cat-foot-val {
+  font-family: var(--rater-fonts-mono);
+  color: var(--rater-cat-math-text);
+  font-weight: var(--rater-fw-semibold);
+  margin-left: auto;
+}
+
+.rater-modifier-editor__cat-foot[data-state="exceeds"] .rater-modifier-editor__cat-foot-val {
+  color: var(--rater-cat-lookup-text);
+}
+
+.rater-modifier-editor__add-cat {
+  margin-top: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: 1px dashed var(--rater-hairline-strong);
+  color: var(--rater-text-muted);
+  font-family: inherit;
+  font-size: var(--rater-t-12, 12px);
+  padding: 6px 12px;
+  border-radius: var(--rater-r-6);
+  cursor: pointer;
+}
+
+.rater-modifier-editor__add-cat:hover {
+  border-color: var(--rater-cat-math);
+  color: var(--rater-cat-math-text);
+}
+
+.rater-modifier-editor__add-hint {
+  font-size: var(--rater-t-10, 10px);
+  color: var(--rater-text-subtle);
+  font-family: var(--rater-fonts-mono);
+}
+
+/* ── Flat mode — effect toggle ────────────────────────────────── */
+.rater-modifier-editor__effect-toggle {
+  display: inline-flex;
+  background: var(--rater-surface-2);
+  border-radius: var(--rater-r-8);
+  padding: 2px;
+}
+
+.rater-modifier-editor__effect-btn {
+  background: transparent;
+  border: 0;
+  padding: 6px 12px;
+  color: var(--rater-text-muted);
+  font-family: inherit;
+  font-size: var(--rater-t-12, 12px);
+  border-radius: var(--rater-r-6);
+  cursor: pointer;
+}
+
+.rater-modifier-editor__effect-btn:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: 1px;
+}
+
+.rater-modifier-editor__effect-btn.is-selected {
+  background: color-mix(in srgb, var(--rater-cat-math) 14%, transparent);
+  color: var(--rater-cat-math-text);
+  font-weight: var(--rater-fw-medium);
+}
+
+/* ── Action row ────────────────────────────────────────────────── */
+.rater-modifier-editor__actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--rater-hairline-soft);
+}
+
+.rater-modifier-editor__btn {
+  background: var(--rater-surface-2);
+  border: 1px solid var(--rater-hairline-base);
+  border-radius: var(--rater-r-6);
+  padding: 6px 12px;
+  font-family: inherit;
+  font-size: var(--rater-t-12, 12px);
+  color: var(--rater-text-default);
+  cursor: pointer;
+}
+
+.rater-modifier-editor__btn:hover {
+  background: var(--rater-surface-3);
+  border-color: var(--rater-hairline-strong);
+}
+
+.rater-modifier-editor__btn:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: 1px;
+}
+
+.rater-modifier-editor__btn.is-primary {
+  background: var(--rater-cat-math);
+  border-color: var(--rater-cat-math);
+  color: var(--rater-surface-canvas);
+  margin-left: auto;
+  font-weight: var(--rater-fw-medium);
+}
+
+.rater-modifier-editor__btn.is-primary:hover {
+  background: color-mix(in srgb, var(--rater-cat-math) 80%, white);
+}
+
+.rater-modifier-editor__btn.is-primary:disabled,
+.rater-modifier-editor__btn.is-primary[aria-disabled="true"] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── Phase H.6 — Model mode (Brief 41 + ModifierModelKind) ─────── */
+
+/* The kind glyph can be either typographic (±, ×, π) or a lucide
+   icon (Brain). The icon variant centers + sizes its inner SVG to
+   match the typographic glyph's visual weight. */
+.rater-modifier-editor__kind-glyph.is-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: currentColor;
+}
+
+/* Side-by-side field pair — used for {model_id, version} and
+   {clamp_min, clamp_max} so two related inputs sit on one row. */
+.rater-modifier-editor__field--pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--rater-s-12);
+}
+
+.rater-modifier-editor__field-col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-4);
+}
+
+.rater-modifier-editor__field-label.is-compact {
+  font-size: var(--rater-t-10, 10px);
+  text-transform: uppercase;
+  letter-spacing: var(--rater-tracking-label);
+  color: var(--rater-text-subtle);
+}
+
+/* Declared inputs table — borrows the schedule-cat aesthetic but
+   simpler (one cell + remove). */
+.rater-modifier-editor__model-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-8);
+}
+
+.rater-modifier-editor__model-input-row {
+  display: grid;
+  grid-template-columns: 1fr 28px;
+  gap: var(--rater-s-8);
+  align-items: center;
+}
+
+/* Multi-line rationale — matches input styling but auto-grows. */
+.rater-modifier-editor__textarea {
+  width: 100%;
+  background: var(--rater-surface-1);
+  border: 1px solid var(--rater-hairline-strong);
+  border-radius: var(--rater-r-6);
+  padding: 8px 10px;
+  font: inherit;
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-13, 13px);
+  color: var(--rater-text-default);
+  resize: vertical;
+  min-height: 64px;
+}
+
+.rater-modifier-editor__textarea:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: 1px;
+  border-color: var(--rater-cat-math);
+}

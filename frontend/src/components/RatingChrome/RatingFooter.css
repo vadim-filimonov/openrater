@@ -1,0 +1,77 @@
+/* <RatingFooter> — Brief 82 D-D: the state of the build, always in view. */
+
+.rater-rating-footer {
+  position: sticky;
+  bottom: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-12);
+  padding: var(--rater-s-10) var(--rater-s-24);
+  background: color-mix(in srgb, var(--rater-surface-canvas) 92%, transparent);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid var(--rater-hairline-base);
+}
+
+.rater-rating-footer__chips {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-8);
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.rater-rating-footer__chip {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--rater-s-6);
+  border: 1px solid var(--rater-hairline-subtle);
+  border-radius: var(--rater-r-8);
+  background: none;
+  padding: var(--rater-s-2) var(--rater-s-10);
+  font: inherit;
+  font-size: var(--rater-t-12);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.rater-rating-footer__chip b {
+  font-weight: var(--rater-fw-medium);
+  color: var(--rater-text-default);
+}
+.rater-rating-footer__chip small {
+  font-size: var(--rater-t-11);
+  color: var(--rater-text-faint);
+}
+.rater-rating-footer__chip:hover {
+  background: var(--rater-surface-2);
+}
+.rater-rating-footer__chip:hover b {
+  color: var(--rater-text-strong);
+}
+.rater-rating-footer__chip:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: 2px;
+}
+
+.rater-rating-footer__state {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-8);
+  font-size: var(--rater-t-12);
+  color: var(--rater-feedback-success);
+  white-space: nowrap;
+}
+.rater-rating-footer__state i {
+  width: 6px;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--rater-feedback-success);
+  display: inline-block;
+}
+.rater-rating-footer__state.is-blocked {
+  color: var(--rater-feedback-warn);
+}
+.rater-rating-footer__state.is-blocked i {
+  background: var(--rater-feedback-warn);
+}

@@ -1,0 +1,196 @@
+/* ============================================================================
+ * <PlanCompareView> + <CompareTree>
+ *
+ * Header (A vs B sides + mode + sample) → summary chip → optional
+ * divergence callout → one or more CompareTree groupings (each with
+ * a title).
+ * ============================================================================ */
+
+.rater-plan-compare-view {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-12);
+  font-family: var(--rater-fonts-sans);
+}
+
+.rater-plan-compare-view__empty {
+  margin: 0;
+  padding: var(--rater-s-16);
+  color: var(--rater-text-muted);
+  font-style: italic;
+  text-align: center;
+}
+
+/* ── Header ─────────────────────────────────────────────────── */
+
+.rater-plan-compare-view__header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-6);
+  padding-bottom: var(--rater-s-10);
+  border-bottom: 1px solid var(--rater-border-subtle);
+}
+
+.rater-plan-compare-view__sides {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-10);
+  flex-wrap: wrap;
+}
+
+.rater-plan-compare-view__side-label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-6);
+  color: var(--rater-text-strong);
+  font-size: var(--rater-t-14);
+  font-weight: var(--rater-fw-semibold);
+}
+
+.rater-plan-compare-view__side-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: var(--rater-r-full);
+  background: var(--rater-surface-3);
+  color: var(--rater-text-strong);
+  font-size: var(--rater-t-11, var(--rater-t-12));
+  font-weight: var(--rater-fw-semibold);
+  flex-shrink: 0;
+}
+
+.rater-plan-compare-view__side-version {
+  color: var(--rater-text-muted);
+  font-family: var(--rater-fonts-mono, var(--rater-fonts-sans));
+  font-size: var(--rater-t-12);
+  font-weight: var(--rater-fw-regular);
+}
+
+.rater-plan-compare-view__side-vs {
+  color: var(--rater-text-subtle);
+  font-size: var(--rater-t-16);
+  user-select: none;
+}
+
+.rater-plan-compare-view__meta {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-12);
+  color: var(--rater-text-muted);
+  font-size: var(--rater-t-12);
+  font-family: var(--rater-fonts-sans);
+}
+
+.rater-plan-compare-view__mode {
+  font-variant-numeric: tabular-nums;
+  text-transform: lowercase;
+}
+
+.rater-plan-compare-view__sample {
+  font-style: italic;
+}
+
+/* ── Summary + divergence ───────────────────────────────────── */
+
+.rater-plan-compare-view__summary {
+  display: inline-flex;
+  align-items: center;
+}
+
+.rater-plan-compare-view__divergence {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-6);
+  padding: var(--rater-s-6) var(--rater-s-10);
+  border-radius: var(--rater-r-6);
+  background: color-mix(in srgb, var(--rater-focus-ring) 8%, var(--rater-surface-1));
+  border: 1px solid color-mix(in srgb, var(--rater-focus-ring) 30%, transparent);
+  color: var(--rater-text-strong);
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-12);
+  font-weight: var(--rater-fw-medium);
+  width: fit-content;
+}
+
+.rater-plan-compare-view__divergence-id {
+  font-family: var(--rater-fonts-mono, var(--rater-fonts-sans));
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-strong);
+  background: var(--rater-surface-canvas);
+  padding: 1px var(--rater-s-4);
+  border-radius: var(--rater-r-2);
+  border: 1px solid var(--rater-border-subtle);
+}
+
+/* ── Trees ──────────────────────────────────────────────────── */
+
+.rater-plan-compare-view__tree {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-16);
+}
+
+.rater-compare-tree {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-4);
+}
+
+.rater-compare-tree__group-title {
+  margin: 0;
+  color: var(--rater-text-muted);
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-12);
+  font-weight: var(--rater-fw-semibold);
+  text-transform: uppercase;
+  letter-spacing: var(--rater-tracking-label);
+}
+
+.rater-compare-tree__rows {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.rater-compare-tree__collapsed {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  margin: 0;
+  cursor: pointer;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-6);
+  padding: var(--rater-s-4) var(--rater-s-8);
+  border-radius: var(--rater-r-4);
+  color: var(--rater-text-muted);
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-12);
+  font-weight: var(--rater-fw-regular);
+  line-height: var(--rater-lh-snug);
+  width: 100%;
+  transition: background var(--rater-d-80) var(--rater-ease-soft);
+}
+
+.rater-compare-tree__collapsed:hover {
+  background: var(--rater-surface-2);
+  color: var(--rater-text-default);
+}
+
+.rater-compare-tree__collapsed:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: 1px;
+}
+
+.rater-compare-tree__collapsed-label {
+  color: var(--rater-text-default);
+  font-weight: var(--rater-fw-medium);
+}
+
+.rater-compare-tree__collapsed-hint {
+  color: var(--rater-text-subtle);
+  font-style: italic;
+}

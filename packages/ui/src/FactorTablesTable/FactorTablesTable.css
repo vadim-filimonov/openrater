@@ -1,0 +1,177 @@
+/* ============================================================================
+ * <FactorTablesTable> — table view of registered factor tables.
+ * Read-only for M4.5; optional onEdit / onDelete callbacks render
+ * pencil + trash actions on each row.
+ *
+ * Mirrors <DimensionsTable>'s styles — same density + two-line name
+ * cell (display_name + optional description).
+ * ============================================================================ */
+
+.rater-factor-tables-table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid var(--rater-hairline-base);
+  border-radius: var(--rater-r-12);
+  background: var(--rater-surface-1);
+  font-family: var(--rater-fonts-sans);
+  overflow: hidden;
+}
+
+/* ── Header ─────────────────────────────────────────────────────── */
+
+.rater-factor-tables-table__th {
+  padding: var(--rater-s-10) var(--rater-s-14);
+  text-align: left;
+  font-size: var(--rater-t-11);
+  font-weight: var(--rater-fw-semibold);
+  text-transform: uppercase;
+  letter-spacing: var(--rater-tracking-label);
+  color: var(--rater-text-muted);
+  background: var(--rater-surface-canvas);
+  border-bottom: 1px solid var(--rater-hairline-base);
+}
+
+.rater-factor-tables-table__th--actions {
+  width: 80px;
+}
+
+/* ── Rows + cells ───────────────────────────────────────────────── */
+
+.rater-factor-tables-table__row {
+  height: 40px;
+  border-bottom: 1px solid var(--rater-hairline-subtle);
+  transition: background var(--rater-d-80) var(--rater-ease-snap);
+}
+
+.rater-factor-tables-table__row:last-child {
+  border-bottom: 0;
+}
+
+.rater-factor-tables-table__row:hover {
+  background: var(--rater-row-hover-bg);
+}
+
+.rater-factor-tables-table__cell {
+  padding: var(--rater-s-10) var(--rater-s-14);
+  font-size: var(--rater-t-13);
+  color: var(--rater-text-strong);
+  vertical-align: middle;
+}
+
+.rater-factor-tables-table__cell--name {
+  min-width: 160px;
+}
+
+.rater-factor-tables-table__name {
+  font-weight: var(--rater-fw-medium);
+}
+
+.rater-factor-tables-table__description {
+  margin-top: 2px;
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-muted);
+  line-height: var(--rater-lh-relaxed);
+}
+
+.rater-factor-tables-table__cell--mono {
+  font-family: var(--rater-fonts-mono, var(--rater-fonts-sans));
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-muted);
+}
+
+.rater-factor-tables-table__muted {
+  color: var(--rater-text-faint);
+  font-style: italic;
+}
+
+/* ── Type chip ──────────────────────────────────────────────────── */
+
+.rater-factor-tables-table__type-chip {
+  display: inline-block;
+  padding: 2px var(--rater-s-6);
+  background: var(--rater-surface-sunken);
+  border-radius: var(--rater-r-4);
+  font-size: var(--rater-t-11);
+  text-transform: uppercase;
+  letter-spacing: var(--rater-tracking-label);
+  color: var(--rater-text-strong);
+  font-family: var(--rater-fonts-mono, var(--rater-fonts-sans));
+}
+
+/* ── Actions ────────────────────────────────────────────────────── */
+
+.rater-factor-tables-table__cell--actions {
+  text-align: right;
+}
+
+.rater-factor-tables-table__action-group {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-2);
+  justify-content: flex-end;
+}
+
+
+
+/* ── Brief 67 — catalog columns ─────────────────────────────────── */
+
+/* The name doubles as the row's accessible OPEN affordance. */
+.rater-factor-tables-table__name-btn {
+  display: inline-block;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-weight: var(--rater-fw-medium);
+  color: var(--rater-text-strong);
+  text-align: left;
+  cursor: pointer;
+  border-radius: var(--rater-r-4);
+}
+
+.rater-factor-tables-table__name-btn:hover {
+  color: var(--rater-accent-primary);
+}
+
+.rater-factor-tables-table__name-btn:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: 2px;
+}
+
+.rater-factor-tables-table__row--openable {
+  cursor: pointer;
+}
+
+.rater-factor-tables-table__secondary {
+  margin-top: 2px;
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-muted);
+  line-height: var(--rater-lh-relaxed);
+}
+
+.rater-factor-tables-table__slug {
+  font-family: var(--rater-fonts-mono, var(--rater-fonts-sans));
+  font-size: var(--rater-t-11);
+}
+
+.rater-factor-tables-table__th--num,
+.rater-factor-tables-table__cell--num {
+  text-align: right;
+}
+
+.rater-factor-tables-table__cell--num {
+  font-family: var(--rater-fonts-mono, var(--rater-fonts-sans));
+  font-size: var(--rater-t-12);
+  font-variant-numeric: tabular-nums;
+}
+
+/* The delete action reveals on row hover/focus — a catalog of filed
+   artifacts should not read as a row of red warnings at rest. */
+.rater-factor-tables-table__row .rater-factor-tables-table__action-group {
+  opacity: 0;
+  transition: opacity var(--rater-d-80) var(--rater-ease-snap);
+}
+.rater-factor-tables-table__row:hover .rater-factor-tables-table__action-group,
+.rater-factor-tables-table__row:focus-within .rater-factor-tables-table__action-group {
+  opacity: 1;
+}

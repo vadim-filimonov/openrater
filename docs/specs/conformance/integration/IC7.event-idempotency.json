@@ -1,0 +1,96 @@
+{
+ "id": "IC7",
+ "name": "event-idempotency",
+ "spec": "§5 rule 1",
+ "asserts": "Replaying an event batch is always safe: the second delivery of the same event_id acks as duplicate and writes nothing — the ledger holds exactly one row per event_id.",
+ "contract_version": "1.0",
+ "world": {
+  "integration": {
+   "name": "Example Integrator — fixture",
+   "paired": true
+  },
+  "plans": [
+   "plan-alpha"
+  ]
+ },
+ "steps": [
+  {
+   "note": "first delivery — applied",
+   "actor": "integrator",
+   "call": {
+    "method": "POST",
+    "path": "/api/v1/integrations/{{integration_id}}/events",
+    "headers": {
+     "X-OpenRater-Integration-Key": "{{integrator_key}}"
+    },
+    "body": {
+     "events": [
+      {
+       "event_id": "pe-fixture-0001",
+       "risk_ref": "r-fixture-0005",
+       "carrier": "acme-mutual",
+       "kind": "quoted",
+       "at": "2026-08-02T17:04:00Z",
+       "premium_cents": 473100,
+       "quote_pins": {
+        "plan_ref": "{{plan_alpha_ref}}",
+        "snapshot_id": "{{plan_alpha_snapshot}}",
+        "request_hash": "sha256:ic7-fixture"
+       }
+      }
+     ]
+    }
+   },
+   "expect": {
+    "status": 202,
+    "body": {
+     "acks": [
+      {
+       "event_id": "pe-fixture-0001",
+       "status": "applied"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "note": "identical replay — duplicate, not error, not a second row",
+   "actor": "integrator",
+   "call": {
+    "method": "POST",
+    "path": "/api/v1/integrations/{{integration_id}}/events",
+    "headers": {
+     "X-OpenRater-Integration-Key": "{{integrator_key}}"
+    },
+    "body": {
+     "events": [
+      {
+       "event_id": "pe-fixture-0001",
+       "risk_ref": "r-fixture-0005",
+       "carrier": "acme-mutual",
+       "kind": "quoted",
+       "at": "2026-08-02T17:04:00Z",
+       "premium_cents": 473100,
+       "quote_pins": {
+        "plan_ref": "{{plan_alpha_ref}}",
+        "snapshot_id": "{{plan_alpha_snapshot}}",
+        "request_hash": "sha256:ic7-fixture"
+       }
+      }
+     ]
+    }
+   },
+   "expect": {
+    "status": 202,
+    "body": {
+     "acks": [
+      {
+       "event_id": "pe-fixture-0001",
+       "status": "duplicate"
+      }
+     ]
+    }
+   }
+  }
+ ]
+}

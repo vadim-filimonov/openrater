@@ -1,0 +1,77 @@
+/* ============================================================================
+ * <EmptyState> — Polish PR 5.
+ *
+ * Canonical empty-state pattern. Vertical stack:
+ *   hero icon (24px, muted) → title (t-16) → description (t-13 muted) →
+ *   actions (any) → cue (t-11 muted).
+ *
+ * Center-aligned text; the surface itself is layout-neutral — the
+ * consumer wraps it in a flex / grid context that decides how it sits
+ * inside the workspace (centered vertically, top-anchored, etc).
+ * ========================================================================== */
+
+.rater-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--rater-s-8);
+  padding: var(--rater-s-32) var(--rater-s-24);
+  max-width: 480px;
+  margin: 0 auto;
+  color: var(--rater-text-default);
+}
+
+.rater-empty-state__hero {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--rater-r-full);
+  background: var(--rater-surface-2);
+  color: var(--rater-text-subtle);
+  margin-bottom: var(--rater-s-4);
+}
+
+.rater-empty-state__title {
+  margin: 0;
+  font-family: var(--rater-font-display);
+  font-size: var(--rater-t-16);
+  font-weight: var(--rater-fw-semibold);
+  letter-spacing: var(--rater-tracking-tight);
+  line-height: var(--rater-leading-snug);
+  color: var(--rater-text-strong);
+}
+
+.rater-empty-state__description {
+  margin: 0;
+  font-size: var(--rater-t-13);
+  line-height: var(--rater-leading-relaxed);
+  color: var(--rater-text-muted);
+  max-width: 38ch;
+}
+
+.rater-empty-state__actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--rater-s-8);
+  margin-top: var(--rater-s-8);
+  flex-wrap: wrap;
+}
+
+.rater-empty-state__cue {
+  margin: var(--rater-s-4) 0 0;
+  font-size: var(--rater-t-11);
+  color: var(--rater-text-subtle);
+  letter-spacing: 0;
+}
+
+.rater-empty-state__cue strong,
+.rater-empty-state__cue code {
+  color: var(--rater-text-default);
+  font-weight: var(--rater-fw-semibold);
+  font-family: inherit;
+  background: transparent;
+}

@@ -1,0 +1,47 @@
+/**
+ * Brief 64 PR 64.4 — <StalenessBanner> styles. Non-blocking amber notice.
+ */
+
+.rater-staleness {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-2, 8px);
+  background: var(--rater-feedback-warn-bg);
+  border: 1px solid var(--rater-feedback-warn);
+  border-radius: var(--rater-r-8, 8px);
+  padding: var(--rater-s-2, 9px) var(--rater-s-3, 13px);
+  font-size: var(--rater-t-13, 12.5px);
+  color: var(--rater-text-strong);
+}
+
+.rater-staleness__icon {
+  flex: none;
+  color: var(--rater-feedback-warn);
+}
+
+.rater-staleness__text {
+  flex: 1;
+  min-width: 0;
+}
+
+.rater-staleness__action {
+  flex: none;
+  background: none;
+  border: none;
+  color: var(--rater-text-muted);
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-13, 12.5px);
+  font-weight: var(--rater-fw-semibold);
+  cursor: pointer;
+  padding: 0;
+}
+
+.rater-staleness__action:hover {
+  text-decoration: underline;
+}
+
+.rater-staleness__action:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--rater-focus-ring);
+  border-radius: var(--rater-r-4, 4px);
+}

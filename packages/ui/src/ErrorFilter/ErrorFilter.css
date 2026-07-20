@@ -1,0 +1,88 @@
+/* ============================================================================
+ * <ErrorFilter> — three-axis multi-select filter chips.
+ * ============================================================================ */
+
+.rater-error-filter {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-10);
+  padding: var(--rater-s-12) var(--rater-s-14);
+  border-bottom: 1px solid var(--rater-border-subtle);
+  background: var(--rater-surface-canvas);
+}
+
+.rater-error-filter__row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--rater-s-10);
+}
+
+.rater-error-filter__row-label {
+  flex-shrink: 0;
+  width: 64px;
+  padding-top: var(--rater-s-4);
+  color: var(--rater-text-muted);
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-12);
+  font-weight: var(--rater-fw-medium);
+  text-transform: uppercase;
+  letter-spacing: var(--rater-tracking-label);
+}
+
+.rater-error-filter__row-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--rater-s-4);
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* ── Source + section chips (severity uses IssueSeverityChip) ─── */
+
+.rater-error-filter__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-4);
+  padding: var(--rater-s-4) var(--rater-s-8);
+  border-radius: var(--rater-r-full);
+  border: 1px solid var(--rater-border-default);
+  background: var(--rater-surface-1);
+  color: var(--rater-text-default);
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-12);
+  font-weight: var(--rater-fw-medium);
+  cursor: pointer;
+  user-select: none;
+  margin: 0;
+
+  transition:
+    background var(--rater-d-80) var(--rater-ease-soft),
+    border-color var(--rater-d-80) var(--rater-ease-soft),
+    color var(--rater-d-80) var(--rater-ease-soft);
+}
+
+.rater-error-filter__chip:hover {
+  border-color: var(--rater-border-strong);
+  color: var(--rater-text-strong);
+}
+
+.rater-error-filter__chip:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: 2px;
+}
+
+.rater-error-filter__chip--active {
+  background: var(--rater-surface-3);
+  border-color: var(--rater-text-strong);
+  color: var(--rater-text-strong);
+}
+
+.rater-error-filter__chip-count {
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-muted);
+}
+
+.rater-error-filter__chip--active .rater-error-filter__chip-count {
+  color: var(--rater-text-strong);
+}

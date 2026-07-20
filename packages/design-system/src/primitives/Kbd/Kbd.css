@@ -1,0 +1,25 @@
+.rater-kbd {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-2);
+  font-family: var(--rater-font-mono);
+  font-size: var(--rater-t-10);
+  line-height: 1;
+  vertical-align: middle;
+}
+
+.rater-kbd__key {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 var(--rater-s-4);
+  background: var(--rater-surface-2);
+  border: 1px solid var(--rater-border-default);
+  border-radius: var(--rater-r-4);
+  color: var(--rater-text-muted);
+  font-weight: var(--rater-fw-medium);
+  text-transform: uppercase;
+  letter-spacing: var(--rater-tracking-mono);
+}

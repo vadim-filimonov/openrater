@@ -1,0 +1,93 @@
+/* <RatingInlineGrid> — Brief 82 R2: the in-row table editor. */
+
+.rater-rigrid {
+  width: 100%;
+}
+
+.rater-rigrid__scroll {
+  max-height: 380px;
+  overflow: auto;
+  border: 1px solid var(--rater-hairline-subtle);
+  border-radius: var(--rater-r-8);
+  background: var(--rater-surface-canvas);
+}
+
+.rater-rigrid__table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.rater-rigrid__corner,
+.rater-rigrid__colhead {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--rater-surface-1);
+  font-size: var(--rater-t-10);
+  font-weight: var(--rater-fw-semibold);
+  letter-spacing: var(--rater-tracking-label);
+  text-transform: uppercase;
+  color: var(--rater-text-faint);
+  text-align: right;
+  padding: var(--rater-s-6) var(--rater-s-10);
+  border-bottom: 1px solid var(--rater-hairline-subtle);
+  white-space: nowrap;
+}
+
+.rater-rigrid__corner {
+  text-align: left;
+  left: 0;
+  z-index: 3;
+}
+
+.rater-rigrid__rowhead {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  background: var(--rater-surface-canvas);
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-muted);
+  padding: 0 var(--rater-s-10);
+  border-bottom: 1px solid var(--rater-hairline-subtle);
+  white-space: nowrap;
+}
+
+.rater-rigrid__cell {
+  padding: 0;
+  border-bottom: 1px solid var(--rater-hairline-subtle);
+  border-left: 1px solid var(--rater-hairline-soft, var(--rater-hairline-subtle));
+  min-width: 88px;
+}
+
+.rater-rigrid__table tr:last-child .rater-rigrid__cell,
+.rater-rigrid__table tr:last-child .rater-rigrid__rowhead {
+  border-bottom: 0;
+}
+
+.rater-rigrid__input {
+  width: 100%;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-family: var(--rater-fonts-mono, var(--rater-fonts-sans));
+  font-variant-numeric: tabular-nums;
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-default);
+  text-align: right;
+  padding: var(--rater-s-6) var(--rater-s-10);
+  outline: none;
+}
+.rater-rigrid__input:focus-visible {
+  background: var(--rater-surface-2);
+  color: var(--rater-text-strong);
+}
+.rater-rigrid__input:disabled {
+  color: var(--rater-text-muted);
+}
+
+.rater-rigrid__foot {
+  margin: var(--rater-s-6) 0 0;
+  font-size: var(--rater-t-11);
+  color: var(--rater-text-faint);
+  font-family: var(--rater-fonts-mono, var(--rater-fonts-sans));
+}

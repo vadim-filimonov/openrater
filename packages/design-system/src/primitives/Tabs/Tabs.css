@@ -1,0 +1,104 @@
+/* ============================================================================
+ * <Tabs> — ARIA-pattern tab navigation.
+ *
+ * Underline-style triggers (the active tab has a colored accent under
+ * its label). Density: compact (chip-row use cases) feel via the type
+ * scale + tight padding.
+ *
+ * The trigger uses display:inline-flex + gap so consumers can drop
+ * counts/icons in the children without manual layout work
+ *   (<Tabs.Trigger value="errors">⊖ 3 errors</Tabs.Trigger> reads
+ *   cleanly).
+ * ============================================================================ */
+
+.rater-tabs {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.rater-tabs__list {
+  display: flex;
+  align-items: stretch;
+  gap: var(--rater-s-2);
+  border-bottom: 1px solid var(--rater-border-subtle);
+  padding: 0;
+  /* Allow long tablists to scroll horizontally on narrow viewports
+     without forcing a wrap (which breaks the underline alignment). */
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.rater-tabs__trigger {
+  /* Reset native button */
+  appearance: none;
+  background: transparent;
+  border: 0;
+  margin: 0;
+  cursor: pointer;
+  user-select: none;
+
+  /* Layout */
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-6);
+  padding: var(--rater-s-10) var(--rater-s-12);
+  white-space: nowrap;
+
+  /* Type */
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-13);
+  font-weight: var(--rater-fw-medium);
+  line-height: var(--rater-lh-snug);
+  color: var(--rater-text-muted);
+
+  /* Underline accent — collapsed-to-transparent on inactive */
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px; /* overlap the list's bottom border so accent aligns */
+
+  /* Motion */
+  transition:
+    color var(--rater-d-140) var(--rater-ease-soft),
+    border-color var(--rater-d-140) var(--rater-ease-soft),
+    background var(--rater-d-80) var(--rater-ease-soft);
+}
+
+.rater-tabs__trigger:hover {
+  color: var(--rater-text-default);
+  background: var(--rater-surface-2);
+  border-radius: var(--rater-r-4) var(--rater-r-4) 0 0;
+}
+
+.rater-tabs__trigger:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: -2px;
+  border-radius: var(--rater-r-4) var(--rater-r-4) 0 0;
+}
+
+.rater-tabs__trigger--selected {
+  color: var(--rater-text-strong);
+  border-bottom-color: var(--rater-focus-ring);
+}
+
+.rater-tabs__trigger--selected:hover {
+  /* Active triggers don't change background on hover — already prominent */
+  background: transparent;
+}
+
+.rater-tabs__trigger[disabled] {
+  color: var(--rater-text-disabled);
+  cursor: not-allowed;
+}
+
+.rater-tabs__panel {
+  /* Panels are full-bleed below the tablist. The tab list itself owns
+     the bottom border; the panel just gets vertical breathing room. */
+  padding-block: var(--rater-s-12);
+  outline: none; /* focus is handled by focus-visible on triggers */
+}
+
+.rater-tabs__panel:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: 2px;
+  border-radius: var(--rater-r-4);
+}

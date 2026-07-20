@@ -1,0 +1,244 @@
+{
+  "id": "IC18",
+  "name": "pinned-rerate",
+  "spec": "\u00a74.6",
+  "asserts": "pins {plan_ref, snapshot_id} collapse the fan-out to ONE plan at ONE frozen version: after the plan's live version moves on (and drift demotes unpinned serving, IC11), a pin to the inception snapshot still returns the inception computation \u2014 Law 1 extended through time. The member pins kind 'snapshot' + the pinned id; an unknown pin is a NAMED issue with zero members, never a 4xx (Law 2).",
+  "contract_version": "1.0",
+  "world": {
+    "integration": {
+      "name": "PAS \u2014 fixture",
+      "paired": true
+    },
+    "plans": [
+      "plan-alpha"
+    ]
+  },
+  "steps": [
+    {
+      "note": "baseline \u2014 the v1 fan-out answer (the number the placement pinned)",
+      "actor": "integrator",
+      "call": {
+        "method": "POST",
+        "path": "/api/v1/integrations/{{integration_id}}/quote-set",
+        "headers": {
+          "X-OpenRater-Integration-Key": "{{integrator_key}}"
+        },
+        "body": {
+          "risk_ref": "risk_01981e6e-7c2a-7f3b-9d41-a2b6c9e0f418",
+          "request_hash": "sha256:ic18-inception",
+          "effective_date": "2026-09-01",
+          "trace": "none",
+          "facts": {
+            "rest.gross_receipts": 250000,
+            "property.tiv": 1200000,
+            "property.construction": "JM"
+          }
+        }
+      },
+      "expect": {
+        "status": 200,
+        "body": {
+          "quotes": [
+            {
+              "carrier": "acme-mutual",
+              "row_status": "ok",
+              "premium": 4731,
+              "version": {
+                "kind": "published",
+                "snapshot_id": {
+                  "$same": "plan_alpha_snapshot"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "note": "operator amends the draft \u2014 v2's body will price differently",
+      "actor": "operator",
+      "call": {
+        "method": "POST",
+        "path": "/api/v1/drafts/{{plan_alpha_id}}/stages",
+        "body": {
+          "stage_id": "pinned_rerate_probe",
+          "stage_kind": "formula",
+          "display_name": "IC18 version discriminator",
+          "config_json": {
+            "name": "probe",
+            "expression": "1.0"
+          },
+          "insert_after_stage_id": "$last",
+          "inputs": [],
+          "outputs": [
+            {
+              "output_name": "value",
+              "data_type": "number",
+              "description": null
+            }
+          ]
+        }
+      },
+      "expect": {
+        "status": 201
+      }
+    },
+    {
+      "note": "operator freezes + publishes v2 \u2014 the live version moves on",
+      "actor": "operator",
+      "call": {
+        "method": "POST",
+        "path": "/api/v1/plans/{{plan_alpha_id}}/snapshots",
+        "body": {
+          "display_name": "v2",
+          "notes": "IC18 \u2014 the world after inception"
+        }
+      },
+      "expect": {
+        "status": 201,
+        "body": {
+          "snapshot_id": {
+            "$type": "string"
+          }
+        }
+      },
+      "capture": {
+        "alpha_v2": "$.snapshot_id"
+      }
+    },
+    {
+      "actor": "operator",
+      "call": {
+        "method": "PATCH",
+        "path": "/api/v1/plans/{{plan_alpha_id}}/snapshots/{{alpha_v2}}/publish"
+      },
+      "expect": {
+        "status": 200
+      }
+    },
+    {
+      "note": "unpinned serving is drift-demoted (IC11 semantics) \u2014 the pin is now the ONLY path to a premium",
+      "actor": "integrator",
+      "call": {
+        "method": "POST",
+        "path": "/api/v1/integrations/{{integration_id}}/quote-set",
+        "headers": {
+          "X-OpenRater-Integration-Key": "{{integrator_key}}"
+        },
+        "body": {
+          "risk_ref": "risk_01981e6e-7c2a-7f3b-9d41-a2b6c9e0f418",
+          "effective_date": "2026-09-01",
+          "trace": "none",
+          "facts": {
+            "rest.gross_receipts": 250000,
+            "property.tiv": 1200000,
+            "property.construction": "JM"
+          }
+        }
+      },
+      "expect": {
+        "status": 200,
+        "body": {
+          "quotes": {
+            "$empty": true
+          },
+          "issues": {
+            "$contains": [
+              {
+                "code": "live_version_untested",
+                "carrier": "acme-mutual"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "note": "the pinned re-rate \u2014 inception snapshot, inception computation, byte-equal premium",
+      "actor": "integrator",
+      "call": {
+        "method": "POST",
+        "path": "/api/v1/integrations/{{integration_id}}/quote-set",
+        "headers": {
+          "X-OpenRater-Integration-Key": "{{integrator_key}}"
+        },
+        "body": {
+          "risk_ref": "risk_01981e6e-7c2a-7f3b-9d41-a2b6c9e0f418",
+          "request_hash": "sha256:ic18-endorsement-what-if",
+          "effective_date": "2026-09-01",
+          "trace": "none",
+          "facts": {
+            "rest.gross_receipts": 250000,
+            "property.tiv": 1200000,
+            "property.construction": "JM"
+          },
+          "pins": {
+            "plan_ref": "{{plan_alpha_ref}}",
+            "snapshot_id": "{{plan_alpha_snapshot}}"
+          }
+        }
+      },
+      "expect": {
+        "status": 200,
+        "body": {
+          "quotes": [
+            {
+              "carrier": "acme-mutual",
+              "row_status": "ok",
+              "premium": 4731,
+              "version": {
+                "kind": "snapshot",
+                "snapshot_id": {
+                  "$same": "plan_alpha_snapshot"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "note": "an unknown pinned snapshot is a NAMED issue + zero members \u2014 never a 4xx",
+      "actor": "integrator",
+      "call": {
+        "method": "POST",
+        "path": "/api/v1/integrations/{{integration_id}}/quote-set",
+        "headers": {
+          "X-OpenRater-Integration-Key": "{{integrator_key}}"
+        },
+        "body": {
+          "risk_ref": "risk_01981e6e-7c2a-7f3b-9d41-a2b6c9e0f418",
+          "effective_date": "2026-09-01",
+          "trace": "none",
+          "facts": {
+            "rest.gross_receipts": 250000,
+            "property.construction": "JM"
+          },
+          "pins": {
+            "plan_ref": "{{plan_alpha_ref}}",
+            "snapshot_id": "snap_does_not_exist"
+          }
+        }
+      },
+      "expect": {
+        "status": 200,
+        "body": {
+          "quotes": {
+            "$empty": true
+          },
+          "issues": {
+            "$contains": [
+              {
+                "code": "unknown_pin_snapshot",
+                "plan_ref": {
+                  "$same": "plan_alpha_ref"
+                },
+                "snapshot_id": "snap_does_not_exist"
+              }
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

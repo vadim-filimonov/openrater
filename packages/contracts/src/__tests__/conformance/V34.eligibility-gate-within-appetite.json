@@ -1,0 +1,32 @@
+{
+  "name": "V34.eligibility-gate-within-appetite",
+  "description": "A fictional Meridian risk (12,000 sq ft, $300k sales) stays below both synthetic thresholds and receives the default preferred tier.",
+  "plan": {
+    "id": "v34.eligibility_gate_within_appetite",
+    "version": "1.0.0",
+    "name": "Meridian fictional eligibility — floor area + gross sales",
+    "lines": ["bop"],
+    "effective": "2025-10-01",
+    "nodes": [
+      {
+        "id": "gate",
+        "kind": "eligibility.gate",
+        "params": {
+          "rules": [
+            { "rule_id": "floor_area_cap", "variable": "total_floor_area_sqft", "op": "gt", "value": 40000, "tier": "submit", "reasoning": "Floor area exceeds the fictional Meridian 40,000 sq ft referral threshold." },
+            { "rule_id": "gross_sales_cap", "variable": "annual_gross_sales", "op": "gt", "value": 5000000, "tier": "submit", "reasoning": "Annual gross sales exceed the fictional Meridian $5M referral threshold." }
+          ],
+          "default_tier": "preferred",
+          "default_reasoning": "Within the fictional Meridian eligibility rules."
+        },
+        "position": { "x": 0, "y": 0 }
+      },
+      { "id": "out_tier", "kind": "output", "params": { "fieldName": "tier", "fieldType": "string" }, "position": { "x": 200, "y": 0 } }
+    ],
+    "edges": [
+      { "from": { "node": "gate", "port": "tier" }, "to": { "node": "out_tier", "port": "value" } }
+    ]
+  },
+  "externalInputs": { "total_floor_area_sqft": 12000, "annual_gross_sales": 300000 },
+  "expectedOutputs": { "tier": "preferred" }
+}

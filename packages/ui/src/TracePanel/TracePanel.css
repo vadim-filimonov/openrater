@@ -1,0 +1,228 @@
+/* ============================================================================
+ * <TracePanel> + <TraceCascade>
+ *
+ * The audit-grade trace surface. Vertical stack: header (as_of +
+ * duration + featured total) → Outputs section → Cascade section.
+ * No fixed width — flexes to its container so it works both inside
+ * a Drawer (fixed width) and inline in section #13 (full width).
+ * ============================================================================ */
+
+.rater-trace-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-16);
+  font-family: var(--rater-fonts-sans);
+}
+
+/* ── Header ─────────────────────────────────────────────────── */
+
+.rater-trace-panel__header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--rater-s-12);
+  padding-bottom: var(--rater-s-10);
+  border-bottom: 1px solid var(--rater-border-subtle);
+}
+
+.rater-trace-panel__meta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-2);
+}
+
+.rater-trace-panel__as-of {
+  color: var(--rater-text-muted);
+  font-size: var(--rater-t-12);
+  font-weight: var(--rater-fw-medium);
+  text-transform: uppercase;
+  letter-spacing: var(--rater-tracking-label);
+}
+
+.rater-trace-panel__duration {
+  color: var(--rater-text-subtle);
+  font-family: var(--rater-fonts-mono, var(--rater-fonts-sans));
+  font-size: var(--rater-t-11, var(--rater-t-12));
+  font-variant-numeric: tabular-nums;
+}
+
+.rater-trace-panel__total {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--rater-s-2);
+}
+
+.rater-trace-panel__total-label {
+  color: var(--rater-text-muted);
+  font-size: var(--rater-t-12);
+  font-weight: var(--rater-fw-medium);
+  text-transform: capitalize;
+}
+
+.rater-trace-panel__total-value {
+  color: var(--rater-text-strong);
+  font-family: var(--rater-fonts-mono, var(--rater-fonts-sans));
+  font-size: var(--rater-t-20, 20px);
+  font-weight: var(--rater-fw-semibold);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+/* ── Sections ───────────────────────────────────────────────── */
+
+.rater-trace-panel__section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-8);
+}
+
+.rater-trace-panel__section-title {
+  margin: 0;
+  color: var(--rater-text-muted);
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-12);
+  font-weight: var(--rater-fw-semibold);
+  text-transform: uppercase;
+  letter-spacing: var(--rater-tracking-label);
+}
+
+/* ── Outputs list ───────────────────────────────────────────── */
+
+.rater-trace-panel__outputs {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-2);
+  background: var(--rater-surface-canvas);
+  border-radius: var(--rater-r-6);
+  padding: var(--rater-s-8) var(--rater-s-10);
+}
+
+.rater-trace-panel__output-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--rater-s-10);
+  padding: var(--rater-s-4) 0;
+  border-bottom: 1px dashed var(--rater-border-subtle);
+}
+
+.rater-trace-panel__output-row:last-child {
+  border-bottom: 0;
+}
+
+.rater-trace-panel__output-key {
+  color: var(--rater-text-default);
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-13);
+  font-weight: var(--rater-fw-medium);
+}
+
+.rater-trace-panel__output-value {
+  color: var(--rater-text-strong);
+  font-family: var(--rater-fonts-mono, var(--rater-fonts-sans));
+  font-size: var(--rater-t-13);
+  font-weight: var(--rater-fw-semibold);
+  font-variant-numeric: tabular-nums;
+  word-break: break-word;
+}
+
+/* ── Cascade ────────────────────────────────────────────────── */
+
+.rater-trace-panel__cascade {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-6);
+}
+
+/* ── Withheld outputs (ADR-0056 — never a number) ───────────── */
+
+.rater-trace-panel__output-value--withheld {
+  color: var(--rater-text-muted);
+  font-weight: var(--rater-fw-regular);
+  font-style: italic;
+}
+
+/* ── Final adjustments (G4 build-up: subtotal → tail → filed) ─ */
+
+.rater-trace-panel__composed {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-2);
+  background: var(--rater-surface-canvas);
+  border-radius: var(--rater-r-6);
+  padding: var(--rater-s-8) var(--rater-s-10);
+}
+
+.rater-trace-panel__composed-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--rater-s-10);
+  padding: var(--rater-s-4) 0;
+  border-bottom: 1px dashed var(--rater-border-subtle);
+}
+
+.rater-trace-panel__composed-row:last-child {
+  border-bottom: 0;
+}
+
+.rater-trace-panel__composed-row--skipped {
+  opacity: 0.6;
+}
+
+.rater-trace-panel__composed-row--total {
+  border-top: 1px solid var(--rater-border-subtle);
+  border-bottom: 0;
+  margin-top: var(--rater-s-2);
+  padding-top: var(--rater-s-6);
+}
+
+.rater-trace-panel__composed-row--total .rater-trace-panel__composed-label,
+.rater-trace-panel__composed-row--total .rater-trace-panel__composed-value {
+  color: var(--rater-text-strong);
+  font-weight: var(--rater-fw-semibold);
+}
+
+.rater-trace-panel__composed-label {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-2);
+  color: var(--rater-text-default);
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-13);
+  font-weight: var(--rater-fw-medium);
+  text-transform: capitalize;
+}
+
+.rater-trace-panel__composed-detail {
+  color: var(--rater-text-muted);
+  font-size: var(--rater-t-12);
+  font-weight: var(--rater-fw-regular);
+  text-transform: none;
+}
+
+.rater-trace-panel__composed-citation {
+  font-size: var(--rater-t-12);
+  text-transform: none;
+}
+
+.rater-trace-panel__composed-value {
+  color: var(--rater-text-strong);
+  font-family: var(--rater-fonts-mono, var(--rater-fonts-sans));
+  font-size: var(--rater-t-13);
+  font-weight: var(--rater-fw-semibold);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* ── Empty state ────────────────────────────────────────────── */
+
+.rater-trace-panel__empty {
+  padding: var(--rater-s-24) var(--rater-s-16);
+  text-align: center;
+  color: var(--rater-text-muted);
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-13);
+  font-style: italic;
+}

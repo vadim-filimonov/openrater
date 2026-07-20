@@ -1,0 +1,46 @@
+/* ============================================================================
+ * <RateImpactBadge> — signed $/% delta chip.
+ *
+ * Color signals direction (red = premium increased, green = decreased,
+ * muted = no change). Mono font + tabular-nums for stable column
+ * alignment when multiple badges stack in a tree.
+ * ============================================================================ */
+
+.rater-rate-impact-badge {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--rater-s-4);
+  padding: 1px var(--rater-s-6);
+  border-radius: var(--rater-r-4);
+  border: 1px solid transparent;
+  font-family: var(--rater-fonts-mono, var(--rater-fonts-sans));
+  font-size: var(--rater-t-12);
+  font-weight: var(--rater-fw-semibold);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0;
+  line-height: var(--rater-lh-snug);
+  user-select: none;
+}
+
+.rater-rate-impact-badge--increase {
+  color: var(--rater-feedback-error);
+  background: color-mix(in srgb, var(--rater-feedback-error) 10%, transparent);
+  border-color: color-mix(in srgb, var(--rater-feedback-error) 25%, transparent);
+}
+
+.rater-rate-impact-badge--decrease {
+  color: var(--rater-feedback-success, var(--rater-cat-math));
+  background: color-mix(in srgb, var(--rater-feedback-success, #10b981) 10%, transparent);
+  border-color: color-mix(in srgb, var(--rater-feedback-success, #10b981) 25%, transparent);
+}
+
+.rater-rate-impact-badge--zero {
+  color: var(--rater-text-subtle);
+  background: transparent;
+  border-color: var(--rater-border-subtle);
+}
+
+.rater-rate-impact-badge__pct {
+  font-weight: var(--rater-fw-regular);
+  opacity: 0.85;
+}

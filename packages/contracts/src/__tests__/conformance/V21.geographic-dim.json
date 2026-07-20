@@ -1,0 +1,40 @@
+{
+  "name": "V21.geographic-dim",
+  "description": "Brief 44 PR 44.1 — geographic dim substrate. A risk with state='WI' rates 1.10 via lookup.direct against a table keyed on the state value. The engine treats `dimension_type='geographic'` identically to a categorical dim at lookup time — Brief 44's geo_* substrate (geo_granularity / geo_scope / geo_territories) is authoring-surface metadata, not new runtime semantics. This fixture proves the engine accepts plans authored with the new substrate and produces deterministic output. STATUS: ✓ runtime-compatible — no engine changes required; UI surfaces (wizard + editor) land in PR 44.2-44.7.",
+  "plan": {
+    "id": "v21.geographic_dim",
+    "version": "1.0.0",
+    "name": "Geographic dim substrate (WI state)",
+    "line": "property",
+    "effective": "2026-01-01",
+    "nodes": [
+      {
+        "id": "in_state",
+        "kind": "input",
+        "params": { "fieldName": "state", "fieldType": "string" },
+        "position": { "x": 0, "y": 0 }
+      },
+      {
+        "id": "lkp_state",
+        "kind": "lookup.direct",
+        "params": {
+          "table": { "WI": 1.10, "MN": 0.95, "IL": 1.05 },
+          "defaultValue": 1.0
+        },
+        "position": { "x": 200, "y": 0 }
+      },
+      {
+        "id": "out_factor",
+        "kind": "output",
+        "params": { "fieldName": "factor", "fieldType": "float" },
+        "position": { "x": 400, "y": 0 }
+      }
+    ],
+    "edges": [
+      { "from": { "node": "in_state",  "port": "value" }, "to": { "node": "lkp_state",  "port": "key"   } },
+      { "from": { "node": "lkp_state", "port": "value" }, "to": { "node": "out_factor", "port": "value" } }
+    ]
+  },
+  "externalInputs": { "state": "WI" },
+  "expectedOutputs": { "factor": 1.10 }
+}

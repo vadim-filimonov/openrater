@@ -1,0 +1,145 @@
+/* ──────────────────────────────────────────────────────────────
+   BarChart — Brief 34 PR 34.1
+
+   SVG bar chart for 1-D categorical factor tables. Each bar is
+   colored by deviation from the baseline (1.0). Strict token-
+   discipline matching the polished mockup Frame 2.
+   ────────────────────────────────────────────────────────────── */
+
+.rater-bar-chart {
+  position: relative;
+  width: 100%;
+  background: var(--rater-surface-1);
+  border-radius: var(--rater-r-8);
+  overflow: hidden;
+}
+.rater-bar-chart-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  font-family: var(--rater-fonts-sans);
+}
+
+/* Empty state */
+.rater-bar-chart--empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 220px;
+  background: var(--rater-surface-canvas);
+  border: 1px dashed var(--rater-hairline-base);
+}
+.rater-bar-chart-empty-text {
+  font-size: 12px;
+  color: var(--rater-text-subtle);
+  font-style: italic;
+}
+
+/* Axes */
+.rater-bar-chart-axis {
+  stroke: var(--rater-hairline-strong);
+  stroke-width: 1;
+}
+
+/* Gridlines */
+.rater-bar-chart-gridline {
+  stroke: var(--rater-hairline-soft);
+  stroke-width: 0.5;
+}
+.rater-bar-chart-gridline.is-baseline {
+  stroke: var(--rater-text-subtle);
+  stroke-dasharray: 3, 3;
+  stroke-width: 1;
+}
+
+/* Axis labels */
+.rater-bar-chart-y-label,
+.rater-bar-chart-x-label {
+  font-family: var(--rater-fonts-mono);
+  font-size: 9px;
+  fill: var(--rater-text-subtle);
+}
+
+/* Bar — Brief 45 PR 45.3 paints inline via `fill={factorGradient()}`.
+   The is-low / is-mid / is-high `data-tint` attribute survives for
+   downstream CSS hooks (e.g. selection-state stripe variants) but
+   no longer drives the fill color. */
+.rater-bar-chart-bar-rect {
+  transition: opacity 80ms ease, transform 220ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.rater-bar-chart-bar.is-focused .rater-bar-chart-bar-rect {
+  opacity: 1;
+  stroke: var(--rater-text-strong);
+  stroke-width: 1.5;
+}
+.rater-bar-chart-bar.is-dimmed .rater-bar-chart-bar-rect {
+  opacity: 0.35;
+}
+
+/* Hover hit-area */
+.rater-bar-chart-hover-area {
+  fill: transparent;
+  cursor: pointer;
+}
+
+/* Value label — PR 45.10: only renders on hover/focus, font shrunk
+   to 8px so it doesn't overpower the bar. Bold + strong color so a
+   single hovered label still reads at the smaller size. */
+.rater-bar-chart-value-label {
+  font-family: var(--rater-fonts-mono);
+  font-size: 8px;
+  font-weight: var(--rater-fw-semibold);
+  fill: var(--rater-text-strong);
+  pointer-events: none;
+  transition: opacity 80ms ease;
+}
+.rater-bar-chart-bar.is-dimmed .rater-bar-chart-value-label {
+  opacity: 0.5;
+}
+
+/* Brief 45 PR 45.3 — "= identity" label at the right end of the
+   baseline gridline. Italic + subtle so it never competes with the
+   data, always present so the actuary doesn't lose the anchor. */
+.rater-bar-chart-identity-label {
+  font-family: var(--rater-fonts-mono);
+  font-size: 9px;
+  font-style: italic;
+  fill: var(--rater-text-subtle);
+  pointer-events: none;
+}
+
+/* Brief 34 PR 34.6 — filed-overlay (compare-to-filed tick markers) */
+.rater-bar-chart-filed-tick {
+  stroke: var(--rater-text-subtle, #71717a);
+  stroke-width: 1.5;
+  stroke-dasharray: 2, 2;
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+/* Brief 34 PR 34.5 — selection + brush */
+.rater-bar-chart-bar.is-selected .rater-bar-chart-bar-rect {
+  stroke: var(--rater-cat-input);
+  stroke-width: 1.5;
+}
+.rater-bar-chart-selection-region {
+  fill: color-mix(in srgb, var(--rater-cat-input) 8%, transparent);
+  pointer-events: none;
+}
+.rater-bar-chart-brush-rect {
+  fill: color-mix(in srgb, var(--rater-cat-input) 12%, transparent);
+  stroke: color-mix(in srgb, var(--rater-cat-input) 60%, transparent);
+  stroke-width: 1;
+  stroke-dasharray: 2, 2;
+}
+.rater-bar-chart[data-brushing="true"] .rater-bar-chart-svg {
+  cursor: crosshair;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .rater-bar-chart-bar-rect,
+  .rater-bar-chart-value-label {
+    transition: none;
+  }
+}

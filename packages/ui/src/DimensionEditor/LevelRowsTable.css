@@ -1,0 +1,375 @@
+/* ============================================================================
+ * <LevelRowsTable> — the level grid, self-styled (Brief 66 §3.1).
+ *
+ * Extracted from the legacy DimensionEditor.css so the primitive dims2
+ * reuses is constitution-native (table DNA: 40px rows, 8/14 cells; warn
+ * rows ride feedback tokens; the drop indicator rides the interaction
+ * accent) and the legacy file can delete at the P5 cutover. Token-only BEM.
+ * ========================================================================== */
+
+.rater-dim-levels {
+  background: var(--rater-surface-canvas);
+  border: 1px solid var(--rater-hairline-soft);
+  border-radius: var(--rater-r-8);
+  overflow: hidden;
+}
+
+.rater-dim-levels__rows {
+  display: flex;
+  flex-direction: column;
+}
+
+.rater-dim-levels__row {
+  display: grid;
+  /* drag · num · id · label · aliases · remove */
+  /* Label is the primary content, so it gets the wider flexible track;
+     aliases (usually empty) take the smaller share. Cold-test N5 — the
+     old 1fr label / 1.4fr aliases split clipped labels like "Arts,
+     Culture & Humanities" while leaving an empty alias field wide. */
+  grid-template-columns: 18px 28px 140px minmax(0, 1.7fr) minmax(0, 1fr) 24px;
+  gap: var(--rater-s-10);
+  align-items: center;
+  min-height: 40px;
+  padding: var(--rater-s-8) var(--rater-s-14);
+  border-bottom: 1px solid var(--rater-hairline-soft);
+  font-size: var(--rater-t-12);
+  background: transparent;
+  transition: background-color var(--rater-d-80) var(--rater-ease-snap);
+}
+
+.rater-dim-levels__row:last-child {
+  border-bottom: none;
+}
+
+.rater-dim-levels__row:hover {
+  background: var(--rater-surface-1);
+}
+
+.rater-dim-levels__row.is-dragging {
+  opacity: 0.5;
+}
+
+.rater-dim-levels__row--placeholder {
+  color: var(--rater-text-subtle);
+  font-style: italic;
+}
+
+.rater-dim-levels__row--placeholder .rater-dim-levels__label,
+.rater-dim-levels__row--placeholder .rater-dim-levels__id {
+  color: var(--rater-text-subtle);
+}
+
+.rater-dim-levels__drag-handle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--rater-text-subtle);
+  cursor: grab;
+  user-select: none;
+}
+
+.rater-dim-levels__drag-handle:active {
+  cursor: grabbing;
+}
+
+.rater-dim-levels__row.is-dragging .rater-dim-levels__drag-handle {
+  cursor: grabbing;
+}
+
+.rater-dim-levels__num {
+  font-family: var(--rater-font-mono);
+  font-size: var(--rater-t-10);
+  color: var(--rater-text-subtle);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.rater-dim-levels__id,
+.rater-dim-levels__label {
+  font-family: var(--rater-font-sans);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--rater-r-4);
+  padding: 2px 6px;
+  min-width: 0;
+  color: var(--rater-text-default);
+}
+
+.rater-dim-levels__id {
+  font-family: var(--rater-font-mono);
+  font-size: var(--rater-t-11);
+  color: var(--rater-text-muted);
+}
+
+.rater-dim-levels__label {
+  font-size: var(--rater-t-13);
+  color: var(--rater-text-default);
+}
+
+.rater-dim-levels__id:hover,
+.rater-dim-levels__label:hover {
+  border-color: var(--rater-hairline-soft);
+}
+
+.rater-dim-levels__id:focus,
+.rater-dim-levels__label:focus {
+  outline: none;
+  border-color: var(--rater-focus-ring);
+  box-shadow: 0 0 0 2px var(--rater-focus-halo);
+  background: var(--rater-surface-canvas);
+  color: var(--rater-text-default);
+}
+
+.rater-dim-levels__label::placeholder {
+  color: var(--rater-text-subtle);
+  font-style: italic;
+}
+
+.rater-dim-levels__aliases {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+}
+
+.rater-dim-levels__aliases > * {
+  width: 100%;
+}
+
+.rater-dim-levels__aliases-placeholder {
+  font-style: italic;
+  color: var(--rater-text-subtle);
+  font-size: var(--rater-t-11);
+}
+
+.rater-dim-levels__remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: var(--rater-r-4);
+  background: transparent;
+  border: none;
+  color: var(--rater-text-subtle);
+  cursor: pointer;
+  transition:
+    background-color var(--rater-d-80) var(--rater-ease-snap),
+    color var(--rater-d-80) var(--rater-ease-snap);
+}
+
+.rater-dim-levels__remove:hover {
+  color: var(--rater-accent-danger-text);
+  background: color-mix(in srgb, var(--rater-accent-danger) 14%, transparent);
+}
+
+.rater-dim-levels__drop-indicator {
+  height: 2px;
+  background: var(--rater-accent-primary);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--rater-accent-primary) 60%, transparent);
+  margin: 0;
+}
+
+/* ── Wave 3 — calm rows: chrome reveals on intent ──────────────────
+ * A 20-level dim used to show 40 permanent grey glyphs (drag handle +
+ * remove per row) plus an always-bordered empty "+ alias" box per row.
+ * All of it now sleeps until the row is hovered or focused; touch
+ * devices (no hover) keep everything visible. Data (real alias chips)
+ * always renders — only CHROME hides. */
+.rater-dim-levels__drag-handle,
+.rater-dim-levels__remove {
+  opacity: 0;
+  transition: opacity var(--rater-d-80) var(--rater-ease-snap);
+}
+.rater-dim-levels__row:hover .rater-dim-levels__drag-handle,
+.rater-dim-levels__row:focus-within .rater-dim-levels__drag-handle,
+.rater-dim-levels__row:hover .rater-dim-levels__remove,
+.rater-dim-levels__row:focus-within .rater-dim-levels__remove {
+  opacity: 1;
+}
+
+/* the empty alias input ghosts: box + placeholder appear on intent */
+.rater-dim-levels__aliases .rater-chip-input__chips {
+  border-color: transparent;
+  background: transparent;
+  transition:
+    border-color var(--rater-d-80) var(--rater-ease-snap),
+    background var(--rater-d-80) var(--rater-ease-snap);
+}
+.rater-dim-levels__aliases .rater-chip-input__input::placeholder {
+  color: transparent;
+  transition: color var(--rater-d-80) var(--rater-ease-snap);
+}
+.rater-dim-levels__row:hover .rater-dim-levels__aliases .rater-chip-input__chips,
+.rater-dim-levels__row:focus-within
+  .rater-dim-levels__aliases
+  .rater-chip-input__chips {
+  border-color: var(--rater-hairline-base);
+  background: var(--rater-surface-1);
+}
+.rater-dim-levels__row:hover
+  .rater-dim-levels__aliases
+  .rater-chip-input__input::placeholder,
+.rater-dim-levels__row:focus-within
+  .rater-dim-levels__aliases
+  .rater-chip-input__input::placeholder {
+  color: var(--rater-text-subtle);
+}
+
+@media (hover: none) {
+  .rater-dim-levels__drag-handle,
+  .rater-dim-levels__remove {
+    opacity: 1;
+  }
+  .rater-dim-levels__aliases .rater-chip-input__chips {
+    border-color: var(--rater-hairline-base);
+    background: var(--rater-surface-1);
+  }
+  .rater-dim-levels__aliases .rater-chip-input__input::placeholder {
+    color: var(--rater-text-subtle);
+  }
+}
+
+/* the just-added row announces itself: a 3px rise + a settle wash */
+.rater-dim-levels__row.is-new {
+  animation:
+    rater-dim-row-in var(--rater-d-140) var(--rater-ease-snap) both,
+    rater-dim-row-settle var(--rater-d-600) var(--rater-ease-float) both;
+}
+@keyframes rater-dim-row-in {
+  from {
+    opacity: 0;
+    transform: translateY(-3px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes rater-dim-row-settle {
+  from {
+    background-color: color-mix(
+      in oklab,
+      var(--rater-accent-primary) 7%,
+      transparent
+    );
+  }
+  to {
+    background-color: transparent;
+  }
+}
+
+/* The add-row is a design-system <Button variant="plain"> now (Shell v3
+ * polish) — these rules only adapt it to its seat at the grid's foot:
+ * left-aligned, squared top corners, a top hairline joining the rows. */
+.rater-dim-levels__add.rater-button {
+  justify-content: flex-start;
+  border-radius: 0 0 var(--rater-r-8) var(--rater-r-8);
+  border-top: 1px solid var(--rater-hairline-soft);
+  font-size: var(--rater-t-12);
+}
+
+/* Brief 30 PR 30.3 — Inline warning row.
+ * Rendered between two adjacent level rows when validation detects
+ * a gap / overlap. The icon + title + detail + fix CTA share the
+ * orange warning palette + match the scrubber's gap visual + the
+ * autosave pill's warning state. */
+.rater-dim-levels__warning-row {
+  display: grid;
+  grid-template-columns: 22px 1fr auto;
+  gap: var(--rater-s-10);
+  align-items: center;
+  padding: var(--rater-s-6) var(--rater-s-12);
+  background: color-mix(in srgb, var(--rater-feedback-warn) 8%, transparent);
+  border-top: 1px solid color-mix(in srgb, var(--rater-feedback-warn) 30%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--rater-feedback-warn) 30%, transparent);
+  font-size: var(--rater-t-12);
+}
+
+.rater-dim-levels__warning-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--rater-feedback-warn);
+}
+
+.rater-dim-levels__warning-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.rater-dim-levels__warning-title {
+  color: var(--rater-feedback-warn);
+  font-weight: var(--rater-fw-medium);
+  font-size: var(--rater-t-12);
+}
+
+.rater-dim-levels__warning-detail {
+  color: var(--rater-text-muted);
+  font-size: var(--rater-t-11);
+  line-height: var(--rater-lh-tight);
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   Banded layout — lo/hi cells + scrubber strip + Generate panel
+   (Brief 30 PR 30.2)
+   ───────────────────────────────────────────────────────────────── */
+
+/* Banded row uses a different column distribution — no alias cloud;
+   instead two numeric inputs sit in the right column. */
+.rater-dim-levels__row--banded {
+  grid-template-columns: 18px 28px 140px 1fr auto 24px;
+}
+
+.rater-dim-levels__banded {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-6);
+  justify-content: flex-end;
+  font-family: var(--rater-font-mono);
+}
+
+.rater-dim-levels__banded-input {
+  width: 72px;
+  padding: 2px 6px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--rater-r-4);
+  color: var(--rater-text-default);
+  font-family: var(--rater-font-mono);
+  font-size: var(--rater-t-12);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  /* Suppress the spinner — the scrubber + manual blur are enough.
+     A tiny chevron would crowd the row at high density. */
+  -moz-appearance: textfield;
+}
+.rater-dim-levels__banded-input::-webkit-outer-spin-button,
+.rater-dim-levels__banded-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.rater-dim-levels__banded-input:hover {
+  border-color: var(--rater-hairline-soft);
+}
+.rater-dim-levels__banded-input:focus {
+  outline: none;
+  border-color: var(--rater-focus-ring);
+  box-shadow: 0 0 0 2px var(--rater-focus-halo);
+  background: var(--rater-surface-canvas);
+}
+
+.rater-dim-levels__banded-op {
+  color: var(--rater-text-subtle);
+  font-size: var(--rater-t-11);
+  font-variant-numeric: tabular-nums;
+  user-select: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rater-dim-levels__row {
+    transition: none;
+  }
+}

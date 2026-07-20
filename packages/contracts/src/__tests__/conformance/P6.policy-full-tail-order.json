@@ -1,0 +1,55 @@
+{
+  "name": "P6.policy-full-tail-order",
+  "description": "A full synthetic Meridian policy tail: subtotal $1,000, schedule rating of -10%, a guarded first-term factor of 0.90, a flat $18 service endorsement, and a $500 minimum premium. The ordered result is $828.",
+  "policy": {
+    "policy_id": "P6",
+    "lines": [
+      { "plan_ref": { "plan_id": "bop-plan", "content_hash": "h-bop", "product": "bop" }, "premium_output": "bop_premium" }
+    ]
+  },
+  "policy_tail": [
+    { "kind": "schedule_rating", "id": "irpm", "display_name": "Schedule rating (IRPM)", "cap_pct": 25, "source": { "from": "literal", "total": -10 } },
+    { "kind": "package_factor", "id": "first_term_credit", "display_name": "Meridian first-term credit", "factor": 0.9, "when": { "field": "is_first_term", "op": "eq", "value": true } },
+    { "kind": "endorsement", "id": "service_fee", "display_name": "Meridian service endorsement", "effect": { "kind": "flat", "amount": 18 } },
+    { "kind": "minimum_premium", "id": "min", "floor": 500 }
+  ],
+  "adjustmentInputs": { "is_first_term": true },
+  "plans": {
+    "bop-plan": {
+      "externalInputs": { "base": 1000 },
+      "plan": {
+        "id": "p6.bop",
+        "version": "1.0.0",
+        "name": "BOP",
+        "nodes": [
+          { "id": "in_base", "kind": "input", "params": { "fieldName": "base", "fieldType": "money" } },
+          { "id": "k", "kind": "constant", "params": { "value": 1.0, "type": "factor" } },
+          { "id": "mul", "kind": "chain.mult", "params": { "stopOnZero": false } },
+          { "id": "out", "kind": "output", "params": { "fieldName": "bop_premium", "fieldType": "money" } }
+        ],
+        "edges": [
+          { "from": { "node": "in_base", "port": "value" }, "to": { "node": "mul", "port": "base" } },
+          { "from": { "node": "k", "port": "value" }, "to": { "node": "mul", "port": "factors" } },
+          { "from": { "node": "mul", "port": "result" }, "to": { "node": "out", "port": "value" } }
+        ]
+      }
+    }
+  },
+  "expected": {
+    "subtotal": 1000,
+    "package_credit": 0.9,
+    "after_credit": 900,
+    "minimum_premium": 500,
+    "minimum_applied": false,
+    "total": 828,
+    "lines": [
+      { "product": "bop", "plan_id": "bop-plan", "premium": 1000 }
+    ],
+    "adjustments": [
+      { "id": "irpm", "kind": "schedule_rating", "applied": true, "before": 1000, "after": 900, "detail": "-10.0% (cap ±25%)", "provenance": { "source": "literal" } },
+      { "id": "first_term_credit", "kind": "package_factor", "applied": true, "before": 900, "after": 810, "detail": "× 0.9" },
+      { "id": "service_fee", "kind": "endorsement", "applied": true, "before": 810, "after": 828, "detail": "+ $18" },
+      { "id": "min", "kind": "minimum_premium", "applied": false, "before": 828, "after": 828, "detail": "floor $500 not binding" }
+    ]
+  }
+}

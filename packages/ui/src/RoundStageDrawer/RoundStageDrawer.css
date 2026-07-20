@@ -1,0 +1,120 @@
+/* ============================================================================
+ * <FlatFactorStageDrawer> — drawer-rendered flat_factor stage editor.
+ *
+ * Mirrors <ChainFactorDrawer>'s body styles (M4.3.7) — same field
+ * stack + hint text density + error banner.
+ *
+ * The Drawer primitive owns the chrome (header, close, ESC, focus,
+ * backdrop, portal); this CSS styles the body content inside
+ * <Drawer.Body>.
+ * ============================================================================ */
+
+.rater-round-stage-drawer__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-14);
+  padding: var(--rater-s-14) var(--rater-s-14) var(--rater-s-6);
+}
+
+/* ── Field ──────────────────────────────────────────────────────── */
+
+.rater-round-stage-drawer__field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-4);
+}
+
+.rater-round-stage-drawer__label {
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-12);
+  font-weight: var(--rater-fw-medium);
+  color: var(--rater-text-muted);
+  text-transform: uppercase;
+  letter-spacing: var(--rater-tracking-label);
+}
+
+.rater-round-stage-drawer__input {
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-13);
+  color: var(--rater-text-strong);
+  background: var(--rater-surface-canvas);
+  border: 1px solid var(--rater-hairline-base);
+  border-radius: var(--rater-r-6);
+  padding: var(--rater-s-8) var(--rater-s-10);
+  outline: none;
+  transition: border-color 100ms ease, box-shadow 100ms ease;
+}
+
+.rater-round-stage-drawer__input:focus {
+  border-color: var(--rater-brand-accent, var(--rater-text-strong));
+  box-shadow: 0 0 0 2px var(--rater-brand-accent-soft, rgba(0, 0, 0, 0.08));
+}
+
+.rater-round-stage-drawer__input--mono {
+  font-family: var(--rater-fonts-mono, var(--rater-fonts-sans));
+  font-size: var(--rater-t-12);
+}
+
+.rater-round-stage-drawer__hint {
+  margin: 0;
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-muted);
+  line-height: var(--rater-lh-relaxed);
+}
+
+.rater-round-stage-drawer__hint code {
+  font-family: var(--rater-fonts-mono, var(--rater-fonts-sans));
+  font-size: 0.95em;
+  background: var(--rater-surface-sunken);
+  padding: 0 4px;
+  border-radius: var(--rater-r-4);
+}
+
+/* ── Error banner ───────────────────────────────────────────────── */
+
+.rater-round-stage-drawer__error {
+  border: 1px solid var(--rater-feedback-error);
+  background: var(--rater-feedback-error-bg, rgba(239, 68, 68, 0.08));
+  color: var(--rater-feedback-error);
+  border-radius: var(--rater-r-6);
+  padding: var(--rater-s-10) var(--rater-s-12);
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-13);
+  line-height: var(--rater-lh-normal);
+}
+
+/* ── Brief 80 D-D — the total-field contract line ───────────────── */
+
+.rater-round-stage-drawer__contract {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-8);
+  margin: 0;
+  padding: var(--rater-s-8) var(--rater-s-10);
+  border-radius: var(--rater-r-6);
+  background: var(--rater-surface-sunken);
+  color: var(--rater-text-muted);
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-12);
+  line-height: var(--rater-lh-normal);
+}
+
+.rater-round-stage-drawer__contract code {
+  font-family: var(--rater-fonts-mono, var(--rater-fonts-sans));
+  font-size: 0.95em;
+  background: var(--rater-surface-canvas);
+  padding: 0 4px;
+  border-radius: var(--rater-r-4);
+}
+
+.rater-round-stage-drawer__contract--warn {
+  border: 1px solid var(--rater-feedback-warn);
+  background: var(--rater-feedback-warn-bg, rgba(245, 158, 11, 0.08));
+  color: var(--rater-feedback-warn);
+}
+
+.rater-round-stage-drawer__contract--warn span {
+  flex: 1;
+  color: var(--rater-text-default);
+}

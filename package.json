@@ -1,0 +1,48 @@
+{
+  "name": "openrater",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Build deterministic, auditable insurance rating engines from rate-filing workbooks.",
+  "type": "module",
+  "packageManager": "pnpm@9.0.0",
+  "engines": {
+    "node": ">=20",
+    "pnpm": ">=9"
+  },
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vadim-filimonov/openrater.git"
+  },
+  "scripts": {
+    "dev": "concurrently -n server,scoring,app -c blue,cyan,magenta 'pnpm dev:server' 'pnpm dev:scoring' 'pnpm dev:app'",
+    "dev:app": "pnpm --filter @openrater/app dev",
+    "dev:server": "cd server && PYTHONPATH=src uv run uvicorn openrater.main:app --reload --host 127.0.0.1 --port 8001 --log-level warning",
+    "dev:scoring": "cd services/scoring && API_LAB_BASE=http://127.0.0.1:8001 pnpm dev",
+    "build:app": "pnpm --filter @openrater/app build",
+    "preview:app": "pnpm --filter @openrater/app preview",
+    "build": "pnpm -r --filter='./packages/*' --filter='./frontend' --filter='./services/*' build",
+    "typecheck": "pnpm -r --filter='./packages/*' --filter='./frontend' --filter='./services/*' typecheck",
+    "test": "pnpm -r --filter='./packages/*' --filter='./frontend' --filter='./services/*' test",
+    "tokens:check": "node scripts/check-tokens.mjs",
+    "raw-palette:check": "node scripts/check-raw-palette.mjs",
+    "v2-buttons:check": "node scripts/check-v2-buttons.mjs",
+    "color-domains:check": "node scripts/check-color-domains.mjs",
+    "rating-lob:check": "node scripts/check-rating-lob-agnostic.mjs",
+    "deploy-compose:check": "node scripts/check-deploy-compose-portable.mjs",
+    "design:check": "pnpm tokens:check && pnpm raw-palette:check && pnpm v2-buttons:check && pnpm color-domains:check && pnpm rating-lob:check",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "clean": "pnpm -r exec rm -rf node_modules dist .turbo .vite && rm -rf node_modules"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.17.0",
+    "concurrently": "^9.0.1",
+    "eslint": "^9.17.0",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "eslint-plugin-react-hooks": "^5.1.0",
+    "globals": "^15.14.0",
+    "typescript": "^5.6.3",
+    "typescript-eslint": "^8.19.0"
+  }
+}

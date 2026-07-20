@@ -1,0 +1,445 @@
+/* Brief 89 §3 (89.3) — analytics before data: the probe band, the
+   rate card, the structural tornado, the honesty footer. One reading
+   column; PROBE provenance on every exhibit (R9/R10). */
+
+.rater-probe {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-24);
+}
+
+/* ── the band (replaces the wall) ─────────────────────────────────── */
+.rater-probe__band {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--rater-s-12);
+  padding: var(--rater-s-12) var(--rater-s-16);
+  border: 1px solid var(--rater-border-default);
+  border-radius: var(--rater-r-12);
+  background: var(--rater-surface-1);
+}
+
+.rater-probe__band-glyph {
+  color: var(--rater-text-muted);
+  margin-top: 2px;
+  flex: none;
+}
+
+.rater-probe__band-text {
+  margin: 0;
+  flex: 1;
+  font-size: var(--rater-t-13);
+  line-height: 1.6;
+  color: var(--rater-text-muted);
+}
+
+.rater-probe__band-text b {
+  color: var(--rater-text-default);
+  font-weight: var(--rater-fw-medium);
+}
+
+/* ── exhibits ─────────────────────────────────────────────────────── */
+.rater-probe__exhibit-head {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-12);
+  margin-bottom: var(--rater-s-12);
+}
+
+.rater-probe__title {
+  margin: 0;
+  font-size: var(--rater-t-16);
+  font-weight: var(--rater-fw-semibold);
+  letter-spacing: var(--rater-tracking-tight);
+  color: var(--rater-text-strong);
+}
+
+.rater-probe__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 9px;
+  border: 1px solid var(--rater-border-default);
+  border-radius: var(--rater-r-full);
+  font-size: 10.5px;
+  font-weight: var(--rater-fw-semibold);
+  letter-spacing: var(--rater-tracking-label);
+  text-transform: uppercase;
+  color: var(--rater-text-subtle);
+}
+
+.rater-probe__eyebrow::before {
+  content: "";
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--rater-text-subtle);
+}
+
+.rater-probe__degrade {
+  margin: 0;
+  font-size: var(--rater-t-13);
+  color: var(--rater-text-muted);
+}
+
+/* ── the rate card ────────────────────────────────────────────────── */
+.rater-probe__card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-12);
+}
+
+.rater-probe__card-toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-12);
+  flex-wrap: wrap;
+}
+
+.rater-probe__axis {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-6);
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-muted);
+}
+
+.rater-probe__axis select {
+  height: 30px;
+  padding: 0 var(--rater-s-8);
+  border: 1px solid var(--rater-border-default);
+  border-radius: var(--rater-r-8);
+  background: var(--rater-surface-1);
+  color: var(--rater-text-default);
+  font-size: var(--rater-t-12);
+}
+
+.rater-probe__pins {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--rater-s-8);
+}
+
+.rater-probe__pin-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-6);
+  padding: 3px 10px;
+  border: 1px solid var(--rater-border-subtle);
+  border-radius: var(--rater-r-full);
+  background: none;
+  cursor: pointer;
+  font-family: var(--rater-fonts-mono);
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-muted);
+}
+
+.rater-probe__pin-btn:hover {
+  border-color: var(--rater-border-default);
+  color: var(--rater-text-default);
+}
+
+.rater-probe__pin-btn b {
+  color: var(--rater-text-default);
+  font-weight: var(--rater-fw-medium);
+}
+
+.rater-probe__pin-input {
+  height: 24px;
+  width: 120px;
+  padding: 0 var(--rater-s-8);
+  border: 1px solid var(--rater-accent-primary);
+  border-radius: var(--rater-r-full);
+  background: var(--rater-surface-1);
+  color: var(--rater-text-default);
+  font-family: var(--rater-fonts-mono);
+  font-size: var(--rater-t-12);
+}
+
+.rater-probe__tablewrap {
+  overflow-x: auto;
+  border: 1px solid var(--rater-border-subtle);
+  border-radius: var(--rater-r-8);
+}
+
+.rater-probe__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--rater-t-13);
+}
+
+.rater-probe__table th {
+  padding: var(--rater-s-8) var(--rater-s-12);
+  border-bottom: 1px solid var(--rater-border-subtle);
+  background: var(--rater-surface-1);
+  font-size: var(--rater-t-11);
+  font-weight: var(--rater-fw-medium);
+  letter-spacing: var(--rater-tracking-label);
+  text-transform: uppercase;
+  color: var(--rater-text-subtle);
+  text-align: right;
+}
+
+.rater-probe__table th[scope="row"] {
+  background: none;
+  font-size: var(--rater-t-13);
+  font-weight: var(--rater-fw-regular);
+  letter-spacing: normal;
+  text-transform: none;
+  color: var(--rater-text-default);
+  text-align: left;
+}
+
+.rater-probe__table thead th:first-child {
+  text-align: left;
+}
+
+.rater-probe__table td {
+  padding: var(--rater-s-8) var(--rater-s-12);
+  border-bottom: 1px solid var(--rater-border-subtle);
+  font-family: var(--rater-fonts-mono);
+  font-size: var(--rater-t-12);
+  font-variant-numeric: tabular-nums;
+  color: var(--rater-text-default);
+  text-align: right;
+}
+
+.rater-probe__table tbody tr:last-child td,
+.rater-probe__table tbody tr:last-child th {
+  border-bottom: none;
+}
+
+.rater-probe__cell-refuse {
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-12);
+  color: var(--rater-feedback-error);
+}
+
+.rater-probe__cell-na {
+  color: var(--rater-text-subtle);
+}
+
+.rater-probe__truncated,
+.rater-probe__cardfoot {
+  margin: 0;
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-subtle);
+}
+
+/* ── the structural tornado ───────────────────────────────────────── */
+.rater-probe__tornado {
+  border: 1px solid var(--rater-border-subtle);
+  border-radius: var(--rater-r-8);
+  padding: var(--rater-s-6) 0;
+}
+
+.rater-probe__trow {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-16);
+  padding: var(--rater-s-8) var(--rater-s-16);
+}
+
+.rater-probe__trow:hover {
+  background: var(--rater-row-hover-bg);
+}
+
+.rater-probe__trow-name {
+  width: 190px;
+  flex: none;
+  font-size: var(--rater-t-13);
+  color: var(--rater-text-default);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Brief 93 §1.1.4 (93.2) — the swing list: each row's min→max band
+ * positioned on ONE shared log scale, with a 1.00× reference tick. */
+.rater-probe__trow-bar {
+  flex: 1;
+  position: relative;
+  height: 8px;
+  border-radius: var(--rater-r-4);
+  background: var(--rater-surface-2);
+  overflow: hidden;
+}
+
+.rater-probe__trow-tick {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--rater-border-strong);
+}
+
+.rater-probe__trow-range {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-radius: var(--rater-r-4);
+  /* data-viz domain — the categorical series token, never accent. */
+  background: var(--rater-cat-categorical-1);
+  opacity: 0.75;
+}
+
+.rater-probe__trow-swing {
+  width: 108px;
+  flex: none;
+  text-align: right;
+  font-family: var(--rater-fonts-mono);
+  font-size: var(--rater-t-11);
+  color: var(--rater-text-muted);
+}
+
+.rater-probe__trow-flatnote {
+  margin: var(--rater-s-4) 0 var(--rater-s-6);
+  padding: 0 var(--rater-s-16);
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-subtle);
+}
+
+/* ── the probe book (89.4) ────────────────────────────────────────── */
+.rater-probe__book {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-16);
+}
+
+.rater-probe__book-intro {
+  margin: 0;
+  max-width: 62ch;
+  font-size: var(--rater-t-13);
+  line-height: 1.6;
+  color: var(--rater-text-muted);
+}
+
+.rater-probe__book-intro b {
+  color: var(--rater-text-default);
+  font-weight: var(--rater-fw-medium);
+}
+
+.rater-probe__book-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-12);
+}
+
+.rater-probe__book-error {
+  margin: 0;
+  font-size: var(--rater-t-13);
+  color: var(--rater-feedback-error);
+}
+
+.rater-probe__book-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--rater-s-8);
+  margin: 0;
+}
+
+.rater-probe__book-stat {
+  flex: 1 1 160px;
+  min-width: 160px;
+  padding: var(--rater-s-12) var(--rater-s-16);
+  border: 1px solid var(--rater-border-subtle);
+  border-radius: var(--rater-r-8);
+  background: var(--rater-surface-1);
+}
+
+.rater-probe__book-stat dt {
+  margin: 0 0 var(--rater-s-4);
+  font-size: 10.5px;
+  font-weight: var(--rater-fw-semibold);
+  letter-spacing: var(--rater-tracking-label);
+  text-transform: uppercase;
+  color: var(--rater-text-subtle);
+}
+
+.rater-probe__book-stat dd {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0;
+  font-family: var(--rater-fonts-mono);
+  font-size: var(--rater-t-16);
+  font-variant-numeric: tabular-nums;
+  color: var(--rater-text-strong);
+}
+
+.rater-probe__book-substat {
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-subtle);
+}
+
+.rater-probe__book-note {
+  margin: 0;
+  font-size: var(--rater-t-13);
+  color: var(--rater-feedback-warn);
+}
+
+.rater-probe__book-subtitle {
+  margin: 0 0 var(--rater-s-8);
+  font-size: var(--rater-t-13);
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-strong);
+}
+
+.rater-probe__book-clusters ul {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-4);
+  margin: 0 0 var(--rater-s-6);
+  padding: 0;
+  list-style: none;
+  font-size: var(--rater-t-13);
+  color: var(--rater-text-muted);
+}
+
+.rater-probe__book-clusters b {
+  color: var(--rater-text-default);
+  font-weight: var(--rater-fw-medium);
+}
+
+.rater-probe__book-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--rater-s-12);
+  margin: 0;
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-subtle);
+}
+
+.rater-probe__book-stale {
+  color: var(--rater-feedback-warn);
+}
+
+/* ── the honesty footer (R10) ─────────────────────────────────────── */
+.rater-probe__honesty {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--rater-s-8);
+  margin: 0;
+  padding-top: var(--rater-s-12);
+  border-top: 1px solid var(--rater-border-subtle);
+  font-size: var(--rater-t-12);
+  line-height: 1.6;
+  color: var(--rater-text-subtle);
+}
+
+.rater-probe__honesty svg {
+  flex: none;
+  margin-top: 2px;
+}
+
+/* screen-reader-only caption */
+.rater-probe__sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}

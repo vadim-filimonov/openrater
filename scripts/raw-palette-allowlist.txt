@@ -1,0 +1,11 @@
+# Raw-palette reference allowlist.
+#
+# Files listed here bypass the `pnpm raw-palette:check` CI guard. Components
+# should consume the semantic alias layer (`--rater-text-*`,
+# `--rater-surface-*`, `--rater-cat-*`, `--rater-accent-*`, and
+# `--rater-feedback-*`); raw palette hues exist only to define that layer.
+#
+# Format: one project-root-relative path per line. Blank lines and lines
+# beginning with `#` are ignored.
+#
+# No exemptions are currently required.

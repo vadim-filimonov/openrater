@@ -1,0 +1,70 @@
+{
+  "name": "P3.policy-irpm-sections",
+  "description": "IRPM by sub-section + a flat endorsement: subtotal 3000, six schedule-rating sections summing to -7% (cap ±25% not binding), a flat +$18 terrorism charge, $500 floor not binding -> $2,808. Proves cap-on-the-SUM (ADR-0042 D2/D5), sub-section retention, and an additive endorsement.",
+  "policy": {
+    "policy_id": "P3",
+    "lines": [
+      { "plan_ref": { "plan_id": "bop-plan", "content_hash": "h-bop", "product": "bop" }, "premium_output": "bop_premium" }
+    ],
+    "adjustments": [
+      {
+        "kind": "schedule_rating",
+        "id": "irpm",
+        "display_name": "Schedule rating (IRPM)",
+        "cap_pct": 25,
+        "source": {
+          "from": "literal",
+          "sections": { "management": -1, "location": -2, "building_features": -1, "premises_equipment": -1, "employees": -1, "protection": -1 }
+        }
+      },
+      { "kind": "endorsement", "id": "terrorism", "display_name": "Terrorism", "effect": { "kind": "flat", "amount": 18 } },
+      { "kind": "minimum_premium", "id": "min", "floor": 500 }
+    ]
+  },
+  "plans": {
+    "bop-plan": {
+      "externalInputs": { "base": 3000 },
+      "plan": {
+        "id": "p3.bop",
+        "version": "1.0.0",
+        "name": "BOP",
+        "nodes": [
+          { "id": "in_base", "kind": "input", "params": { "fieldName": "base", "fieldType": "money" } },
+          { "id": "k", "kind": "constant", "params": { "value": 1.0, "type": "factor" } },
+          { "id": "mul", "kind": "chain.mult", "params": { "stopOnZero": false } },
+          { "id": "out", "kind": "output", "params": { "fieldName": "bop_premium", "fieldType": "money" } }
+        ],
+        "edges": [
+          { "from": { "node": "in_base", "port": "value" }, "to": { "node": "mul", "port": "base" } },
+          { "from": { "node": "k", "port": "value" }, "to": { "node": "mul", "port": "factors" } },
+          { "from": { "node": "mul", "port": "result" }, "to": { "node": "out", "port": "value" } }
+        ]
+      }
+    }
+  },
+  "expected": {
+    "subtotal": 3000,
+    "package_credit": 1,
+    "after_credit": 3000,
+    "minimum_premium": 500,
+    "minimum_applied": false,
+    "total": 2808,
+    "lines": [
+      { "product": "bop", "plan_id": "bop-plan", "premium": 3000 }
+    ],
+    "adjustments": [
+      {
+        "id": "irpm",
+        "kind": "schedule_rating",
+        "applied": true,
+        "before": 3000,
+        "after": 2790,
+        "detail": "-7.0% (Σ 6 sections, cap ±25%)",
+        "sections": { "management": -1, "location": -2, "building_features": -1, "premises_equipment": -1, "employees": -1, "protection": -1 },
+        "provenance": { "source": "literal" }
+      },
+      { "id": "terrorism", "kind": "endorsement", "applied": true, "before": 2790, "after": 2808, "detail": "+ $18" },
+      { "id": "min", "kind": "minimum_premium", "applied": false, "before": 2808, "after": 2808, "detail": "floor $500 not binding" }
+    ]
+  }
+}

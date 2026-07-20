@@ -1,0 +1,67 @@
+{
+  "name": "V23.derive-territory-unmapped",
+  "description": "ADR-0028 (cold-test L13) — the unmapped-value case. A risk with state='PR' (Puerto Rico) maps to NO territory in the grouping. `derive.territory` returns territory_id='' with unmapped=true (surfaced on a diagnostic output — the L22 anti-silent-1.0 principle: an unmapped state is VISIBLE, not hidden). The empty key misses the territory-keyed `lookup.direct`, which falls back to its defaultValue 1.0. Same plan shape as V22; only the input + expected outputs differ. Confirms the fallback path is deterministic and the diagnostic fires.",
+  "plan": {
+    "id": "v23.derive_territory_unmapped",
+    "version": "1.0.0",
+    "name": "Territory grouping runtime (PR → unmapped → 1.0)",
+    "line": "property",
+    "effective": "2026-01-01",
+    "nodes": [
+      {
+        "id": "in_state",
+        "kind": "input",
+        "params": { "fieldName": "state", "fieldType": "string" },
+        "position": { "x": 0, "y": 0 }
+      },
+      {
+        "id": "terr_state",
+        "kind": "derive.territory",
+        "params": {
+          "dimSlug": "state",
+          "territoryMap": {
+            "CA": "T1", "FL": "T1", "NY": "T1",
+            "TX": "T2", "IL": "T2",
+            "WI": "T3", "MN": "T3", "OH": "T3"
+          },
+          "territoryLabels": {
+            "T1": "Tier 1 — high-cost coastal",
+            "T2": "Tier 2 — mid",
+            "T3": "Tier 3 — low-cost"
+          }
+        },
+        "position": { "x": 200, "y": 0 }
+      },
+      {
+        "id": "lkp_territory",
+        "kind": "lookup.direct",
+        "params": {
+          "table": { "T1": 1.30, "T2": 1.10, "T3": 0.90 },
+          "defaultValue": 1.0,
+          "tableName": "State tier factor"
+        },
+        "position": { "x": 400, "y": 0 }
+      },
+      {
+        "id": "out_factor",
+        "kind": "output",
+        "params": { "fieldName": "factor", "fieldType": "float" },
+        "position": { "x": 600, "y": 0 }
+      },
+      {
+        "id": "out_unmapped",
+        "kind": "output",
+        "params": { "fieldName": "unmapped", "fieldType": "bool" },
+        "position": { "x": 600, "y": 120 }
+      }
+    ],
+    "edges": [
+      { "from": { "node": "in_state",      "port": "value" },        "to": { "node": "terr_state",    "port": "value"    } },
+      { "from": { "node": "terr_state",    "port": "territory_id" }, "to": { "node": "lkp_territory", "port": "key"      } },
+      { "from": { "node": "terr_state",    "port": "unmapped" },     "to": { "node": "out_unmapped",  "port": "value"    } },
+      { "from": { "node": "lkp_territory", "port": "value" },        "to": { "node": "out_factor",    "port": "value"    } }
+    ]
+  },
+  "externalInputs": { "state": "PR" },
+  "expectedOutputs": { "factor": 1.0, "unmapped": true }
+}

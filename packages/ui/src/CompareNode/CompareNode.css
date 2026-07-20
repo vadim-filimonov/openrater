@@ -1,0 +1,121 @@
+/* ============================================================================
+ * <CompareNode> — single row in the structured diff tree.
+ *
+ * Visual states (state-icon at the left):
+ *   changed   → amber arrow (→)
+ *   added     → green plus
+ *   removed   → red minus
+ *   unchanged → muted equals
+ *
+ * Indentation is set inline via padding-left (depth × 16px) so the
+ * tree doesn't need nested DOM containers for the hierarchy.
+ * ============================================================================ */
+
+.rater-compare-node {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-8);
+  padding: var(--rater-s-4) var(--rater-s-8);
+  border-radius: var(--rater-r-4);
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-13);
+  line-height: var(--rater-lh-snug);
+  transition: background var(--rater-d-80) var(--rater-ease-soft);
+}
+
+.rater-compare-node:hover {
+  background: var(--rater-surface-2);
+}
+
+.rater-compare-node__state-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  flex-shrink: 0;
+}
+
+/* Tone the state icon per diff state */
+.rater-compare-node--changed .rater-compare-node__state-icon {
+  color: var(--rater-feedback-warn, var(--rater-cat-lookup));
+}
+
+.rater-compare-node--added .rater-compare-node__state-icon {
+  color: var(--rater-feedback-success, var(--rater-cat-math));
+}
+
+.rater-compare-node--removed .rater-compare-node__state-icon {
+  color: var(--rater-feedback-error);
+}
+
+.rater-compare-node--unchanged .rater-compare-node__state-icon {
+  color: var(--rater-text-subtle);
+}
+
+.rater-compare-node__label {
+  color: var(--rater-text-default);
+  font-weight: var(--rater-fw-medium);
+  flex-shrink: 0;
+  min-width: 140px;
+}
+
+.rater-compare-node--unchanged .rater-compare-node__label {
+  color: var(--rater-text-muted);
+}
+
+.rater-compare-node__values {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--rater-s-4);
+  flex: 1 1 auto;
+  min-width: 0;
+  font-family: var(--rater-fonts-mono, var(--rater-fonts-sans));
+  font-variant-numeric: tabular-nums;
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-strong);
+}
+
+.rater-compare-node__a-value {
+  color: var(--rater-feedback-error);
+  text-decoration: line-through;
+  text-decoration-color: color-mix(in srgb, var(--rater-feedback-error) 60%, transparent);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 220px;
+}
+
+.rater-compare-node--added .rater-compare-node__a-value,
+.rater-compare-node--added .rater-compare-node__arrow {
+  display: none; /* added rows show only b_value */
+}
+
+.rater-compare-node--removed .rater-compare-node__b-value,
+.rater-compare-node--removed .rater-compare-node__arrow {
+  display: none;
+}
+
+.rater-compare-node--added .rater-compare-node__b-value,
+.rater-compare-node--removed .rater-compare-node__a-value {
+  text-decoration: none;
+  color: var(--rater-text-strong);
+}
+
+.rater-compare-node__arrow {
+  color: var(--rater-text-subtle);
+  font-family: var(--rater-fonts-sans);
+  flex-shrink: 0;
+}
+
+.rater-compare-node__b-value {
+  color: var(--rater-feedback-success, var(--rater-cat-math));
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 220px;
+}
+
+.rater-compare-node__deep-link {
+  margin-left: auto;
+  flex-shrink: 0;
+}

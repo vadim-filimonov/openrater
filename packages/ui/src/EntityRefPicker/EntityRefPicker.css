@@ -1,0 +1,81 @@
+/* ============================================================================
+ * <EntityRefPicker> — insurance-domain reference picker.
+ *
+ * Composes around <Combobox>. The styling adds:
+ *   - Stale-ref warning icon overlaid on the right edge (next to the
+ *     chevron — but offset so they don't collide)
+ *   - Sublabel rendering with mono font for codes
+ *   - Empty-state CTA layout
+ * ============================================================================ */
+
+.rater-entity-ref-picker {
+  position: relative;
+  display: inline-flex;
+  align-items: stretch;
+  min-width: 240px;
+}
+
+.rater-entity-ref-picker > .rater-combobox {
+  flex: 1 1 auto;
+}
+
+/* When stale-ref, the input's chevron shifts left to make room for
+   the warning icon. */
+.rater-entity-ref-picker--stale .rater-combobox__chevron {
+  right: calc(var(--rater-s-10) + 22px);
+}
+
+.rater-entity-ref-picker__stale-warning {
+  position: absolute;
+  right: var(--rater-s-10);
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--rater-feedback-warn, var(--rater-feedback-error));
+  pointer-events: auto;
+  cursor: help;
+}
+
+/* ── Empty state CTA layout ─────────────────────────────────────── */
+
+.rater-entity-ref-picker__empty {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-8);
+  padding: var(--rater-s-8) var(--rater-s-4);
+}
+
+.rater-entity-ref-picker__empty-text {
+  color: var(--rater-text-muted);
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-13);
+  font-style: italic;
+}
+
+.rater-entity-ref-picker__empty-action {
+  align-self: flex-start;
+}
+
+/* ── Option label/sublabel ──────────────────────────────────────── */
+
+.rater-entity-ref-picker__opt-label {
+  display: block;
+  color: var(--rater-text-strong);
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-13);
+  font-weight: var(--rater-fw-medium);
+  line-height: var(--rater-lh-snug);
+}
+
+.rater-entity-ref-picker__opt-sublabel {
+  display: block;
+  color: var(--rater-text-muted);
+  font-family: var(--rater-fonts-mono, var(--rater-fonts-sans));
+  font-size: var(--rater-t-12);
+  font-weight: var(--rater-fw-regular);
+  line-height: var(--rater-lh-snug);
+  letter-spacing: 0.01em;
+  margin-top: 2px;
+}

@@ -1,0 +1,29 @@
+{
+  "name": "@openrater/mcp",
+  "version": "0.1.0",
+  "private": true,
+  "description": "OpenRater MCP server \u2014 lets any MCP client (Claude Desktop, Claude Code, \u2026) drive the deterministic rating platform: fetch the transcription spec, validate + build workbooks, read build reports, quote risks, re-rate books. The platform never calls an AI; the AI calls the platform.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "bin": {
+    "openrater-mcp": "dist/main.js"
+  },
+  "scripts": {
+    "dev": "tsx src/main.ts",
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "@openrater/contracts": "workspace:*",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^22",
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.8",
+    "esbuild": "^0.24.0"
+  }
+}

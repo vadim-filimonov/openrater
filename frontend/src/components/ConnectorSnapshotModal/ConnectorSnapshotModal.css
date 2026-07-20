@@ -1,0 +1,104 @@
+/* ============================================================================
+ * <ConnectorSnapshotModal> — the frozen replay record (Brief 62.6 §4).
+ * The "show me the receipt" view behind a connector-sourced IRPM step: the
+ * captured request + response a filed premium replays from. Calm, evidentiary.
+ * ============================================================================ */
+
+.conn-snapshot {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-16);
+}
+
+/* The reassurance banner — why this snapshot exists (replay, not re-call). */
+.conn-snapshot__provenance {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--rater-s-8);
+  margin: 0;
+  padding: var(--rater-s-10) var(--rater-s-12);
+  background: var(--rater-cat-transform-soft);
+  color: var(--rater-cat-transform-text);
+  border-radius: var(--rater-r-8);
+  font-size: 12.5px;
+  line-height: 1.45;
+}
+.conn-snapshot__provenance svg {
+  flex: 0 0 auto;
+  margin-top: 1px;
+}
+
+/* Provenance metadata — captured-at / status / cost / ids. */
+.conn-snapshot__meta {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--rater-s-6) var(--rater-s-16);
+  margin: 0;
+}
+.conn-snapshot__meta-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--rater-s-8);
+  padding: var(--rater-s-4) 0;
+  border-bottom: 1px solid var(--rater-border-subtle);
+}
+.conn-snapshot__meta-row dt {
+  font-size: 11px;
+  letter-spacing: var(--rater-tracking-label);
+  text-transform: uppercase;
+  color: var(--rater-text-muted);
+}
+.conn-snapshot__meta-row dd {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--rater-text-default);
+  font-variant-numeric: tabular-nums;
+}
+.conn-snapshot__mono {
+  font-family: var(--rater-font-mono, ui-monospace, monospace);
+  font-size: 11px;
+  color: var(--rater-text-muted);
+  overflow-wrap: anywhere;
+}
+
+/* A labelled JSON block (request / response bodies). */
+.conn-snapshot__block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-4);
+}
+.conn-snapshot__block-label {
+  font-size: 11px;
+  letter-spacing: var(--rater-tracking-label);
+  text-transform: uppercase;
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-muted);
+}
+.conn-snapshot__json {
+  margin: 0;
+  padding: var(--rater-s-10) var(--rater-s-12);
+  max-height: 260px;
+  overflow: auto;
+  background: var(--rater-surface-sunken);
+  border: 1px solid var(--rater-border-subtle);
+  border-radius: var(--rater-r-8);
+  font-family: var(--rater-font-mono, ui-monospace, monospace);
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: var(--rater-text-default);
+  white-space: pre;
+}
+
+.conn-snapshot__status {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-6);
+  margin: 0;
+  padding: var(--rater-s-16) 0;
+  color: var(--rater-text-muted);
+  font-size: 13px;
+}
+.conn-snapshot__status--error {
+  color: var(--rater-feedback-error);
+}

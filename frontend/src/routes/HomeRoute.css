@@ -1,0 +1,269 @@
+/* ──────────────────────────────────────────────────────────────────
+   OpenRater Home (Brief 74, reshaped by Brief 88 §3.2 / 88.2).
+   ONE page, one voice: status line → attention → Your plans → Your
+   book → the other rooms, in a 1120px reading column. Conforms to
+   V2_INTERFACE_SPEC: the s-/t-/r- scales, panels r-12 no shadows, ONE
+   table DNA, no charts. Status rides feedback tokens. All values are
+   tokens — no raw hex.
+   ────────────────────────────────────────────────────────────────── */
+
+.rater-home {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: var(--rater-s-24) var(--rater-s-24) var(--rater-s-48);
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-28);
+}
+
+/* A11y — one visible focus ring on every interactive element on Home
+   (V2_INTERFACE_SPEC: outline 2px focus-ring, never outline:none). */
+.rater-home a:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: 2px;
+  border-radius: var(--rater-r-4);
+}
+
+.rater-home__actions {
+  display: flex;
+  gap: var(--rater-s-8);
+}
+
+/* Block 2 sits directly under the status line — it is its expansion. */
+.rater-home__attn {
+  margin-top: calc(-1 * var(--rater-s-12));
+}
+
+/* "+N more" — D6: the triage cap is stated, never silent. */
+.rater-home__more {
+  margin-top: var(--rater-s-10);
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-subtle);
+}
+
+/* ── Blocks 3–4 — the shared block anatomy (eyebrow · count · action) ── */
+.rater-home-blk {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-10);
+}
+.rater-home-blk__head {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-10);
+}
+.rater-home-blk__label {
+  font-size: var(--rater-t-11);
+  font-weight: var(--rater-fw-semibold);
+  letter-spacing: var(--rater-tracking-label);
+  text-transform: uppercase;
+  color: var(--rater-text-subtle);
+  margin: 0;
+}
+.rater-home-blk__count {
+  font-family: var(--rater-font-mono);
+  font-size: var(--rater-t-11);
+  color: var(--rater-text-subtle);
+}
+.rater-home-blk__spacer {
+  flex: 1;
+}
+
+/* ── Block 3 — Your plans (constitution table DNA) ── */
+.rater-home-plans {
+  background: var(--rater-surface-1);
+  border: 1px solid var(--rater-border-subtle);
+  border-radius: var(--rater-r-12);
+  overflow: hidden;
+}
+.rater-home-plans__row {
+  display: grid;
+  grid-template-columns: minmax(220px, 1.3fr) auto 1fr auto;
+  gap: var(--rater-s-16);
+  align-items: center;
+  padding: var(--rater-s-12) var(--rater-s-16);
+  color: inherit;
+  text-decoration: none;
+  transition: background var(--rater-d-80) var(--rater-ease-snap);
+}
+.rater-home-plans__row + .rater-home-plans__row {
+  border-top: 1px solid var(--rater-border-subtle);
+}
+.rater-home-plans__row:hover {
+  background: var(--rater-row-hover-bg);
+}
+.rater-home-plans__name {
+  font-size: var(--rater-t-13);
+  font-weight: var(--rater-fw-medium);
+  color: var(--rater-text-strong);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* First-run §5.5 — the seeded reference plan's provenance note: a
+   quiet second line under the name, so sample content never reads as
+   someone's real book. */
+.rater-home-plans__ref-note {
+  display: block;
+  font-size: var(--rater-t-11);
+  font-weight: var(--rater-fw-regular);
+  color: var(--rater-text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rater-home-plans__chip {
+  display: inline-flex;
+}
+.rater-home-plans__next {
+  font-size: var(--rater-t-13);
+  color: var(--rater-text-muted);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rater-home-plans__open {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-4);
+  font-size: var(--rater-t-13);
+  font-weight: var(--rater-fw-medium);
+  color: var(--rater-accent-primary);
+  white-space: nowrap;
+}
+.rater-home-plans__open svg {
+  width: var(--rater-icon-14);
+  height: var(--rater-icon-14);
+}
+.rater-home-plans__foot {
+  display: block;
+  padding: var(--rater-s-10) var(--rater-s-16);
+  border-top: 1px solid var(--rater-border-subtle);
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-muted);
+  text-decoration: none;
+}
+.rater-home-plans__foot:hover {
+  color: var(--rater-text-default);
+}
+/* Loading — static ghost rows (skeleton, never a spinner). */
+.rater-home-plans__ghost {
+  height: 44px;
+  position: relative;
+}
+.rater-home-plans__ghost + .rater-home-plans__ghost {
+  border-top: 1px solid var(--rater-border-subtle);
+}
+.rater-home-plans__ghost::after {
+  content: "";
+  position: absolute;
+  left: var(--rater-s-16);
+  top: 50%;
+  transform: translateY(-50%);
+  width: 38%;
+  height: 10px;
+  border-radius: var(--rater-r-full);
+  background: var(--rater-surface-2);
+}
+
+/* ── Block 4 — Your book ── */
+.rater-home-book {
+  background: var(--rater-surface-1);
+  border: 1px solid var(--rater-border-subtle);
+  border-radius: var(--rater-r-12);
+  padding: var(--rater-s-16);
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-24);
+}
+.rater-home-book__num {
+  font-family: var(--rater-font-display);
+  font-size: var(--rater-t-24);
+  font-weight: var(--rater-fw-semibold);
+  letter-spacing: var(--rater-tracking-tight);
+  color: var(--rater-text-strong);
+  font-variant-numeric: tabular-nums;
+}
+.rater-home-book__num small {
+  font-size: var(--rater-t-13);
+  font-weight: var(--rater-fw-regular);
+  letter-spacing: normal;
+  color: var(--rater-text-muted);
+  margin-left: var(--rater-s-6);
+}
+.rater-home-book__stat {
+  font-size: var(--rater-t-13);
+  color: var(--rater-text-muted);
+}
+.rater-home-book__stat strong {
+  font-weight: var(--rater-fw-medium);
+  color: var(--rater-text-default);
+  font-variant-numeric: tabular-nums;
+}
+.rater-home-book__empty {
+  font-size: var(--rater-t-13);
+  color: var(--rater-text-muted);
+}
+.rater-home-book__spacer {
+  flex: 1;
+}
+.rater-home-book__open {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-4);
+  font-size: var(--rater-t-13);
+  font-weight: var(--rater-fw-medium);
+  color: var(--rater-accent-primary);
+  white-space: nowrap;
+  text-decoration: none;
+}
+.rater-home-book__open:hover {
+  color: var(--rater-accent-primary-hover);
+}
+.rater-home-book__open svg {
+  width: var(--rater-icon-14);
+  height: var(--rater-icon-14);
+}
+.rater-home-book__ghost {
+  width: 180px;
+  height: 14px;
+  border-radius: var(--rater-r-full);
+  background: var(--rater-surface-2);
+}
+
+/* ── Narrow widths — drop the next-step column; the book wraps ── */
+@media (max-width: 800px) {
+  .rater-home-plans__row {
+    grid-template-columns: minmax(0, 1fr) auto auto;
+  }
+  .rater-home-plans__next {
+    display: none;
+  }
+  .rater-home-book {
+    flex-wrap: wrap;
+    gap: var(--rater-s-12);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rater-home-plans__row {
+    transition-duration: 1ms;
+  }
+}
+
+/* Brief 94 (U2) — the quiet second line under the first-run CTA:
+   the workbook door, deep-linked. */
+.rater-home__workbook-line {
+  margin-top: var(--rater-s-12);
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-subtle);
+}
+
+.rater-home__workbook-line a {
+  color: var(--rater-accent-primary);
+  text-decoration: none;
+  border-bottom: 1px dotted var(--rater-accent-primary);
+}

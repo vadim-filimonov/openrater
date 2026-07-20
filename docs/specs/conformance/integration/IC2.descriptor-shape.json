@@ -1,0 +1,68 @@
+{
+  "id": "IC2",
+  "name": "descriptor-shape",
+  "spec": "§3",
+  "asserts": "The descriptor speaks peer vocabulary: required_fields are the plan's consumed inputs pulled back through the mapping.",
+  "contract_version": "1.0",
+  "world": {
+    "integration": { "name": "Example Integrator — fixture", "paired": true },
+    "plans": ["plan-alpha", "plan-beta"]
+  },
+  "steps": [
+    {
+      "note": "the peer reads the descriptor with its key",
+      "actor": "integrator",
+      "call": {
+        "method": "GET",
+        "path": "/api/v1/integrations/{{integration_id}}/descriptor",
+        "headers": { "X-OpenRater-Integration-Key": "{{integrator_key}}" }
+      },
+      "expect": {
+        "status": 200,
+        "body": {
+          "contract_version": "1.0",
+          "plans": [
+            {
+              "carrier": "acme-mutual",
+              "plan_ref": { "$type": "string" },
+              "product": "bop",
+              "state": "WA",
+              "status": "live",
+              "trace_policy": "summary",
+              "validity_days": 30,
+              "required_fields": {
+                "$contains": [
+                  { "key": "rest.gross_receipts", "dtype": "number", "unit": "USD" },
+                  { "key": "property.construction", "dtype": "enum" },
+                  { "key": "property.tiv", "dtype": "number", "unit": "USD" }
+                ]
+              }
+            },
+            {
+              "carrier": "birch-specialty",
+              "plan_ref": { "$type": "string" },
+              "status": "live"
+            }
+          ],
+          "events": {
+            "accepted_kinds": {
+              "$contains": ["sent", "quoted", "bound", "declined", "lost", "corrected"]
+            }
+          }
+        }
+      }
+    },
+    {
+      "note": "no key → 401 with the envelope",
+      "actor": "anonymous",
+      "call": {
+        "method": "GET",
+        "path": "/api/v1/integrations/{{integration_id}}/descriptor"
+      },
+      "expect": {
+        "status": 401,
+        "body": { "error": { "code": { "$present": true } } }
+      }
+    }
+  ]
+}

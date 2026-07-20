@@ -1,0 +1,79 @@
+{
+  "id": "IC3",
+  "name": "quote-set-parity",
+  "spec": "§4.2 rule 1 (Law 1 — one premium)",
+  "asserts": "A quote-set member and a direct plan quote with the mapped inputs return the identical premium on the identical version.",
+  "contract_version": "1.0",
+  "world": {
+    "integration": { "name": "Example Integrator — fixture", "paired": true },
+    "plans": ["plan-alpha"]
+  },
+  "steps": [
+    {
+      "note": "quote through the integration seam, peer vocabulary",
+      "actor": "integrator",
+      "call": {
+        "method": "POST",
+        "path": "/api/v1/integrations/{{integration_id}}/quote-set",
+        "headers": { "X-OpenRater-Integration-Key": "{{integrator_key}}" },
+        "body": {
+          "risk_ref": "r-fixture-0001",
+          "request_hash": "sha256:ic3-fixture",
+          "effective_date": "2026-08-01",
+          "carriers": ["acme-mutual"],
+          "trace": "none",
+          "facts": {
+            "rest.gross_receipts": 1250000,
+            "property.construction": "JM",
+            "property.tiv": 1500000
+          }
+        }
+      },
+      "expect": {
+        "status": 200,
+        "body": {
+          "risk_ref": "r-fixture-0001",
+          "request_hash": "sha256:ic3-fixture",
+          "contract_version": "1.0",
+          "quotes": [
+            {
+              "carrier": "acme-mutual",
+              "row_status": "ok",
+              "premium": { "$type": "number" },
+              "version": { "kind": "published", "snapshot_id": { "$type": "string" } }
+            }
+          ]
+        }
+      },
+      "capture": {
+        "seam_premium": "$.quotes[0].premium",
+        "seam_snapshot": "$.quotes[0].version.snapshot_id"
+      }
+    },
+    {
+      "note": "quote the same risk directly at the plan, using plan vocabulary with the mapping applied by hand",
+      "actor": "operator",
+      "call": {
+        "method": "POST",
+        "path": "/api/v1/plans/{{plan_alpha_id}}/quote",
+        "body": {
+          "inputs": {
+            "gross_receipts": 1250000,
+            "construction_class": "JM",
+            "tiv": 1500000
+          },
+          "as_of": "2026-08-01",
+          "trace": "none"
+        }
+      },
+      "expect": {
+        "status": 200,
+        "body": {
+          "row_status": "ok",
+          "premium": { "$same": "seam_premium" },
+          "version": { "kind": "published", "snapshot_id": { "$same": "seam_snapshot" } }
+        }
+      }
+    }
+  ]
+}

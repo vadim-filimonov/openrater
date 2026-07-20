@@ -1,0 +1,252 @@
+/* ============================================================================
+ * <PlanOverview> — the landing section (V2_INTERFACE_SPEC §2.3).
+ *
+ * Constitution: panels = surface-1 · 1px border-subtle · r-12 ·
+ * padding 16px top / 20px sides; eyebrow DNA t-11/semibold/tracking-
+ * label; 40px checklist rows; status rides 6px dots; ONE large number
+ * (the last-test premium) in text-strong, never green. Token-only BEM.
+ * ========================================================================== */
+
+.rater-overview {
+  display: grid;
+  grid-template-columns: 58fr 42fr;
+  gap: var(--rater-s-20);
+  align-items: start;
+  padding: var(--rater-s-20) 0 var(--rater-s-48);
+}
+
+@media (max-width: 1080px) {
+  .rater-overview {
+    grid-template-columns: 1fr;
+  }
+}
+
+.rater-overview__side {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-20);
+}
+
+.rater-overview__panel {
+  background: var(--rater-surface-1);
+  border: 1px solid var(--rater-border-subtle);
+  border-radius: var(--rater-r-12);
+  padding: var(--rater-s-16) var(--rater-s-20);
+}
+
+.rater-overview__panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--rater-s-8);
+}
+
+.rater-overview__eyebrow {
+  margin: 0;
+  font-size: var(--rater-t-11);
+  font-weight: var(--rater-fw-semibold);
+  letter-spacing: var(--rater-tracking-label);
+  text-transform: uppercase;
+  color: var(--rater-text-subtle);
+}
+
+.rater-overview__count {
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── checklist ────────────────────────────────────────────────────── */
+
+.rater-overview__steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.rater-overview__step {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-10);
+  height: 40px;
+  border-bottom: 1px solid var(--rater-border-subtle);
+}
+
+.rater-overview__step:last-child {
+  border-bottom: 0;
+}
+
+.rater-overview__step-mark {
+  width: 16px;
+  height: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  color: var(--rater-feedback-success);
+}
+
+/* not-done: a quiet 6px attention dot centered in the same slot so
+ * the labels stay column-aligned */
+.rater-overview__step-mark:not(.rater-overview__step-mark--done)::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: var(--rater-r-full);
+  background: var(--rater-feedback-warn);
+}
+
+.rater-overview__step-label {
+  font-size: var(--rater-t-13);
+  color: var(--rater-text-default);
+  flex: 1;
+  min-width: 0;
+}
+
+.rater-overview__step-detail {
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-muted);
+  font-variant-numeric: tabular-nums;
+  flex: none;
+}
+
+/* Brief 89 R6 — the quiet separator between a step's two equally-valid
+   paths ("Declare inputs → ·or· Add them from a book →"). */
+.rater-overview__step-or {
+  font-size: 11px;
+  color: var(--rater-text-subtle);
+  flex: none;
+}
+
+/* ── last test ────────────────────────────────────────────────────── */
+
+.rater-overview__premium {
+  margin: var(--rater-s-4) 0 0;
+  font-size: 28px;
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-strong);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: var(--rater-tracking-tight);
+}
+
+.rater-overview__subline {
+  margin: var(--rater-s-4) 0 var(--rater-s-6);
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-muted);
+}
+
+/* ── versions ─────────────────────────────────────────────────────── */
+
+.rater-overview__versions {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.rater-overview__version {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-10);
+  height: 40px;
+  border-bottom: 1px solid var(--rater-border-subtle);
+}
+
+.rater-overview__version:last-child {
+  border-bottom: 0;
+}
+
+.rater-overview__version-name {
+  /* A version name ("Working draft", "Frozen …") is a label, not a machine
+     identifier — sans, per the type ramp (§1.3). The date rides its own span. */
+  font-family: var(--rater-font-sans);
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-default);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rater-overview__version-date {
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-subtle);
+  font-variant-numeric: tabular-nums;
+  flex: none;
+}
+
+/* neutral chip; state rides the dot (color governance) */
+.rater-overview__version-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-6);
+  height: 20px;
+  padding: 0 var(--rater-s-8);
+  border: 1px solid var(--rater-border-default);
+  border-radius: var(--rater-r-full);
+  font-size: var(--rater-t-11);
+  color: var(--rater-text-muted);
+  flex: none;
+}
+
+.rater-overview__version-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--rater-r-full);
+}
+
+.rater-overview__version-dot--draft {
+  background: var(--rater-accent-primary);
+}
+
+.rater-overview__version-dot--frozen {
+  background: var(--rater-text-muted);
+}
+
+.rater-overview__version-dot--published {
+  background: var(--rater-feedback-success);
+}
+
+/* ── plan facts ───────────────────────────────────────────────────── */
+
+.rater-overview__facts {
+  margin: 0;
+}
+
+.rater-overview__fact {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--rater-s-12);
+  height: 32px;
+}
+
+.rater-overview__fact dt {
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-subtle);
+}
+
+.rater-overview__fact dd {
+  margin: 0;
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-default);
+  font-variant-numeric: tabular-nums;
+}
+
+/* The creation note — long-form prose, so the row stacks (label above
+   text) instead of the 32px label/value line. */
+.rater-overview__fact--note {
+  flex-direction: column;
+  align-items: stretch;
+  height: auto;
+  gap: var(--rater-s-4);
+  padding-top: var(--rater-s-8);
+}
+
+.rater-overview__fact--note dd {
+  font-variant-numeric: normal;
+  line-height: var(--rater-lh-normal);
+  color: var(--rater-text-muted);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}

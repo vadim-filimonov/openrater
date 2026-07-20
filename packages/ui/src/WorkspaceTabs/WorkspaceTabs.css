@@ -1,0 +1,246 @@
+/* ============================================================================
+ * <WorkspaceTabs> — sub-brief 24.F2
+ *
+ * Top tab strip replacing the 24.B left rail. Primary navigation;
+ * Apple-grade type-only nav with a 2px accent underline on active.
+ *
+ * Tokens consumed:
+ *   --rater-surface-1, -2
+ *   --rater-hairline-base, -soft
+ *   --rater-text-strong, -default, -muted, -faint
+ *   --rater-row-hover-bg
+ *   --rater-accent-primary (active underline)
+ *   --rater-feedback-warn, -success
+ *   --rater-t-{10,13}
+ *   --rater-fw-{medium,semibold}
+ *   --rater-s-{4,6,8,12,16,20}
+ *   --rater-r-{2,full}
+ *   --rater-d-{80,140}
+ *   --rater-ease-snap
+ *   --rater-focus-ring
+ * ============================================================================ */
+
+.rater-workspace-tabs {
+  background: transparent;
+  border-bottom: 1px solid var(--rater-border-subtle);
+  /* Span full content width — the route puts this inside a max-width
+   * container if it wants centered. */
+  width: 100%;
+}
+
+.rater-workspace-tabs__list {
+  display: flex;
+  align-items: stretch;
+  gap: var(--rater-s-2);
+  /* V2_INTERFACE_SPEC §1.2 — one shared left edge: the page container
+   * owns the gutter + max-width; the strip adds NO padding of its own,
+   * and the first/last tabs bleed their hit-box padding outward so the
+   * first LABEL's glyph sits exactly on the content edge (fixes the
+   * +28px drift). */
+  padding: 0;
+  margin: 0;
+  /* V5 — at narrow widths the strip used to clip the last tab
+   * off the right edge with no way to reach it. Scroll horizontally
+   * instead; the scrollbar is hidden so it reads as a clean strip. */
+  overflow-x: auto;
+  scrollbar-width: none; /* Firefox */
+  /* A2 — the first/last tabs pull 16px outward (below) so their LABELS land on
+   * the shared content edge. But this list is the overflow scroll container, so
+   * its clip boundary used to sit at the content edge and shear the first tab's
+   * hover/active fill flush against the label (and the last tab's on the right).
+   * Push the clip boundary 16px into the gutter with an equal negative
+   * margin + padding: the content edge (and labels) stay put, but the first/last
+   * tabs' fills now render fully into the gutter — the same 16px the box extends
+   * past the label on every other tab. */
+  margin-inline: calc(-1 * var(--rater-s-16));
+  padding-inline: var(--rater-s-16);
+}
+
+.rater-workspace-tabs__list > .rater-workspace-tabs__tab:first-child {
+  margin-left: calc(-1 * var(--rater-s-16));
+}
+.rater-workspace-tabs__list > .rater-workspace-tabs__tab:last-child {
+  margin-right: calc(-1 * var(--rater-s-16));
+}
+.rater-workspace-tabs__list::-webkit-scrollbar {
+  display: none; /* WebKit/Blink */
+}
+
+.rater-workspace-tabs__spacer {
+  flex: 1;
+}
+
+/* ── Individual tab ───────────────────────────────────────────── */
+
+.rater-workspace-tabs__tab {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-6);
+  padding: var(--rater-s-12) var(--rater-s-16);
+  background: transparent;
+  border: 0;
+  /* V5 — never squish a tab below its label; the strip scrolls instead. */
+  flex-shrink: 0;
+  white-space: nowrap;
+  /* Active state uses a bottom border for the 2px accent — start
+   * with a transparent placeholder so the layout doesn't shift on
+   * activation. */
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  font-family: var(--rater-font-sans);
+  font-size: var(--rater-t-13);
+  font-weight: var(--rater-fw-medium);
+  color: var(--rater-text-muted);
+  letter-spacing: -0.005em;
+  /* Pull bottom border down 1px so it overlaps the strip's bottom
+   * hairline — gives the cleaner Apple-style "tab joins the strip"
+   * effect. */
+  margin-bottom: -1px;
+  transition:
+    color var(--rater-d-140) var(--rater-ease-snap),
+    border-color var(--rater-d-140) var(--rater-ease-snap),
+    background var(--rater-d-80) var(--rater-ease-snap);
+}
+
+.rater-workspace-tabs__tab:hover {
+  color: var(--rater-text-default);
+  background: var(--rater-row-hover-bg);
+}
+
+.rater-workspace-tabs__tab:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: -2px;
+}
+
+.rater-workspace-tabs__tab--active {
+  color: var(--rater-text-strong);
+  font-weight: var(--rater-fw-semibold);
+}
+
+/* A2 — the active accent underline rides a ::after (not border-bottom) so the
+ * first/last tabs — whose boxes pull 16px into the gutter for the shared-label-
+ * edge law — keep the underline ON the content edge instead of poking past it.
+ * The transparent border-bottom above still reserves the 2px + the -1px hairline
+ * overlap, so there is no layout shift. */
+.rater-workspace-tabs__tab::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 2px;
+  border-radius: 2px;
+  background: transparent;
+  transition: background var(--rater-d-140) var(--rater-ease-snap);
+}
+.rater-workspace-tabs__tab--active::after {
+  background: var(--rater-accent-primary);
+}
+/* the first/last tab labels sit on the content edge while the box overhangs the
+ * gutter by 16px — inset the underline by that overhang so it aligns to the
+ * label, not the box. */
+.rater-workspace-tabs__list
+  > .rater-workspace-tabs__tab:first-child::after {
+  left: var(--rater-s-16);
+}
+.rater-workspace-tabs__list
+  > .rater-workspace-tabs__tab:last-child::after {
+  right: var(--rater-s-16);
+}
+
+/* V2_INTERFACE_SPEC §1.1 color governance — the per-workspace kind
+ * underlines (Polish PR 8) are RETIRED: azure belongs to interaction
+ * (one accent underline for the active tab), and the cat-* palette
+ * appears only where the artifact IS a computation step. Navigation is
+ * neutral. */
+
+.rater-workspace-tabs__tab--active:hover {
+  background: transparent;
+}
+
+/* Sibling tabs (e.g., Verify) — slightly muted by default to signal
+ * they're an execution surface, not an authoring step. */
+.rater-workspace-tabs__tab--sibling:not(.rater-workspace-tabs__tab--active) {
+  color: var(--rater-text-faint);
+}
+
+/*  — the right group's hairline + eyebrow: the muted tint
+ * reads as a NAMED group, not disabled tabs. */
+.rater-workspace-tabs__group {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-8);
+  margin-right: var(--rater-s-4);
+}
+
+.rater-workspace-tabs__group-rule {
+  width: 1px;
+  height: 14px;
+  background: var(--rater-border-default);
+}
+
+.rater-workspace-tabs__group-eyebrow {
+  font-size: var(--rater-t-10);
+  letter-spacing: var(--rater-tracking-label);
+  text-transform: uppercase;
+  color: var(--rater-text-faint);
+  white-space: nowrap;
+}
+
+/* ── Tab label + status dot ──────────────────────────────────── */
+
+.rater-workspace-tabs__tab-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  /* Icon color follows the label's color via currentColor on the
+   * SVG; transition synced with label color. */
+  color: inherit;
+  opacity: 0.85;
+  transition: opacity var(--rater-d-140) var(--rater-ease-snap);
+}
+
+.rater-workspace-tabs__tab--active .rater-workspace-tabs__tab-icon,
+.rater-workspace-tabs__tab:hover .rater-workspace-tabs__tab-icon {
+  opacity: 1;
+}
+
+.rater-workspace-tabs__tab-label {
+  white-space: nowrap;
+}
+
+.rater-workspace-tabs__tab-status {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: var(--rater-r-full);
+  flex-shrink: 0;
+}
+
+.rater-workspace-tabs__tab-status--required-empty {
+  background: var(--rater-feedback-warn);
+}
+
+.rater-workspace-tabs__tab-status--in-progress {
+  background: var(--rater-text-muted);
+}
+
+.rater-workspace-tabs__tab-status--complete {
+  background: var(--rater-feedback-success, var(--rater-accent-success));
+}
+
+/* Narrow viewports — let tabs scroll horizontally rather than wrap or
+ * shrink. The active tab stays visible via scroll-into-view on URL
+ * change (handled by the route). */
+@media (max-width: 720px) {
+  .rater-workspace-tabs__list {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .rater-workspace-tabs__list::-webkit-scrollbar {
+    display: none;
+  }
+}

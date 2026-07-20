@@ -1,0 +1,57 @@
+{
+  "name": "V63.eligibility-portless-gate-variable",
+  "description": "Phase F residual (2026-07-17) — the gate-ONLY variable: declared by the actuary, referenced by an appetite rule, consumed by NO other stage, so the plan carries NO input port for it. The record coercion (V62) keyed off declared ports, so the boolean wire spelling '\"sprinklered_only_gate\": \"true\"' still reached the rule walk raw and strictly missed `eq true` — the same silent tier flip, alive in the port-less shape (legitimate authoring: the preflight treats gate variables as consumed-but-never-required). For a variable no port declares, the rule's own RHS is the one type declaration the compiled plan still carries: the run seam types from it when every reference is unambiguously boolean. Here the port-less boolean arrives as a wire string (rule matches → preferred) alongside a ported money field arriving as a wire string too (the V62 port path, unchanged — $1,898 is the Meridian mv_01 anchor). A typed-input caller is byte-identical.",
+  "plan": {
+    "id": "v63.eligibility_portless_gate_variable",
+    "version": "1.0.0",
+    "name": "Port-less gate-only boolean variable",
+    "lines": ["property"],
+    "effective": "2026-01-01",
+    "nodes": [
+      {
+        "id": "in_base",
+        "kind": "input",
+        "params": { "fieldName": "base_premium", "fieldType": "money" },
+        "position": { "x": 0, "y": 0 }
+      },
+      {
+        "id": "gate",
+        "kind": "eligibility.gate",
+        "params": {
+          "rules": [
+            {
+              "rule_id": "sprinklered_only",
+              "variable": "sprinklered_only_gate",
+              "op": "eq",
+              "value": true,
+              "tier": "preferred",
+              "reasoning": "Fully sprinklered occupancy — preferred appetite."
+            }
+          ],
+          "default_tier": "standard",
+          "default_reasoning": "Standard appetite."
+        },
+        "position": { "x": 200, "y": 120 }
+      },
+      {
+        "id": "out_premium",
+        "kind": "output",
+        "params": { "fieldName": "premium", "fieldType": "money" },
+        "position": { "x": 400, "y": 0 }
+      },
+      {
+        "id": "out_tier",
+        "kind": "output",
+        "params": { "fieldName": "tier", "fieldType": "string" },
+        "position": { "x": 400, "y": 120 }
+      }
+    ],
+    "edges": [
+      { "from": { "node": "in_base", "port": "value" }, "to": { "node": "out_premium", "port": "value" } },
+      { "from": { "node": "gate", "port": "tier" }, "to": { "node": "out_tier", "port": "value" } }
+    ]
+  },
+  "externalInputs": { "sprinklered_only_gate": "true", "base_premium": "1898" },
+  "expectedOutputs": { "premium": 1898, "tier": "preferred" },
+  "expectedEligibilityTier": "preferred"
+}

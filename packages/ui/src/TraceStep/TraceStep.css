@@ -1,0 +1,211 @@
+/* ============================================================================
+ * <TraceStep> — single trace entry row.
+ *
+ * Bordered card with header (label + kind id + headline output), an
+ * actuary-language explanation line, optional citation, optional
+ * error banner, and a collapsed inputs/outputs disclosure.
+ * ============================================================================ */
+
+.rater-trace-step {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-6);
+  padding: var(--rater-s-10) var(--rater-s-12);
+  border-radius: var(--rater-r-6);
+  border: 1px solid var(--rater-border-subtle);
+  background: var(--rater-surface-1);
+  transition:
+    background var(--rater-d-80) var(--rater-ease-soft),
+    border-color var(--rater-d-80) var(--rater-ease-soft);
+}
+
+.rater-trace-step:hover {
+  background: var(--rater-surface-2);
+}
+
+.rater-trace-step--errored {
+  border-color: var(--rater-feedback-error);
+  background: color-mix(in srgb, var(--rater-feedback-error) 6%, var(--rater-surface-1));
+}
+
+.rater-trace-step--highlighted {
+  border-color: var(--rater-focus-ring);
+  background: color-mix(in srgb, var(--rater-focus-ring) 8%, var(--rater-surface-1));
+}
+
+/* ── Header ─────────────────────────────────────────────────── */
+
+.rater-trace-step__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--rater-s-10);
+  /* Narrow cards: a long mono headline wraps to its own line instead
+     of crushing the label into ellipsis — the label is the step's
+     identity and must win the fight for width. */
+  flex-wrap: wrap;
+}
+
+.rater-trace-step__label-block {
+  display: flex;
+  align-items: baseline;
+  gap: var(--rater-s-8);
+  min-width: 0;
+}
+
+.rater-trace-step__node-label {
+  color: var(--rater-text-strong);
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-13);
+  font-weight: var(--rater-fw-semibold);
+  line-height: var(--rater-lh-snug);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rater-trace-step__kind-id {
+  color: var(--rater-text-muted);
+  font-family: var(--rater-fonts-mono, var(--rater-fonts-sans));
+  font-size: var(--rater-t-11, var(--rater-t-12));
+  font-weight: var(--rater-fw-regular);
+  flex-shrink: 0;
+}
+
+.rater-trace-step__headline {
+  font-family: var(--rater-fonts-mono, var(--rater-fonts-sans));
+  font-size: var(--rater-t-14);
+  font-weight: var(--rater-fw-semibold);
+  font-variant-numeric: tabular-nums;
+  color: var(--rater-text-strong);
+  flex-shrink: 0;
+  /* Wrapped onto its own line it stays right-aligned; an unbroken
+     token longer than the card can still break as a last resort. */
+  margin-left: auto;
+  max-width: 100%;
+  overflow-wrap: break-word;
+}
+
+/* ── Explanation + citation ─────────────────────────────────── */
+
+.rater-trace-step__explanation {
+  margin: 0;
+  color: var(--rater-text-default);
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-13);
+  line-height: var(--rater-lh-normal);
+}
+
+.rater-trace-step__citation {
+  /* CitationLink owns its own styling — this is just spacing */
+  display: block;
+}
+
+/* ── Error banner ───────────────────────────────────────────── */
+
+.rater-trace-step__error {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--rater-s-6);
+  padding: var(--rater-s-6) var(--rater-s-8);
+  border-radius: var(--rater-r-4);
+  background: color-mix(in srgb, var(--rater-feedback-error) 12%, var(--rater-surface-1));
+  color: var(--rater-feedback-error);
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-12);
+  font-weight: var(--rater-fw-medium);
+  line-height: var(--rater-lh-snug);
+}
+
+.rater-trace-step__error svg {
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* ── Inputs disclosure ──────────────────────────────────────── */
+
+.rater-trace-step__inputs {
+  margin: 0;
+}
+
+.rater-trace-step__inputs-summary {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-4);
+  padding: var(--rater-s-2) var(--rater-s-4);
+  border-radius: var(--rater-r-2);
+  cursor: pointer;
+  color: var(--rater-text-muted);
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-12);
+  font-weight: var(--rater-fw-medium);
+  user-select: none;
+  list-style: none;
+  width: fit-content;
+}
+
+.rater-trace-step__inputs-summary::-webkit-details-marker {
+  display: none;
+}
+
+.rater-trace-step__inputs-summary:hover {
+  color: var(--rater-text-default);
+  background: var(--rater-surface-2);
+}
+
+.rater-trace-step__inputs-summary:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: 1px;
+}
+
+.rater-trace-step__disclosure-icon {
+  flex-shrink: 0;
+  transition: transform var(--rater-d-140) var(--rater-ease-soft);
+}
+
+.rater-trace-step__inputs[open] .rater-trace-step__disclosure-icon {
+  transform: rotate(90deg);
+}
+
+.rater-trace-step__io-table {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-6);
+  padding-top: var(--rater-s-6);
+  padding-left: var(--rater-s-12);
+}
+
+.rater-trace-step__io-table table {
+  border-collapse: collapse;
+  width: 100%;
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-12);
+}
+
+.rater-trace-step__io-caption {
+  text-align: left;
+  padding-bottom: var(--rater-s-2);
+  color: var(--rater-text-muted);
+  font-size: var(--rater-t-11, var(--rater-t-12));
+  font-weight: var(--rater-fw-semibold);
+  text-transform: uppercase;
+  letter-spacing: var(--rater-tracking-label);
+}
+
+.rater-trace-step__io-table th {
+  text-align: left;
+  font-weight: var(--rater-fw-medium);
+  color: var(--rater-text-muted);
+  padding: var(--rater-s-2) var(--rater-s-8) var(--rater-s-2) 0;
+  white-space: nowrap;
+  vertical-align: top;
+  width: 1%;
+}
+
+.rater-trace-step__io-table td {
+  color: var(--rater-text-strong);
+  font-family: var(--rater-fonts-mono, var(--rater-fonts-sans));
+  font-variant-numeric: tabular-nums;
+  padding: var(--rater-s-2) 0;
+  word-break: break-word;
+}

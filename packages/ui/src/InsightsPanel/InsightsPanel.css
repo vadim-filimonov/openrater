@@ -1,0 +1,161 @@
+/* ──────────────────────────────────────────────────────────────
+   InsightsPanel — Brief 34 PR 34.3
+
+   Calm auto-insights panel rendered below the chart in the right
+   pane. Matches the polished mockup's `.insights` + `.insight--*`
+   classes. Per Brief 34 P4: "Loud about what matters, quiet about
+   what doesn't" — no banners, no bright reds, max 6 visible.
+   ────────────────────────────────────────────────────────────── */
+
+.rater-insights-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-6);
+  padding: var(--rater-s-12);
+  background: var(--rater-surface-canvas);
+  border: 1px solid var(--rater-hairline-soft);
+  border-radius: var(--rater-r-8);
+}
+
+.rater-insights-panel-label {
+  font-size: 10px;
+  letter-spacing: var(--rater-tracking-label);
+  text-transform: uppercase;
+  color: var(--rater-text-subtle);
+  font-weight: var(--rater-fw-semibold);
+}
+
+.rater-insights-panel-empty {
+  margin: 0;
+  font-size: 12px;
+  color: var(--rater-text-subtle);
+  font-style: italic;
+  padding: var(--rater-s-6) 0;
+}
+
+.rater-insights-panel-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-4);
+}
+
+.rater-insights-panel-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--rater-s-8);
+  padding: var(--rater-s-6) var(--rater-s-8);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--rater-r-6);
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--rater-text-default);
+  transition: background 80ms ease, border-color 80ms ease;
+}
+.rater-insights-panel-item.is-clickable {
+  cursor: pointer;
+}
+.rater-insights-panel-item.is-clickable:hover,
+.rater-insights-panel-item.is-clickable:focus-visible {
+  background: var(--rater-surface-2);
+  border-color: var(--rater-hairline-soft);
+  outline: none;
+}
+
+/* Severity variants */
+.rater-insights-panel-item.is-info {
+  color: var(--rater-text-default);
+}
+.rater-insights-panel-item.is-good {
+  color: var(--rater-text-default);
+}
+.rater-insights-panel-item.is-warn {
+  color: var(--rater-text-default);
+  background: color-mix(
+    in srgb,
+    var(--rater-cat-loading) 5%,
+    transparent
+  );
+}
+
+/* Icon — circular, severity-tinted */
+.rater-insights-panel-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  font-size: 10px;
+  font-weight: var(--rater-fw-semibold);
+  font-family: var(--rater-fonts-mono);
+  margin-top: 2px;
+}
+.rater-insights-panel-item.is-info .rater-insights-panel-icon {
+  background: var(--rater-surface-2);
+  color: var(--rater-text-muted);
+}
+.rater-insights-panel-item.is-good .rater-insights-panel-icon {
+  background: color-mix(
+    in srgb,
+    var(--rater-cat-math) 24%,
+    transparent
+  );
+  color: var(--rater-cat-math-text, #6ee7b7);
+}
+.rater-insights-panel-item.is-warn .rater-insights-panel-icon {
+  background: color-mix(
+    in srgb,
+    var(--rater-cat-loading) 24%,
+    transparent
+  );
+  color: var(--rater-cat-loading-text);
+}
+
+.rater-insights-panel-message {
+  min-width: 0;
+  word-wrap: break-word;
+}
+
+/* Inline `code:` tokens */
+.rater-insights-panel-code {
+  font-family: var(--rater-fonts-mono);
+  font-size: 11px;
+  padding: 1px var(--rater-s-4);
+  background: var(--rater-surface-2);
+  border-radius: var(--rater-r-4);
+  color: var(--rater-text-default);
+  margin: 0 1px;
+  white-space: nowrap;
+}
+
+/* "Show N more" footer */
+.rater-insights-panel-more {
+  align-self: flex-start;
+  background: transparent;
+  border: 1px solid var(--rater-hairline-soft);
+  color: var(--rater-text-muted);
+  padding: var(--rater-s-4) var(--rater-s-8);
+  font-size: 11px;
+  border-radius: var(--rater-r-6);
+  cursor: pointer;
+  font-family: inherit;
+  margin-top: var(--rater-s-4);
+  transition: border-color 80ms ease, color 80ms ease;
+}
+.rater-insights-panel-more:hover {
+  border-color: var(--rater-hairline-strong);
+  color: var(--rater-text-default);
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .rater-insights-panel-item,
+  .rater-insights-panel-more {
+    transition: none;
+  }
+}

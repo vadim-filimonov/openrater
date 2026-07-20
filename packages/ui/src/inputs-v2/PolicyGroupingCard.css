@@ -1,0 +1,168 @@
+/* <PolicyGroupingCard> — Brief 80 D-A (finding E7). The policy-
+ * composition contract's one authoring home: sentence-shaped card in
+ * the Inputs mapping act. */
+
+.rater-polgroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-10);
+  padding: var(--rater-s-12) var(--rater-s-14);
+  background: var(--rater-surface-1);
+  border: 1px solid var(--rater-border-subtle);
+  border-radius: var(--rater-r-12);
+}
+
+/* ── Collapsed offer ─────────────────────────────────────────────── */
+
+.rater-polgroup--offer {
+  flex-direction: row;
+  align-items: center;
+  gap: var(--rater-s-10);
+  color: var(--rater-text-muted);
+}
+
+.rater-polgroup__offer-copy {
+  flex: 1;
+  margin: 0;
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-muted);
+  line-height: var(--rater-lh-normal);
+}
+
+.rater-polgroup__offer-copy code,
+.rater-polgroup__sentence code,
+.rater-polgroup__rollup code,
+.rater-polgroup__honesty code {
+  font-family: var(--rater-font-mono);
+  letter-spacing: var(--rater-tracking-mono);
+  font-size: 0.95em;
+  background: var(--rater-surface-sunken);
+  padding: 0 4px;
+  border-radius: var(--rater-r-4);
+  color: var(--rater-text-default);
+}
+
+/* ── Enabled card ────────────────────────────────────────────────── */
+
+.rater-polgroup__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--rater-s-8);
+}
+
+.rater-polgroup__eyebrow {
+  font-size: var(--rater-t-11);
+  letter-spacing: var(--rater-tracking-label);
+  text-transform: uppercase;
+  color: var(--rater-text-subtle);
+  font-weight: var(--rater-fw-semibold);
+}
+
+.rater-polgroup__sentence {
+  margin: 0;
+  font-size: var(--rater-t-13);
+  color: var(--rater-text-default);
+  line-height: var(--rater-lh-relaxed);
+}
+
+.rater-polgroup__select {
+  padding: 2px var(--rater-s-6);
+  background: var(--rater-surface-canvas);
+  border: 1px solid var(--rater-border-default);
+  border-radius: var(--rater-r-6);
+  color: var(--rater-text-default);
+  font-family: var(--rater-font-mono);
+  letter-spacing: var(--rater-tracking-mono);
+  font-size: var(--rater-t-12);
+}
+
+.rater-polgroup__select:focus-visible {
+  outline: none;
+  border-color: var(--rater-focus-ring);
+  box-shadow: 0 0 0 2px var(--rater-focus-halo);
+}
+
+.rater-polgroup__rollups {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-6);
+}
+
+.rater-polgroup__rollups-label {
+  font-size: var(--rater-t-11);
+  letter-spacing: var(--rater-tracking-label);
+  text-transform: uppercase;
+  color: var(--rater-text-subtle);
+  font-weight: var(--rater-fw-semibold);
+}
+
+.rater-polgroup__rollup-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.rater-polgroup__rollup {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-8);
+  padding: var(--rater-s-4) var(--rater-s-6);
+  border-radius: var(--rater-r-6);
+  font-size: var(--rater-t-12);
+}
+
+.rater-polgroup__rollup:hover {
+  background: var(--rater-row-hover-bg);
+}
+
+.rater-polgroup__reducer {
+  color: var(--rater-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.rater-polgroup__rollup-note {
+  color: var(--rater-text-subtle);
+  font-size: var(--rater-t-11);
+}
+
+.rater-polgroup__remove,
+.rater-polgroup__add {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-4);
+  border: 0;
+  background: transparent;
+  color: var(--rater-text-subtle);
+  font-family: inherit;
+  font-size: var(--rater-t-11);
+  cursor: pointer;
+  padding: 2px var(--rater-s-4);
+  border-radius: var(--rater-r-4);
+}
+
+.rater-polgroup__remove {
+  margin-left: auto;
+}
+
+.rater-polgroup__remove:hover,
+.rater-polgroup__add:hover {
+  color: var(--rater-text-default);
+  background: var(--rater-surface-2);
+}
+
+.rater-polgroup__remove:focus-visible,
+.rater-polgroup__add:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: 1px;
+}
+
+.rater-polgroup__honesty {
+  margin: 0;
+  font-size: var(--rater-t-12);
+  color: var(--rater-feedback-warn);
+  line-height: var(--rater-lh-normal);
+}

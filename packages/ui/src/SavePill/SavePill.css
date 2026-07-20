@@ -1,0 +1,63 @@
+/* ============================================================================
+ * <SavePill> — the one save-status pill (calm dot + sentence-case t-11).
+ *
+ * Replaces the per-surface bespoke pills (buildup / appetite / pc /
+ * geo-editor). Color lives in the status domain only (V2 §1.1); the 6px
+ * dot inherits currentcolor so dot + text always agree.
+ * ========================================================================= */
+
+.rater-savepill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-6);
+  font-size: var(--rater-t-11);
+  font-weight: var(--rater-fw-medium);
+  padding: 2px var(--rater-s-8);
+  border-radius: var(--rater-r-full);
+  white-space: nowrap;
+}
+
+.rater-savepill::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentcolor;
+}
+
+.rater-savepill--dirty {
+  color: var(--rater-feedback-warn);
+}
+.rater-savepill--saving {
+  color: var(--rater-text-subtle);
+}
+.rater-savepill--saved {
+  color: var(--rater-feedback-success);
+}
+.rater-savepill--error {
+  color: var(--rater-feedback-error);
+}
+
+/* The "Saved" confirmation is transient — hold briefly, then fade out so
+ * it doesn't linger as a permanent badge. Motion-reduced users get the
+ * static pill. */
+@keyframes rater-savepill-fade {
+  0%,
+  55% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.rater-savepill--saved {
+  animation: rater-savepill-fade 2.6s var(--rater-ease-snap) forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rater-savepill--saved {
+    animation: none;
+  }
+}

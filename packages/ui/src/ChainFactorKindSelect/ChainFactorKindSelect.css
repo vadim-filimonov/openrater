@@ -1,0 +1,41 @@
+/* ============================================================================
+ * <ChainFactorKindSelect> — factor-kind picker.
+ * Native <select> styled to match the rest of the design system +
+ * a small hint row below.
+ * ============================================================================ */
+
+.rater-chain-factor-kind-select {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-4);
+  font-family: var(--rater-fonts-sans);
+}
+
+.rater-chain-factor-kind-select__field {
+  height: 36px;
+  padding: 0 var(--rater-s-10);
+  border: 1px solid var(--rater-hairline-base);
+  border-radius: var(--rater-r-6);
+  background: var(--rater-surface-canvas);
+  color: var(--rater-text-strong);
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-13);
+  cursor: pointer;
+}
+
+.rater-chain-factor-kind-select__field:focus-visible {
+  outline: 2px solid var(--rater-brand-accent, var(--rater-text-strong));
+  outline-offset: 1px;
+}
+
+.rater-chain-factor-kind-select__field:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.rater-chain-factor-kind-select__hint {
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-muted);
+  line-height: var(--rater-lh-relaxed);
+  font-style: italic;
+}

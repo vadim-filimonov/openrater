@@ -1,0 +1,193 @@
+/*
+ * <LevelMappingRow> styles — Brief 26 PR 6.
+ *
+ * Kind-aware per-level row. Categorical / banded / geographic
+ * variants get accent stripes matching the ADR-0023 §7 palette:
+ *   categorical → cat-input    (azure)
+ *   banded      → cat-loading  (orange)
+ *   geographic  → cat-transform (violet)
+ */
+
+.rater-level-mapping-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-6);
+  padding: var(--rater-s-8) var(--rater-s-10) var(--rater-s-8) var(--rater-s-12);
+  border: 1px solid var(--rater-hairline-soft);
+  border-radius: var(--rater-r-6);
+  background: var(--rater-surface-1);
+  position: relative;
+}
+
+/* Left-edge accent stripe — per-kind color. */
+.rater-level-mapping-row::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  border-radius: var(--rater-r-6) 0 0 var(--rater-r-6);
+}
+
+.rater-level-mapping-row--categorical::before {
+  background: var(--rater-cat-input);
+}
+
+.rater-level-mapping-row--banded::before {
+  background: var(--rater-cat-loading);
+}
+
+.rater-level-mapping-row--geographic::before {
+  background: var(--rater-cat-transform);
+}
+
+/* Header — id chip + label input + delete */
+
+.rater-level-mapping-row__head {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-6);
+}
+
+.rater-level-mapping-row__id {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  padding: var(--rater-s-2) var(--rater-s-6);
+  background: var(--rater-surface-sunken);
+  border-radius: var(--rater-r-4);
+  font-family: var(--rater-font-mono);
+  font-size: var(--rater-t-11);
+  color: var(--rater-text-muted);
+  white-space: nowrap;
+}
+
+.rater-level-mapping-row__label-input {
+  flex: 1;
+  padding: var(--rater-s-2) var(--rater-s-6);
+  border: 1px solid transparent;
+  border-radius: var(--rater-r-4);
+  background: transparent;
+  color: var(--rater-text-default);
+  font-family: var(--rater-font-sans);
+  font-size: var(--rater-t-13);
+  font-weight: var(--rater-fw-medium);
+  transition: border-color var(--rater-d-80) var(--rater-ease-snap);
+}
+
+.rater-level-mapping-row__label-input:hover {
+  border-color: var(--rater-hairline-base);
+}
+
+.rater-level-mapping-row__label-input:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: 1px;
+  border-color: var(--rater-focus-ring);
+}
+
+.rater-level-mapping-row__delete {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  border-radius: var(--rater-r-4);
+  background: transparent;
+  color: var(--rater-text-muted);
+  cursor: pointer;
+  transition:
+    background-color var(--rater-d-80) var(--rater-ease-snap),
+    color var(--rater-d-80) var(--rater-ease-snap);
+}
+
+.rater-level-mapping-row__delete:hover {
+  background: var(--rater-surface-sunken);
+  color: var(--rater-feedback-error);
+}
+
+.rater-level-mapping-row__delete:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: 2px;
+}
+
+.rater-level-mapping-row__delete:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* Body — kind-specific affordances */
+
+.rater-level-mapping-row__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-4);
+}
+
+.rater-level-mapping-row__body--banded {
+  gap: var(--rater-s-6);
+}
+
+.rater-level-mapping-row__sub-label {
+  font-size: var(--rater-t-11);
+  font-weight: var(--rater-fw-medium);
+  letter-spacing: var(--rater-tracking-label);
+  color: var(--rater-text-muted);
+  text-transform: uppercase;
+}
+
+.rater-level-mapping-row__hint {
+  margin: 0;
+  font-size: var(--rater-t-11);
+  color: var(--rater-text-faint);
+  line-height: var(--rater-leading-snug);
+}
+
+/* Banded — lo / hi range inputs */
+
+.rater-level-mapping-row__range {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-6);
+}
+
+.rater-level-mapping-row__range-input {
+  flex: 1;
+  max-width: 120px;
+  padding: var(--rater-s-2) var(--rater-s-6);
+  border: 1px solid var(--rater-hairline-base);
+  border-radius: var(--rater-r-4);
+  background: var(--rater-surface-1);
+  color: var(--rater-text-default);
+  font-family: var(--rater-font-mono);
+  font-variant-numeric: var(--rater-num-tabular);
+  font-size: var(--rater-t-12);
+}
+
+.rater-level-mapping-row__range-input:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: 1px;
+  border-color: var(--rater-cat-loading);
+}
+
+.rater-level-mapping-row__range-sep {
+  font-family: var(--rater-font-mono);
+  font-size: var(--rater-t-11);
+  color: var(--rater-text-muted);
+  white-space: nowrap;
+}
+
+/* Geographic — read-only territory ref */
+
+.rater-level-mapping-row__territory-ref {
+  display: inline-block;
+  padding: var(--rater-s-4) var(--rater-s-8);
+  background: color-mix(in srgb, var(--rater-cat-transform) 8%, var(--rater-surface-1));
+  border: 1px solid color-mix(in srgb, var(--rater-cat-transform) 24%, var(--rater-hairline-base));
+  border-radius: var(--rater-r-4);
+  font-family: var(--rater-font-mono);
+  font-size: var(--rater-t-12);
+  color: var(--rater-cat-transform);
+  width: fit-content;
+}

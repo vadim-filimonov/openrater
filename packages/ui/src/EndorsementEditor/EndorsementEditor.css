@@ -1,0 +1,594 @@
+/* ============================================================================
+ * <EndorsementEditor> — Brief 39 PR 39.4.
+ *
+ * Same shell + density as Brief 35 Assemble nodes / Brief 38 input
+ * editor / Brief 39 FilterRuleEditor + ModifierEditor. Surface-1
+ * card on the dot-grid canvas, hairline borders, 11px uppercase
+ * field labels, 13px field inputs. Endorsement uses the "output"
+ * category color (red glyph) per Brief 39 §5 inventory rail spec.
+ * ========================================================================== */
+
+.rater-endorsement-editor {
+  background: var(--rater-surface-1);
+  border: 1px solid var(--rater-hairline-base);
+  border-radius: var(--rater-r-8);
+  overflow: hidden;
+  width: 100%;
+  max-width: 640px;
+  font-family: var(--rater-fonts-sans);
+  color: var(--rater-text-default);
+}
+
+/* ── Hard-mismatch banner ───────────────────────────────────────── */
+.rater-endorsement-editor__mismatch {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 14px;
+  background: color-mix(in srgb, var(--rater-feedback-error) 8%, var(--rater-surface-1));
+  border-bottom: 1px solid color-mix(in srgb, var(--rater-feedback-error) 32%, transparent);
+}
+
+.rater-endorsement-editor__mismatch-glyph {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--rater-feedback-error) 22%, transparent);
+  color: var(--rater-feedback-error);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: var(--rater-fw-bold);
+  flex-shrink: 0;
+}
+
+.rater-endorsement-editor__mismatch-title {
+  margin: 0 0 4px;
+  font-size: var(--rater-t-13, 13px);
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-feedback-error);
+}
+
+.rater-endorsement-editor__mismatch-detail {
+  margin: 0;
+  font-size: var(--rater-t-12, 12px);
+  line-height: 1.5;
+  color: var(--rater-text-default);
+}
+
+.rater-endorsement-editor__mismatch-detail code {
+  background: var(--rater-surface-canvas);
+  padding: 1px 5px;
+  border-radius: var(--rater-r-4);
+  font-family: var(--rater-fonts-mono);
+  font-size: var(--rater-t-11, 11px);
+  color: var(--rater-cat-output-text);
+}
+
+/* ── Head ──────────────────────────────────────────────────────── */
+.rater-endorsement-editor__head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--rater-hairline-soft);
+}
+
+.rater-endorsement-editor__head-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--rater-r-6);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--rater-fonts-mono);
+  font-size: var(--rater-t-13, 13px);
+  background: color-mix(in srgb, var(--rater-cat-output) 18%, transparent);
+  color: var(--rater-cat-output-text);
+  flex-shrink: 0;
+}
+
+.rater-endorsement-editor__head-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.rater-endorsement-editor__head-title {
+  margin: 0;
+  font-size: var(--rater-t-14, 14px);
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-strong);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rater-endorsement-editor__head-sub {
+  font-size: var(--rater-t-11, 11px);
+  color: var(--rater-text-subtle);
+  font-family: var(--rater-fonts-mono);
+}
+
+/* ── Body ─────────────────────────────────────────────────────── */
+.rater-endorsement-editor__body {
+  padding: 16px 18px;
+}
+
+.rater-endorsement-editor__field {
+  margin-bottom: 14px;
+}
+
+.rater-endorsement-editor__field-label {
+  display: block;
+  font-size: var(--rater-t-11, 11px);
+  color: var(--rater-text-subtle);
+  text-transform: uppercase;
+  letter-spacing: var(--rater-tracking-label);
+  margin-bottom: 6px;
+  font-weight: var(--rater-fw-semibold);
+}
+
+.rater-endorsement-editor__field-hint {
+  font-size: var(--rater-t-11, 11px);
+  color: var(--rater-text-subtle);
+  margin-top: 6px;
+  line-height: 1.55;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.rater-endorsement-editor__field-hint code,
+.rater-endorsement-editor__field-hint strong {
+  font-family: var(--rater-fonts-mono);
+  font-size: var(--rater-t-11, 11px);
+  color: var(--rater-text-default);
+  background: var(--rater-surface-canvas);
+  padding: 1px 5px;
+  border-radius: var(--rater-r-4);
+}
+
+.rater-endorsement-editor__input {
+  width: 100%;
+  background: var(--rater-surface-canvas);
+  border: 1px solid var(--rater-hairline-base);
+  border-radius: var(--rater-r-6);
+  padding: 8px 10px;
+  color: var(--rater-text-default);
+  font-family: inherit;
+  font-size: var(--rater-t-13, 13px);
+  outline: none;
+}
+
+.rater-endorsement-editor__input.is-mono {
+  font-family: var(--rater-fonts-mono);
+}
+
+.rater-endorsement-editor__input.is-narrow {
+  width: auto;
+  min-width: 88px;
+  max-width: 140px;
+}
+
+.rater-endorsement-editor__input.is-op {
+  text-align: center;
+}
+
+.rater-endorsement-editor__input:focus-visible {
+  border-color: var(--rater-cat-output);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--rater-cat-output) 30%, transparent);
+}
+
+.rater-endorsement-editor__input::placeholder {
+  color: var(--rater-text-subtle);
+}
+
+/* ── Form-number row (input + suggested picker) ───────────────── */
+.rater-endorsement-editor__form-row {
+  display: flex;
+  gap: 6px;
+  align-items: stretch;
+}
+
+.rater-endorsement-editor__form-row > .rater-endorsement-editor__input {
+  flex: 1;
+}
+
+.rater-endorsement-editor__suggest {
+  position: relative;
+}
+
+.rater-endorsement-editor__suggest-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--rater-surface-2);
+  border: 1px solid var(--rater-hairline-base);
+  border-radius: var(--rater-r-6);
+  padding: 8px 10px;
+  color: var(--rater-text-default);
+  font-family: inherit;
+  font-size: var(--rater-t-12, 12px);
+  cursor: pointer;
+  white-space: nowrap;
+  height: 100%;
+}
+
+.rater-endorsement-editor__suggest-btn:hover {
+  border-color: var(--rater-hairline-strong);
+}
+
+.rater-endorsement-editor__suggest-btn.is-open {
+  background: color-mix(in srgb, var(--rater-cat-output) 12%, transparent);
+  border-color: color-mix(in srgb, var(--rater-cat-output) 40%, transparent);
+  color: var(--rater-cat-output-text);
+}
+
+.rater-endorsement-editor__suggest-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  z-index: 20;
+  min-width: 320px;
+  max-height: 280px;
+  overflow-y: auto;
+  background: var(--rater-surface-1);
+  border: 1px solid var(--rater-hairline-base);
+  border-radius: var(--rater-r-8);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+  padding: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.rater-endorsement-editor__suggest-item {
+  display: grid;
+  grid-template-columns: 90px 1fr 80px;
+  gap: 8px;
+  align-items: center;
+  padding: 8px 10px;
+  background: transparent;
+  border: 0;
+  border-radius: var(--rater-r-6);
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+  width: 100%;
+}
+
+.rater-endorsement-editor__suggest-item:hover,
+.rater-endorsement-editor__suggest-item:focus-visible {
+  background: var(--rater-surface-2);
+  outline: none;
+}
+
+.rater-endorsement-editor__suggest-item[aria-selected="true"] {
+  background: color-mix(in srgb, var(--rater-cat-output) 10%, transparent);
+}
+
+.rater-endorsement-editor__suggest-form {
+  font-family: var(--rater-fonts-mono);
+  font-size: var(--rater-t-12, 12px);
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-strong);
+}
+
+.rater-endorsement-editor__suggest-name {
+  font-size: var(--rater-t-12, 12px);
+  color: var(--rater-text-default);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rater-endorsement-editor__suggest-kind {
+  font-family: var(--rater-fonts-mono);
+  font-size: var(--rater-t-10, 10px);
+  font-weight: var(--rater-fw-semibold);
+  padding: 2px 6px;
+  border-radius: var(--rater-r-4);
+  text-transform: uppercase;
+  letter-spacing: var(--rater-tracking-label);
+  text-align: center;
+  background: var(--rater-surface-2);
+  color: var(--rater-text-muted);
+}
+
+.rater-endorsement-editor__suggest-kind[data-kind="factor"] {
+  background: color-mix(in srgb, var(--rater-cat-math) 14%, transparent);
+  color: var(--rater-cat-math-text);
+}
+
+.rater-endorsement-editor__suggest-kind[data-kind="additive"] {
+  background: color-mix(in srgb, var(--rater-cat-transform) 14%, transparent);
+  color: var(--rater-cat-transform-text);
+}
+
+.rater-endorsement-editor__suggest-kind[data-kind="sublimit"] {
+  background: color-mix(in srgb, var(--rater-cat-output) 14%, transparent);
+  color: var(--rater-cat-output-text);
+}
+
+/* ── Trigger block ────────────────────────────────────────────── */
+.rater-endorsement-editor__trigger {
+  background: var(--rater-surface-canvas);
+  border: 1px dashed color-mix(in srgb, var(--rater-cat-loading) 32%, var(--rater-hairline-base));
+  border-radius: var(--rater-r-6);
+  padding: 12px;
+  margin-bottom: 14px;
+}
+
+.rater-endorsement-editor__trigger.is-unresolved {
+  border-color: color-mix(in srgb, var(--rater-feedback-error) 50%, var(--rater-hairline-base));
+}
+
+.rater-endorsement-editor__trigger-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.rater-endorsement-editor__trigger-label {
+  font-size: var(--rater-t-10, 10px);
+  text-transform: uppercase;
+  letter-spacing: var(--rater-tracking-label);
+  color: var(--rater-cat-loading-text);
+  font-weight: var(--rater-fw-semibold);
+}
+
+.rater-endorsement-editor__trigger.is-unresolved .rater-endorsement-editor__trigger-label {
+  color: var(--rater-feedback-error);
+}
+
+.rater-endorsement-editor__trigger-clear {
+  background: transparent;
+  border: 0;
+  color: var(--rater-text-subtle);
+  font-family: inherit;
+  font-size: var(--rater-t-11, 11px);
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: var(--rater-r-4);
+}
+
+.rater-endorsement-editor__trigger-clear:hover {
+  background: var(--rater-surface-2);
+  color: var(--rater-text-default);
+}
+
+.rater-endorsement-editor__trigger-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 64px 1fr;
+  gap: 6px;
+  align-items: stretch;
+}
+
+.rater-endorsement-editor__trigger-grid.is-unmapped {
+  outline: 1px solid color-mix(in srgb, var(--rater-feedback-error) 40%, transparent);
+  outline-offset: 2px;
+  border-radius: var(--rater-r-6);
+}
+
+.rater-endorsement-editor__trigger-add {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: 1px dashed var(--rater-hairline-strong);
+  color: var(--rater-text-muted);
+  font-family: inherit;
+  font-size: var(--rater-t-12, 12px);
+  padding: 8px 12px;
+  border-radius: var(--rater-r-6);
+  cursor: pointer;
+  width: 100%;
+  justify-content: center;
+}
+
+.rater-endorsement-editor__trigger-add:hover {
+  border-color: var(--rater-cat-loading);
+  color: var(--rater-cat-loading-text);
+}
+
+.rater-endorsement-editor__trigger-hint {
+  font-size: var(--rater-t-10, 10px);
+  color: var(--rater-text-subtle);
+  font-family: var(--rater-fonts-mono);
+  margin-left: 6px;
+}
+
+/* ── Effect picker (3 buttons) ────────────────────────────────── */
+.rater-endorsement-editor__effect-picker {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.rater-endorsement-editor__effect-btn {
+  background: var(--rater-surface-2);
+  border: 1px solid var(--rater-hairline-soft);
+  border-radius: var(--rater-r-8);
+  padding: 12px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  color: var(--rater-text-muted);
+  font-family: inherit;
+  transition: all 100ms ease-out;
+}
+
+.rater-endorsement-editor__effect-btn:hover {
+  border-color: var(--rater-hairline-strong);
+}
+
+.rater-endorsement-editor__effect-btn:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: 1px;
+}
+
+.rater-endorsement-editor__effect-btn.is-selected {
+  background: color-mix(in srgb, var(--rater-cat-output) 12%, transparent);
+  border-color: color-mix(in srgb, var(--rater-cat-output) 40%, transparent);
+  color: var(--rater-cat-output-text);
+}
+
+.rater-endorsement-editor__effect-glyph {
+  font-family: var(--rater-fonts-mono);
+  font-size: var(--rater-t-16, 16px);
+  font-weight: var(--rater-fw-bold);
+}
+
+.rater-endorsement-editor__effect-label {
+  font-size: var(--rater-t-11, 11px);
+  font-weight: var(--rater-fw-semibold);
+  text-transform: uppercase;
+  letter-spacing: var(--rater-tracking-label);
+}
+
+.rater-endorsement-editor__effect-hint {
+  font-size: var(--rater-t-10, 10px);
+  color: var(--rater-text-subtle);
+  font-weight: var(--rater-fw-regular);
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+/* ── Action row ────────────────────────────────────────────────── */
+.rater-endorsement-editor__actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--rater-hairline-soft);
+}
+
+.rater-endorsement-editor__btn {
+  background: var(--rater-surface-2);
+  border: 1px solid var(--rater-hairline-base);
+  border-radius: var(--rater-r-6);
+  padding: 6px 12px;
+  font-family: inherit;
+  font-size: var(--rater-t-12, 12px);
+  color: var(--rater-text-default);
+  cursor: pointer;
+}
+
+.rater-endorsement-editor__btn:hover {
+  background: var(--rater-surface-3);
+  border-color: var(--rater-hairline-strong);
+}
+
+.rater-endorsement-editor__btn:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: 1px;
+}
+
+.rater-endorsement-editor__btn.is-primary {
+  background: var(--rater-cat-output);
+  border-color: var(--rater-cat-output);
+  color: var(--rater-surface-canvas);
+  margin-left: auto;
+  font-weight: var(--rater-fw-medium);
+}
+
+.rater-endorsement-editor__btn.is-primary:hover {
+  background: color-mix(in srgb, var(--rater-cat-output) 80%, white);
+}
+
+.rater-endorsement-editor__btn.is-primary:disabled,
+.rater-endorsement-editor__btn.is-primary[aria-disabled="true"] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── Phase H.5 — Branch factor-lookups inline table ────────────── */
+
+.rater-endorsement-editor__branch-flu {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-4);
+  border: 1px solid var(--rater-hairline-soft);
+  border-radius: var(--rater-r-6);
+  overflow: hidden;
+  margin-top: var(--rater-s-8);
+}
+
+.rater-endorsement-editor__branch-flu-head,
+.rater-endorsement-editor__branch-flu-row {
+  display: grid;
+  grid-template-columns: 1.2fr 1.6fr 1fr 1.6fr 28px;
+  gap: var(--rater-s-8);
+  padding: var(--rater-s-8) var(--rater-s-12);
+  align-items: center;
+}
+
+.rater-endorsement-editor__branch-flu-head {
+  font-size: var(--rater-t-10, 10px);
+  text-transform: uppercase;
+  letter-spacing: var(--rater-tracking-label);
+  color: var(--rater-text-subtle);
+  font-weight: var(--rater-fw-semibold);
+  background: var(--rater-surface-2);
+  border-bottom: 1px solid var(--rater-hairline-soft);
+}
+
+.rater-endorsement-editor__branch-flu-row + .rater-endorsement-editor__branch-flu-row {
+  border-top: 1px solid var(--rater-hairline-soft);
+}
+
+/* Compact icon-only variant of the action button — used for the
+   per-row remove control in the factor-lookups table. */
+.rater-endorsement-editor__btn.is-icon {
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--rater-r-4);
+  background: transparent;
+  border: 1px solid var(--rater-hairline-soft);
+  color: var(--rater-text-subtle);
+}
+
+.rater-endorsement-editor__btn.is-icon:hover {
+  background: var(--rater-surface-2);
+  border-color: var(--rater-hairline-strong);
+  color: var(--rater-text-default);
+}
+
+/* Add-row affordance — dashed → solid on hover, matches
+   ModifierEditor's __add-cat treatment for visual consistency. */
+.rater-endorsement-editor__add-row {
+  margin-top: var(--rater-s-8);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-8);
+  background: transparent;
+  border: 1px dashed var(--rater-hairline-strong);
+  border-radius: var(--rater-r-6);
+  padding: 6px 12px;
+  font-family: inherit;
+  font-size: var(--rater-t-12, 12px);
+  color: var(--rater-text-muted);
+  cursor: pointer;
+  transition: all 100ms ease-out;
+}
+
+.rater-endorsement-editor__add-row:hover {
+  background: var(--rater-surface-2);
+  color: var(--rater-text-default);
+  border-color: var(--rater-cat-output);
+  border-style: solid;
+}
+
+.rater-endorsement-editor__add-hint {
+  font-size: var(--rater-t-10, 10px);
+  color: var(--rater-text-subtle);
+}

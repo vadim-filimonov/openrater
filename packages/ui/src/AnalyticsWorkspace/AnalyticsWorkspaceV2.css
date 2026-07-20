@@ -1,0 +1,213 @@
+/* V2_INTERFACE_SPEC §1.5 — the phantom step-scale (var(--rater-s-N, Xpx)
+ * with px fallbacks) silently COLLIDED with the real px-named token
+ * scale, rendering 2-10px paddings where 18-40px were intended. Every
+ * value below now uses the real token nearest the intended fallback.
+ * Off-ramp weights (650/680) snapped to the token ramp in the same
+ * pass. */
+/**
+ * Brief 64 PR 64.6 — <AnalyticsWorkspaceV2> shell styles. BEM + tokens.
+ */
+
+.rater-analytics {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-14);
+}
+
+.rater-analytics__header {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.rater-analytics__title {
+  margin: 0;
+  font-size: var(--rater-t-20);
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-strong);
+}
+
+.rater-analytics__subtitle {
+  margin: 0;
+  font-size: var(--rater-t-13);
+  color: var(--rater-text-muted);
+}
+
+.rater-analytics__blocker,
+.rater-analytics__hint {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--rater-s-12);
+  padding: var(--rater-s-40) 0;
+}
+
+/* The score-first blocker is the whole-surface empty state. Center it in
+   the content area instead of pinning it to the top with a large void
+   below (v2 ethos check #6 — no orphaned empty space). The shared rule
+   above keeps the smaller inline __hint untouched. */
+.rater-analytics__blocker {
+  min-height: 58vh;
+  justify-content: center;
+}
+
+/* ── Executive band ──────────────────────────────────────────────── */
+
+.rater-analytics__band {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--rater-s-16);
+  flex-wrap: wrap;
+  background: var(--rater-surface-1);
+  border: 1px solid var(--rater-border-subtle);
+  border-radius: var(--rater-r-12);
+  padding: var(--rater-s-16) var(--rater-s-20);
+}
+
+.rater-analytics__band-kpis {
+  display: flex;
+  gap: var(--rater-s-32);
+  flex-wrap: wrap;
+}
+
+.rater-analytics__band-stat {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-4);
+}
+
+.rater-analytics__band-label {
+  font-size: var(--rater-t-11);
+  letter-spacing: var(--rater-tracking-label);
+  text-transform: uppercase;
+  color: var(--rater-text-subtle);
+}
+
+.rater-analytics__band-val {
+  font-size: 26px;
+  font-weight: var(--rater-fw-semibold);
+  letter-spacing: -0.01em;
+  color: var(--rater-text-strong);
+  font-variant-numeric: tabular-nums;
+}
+.rater-analytics__band-val.is-up {
+  color: var(--rater-viz-delta-up-text);
+}
+.rater-analytics__band-val.is-down {
+  color: var(--rater-viz-delta-down-text);
+}
+
+/* ── Toolbar: act switch + pickers ───────────────────────────────── */
+
+.rater-analytics__toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--rater-s-12);
+  flex-wrap: wrap;
+}
+
+.rater-analytics__acts {
+  display: inline-flex;
+  background: var(--rater-surface-2);
+  border: 1px solid var(--rater-hairline-base);
+  border-radius: var(--rater-r-8);
+  padding: 3px;
+  gap: 2px;
+}
+
+.rater-analytics__act {
+  border: none;
+  background: transparent;
+  color: var(--rater-text-muted);
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-14);
+  font-weight: var(--rater-fw-semibold);
+  padding: var(--rater-s-6) var(--rater-s-16);
+  border-radius: var(--rater-r-8);
+  cursor: pointer;
+}
+.rater-analytics__act.is-active {
+  background: var(--rater-surface-canvas);
+  color: var(--rater-text-strong);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+.rater-analytics__act:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--rater-focus-ring);
+}
+
+.rater-analytics__pickers {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-10);
+  flex-wrap: wrap;
+}
+
+.rater-analytics__picker {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-8);
+  font-size: var(--rater-t-13);
+  color: var(--rater-text-muted);
+}
+
+.rater-analytics__picker-select {
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-13);
+  color: var(--rater-text-default);
+  background: var(--rater-surface-1);
+  border: 1px solid var(--rater-hairline-base);
+  border-radius: var(--rater-r-8);
+  padding: var(--rater-s-6) var(--rater-s-10);
+  cursor: pointer;
+}
+.rater-analytics__picker-select:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--rater-focus-ring);
+}
+
+.rater-analytics__export {
+  background: var(--rater-surface-1);
+  border: 1px solid var(--rater-hairline-base);
+  border-radius: var(--rater-r-8);
+  color: var(--rater-text-default);
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-13);
+  font-weight: var(--rater-fw-semibold);
+  padding: var(--rater-s-6) var(--rater-s-12);
+  cursor: pointer;
+}
+.rater-analytics__export:hover {
+  border-color: var(--rater-hairline-strong);
+}
+
+/* ── Act body ────────────────────────────────────────────────────── */
+
+.rater-analytics__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-14);
+}
+
+.rater-analytics__map-hint {
+  margin: 0;
+  font-size: var(--rater-t-13);
+  color: var(--rater-text-subtle);
+  font-style: italic;
+}
+
+/* Brief 73 — the "Re-rate the stored book" what-if section atop Compare. */
+.rater-analytics__book-rerate {
+  border: 1px solid var(--rater-hairline-base);
+  border-radius: var(--rater-r-12);
+  padding: var(--rater-s-16);
+  margin-bottom: var(--rater-s-16);
+}
+.rater-analytics__section-title {
+  font-size: 13px;
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-strong);
+  margin: 0 0 var(--rater-s-12);
+}

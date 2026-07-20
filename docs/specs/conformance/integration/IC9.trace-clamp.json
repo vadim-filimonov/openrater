@@ -1,0 +1,48 @@
+{
+  "id": "IC9",
+  "name": "trace-clamp",
+  "spec": "§4.3",
+  "asserts": "A trace request above the plan's policy ceiling is clamped, and the clamp is echoed — never silently honored.",
+  "contract_version": "1.0",
+  "world": {
+    "integration": { "name": "Example Integrator — fixture", "paired": true },
+    "plans": ["plan-alpha"],
+    "note": "plan-alpha's trace_policy ceiling is 'summary'"
+  },
+  "steps": [
+    {
+      "note": "the peer asks for the full build-up; the ceiling says summary",
+      "actor": "integrator",
+      "call": {
+        "method": "POST",
+        "path": "/api/v1/integrations/{{integration_id}}/quote-set",
+        "headers": { "X-OpenRater-Integration-Key": "{{integrator_key}}" },
+        "body": {
+          "risk_ref": "r-fixture-0007",
+          "request_hash": "sha256:ic9-fixture",
+          "effective_date": "2026-08-01",
+          "carriers": ["acme-mutual"],
+          "trace": "full",
+          "facts": {
+            "rest.gross_receipts": 1250000,
+            "property.construction": "JM",
+            "property.tiv": 1500000
+          }
+        }
+      },
+      "expect": {
+        "status": 200,
+        "body": {
+          "quotes": [
+            {
+              "carrier": "acme-mutual",
+              "row_status": "ok",
+              "trace_granted": "summary",
+              "trace": { "$present": true }
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

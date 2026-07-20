@@ -1,0 +1,57 @@
+{
+  "name": "V24.derive-class-attribute",
+  "description": "A fictional Meridian class code drives a derived structural dimension. class_code='c201' resolves through a `derive.class_attribute` node onto synthetic rate key 'r1', then a rate-keyed `lookup.direct` returns 1.25. This proves the factor table keys off the derived value rather than the raw class code.",
+  "plan": {
+    "id": "v24.derive_class_attribute",
+    "version": "1.0.0",
+    "name": "Meridian class-attribute derivation (c201 → r1 → 1.25)",
+    "line": "bop",
+    "effective": "2026-01-01",
+    "nodes": [
+      {
+        "id": "in_class",
+        "kind": "input",
+        "params": { "fieldName": "class_code", "fieldType": "string" },
+        "position": { "x": 0, "y": 0 }
+      },
+      {
+        "id": "derive_rate_no",
+        "kind": "derive.class_attribute",
+        "params": {
+          "attributeKey": "prop_rate_number",
+          "tableName": "Meridian fictional class table",
+          "table": {
+            "c101": "r2",
+            "c102": "r3",
+            "c103": "r4",
+            "c201": "r1"
+          }
+        },
+        "position": { "x": 200, "y": 0 }
+      },
+      {
+        "id": "lkp_rate_no",
+        "kind": "lookup.direct",
+        "params": {
+          "table": { "r1": 1.25, "r2": 1.0, "r3": 0.9, "r4": 0.85 },
+          "defaultValue": 1.0,
+          "tableName": "Meridian synthetic building relativity"
+        },
+        "position": { "x": 400, "y": 0 }
+      },
+      {
+        "id": "out_factor",
+        "kind": "output",
+        "params": { "fieldName": "factor", "fieldType": "float" },
+        "position": { "x": 600, "y": 0 }
+      }
+    ],
+    "edges": [
+      { "from": { "node": "in_class",       "port": "value" }, "to": { "node": "derive_rate_no", "port": "class_code" } },
+      { "from": { "node": "derive_rate_no", "port": "value" }, "to": { "node": "lkp_rate_no",    "port": "key" } },
+      { "from": { "node": "lkp_rate_no",    "port": "value" }, "to": { "node": "out_factor",     "port": "value" } }
+    ]
+  },
+  "externalInputs": { "class_code": "c201" },
+  "expectedOutputs": { "factor": 1.25 }
+}

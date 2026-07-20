@@ -1,0 +1,64 @@
+/* ============================================================================
+ * <DiffSummaryChip> — top-level diff summary.
+ * ============================================================================ */
+
+.rater-diff-summary-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-8);
+  padding: var(--rater-s-4) var(--rater-s-10);
+  border-radius: var(--rater-r-full);
+  border: 1px solid var(--rater-border-default);
+  background: var(--rater-surface-1);
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-12);
+  line-height: var(--rater-lh-snug);
+  user-select: none;
+}
+
+.rater-diff-summary-chip--identical {
+  color: var(--rater-feedback-success, var(--rater-cat-math));
+  background: color-mix(in srgb, var(--rater-feedback-success, #10b981) 8%, var(--rater-surface-1));
+  border-color: color-mix(in srgb, var(--rater-feedback-success, #10b981) 25%, transparent);
+  font-weight: var(--rater-fw-semibold);
+}
+
+.rater-diff-summary-chip__counts {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-10);
+}
+
+.rater-diff-summary-chip__count {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--rater-s-4);
+}
+
+.rater-diff-summary-chip__count-value {
+  font-family: var(--rater-fonts-mono, var(--rater-fonts-sans));
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-strong);
+}
+
+.rater-diff-summary-chip__count-label {
+  color: var(--rater-text-muted);
+}
+
+.rater-diff-summary-chip__count--changed .rater-diff-summary-chip__count-value {
+  color: var(--rater-feedback-warn, var(--rater-cat-lookup));
+}
+
+.rater-diff-summary-chip__count--added .rater-diff-summary-chip__count-value {
+  color: var(--rater-feedback-success, var(--rater-cat-math));
+}
+
+.rater-diff-summary-chip__count--removed .rater-diff-summary-chip__count-value {
+  color: var(--rater-feedback-error);
+}
+
+.rater-diff-summary-chip__separator {
+  color: var(--rater-text-subtle);
+  user-select: none;
+}

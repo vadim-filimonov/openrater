@@ -1,0 +1,552 @@
+/* ============================================================================
+ * <FilterRuleEditor> — Brief 39 PR 39.2.
+ *
+ * Same shell + density as Brief 35 Assemble nodes / Brief 38 input
+ * editor. Surface-1 card on the dot-grid canvas, hairline borders,
+ * 11px uppercase field labels, 13px field inputs, color-coded
+ * disposition pills (orange / amber / red).
+ * ========================================================================== */
+
+.rater-filter-rule-editor {
+  background: var(--rater-surface-1);
+  border: 1px solid var(--rater-hairline-base);
+  border-radius: var(--rater-r-8);
+  overflow: hidden;
+  width: 100%;
+  max-width: 560px;
+  font-family: var(--rater-fonts-sans);
+  color: var(--rater-text-default);
+}
+
+/* ── Hard-mismatch banner — top of editor when refs unmapped ───── */
+.rater-filter-rule-editor__mismatch {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 14px;
+  background: color-mix(in srgb, var(--rater-feedback-error) 8%, var(--rater-surface-1));
+  border-bottom: 1px solid color-mix(in srgb, var(--rater-feedback-error) 32%, transparent);
+}
+
+.rater-filter-rule-editor__mismatch-glyph {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--rater-feedback-error) 22%, transparent);
+  color: var(--rater-feedback-error);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: var(--rater-fw-bold);
+  flex-shrink: 0;
+}
+
+.rater-filter-rule-editor__mismatch-title {
+  margin: 0 0 4px;
+  font-size: var(--rater-t-13, 13px);
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-feedback-error);
+}
+
+.rater-filter-rule-editor__mismatch-detail {
+  margin: 0;
+  font-size: var(--rater-t-12, 12px);
+  line-height: 1.5;
+  color: var(--rater-text-default);
+}
+
+.rater-filter-rule-editor__mismatch-detail code {
+  background: var(--rater-surface-canvas);
+  padding: 1px 5px;
+  border-radius: var(--rater-r-4);
+  font-family: var(--rater-fonts-mono);
+  font-size: var(--rater-t-11, 11px);
+  color: var(--rater-cat-input-text);
+}
+
+/* ── Head: glyph + title + sub ─────────────────────────────────── */
+.rater-filter-rule-editor__head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--rater-hairline-soft);
+}
+
+.rater-filter-rule-editor__head-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--rater-r-6);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--rater-fonts-mono);
+  font-size: var(--rater-t-12, 12px);
+  background: color-mix(in srgb, var(--rater-cat-loading) 18%, transparent);
+  color: var(--rater-cat-loading-text);
+  flex-shrink: 0;
+}
+
+.rater-filter-rule-editor__head-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.rater-filter-rule-editor__head-title {
+  margin: 0;
+  font-size: var(--rater-t-14, 14px);
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-strong);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rater-filter-rule-editor__head-sub {
+  font-size: var(--rater-t-11, 11px);
+  color: var(--rater-text-subtle);
+  font-family: var(--rater-fonts-mono);
+}
+
+/* ── Body ──────────────────────────────────────────────────────── */
+.rater-filter-rule-editor__body {
+  padding: 16px 18px;
+}
+
+/* ── Mode toggle ──────────────────────────────────────────────── */
+.rater-filter-rule-editor__mode-toggle {
+  display: inline-flex;
+  background: var(--rater-surface-2);
+  border-radius: var(--rater-r-8);
+  padding: 2px;
+  margin-bottom: 14px;
+}
+
+.rater-filter-rule-editor__mode-btn {
+  background: transparent;
+  border: 0;
+  padding: 6px 12px;
+  color: var(--rater-text-muted);
+  font-family: inherit;
+  font-size: var(--rater-t-12, 12px);
+  border-radius: var(--rater-r-6);
+  cursor: pointer;
+}
+
+.rater-filter-rule-editor__mode-btn.is-active {
+  background: var(--rater-surface-3);
+  color: var(--rater-text-strong);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* ── Scope toggle (E03 / brief D4) — per-location vs policy-level ── */
+.rater-filter-rule-editor__scope-toggle {
+  display: inline-flex;
+  background: var(--rater-surface-2);
+  border-radius: var(--rater-r-8);
+  padding: 2px;
+  margin-bottom: 10px;
+}
+
+.rater-filter-rule-editor__scope-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: transparent;
+  border: 0;
+  padding: 6px 12px;
+  color: var(--rater-text-muted);
+  font-family: inherit;
+  font-size: var(--rater-t-12, 12px);
+  border-radius: var(--rater-r-6);
+  cursor: pointer;
+}
+
+.rater-filter-rule-editor__scope-btn.is-active {
+  background: var(--rater-surface-3);
+  color: var(--rater-text-strong);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.rater-filter-rule-editor__scope-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 12px;
+  padding: 6px 10px;
+  font-size: var(--rater-t-12, 12px);
+  color: var(--rater-cat-math-text);
+  background: color-mix(in srgb, var(--rater-cat-math) 12%, transparent);
+  border-radius: var(--rater-r-6);
+}
+
+.rater-filter-rule-editor__scope-chip svg {
+  flex: 0 0 auto;
+}
+
+/* D5 nudge — a row-scope rule reading a rolled-up field. */
+.rater-filter-rule-editor__nudge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 12px;
+  padding: 8px 10px;
+  font-size: var(--rater-t-12, 12px);
+  color: var(--rater-text-default);
+  background: color-mix(in srgb, var(--rater-cat-loading) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--rater-cat-loading-text) 40%, transparent);
+  border-radius: var(--rater-r-6);
+}
+
+.rater-filter-rule-editor__nudge svg {
+  flex: 0 0 auto;
+  color: var(--rater-cat-loading-text);
+}
+
+.rater-filter-rule-editor__nudge code {
+  font-family: var(--rater-fonts-mono);
+  font-size: var(--rater-t-11, 11px);
+}
+
+.rater-filter-rule-editor__nudge-action {
+  flex: 0 0 auto;
+  margin-left: auto;
+  background: var(--rater-surface-3);
+  border: 1px solid var(--rater-hairline-base);
+  border-radius: var(--rater-r-6);
+  padding: 4px 10px;
+  color: var(--rater-text-default);
+  font-size: var(--rater-t-12, 12px);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.rater-filter-rule-editor__nudge-action:hover {
+  background: var(--rater-surface-2);
+  border-color: var(--rater-hairline-strong);
+}
+
+.rater-filter-rule-editor__nudge-action:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: 1px;
+}
+
+/* ── Field ─────────────────────────────────────────────────────── */
+.rater-filter-rule-editor__field {
+  margin-bottom: 14px;
+}
+
+.rater-filter-rule-editor__field-label {
+  display: block;
+  font-size: var(--rater-t-11, 11px);
+  color: var(--rater-text-subtle);
+  text-transform: uppercase;
+  letter-spacing: var(--rater-tracking-label);
+  margin-bottom: 6px;
+  font-weight: var(--rater-fw-semibold);
+}
+
+.rater-filter-rule-editor__field-hint {
+  font-size: var(--rater-t-11, 11px);
+  color: var(--rater-text-subtle);
+  margin-top: 4px;
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: var(--rater-fw-regular);
+}
+
+/* Required marker on a field label (E04). */
+.rater-filter-rule-editor__req {
+  margin-left: 3px;
+  color: var(--rater-feedback-error);
+  font-weight: var(--rater-fw-semibold);
+}
+
+/* Inline reason Save is disabled — sits above the action bar (E04). */
+.rater-filter-rule-editor__save-hint {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
+  font-size: var(--rater-t-12, 12px);
+  color: var(--rater-text-subtle);
+}
+
+.rater-filter-rule-editor__save-hint svg {
+  flex: 0 0 auto;
+  color: var(--rater-text-subtle);
+}
+
+.rater-filter-rule-editor__field-input {
+  width: 100%;
+  background: var(--rater-surface-canvas);
+  border: 1px solid var(--rater-hairline-base);
+  border-radius: var(--rater-r-6);
+  padding: 8px 10px;
+  color: var(--rater-text-default);
+  font-family: inherit;
+  font-size: var(--rater-t-13, 13px);
+  outline: none;
+}
+
+.rater-filter-rule-editor__field-input.is-mono {
+  font-family: var(--rater-fonts-mono);
+}
+
+.rater-filter-rule-editor__field-input:focus-visible {
+  border-color: var(--rater-cat-input);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--rater-cat-input) 30%, transparent);
+}
+
+.rater-filter-rule-editor__field-input::placeholder {
+  color: var(--rater-text-subtle);
+}
+
+/* ── Condition row ────────────────────────────────────────────── */
+.rater-filter-rule-editor__condition-row {
+  margin-bottom: 6px;
+}
+
+.rater-filter-rule-editor__and-prefix {
+  display: inline-block;
+  font-family: var(--rater-fonts-mono);
+  font-size: var(--rater-t-10, 10px);
+  padding: 2px 6px;
+  background: color-mix(in srgb, var(--rater-cat-transform) 18%, transparent);
+  color: var(--rater-cat-transform-text);
+  border-radius: var(--rater-r-4);
+  letter-spacing: var(--rater-tracking-label);
+  font-weight: var(--rater-fw-semibold);
+  margin-bottom: 6px;
+}
+
+.rater-filter-rule-editor__condition-grid {
+  display: grid;
+  grid-template-columns: 1fr 64px 1fr 28px;
+  gap: 6px;
+  align-items: stretch;
+}
+
+.rater-filter-rule-editor__condition-grid.is-unmapped {
+  outline: 1px solid color-mix(in srgb, var(--rater-feedback-error) 40%, transparent);
+  outline-offset: 2px;
+  border-radius: var(--rater-r-6);
+}
+
+.rater-filter-rule-editor__condition-grid .rater-filter-rule-editor__field-input.is-op {
+  text-align: center;
+}
+
+.rater-filter-rule-editor__remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--rater-surface-2);
+  border: 1px solid var(--rater-hairline-soft);
+  border-radius: var(--rater-r-6);
+  color: var(--rater-text-subtle);
+  cursor: pointer;
+  width: 28px;
+  height: auto;
+}
+
+.rater-filter-rule-editor__remove:hover {
+  background: color-mix(in srgb, var(--rater-feedback-error) 14%, var(--rater-surface-2));
+  border-color: color-mix(in srgb, var(--rater-feedback-error) 32%, transparent);
+  color: var(--rater-feedback-error);
+}
+
+.rater-filter-rule-editor__add-condition {
+  margin-top: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: 1px dashed var(--rater-hairline-strong);
+  color: var(--rater-text-muted);
+  font-family: inherit;
+  font-size: var(--rater-t-12, 12px);
+  padding: 6px 12px;
+  border-radius: var(--rater-r-6);
+  cursor: pointer;
+}
+
+.rater-filter-rule-editor__add-condition:hover {
+  border-color: var(--rater-cat-input);
+  color: var(--rater-cat-input-text);
+}
+
+.rater-filter-rule-editor__add-hint {
+  font-size: var(--rater-t-10, 10px);
+  color: var(--rater-text-subtle);
+  font-family: var(--rater-fonts-mono);
+}
+
+/* ── Tier picker (Brief 55) ───────────────────────────────────── */
+/* Each option wraps a <TierVerdictChip> (which carries the tier color);
+   the button is a thin selectable shell — dimmed when unselected, with
+   a neutral ring when selected. */
+.rater-filter-rule-editor__tier {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.rater-filter-rule-editor__tier-opt {
+  flex: 1 1 auto;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--rater-r-8, 8px);
+  padding: 4px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.55;
+  transition:
+    opacity 120ms ease-out,
+    box-shadow 120ms ease-out;
+}
+
+.rater-filter-rule-editor__tier-opt:hover {
+  opacity: 0.85;
+}
+
+.rater-filter-rule-editor__tier-opt.is-selected {
+  opacity: 1;
+  box-shadow: 0 0 0 2px var(--rater-hairline-strong);
+}
+
+.rater-filter-rule-editor__tier-opt:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: 1px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rater-filter-rule-editor__tier-opt {
+    transition: none;
+  }
+}
+
+/* ── Tree view (Advanced) ─────────────────────────────────────── */
+.rater-filter-rule-editor__tree {
+  background: var(--rater-surface-canvas);
+  border: 1px solid var(--rater-hairline-base);
+  border-radius: var(--rater-r-6);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.rater-filter-rule-editor__tree-empty {
+  color: var(--rater-text-subtle);
+  font-size: var(--rater-t-12, 12px);
+  font-style: italic;
+}
+
+.rater-filter-rule-editor__tree-group-op {
+  display: inline-block;
+  font-family: var(--rater-fonts-mono);
+  font-size: var(--rater-t-10, 10px);
+  padding: 2px 6px;
+  background: color-mix(in srgb, var(--rater-cat-transform) 18%, transparent);
+  color: var(--rater-cat-transform-text);
+  border-radius: var(--rater-r-4);
+  letter-spacing: var(--rater-tracking-label);
+  font-weight: var(--rater-fw-semibold);
+  align-self: flex-start;
+}
+
+.rater-filter-rule-editor__tree-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 12px;
+  font-family: var(--rater-fonts-mono);
+  font-size: var(--rater-t-11, 11px);
+}
+
+.rater-filter-rule-editor__tree-pill {
+  padding: 3px 8px;
+  border-radius: var(--rater-r-4);
+  background: var(--rater-surface-2);
+  border: 1px solid var(--rater-hairline-soft);
+}
+
+.rater-filter-rule-editor__tree-pill.is-field {
+  background: color-mix(in srgb, var(--rater-cat-input) 14%, transparent);
+  color: var(--rater-cat-input-text);
+  border-color: color-mix(in srgb, var(--rater-cat-input) 28%, transparent);
+}
+
+.rater-filter-rule-editor__tree-pill.is-op {
+  color: var(--rater-text-strong);
+  font-weight: var(--rater-fw-semibold);
+}
+
+.rater-filter-rule-editor__tree-pill.is-value {
+  color: var(--rater-text-default);
+  background: var(--rater-surface-canvas);
+}
+
+.rater-filter-rule-editor__advanced-note {
+  margin: 12px 0 0;
+  padding: 10px 14px;
+  background: color-mix(in srgb, var(--rater-cat-input) 5%, var(--rater-surface-1));
+  border-left: 2px solid var(--rater-cat-input);
+  border-radius: var(--rater-r-6);
+  font-size: var(--rater-t-11, 11px);
+  color: var(--rater-text-muted);
+  line-height: 1.6;
+}
+
+/* ── Action row ────────────────────────────────────────────────── */
+.rater-filter-rule-editor__actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--rater-hairline-soft);
+}
+
+.rater-filter-rule-editor__btn {
+  background: var(--rater-surface-2);
+  border: 1px solid var(--rater-hairline-base);
+  border-radius: var(--rater-r-6);
+  padding: 6px 12px;
+  font-family: inherit;
+  font-size: var(--rater-t-12, 12px);
+  color: var(--rater-text-default);
+  cursor: pointer;
+}
+
+.rater-filter-rule-editor__btn:hover {
+  background: var(--rater-surface-3);
+  border-color: var(--rater-hairline-strong);
+}
+
+.rater-filter-rule-editor__btn:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: 1px;
+}
+
+.rater-filter-rule-editor__btn.is-primary {
+  background: var(--rater-cat-input);
+  border-color: var(--rater-cat-input);
+  color: white;
+  margin-left: auto;
+}
+
+.rater-filter-rule-editor__btn.is-primary:hover {
+  background: color-mix(in srgb, var(--rater-cat-input) 80%, white);
+}
+
+.rater-filter-rule-editor__btn.is-primary:disabled,
+.rater-filter-rule-editor__btn.is-primary[aria-disabled="true"] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

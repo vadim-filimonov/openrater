@@ -1,0 +1,34 @@
+# Litestream replica config — continuous streaming backup of the two
+# SQLite books of record to an S3-compatible bucket (AWS S3 or Cloudflare
+# R2 / MinIO). Mounted read-only into the `litestream` sidecar at
+# /etc/litestream.yml (see deploy/docker-compose.yml).
+#
+# Every value is ${ENV}-expanded by Litestream at runtime from the
+# container's environment (fed from deploy/.env). No credentials live in
+# this file or the repo. The sidecar only runs `litestream replicate`
+# when LITESTREAM_BUCKET is non-empty; otherwise it idles.
+#
+#   AWS S3     — LITESTREAM_ENDPOINT blank, LITESTREAM_REGION = real region
+#                (e.g. us-east-1).
+#   Cloudflare — LITESTREAM_ENDPOINT = https://<acct>.r2.cloudflarestorage.com,
+#   R2           LITESTREAM_REGION = auto.
+#
+# The WAL is streamed continuously, so the recovery point objective is
+# seconds. Restore with:
+#   litestream restore -config /etc/litestream.yml -o /data/openrater.db /data/openrater.db
+# See Litestream's restore documentation before a production recovery.
+
+# Access credentials are read globally from the environment
+# (LITESTREAM_ACCESS_KEY_ID / LITESTREAM_SECRET_ACCESS_KEY), so each
+# replica below only needs the bucket coordinates.
+access-key-id: ${LITESTREAM_ACCESS_KEY_ID}
+secret-access-key: ${LITESTREAM_SECRET_ACCESS_KEY}
+
+dbs:
+  - path: /data/openrater.db
+    replicas:
+      - type: s3
+        bucket: ${LITESTREAM_BUCKET}
+        path: ${LITESTREAM_PATH}/openrater.db
+        region: ${LITESTREAM_REGION}
+        endpoint: ${LITESTREAM_ENDPOINT}

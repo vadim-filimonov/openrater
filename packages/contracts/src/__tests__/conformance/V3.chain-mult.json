@@ -1,0 +1,28 @@
+{
+  "name": "V3.chain-mult",
+  "description": "base x constants[1.10, 0.95, 1.32] (BOP-like LCM stack).",
+  "plan": {
+    "id": "v3.chain",
+    "version": "1.0.0",
+    "name": "Chain mult",
+    "line": "bop",
+    "effective": "2026-01-01",
+    "nodes": [
+      { "id": "in_base", "kind": "input", "params": { "fieldName": "base", "fieldType": "money" }, "position": { "x": 0, "y": 0 } },
+      { "id": "k_lcm", "kind": "constant", "params": { "value": 1.10, "type": "factor" }, "position": { "x": 0, "y": 60 } },
+      { "id": "k_disc", "kind": "constant", "params": { "value": 0.95, "type": "factor" }, "position": { "x": 0, "y": 120 } },
+      { "id": "k_load", "kind": "constant", "params": { "value": 1.32, "type": "factor" }, "position": { "x": 0, "y": 180 } },
+      { "id": "mul", "kind": "chain.mult", "params": { "stopOnZero": false }, "position": { "x": 200, "y": 0 } },
+      { "id": "out_p", "kind": "output", "params": { "fieldName": "premium", "fieldType": "money" }, "position": { "x": 400, "y": 0 } }
+    ],
+    "edges": [
+      { "from": { "node": "in_base", "port": "value" }, "to": { "node": "mul", "port": "base" } },
+      { "from": { "node": "k_lcm",   "port": "value" }, "to": { "node": "mul", "port": "factors" } },
+      { "from": { "node": "k_disc",  "port": "value" }, "to": { "node": "mul", "port": "factors" } },
+      { "from": { "node": "k_load",  "port": "value" }, "to": { "node": "mul", "port": "factors" } },
+      { "from": { "node": "mul",     "port": "result" }, "to": { "node": "out_p", "port": "value" } }
+    ]
+  },
+  "externalInputs": { "base": 1000 },
+  "expectedOutputs": { "premium": 1379.4 }
+}

@@ -1,0 +1,98 @@
+/**
+ * Add-stage form styles. The drawer chrome lives in @openrater/design-system;
+ * what's here is the form-specific layout that sits inside <Drawer.Body>.
+ */
+
+.add-stage-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-20);
+}
+
+.add-stage-form__banner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-4);
+  padding: var(--rater-s-12) var(--rater-s-16);
+  border: 1px solid var(--rater-cat-output-border);
+  background: var(--rater-cat-output-soft);
+  color: var(--rater-cat-output-text);
+  border-radius: var(--rater-r-6);
+  font-size: var(--rater-t-12);
+  line-height: var(--rater-leading-snug);
+}
+
+.add-stage-form__banner strong {
+  font-weight: var(--rater-fw-semibold);
+}
+
+.add-stage-form__field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-6);
+}
+
+.add-stage-form__select {
+  height: 32px;
+  padding: 0 var(--rater-s-10);
+  background: var(--rater-surface-2);
+  border: 1px solid var(--rater-border-default);
+  border-radius: var(--rater-r-4);
+  color: var(--rater-text-default);
+  font-family: var(--rater-font-sans);
+  font-size: var(--rater-t-13);
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='currentColor' stroke-width='1.5'%3E%3Cpath d='m6 8 4 4 4-4'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right var(--rater-s-8) center;
+  background-size: 16px 16px;
+  padding-right: var(--rater-s-28);
+  transition:
+    border-color var(--rater-d-80) var(--rater-ease-soft),
+    background-color var(--rater-d-80) var(--rater-ease-soft);
+}
+
+.add-stage-form__select:hover {
+  border-color: var(--rater-border-strong);
+}
+
+.add-stage-form__select:focus-visible {
+  outline: 2px solid var(--rater-focus-ring, var(--rater-accent-primary));
+  outline-offset: 2px;
+}
+
+.add-stage-form__field-error {
+  font-size: var(--rater-t-12);
+  color: var(--rater-cat-output-text);
+}
+
+/* (Form action buttons now live in <Drawer.Footer>; .add-stage-form__actions
+ * was used in the previous PR's inline-footer pattern and is no longer
+ * needed.) */
+
+/* ----------------------------------------------------------------
+ * Delete-confirmation panel
+ * ---------------------------------------------------------------- */
+
+.delete-confirm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-16);
+}
+
+.delete-confirm__title {
+  margin: 0;
+  font-family: var(--rater-font-display);
+  font-size: var(--rater-t-16);
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-strong);
+}
+
+.delete-confirm__body {
+  margin: 0;
+  font-size: var(--rater-t-13);
+  line-height: var(--rater-leading-snug);
+  color: var(--rater-text-muted);
+}

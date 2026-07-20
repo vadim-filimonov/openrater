@@ -1,0 +1,51 @@
+{
+  "name": "V60.boolean-input-coercion",
+  "description": "Brief 83.4 — the port TYPE is the contract: a boolean input port coerces the wire's string spellings ('false' → false), so a stringly integrator payload (CSV rows, HTML forms, fact stores whose values are string|number) can never flip a predicate by truthiness. Found live: the Hub test form sent sprinklered='false' and the sprinkler DISCOUNT silently applied ($1,807 → $1,239). The branch below takes `then` only for a REAL true; the string 'false' must resolve the else path.",
+  "plan": {
+    "id": "v60.boolean_input_coercion",
+    "version": "1.0.0",
+    "name": "Boolean input coercion",
+    "lines": ["property"],
+    "effective": "2026-01-01",
+    "nodes": [
+      {
+        "id": "in_flag",
+        "kind": "input",
+        "params": { "fieldName": "sprinklered", "fieldType": "boolean" },
+        "position": { "x": 0, "y": 0 }
+      },
+      {
+        "id": "c_then",
+        "kind": "constant",
+        "params": { "value": 0.686, "type": "number" },
+        "position": { "x": 0, "y": 120 }
+      },
+      {
+        "id": "c_else",
+        "kind": "constant",
+        "params": { "value": 1.0, "type": "number" },
+        "position": { "x": 0, "y": 240 }
+      },
+      {
+        "id": "br",
+        "kind": "branch",
+        "params": {},
+        "position": { "x": 200, "y": 120 }
+      },
+      {
+        "id": "out_factor",
+        "kind": "output",
+        "params": { "fieldName": "factor", "fieldType": "factor" },
+        "position": { "x": 400, "y": 120 }
+      }
+    ],
+    "edges": [
+      { "from": { "node": "in_flag", "port": "value" }, "to": { "node": "br", "port": "predicate" } },
+      { "from": { "node": "c_then", "port": "value" }, "to": { "node": "br", "port": "then" } },
+      { "from": { "node": "c_else", "port": "value" }, "to": { "node": "br", "port": "else" } },
+      { "from": { "node": "br", "port": "result" }, "to": { "node": "out_factor", "port": "value" } }
+    ]
+  },
+  "externalInputs": { "sprinklered": "false" },
+  "expectedOutputs": { "factor": 1.0 }
+}

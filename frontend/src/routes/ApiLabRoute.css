@@ -1,0 +1,491 @@
+/* API Lab surface (Brief 47, Phase A) — BEM + design tokens; accent fills use
+   color-mix so they read on both dark + light themes. */
+
+.apilab {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: var(--rater-s-48) var(--rater-s-24) var(--rater-s-64);
+}
+
+/* header */
+.apilab__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--rater-s-24);
+  margin-bottom: var(--rater-s-24);
+  padding-bottom: var(--rater-s-20);
+  border-bottom: 1px solid var(--rater-border-subtle);
+}
+.apilab__title {
+  margin: 0 0 var(--rater-s-6);
+  font-family: var(--rater-font-display);
+  font-size: var(--rater-t-28);
+  font-weight: var(--rater-fw-semibold);
+  letter-spacing: -0.01em;
+  color: var(--rater-text-strong);
+}
+.apilab__subtitle {
+  margin: 0;
+  max-width: 66ch;
+  font-size: var(--rater-t-13);
+  line-height: 1.5;
+  color: var(--rater-text-muted);
+}
+/* section cards */
+.apilab__card {
+  background: var(--rater-surface-1);
+  border: 1px solid var(--rater-border-subtle);
+  border-radius: var(--rater-r-12);
+  padding: var(--rater-s-20);
+  margin-bottom: var(--rater-s-16);
+}
+.apilab__sec-head {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-8);
+  margin-bottom: var(--rater-s-16);
+  font-size: var(--rater-t-13);
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-strong);
+}
+.apilab__sec-num {
+  display: inline-flex;
+  width: 20px;
+  height: 20px;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--rater-r-full);
+  background: color-mix(in srgb, var(--rater-accent-primary) 16%, transparent);
+  color: var(--rater-cat-input-text);
+  font-size: var(--rater-t-11);
+  font-family: var(--rater-font-mono);
+}
+.apilab__sec-meta {
+  margin-left: auto;
+  font-size: var(--rater-t-11);
+  font-weight: var(--rater-fw-regular);
+  color: var(--rater-text-muted);
+  font-family: var(--rater-font-mono);
+}
+
+/* field labels */
+.apilab__flabel {
+  font-size: var(--rater-t-11);
+  color: var(--rater-text-muted);
+  font-family: var(--rater-font-mono);
+  white-space: nowrap;
+}
+.apilab__input {
+  flex: 1;
+  height: 36px;
+  padding: 0 var(--rater-s-12);
+  font-family: var(--rater-font-sans);
+  font-size: var(--rater-t-13);
+  color: var(--rater-text-strong);
+  background: var(--rater-surface-canvas);
+  border: 1px solid var(--rater-border-subtle);
+  border-radius: var(--rater-r-8);
+  transition: border-color 120ms ease;
+}
+.apilab__input:focus {
+  outline: none;
+  border-color: var(--rater-accent-primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--rater-accent-primary) 22%, transparent);
+}
+
+/* buttons */
+.apilab__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-6);
+  height: 36px;
+  padding: 0 var(--rater-s-16);
+  font-size: var(--rater-t-13);
+  font-weight: var(--rater-fw-medium);
+  border-radius: var(--rater-r-8);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: background 120ms ease, border-color 120ms ease;
+}
+.apilab__btn--primary {
+  color: #fff;
+  background: var(--rater-accent-primary);
+}
+.apilab__btn--primary:hover:not(disabled) {
+  background: var(--rater-accent-primary-hover);
+}
+.apilab__btn--ghost {
+  color: var(--rater-text-default);
+  background: var(--rater-surface-2);
+  border-color: var(--rater-border-subtle);
+}
+.apilab__btn--ghost:hover:not(disabled) {
+  border-color: var(--rater-accent-primary);
+  color: var(--rater-text-strong);
+}
+.apilab__btn:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+.apilab__spin {
+  animation: apilab-spin 0.8s linear infinite;
+}
+@keyframes apilab-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.apilab__banner {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-8);
+  margin-top: var(--rater-s-12);
+  padding: var(--rater-s-12) var(--rater-s-16);
+  border-radius: var(--rater-r-8);
+  font-size: var(--rater-t-12);
+  color: var(--rater-feedback-error);
+  background: color-mix(in srgb, var(--rater-accent-danger) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--rater-accent-danger) 30%, transparent);
+}
+
+/* E10 — inline "filled k of N" success line on the route card. */
+.apilab__filled {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-8);
+  margin-top: var(--rater-s-12);
+  padding: var(--rater-s-8) var(--rater-s-12);
+  border-radius: var(--rater-r-8);
+  font-size: var(--rater-t-12);
+  color: var(--rater-accent-success);
+  background: color-mix(in srgb, var(--rater-accent-success) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--rater-accent-success) 30%, transparent);
+  animation: apilab-fill-in var(--rater-d-160, 160ms) var(--rater-ease-snap, ease-out);
+}
+.apilab__filled b {
+  font-weight: var(--rater-fw-semibold);
+}
+@keyframes apilab-fill-in {
+  from {
+    opacity: 0;
+    transform: translateY(-2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .apilab__filled {
+    animation: none;
+  }
+}
+
+/* plan inputs list */
+.apilab__inputs-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--rater-border-subtle);
+  border-radius: var(--rater-r-8);
+  overflow: hidden;
+}
+.apilab__irow {
+  display: grid;
+  grid-template-columns: 18px 184px 132px 1fr 16px;
+  align-items: center;
+  gap: var(--rater-s-12);
+  padding: var(--rater-s-8) var(--rater-s-12);
+  border-bottom: 1px solid var(--rater-border-subtle);
+}
+.apilab__irow:last-child {
+  border-bottom: none;
+}
+.apilab__irow--filled {
+  background: color-mix(in srgb, var(--rater-accent-success) 5%, transparent);
+}
+.apilab__istate {
+  display: inline-flex;
+  color: var(--rater-text-subtle);
+}
+.apilab__istate--ok {
+  color: var(--rater-accent-success);
+}
+.apilab__idot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--rater-r-full);
+  border: 1.5px solid var(--rater-text-subtle);
+  display: inline-block;
+}
+.apilab__ikey {
+  font-family: var(--rater-font-mono);
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-default);
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-8);
+}
+.apilab__ireq {
+  font-style: normal;
+  font-family: var(--rater-font-sans);
+  font-size: var(--rater-t-10);
+  color: var(--rater-cat-loading);
+}
+.apilab__ivalue {
+  font-family: var(--rater-font-mono);
+  font-size: var(--rater-t-12);
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-strong);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.apilab__isource {
+  font-size: var(--rater-t-11);
+  color: var(--rater-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* connector library */
+.apilab__lib {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--rater-s-8);
+  margin-bottom: var(--rater-s-16);
+}
+.apilab__lib-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-8);
+  padding: var(--rater-s-6) var(--rater-s-12);
+  border-radius: var(--rater-r-8);
+  background: var(--rater-surface-2);
+  border: 1px solid var(--rater-border-subtle);
+  cursor: pointer;
+  transition: border-color 120ms ease, background 120ms ease;
+}
+.apilab__lib-chip:hover {
+  border-color: var(--rater-text-subtle);
+}
+.apilab__lib-icon {
+  display: inline-flex;
+  width: 22px;
+  height: 22px;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--rater-r-6);
+  color: var(--rater-accent-warning);
+  background: color-mix(in srgb, var(--rater-accent-warning) 16%, transparent);
+}
+.apilab__lib-name {
+  font-size: var(--rater-t-12);
+  font-weight: var(--rater-fw-medium);
+  color: var(--rater-text-default);
+}
+.apilab__lib-state {
+  font-size: var(--rater-t-10);
+  font-weight: var(--rater-fw-semibold);
+  padding: 1px var(--rater-s-8);
+  border-radius: var(--rater-r-full);
+}
+.apilab__lib-state--ok {
+  color: var(--rater-accent-success);
+  background: color-mix(in srgb, var(--rater-accent-success) 15%, transparent);
+}
+.apilab__lib-state--off {
+  color: var(--rater-cat-loading);
+  background: color-mix(in srgb, var(--rater-cat-loading) 15%, transparent);
+}
+
+/* library items: a selectable chip + hover actions (edit/delete/duplicate) */
+.apilab__lib-item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-4);
+}
+.apilab__lib-actions {
+  display: inline-flex;
+  gap: 2px;
+  opacity: 0;
+  transition: opacity 120ms ease;
+}
+.apilab__lib-item:hover .apilab__lib-actions {
+  opacity: 1;
+}
+.apilab__mini {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: var(--rater-r-6);
+  border: 1px solid var(--rater-border-subtle);
+  background: var(--rater-surface-2);
+  color: var(--rater-text-muted);
+  cursor: pointer;
+  transition: color 120ms ease, border-color 120ms ease;
+}
+.apilab__mini:hover {
+  color: var(--rater-text-strong);
+  border-color: var(--rater-text-subtle);
+}
+.apilab__mini--danger:hover {
+  color: var(--rater-feedback-error);
+  border-color: color-mix(in srgb, var(--rater-accent-danger) 40%, transparent);
+}
+.apilab__lib-tag {
+  font-size: var(--rater-t-10);
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-cat-transform-text);
+  background: color-mix(in srgb, var(--rater-cat-transform) 16%, transparent);
+  padding: 1px var(--rater-s-6);
+  border-radius: var(--rater-r-full);
+}
+.apilab__new-connector {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-6);
+  padding: var(--rater-s-6) var(--rater-s-12);
+  border-radius: var(--rater-r-8);
+  border: 1px dashed var(--rater-border-subtle);
+  background: transparent;
+  color: var(--rater-text-muted);
+  font-size: var(--rater-t-12);
+  font-weight: var(--rater-fw-medium);
+  cursor: pointer;
+  transition: color 120ms ease, border-color 120ms ease;
+}
+.apilab__new-connector:hover {
+  color: var(--rater-cat-input-text);
+  border-color: var(--rater-accent-primary);
+}
+
+/* --- Brief 48: Routes workspace ------------------------------------------- */
+.apilab__plan-pick {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-8);
+  padding: var(--rater-s-6) var(--rater-s-10);
+  border-radius: var(--rater-r-8);
+  background: var(--rater-surface-2);
+  border: 1px solid var(--rater-border-subtle);
+  color: var(--rater-text-muted);
+}
+.apilab__plan-select {
+  border: none;
+  background: transparent;
+  color: var(--rater-text-strong);
+  font-size: var(--rater-t-13);
+  font-family: var(--rater-font-sans);
+  cursor: pointer;
+  max-width: 240px;
+}
+.apilab__plan-select:focus {
+  outline: none;
+}
+.apilab__plan-select:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: 2px;
+}
+.apilab__empty-card {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-12);
+  color: var(--rater-text-muted);
+  font-size: var(--rater-t-13);
+}
+.apilab__head-btn {
+  margin-left: auto;
+  height: 30px;
+  font-size: var(--rater-t-12);
+}
+.apilab__hint {
+  margin: 0;
+  font-size: var(--rater-t-12);
+  line-height: 1.5;
+  color: var(--rater-text-muted);
+}
+
+.apilab__routes {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-10);
+}
+.apilab__route {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--rater-s-12);
+  align-items: center;
+  padding: var(--rater-s-12) var(--rater-s-16);
+  border: 1px solid var(--rater-border-subtle);
+  border-radius: var(--rater-r-12);
+  background: var(--rater-surface-1);
+}
+.apilab__route-name {
+  font-size: var(--rater-t-13);
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-strong);
+}
+.apilab__route-io {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-12);
+  margin-top: var(--rater-s-6);
+}
+.apilab__route-conn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-6);
+  font-size: var(--rater-t-11);
+  font-family: var(--rater-font-mono);
+  color: var(--rater-cat-transform-text);
+  background: color-mix(in srgb, var(--rater-cat-transform) 14%, transparent);
+  padding: 2px var(--rater-s-8);
+  border-radius: var(--rater-r-full);
+}
+.apilab__route-flow {
+  font-size: var(--rater-t-11);
+  font-family: var(--rater-font-mono);
+  color: var(--rater-text-muted);
+}
+.apilab__route-actions {
+  display: inline-flex;
+  gap: 4px;
+}
+.apilab__run {
+  grid-column: 1 / -1;
+  margin-top: var(--rater-s-10);
+  padding-top: var(--rater-s-12);
+  border-top: 1px solid var(--rater-border-subtle);
+}
+.apilab__run-head {
+  font-size: var(--rater-t-10);
+  letter-spacing: var(--rater-tracking-label);
+  text-transform: uppercase;
+  color: var(--rater-text-subtle);
+  font-weight: var(--rater-fw-semibold);
+  margin-bottom: var(--rater-s-8);
+}
+.apilab__run-fields {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--rater-s-12);
+  margin-bottom: var(--rater-s-12);
+}
+.apilab__run-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-6);
+}
+.apilab__run-actions {
+  display: flex;
+  gap: var(--rater-s-8);
+}

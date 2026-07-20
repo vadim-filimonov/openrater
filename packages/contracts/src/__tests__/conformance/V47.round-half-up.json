@@ -1,0 +1,29 @@
+{
+  "name": "V47.round-half-up",
+  "description": "The round kind applies the fictional Meridian Rule MS-R23 sequence: rate to 3 decimals and premium to the nearest dollar using half-up rounding.",
+  "plan": {
+    "id": "v47.round",
+    "version": "1.0.0",
+    "name": "Meridian rate and premium roundings",
+    "line": "bop",
+    "effective": "2026-01-01",
+    "nodes": [
+      { "id": "in_rate", "kind": "input", "params": { "fieldName": "rate_raw", "fieldType": "float" }, "position": { "x": 0, "y": 0 } },
+      { "id": "round_rate", "kind": "round", "params": { "decimals": 3 }, "position": { "x": 200, "y": 0 } },
+      { "id": "out_rate", "kind": "output", "params": { "fieldName": "rate3", "fieldType": "float" }, "position": { "x": 400, "y": 0 } },
+
+      { "id": "in_prem", "kind": "input", "params": { "fieldName": "premium_raw", "fieldType": "money" }, "position": { "x": 0, "y": 120 } },
+      { "id": "round_prem", "kind": "round", "params": { "decimals": 0 }, "position": { "x": 200, "y": 120 } },
+      { "id": "out_prem", "kind": "output", "params": { "fieldName": "premium", "fieldType": "money" }, "position": { "x": 400, "y": 120 } }
+    ],
+    "edges": [
+      { "from": { "node": "in_rate", "port": "value" }, "to": { "node": "round_rate", "port": "value" } },
+      { "from": { "node": "round_rate", "port": "value" }, "to": { "node": "out_rate", "port": "value" } },
+
+      { "from": { "node": "in_prem", "port": "value" }, "to": { "node": "round_prem", "port": "value" } },
+      { "from": { "node": "round_prem", "port": "value" }, "to": { "node": "out_prem", "port": "value" } }
+    ]
+  },
+  "externalInputs": { "rate_raw": 0.6158901, "premium_raw": 1725.5 },
+  "expectedOutputs": { "rate3": 0.616, "premium": 1726 }
+}

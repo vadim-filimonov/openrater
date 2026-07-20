@@ -1,0 +1,182 @@
+/**
+ * <ClassBulkImportOverlay> — Brief 51.
+ * Tokens: --rater-surface-*, --rater-text-*, --rater-hairline-*,
+ * --rater-feedback-*, --rater-accent-primary, --rater-s-*, --rater-r-*,
+ * --rater-t-*, --rater-fonts-{sans,mono}.
+ */
+
+.rater-class-import__intro {
+  margin: 0 0 var(--rater-s-12);
+  font-size: var(--rater-t-12);
+  line-height: var(--rater-lh-normal, 1.5);
+  color: var(--rater-text-muted);
+}
+
+.rater-class-import__intro code {
+  font-family: var(--rater-fonts-mono);
+  font-size: 0.92em;
+  color: var(--rater-text-default);
+}
+
+.rater-class-import__file {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-4);
+  margin-bottom: var(--rater-s-8);
+  padding: var(--rater-s-4) var(--rater-s-8);
+  border: 1px dashed var(--rater-hairline-strong, var(--rater-hairline-base));
+  border-radius: var(--rater-r-6);
+  background: var(--rater-surface-2);
+  color: var(--rater-text-default);
+  font-size: var(--rater-t-12);
+  font-weight: var(--rater-fw-medium);
+  cursor: pointer;
+}
+
+.rater-class-import__file:hover {
+  border-color: var(--rater-accent-primary);
+  color: var(--rater-text-strong);
+}
+
+.rater-class-import__file-input {
+  display: none;
+}
+
+.rater-class-import__textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: var(--rater-s-8);
+  border: 1px solid var(--rater-hairline-base);
+  border-radius: var(--rater-r-6);
+  background: var(--rater-surface-1);
+  color: var(--rater-text-strong);
+  font-family: var(--rater-fonts-mono);
+  font-size: var(--rater-t-12);
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.rater-class-import__textarea:focus {
+  outline: none;
+  border-color: var(--rater-accent-primary);
+  box-shadow: 0 0 0 3px var(--rater-focus-ring);
+}
+
+.rater-class-import__alert {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-6);
+  margin-top: var(--rater-s-8);
+  padding: var(--rater-s-6) var(--rater-s-8);
+  border-radius: var(--rater-r-6);
+  background: var(--rater-feedback-error-soft, transparent);
+  color: var(--rater-feedback-error);
+  font-size: var(--rater-t-12);
+}
+
+.rater-class-import__preview {
+  margin-top: var(--rater-s-10);
+  border: 1px solid var(--rater-hairline-soft);
+  border-radius: var(--rater-r-8);
+  background: var(--rater-surface-2);
+  overflow: hidden;
+}
+
+.rater-class-import__summary {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-12);
+  padding: var(--rater-s-8) var(--rater-s-10);
+  border-bottom: 1px solid var(--rater-hairline-soft);
+  font-size: var(--rater-t-12);
+}
+
+.rater-class-import__stat {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-4);
+  font-weight: var(--rater-fw-semibold);
+}
+
+.rater-class-import__stat--ok {
+  color: var(--rater-feedback-success, var(--rater-cat-output));
+}
+
+.rater-class-import__stat--skip {
+  color: var(--rater-feedback-warn, var(--rater-cat-lookup));
+}
+
+.rater-class-import__cols {
+  margin-left: auto;
+  color: var(--rater-text-faint);
+}
+
+.rater-class-import__rows {
+  list-style: none;
+  margin: 0;
+  padding: var(--rater-s-4) 0;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.rater-class-import__row {
+  display: grid;
+  grid-template-columns: 5.5em 1fr auto;
+  gap: var(--rater-s-8);
+  align-items: center;
+  padding: var(--rater-s-4) var(--rater-s-10);
+  font-size: var(--rater-t-12);
+}
+
+.rater-class-import__row-code {
+  font-family: var(--rater-fonts-mono);
+  font-variant-numeric: tabular-nums;
+  color: var(--rater-text-strong);
+}
+
+.rater-class-import__row-name {
+  color: var(--rater-text-default);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rater-class-import__row-attrs {
+  color: var(--rater-text-faint);
+  font-size: var(--rater-t-11);
+}
+
+.rater-class-import__more {
+  list-style: none;
+  padding: var(--rater-s-4) var(--rater-s-10);
+  font-size: var(--rater-t-11);
+  color: var(--rater-text-faint);
+}
+
+.rater-class-import__skipped {
+  margin: 0;
+  padding: var(--rater-s-6) var(--rater-s-10);
+  border-top: 1px solid var(--rater-hairline-soft);
+  font-size: var(--rater-t-11);
+  color: var(--rater-feedback-warn, var(--rater-cat-lookup));
+}
+
+.rater-class-import__opts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--rater-s-16);
+  margin-top: var(--rater-s-12);
+}
+
+.rater-class-import__opt {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-6);
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-default);
+  cursor: pointer;
+}
+
+.rater-class-import__footer-spacer {
+  flex: 1;
+}

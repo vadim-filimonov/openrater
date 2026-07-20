@@ -1,0 +1,59 @@
+{
+  "name": "V35.coverage-split-2d-table",
+  "description": "A fictional Meridian 2-D factor table (territory × coverage) rates the correct column per coverage tower. Fed the same synthetic territory t1, the Building and BPP columns return different factors (0.4 and 0.2), proving the coverage axis is preserved.",
+  "plan": {
+    "id": "v35.coverage_split_2d",
+    "version": "1.0.0",
+    "name": "Meridian coverage split (t1 → Building 0.4 / BPP 0.2)",
+    "line": "bop",
+    "effective": "2026-01-01",
+    "nodes": [
+      {
+        "id": "in_territory",
+        "kind": "input",
+        "params": { "fieldName": "territory", "fieldType": "string" },
+        "position": { "x": 0, "y": 60 }
+      },
+      {
+        "id": "lkp_building",
+        "kind": "lookup.direct",
+        "params": {
+          "table": { "t1": 0.4, "t2": 0.35 },
+          "defaultValue": 1.0,
+          "tableName": "Meridian synthetic property table · Building column"
+        },
+        "position": { "x": 220, "y": 0 }
+      },
+      {
+        "id": "lkp_bpp",
+        "kind": "lookup.direct",
+        "params": {
+          "table": { "t1": 0.2, "t2": 0.18 },
+          "defaultValue": 1.0,
+          "tableName": "Meridian synthetic property table · BPP column"
+        },
+        "position": { "x": 220, "y": 120 }
+      },
+      {
+        "id": "out_building",
+        "kind": "output",
+        "params": { "fieldName": "building_base_lc", "fieldType": "float" },
+        "position": { "x": 440, "y": 0 }
+      },
+      {
+        "id": "out_bpp",
+        "kind": "output",
+        "params": { "fieldName": "bpp_base_lc", "fieldType": "float" },
+        "position": { "x": 440, "y": 120 }
+      }
+    ],
+    "edges": [
+      { "from": { "node": "in_territory", "port": "value" }, "to": { "node": "lkp_building", "port": "key" } },
+      { "from": { "node": "in_territory", "port": "value" }, "to": { "node": "lkp_bpp", "port": "key" } },
+      { "from": { "node": "lkp_building", "port": "value" }, "to": { "node": "out_building", "port": "value" } },
+      { "from": { "node": "lkp_bpp", "port": "value" }, "to": { "node": "out_bpp", "port": "value" } }
+    ]
+  },
+  "externalInputs": { "territory": "t1" },
+  "expectedOutputs": { "building_base_lc": 0.4, "bpp_base_lc": 0.2 }
+}

@@ -1,0 +1,142 @@
+/* ============================================================================
+ * <UsedInPanel> — the references panel, self-styled (Brief 66 §3.1).
+ *
+ * Extracted from the legacy DimensionEditor.css; reference icons are
+ * wayfinding (neutral), broken refs ride the danger token, the head is
+ * eyebrow DNA. Token-only BEM.
+ * ========================================================================== */
+
+.rater-dim-used-in {
+  background: var(--rater-surface-canvas);
+  border: 1px solid var(--rater-hairline-soft);
+  border-radius: var(--rater-r-8);
+  overflow: hidden;
+}
+
+.rater-dim-used-in__head {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-6);
+  padding: var(--rater-s-8) var(--rater-s-14);
+  background: var(--rater-surface-1);
+  border-bottom: 1px solid var(--rater-hairline-soft);
+  font-size: var(--rater-t-11);
+  letter-spacing: var(--rater-tracking-label);
+  text-transform: uppercase;
+  color: var(--rater-text-subtle);
+  font-weight: var(--rater-fw-semibold);
+}
+
+.rater-dim-used-in__count {
+  letter-spacing: 0;
+  text-transform: none;
+  font-weight: var(--rater-fw-medium);
+  color: var(--rater-text-default);
+}
+
+.rater-dim-used-in__rows {
+  display: flex;
+  flex-direction: column;
+}
+
+.rater-dim-used-in__row {
+  display: grid;
+  grid-template-columns: 22px 1fr auto 14px;
+  gap: var(--rater-s-10);
+  align-items: center;
+  padding: var(--rater-s-6) var(--rater-s-12);
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--rater-hairline-soft);
+  font-family: var(--rater-font-sans);
+  font-size: var(--rater-t-12);
+  cursor: pointer;
+  text-align: left;
+}
+
+.rater-dim-used-in__row:last-child {
+  border-bottom: none;
+}
+
+.rater-dim-used-in__row:hover {
+  background: var(--rater-surface-1);
+}
+
+.rater-dim-used-in__row:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: -2px;
+}
+
+.rater-dim-used-in__row:disabled {
+  cursor: default;
+  opacity: 0.7;
+}
+
+.rater-dim-used-in__row.is-broken {
+  background: color-mix(in srgb, var(--rater-accent-danger) 5%, transparent);
+}
+
+.rater-dim-used-in__icon {
+  width: 22px;
+  height: 22px;
+  border-radius: var(--rater-r-4);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Reference icons are wayfinding, not computation artifacts — neutral
+   (color governance: cat-* stays on the canvases themselves). */
+.rater-dim-used-in__icon--chain,
+.rater-dim-used-in__icon--factor-table,
+.rater-dim-used-in__icon--modifier,
+.rater-dim-used-in__icon--curve {
+  background: var(--rater-surface-2);
+  color: var(--rater-text-muted);
+}
+
+.rater-dim-used-in__row-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rater-dim-used-in__row-label-text {
+  color: var(--rater-text-default);
+  font-size: var(--rater-t-13);
+}
+
+.rater-dim-used-in__row-context {
+  font-size: var(--rater-t-11);
+  color: var(--rater-text-muted);
+  white-space: nowrap;
+}
+
+.rater-dim-used-in__broken {
+  color: var(--rater-accent-danger-text);
+  font-weight: var(--rater-fw-medium);
+}
+
+.rater-dim-used-in__row-jump {
+  font-size: var(--rater-t-11);
+  color: var(--rater-text-subtle);
+}
+
+.rater-dim-used-in__empty {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-10);
+  padding: var(--rater-s-14);
+}
+
+.rater-dim-used-in__empty-msg {
+  margin: 0;
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-muted);
+}
+
+.rater-dim-used-in__empty-ctas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--rater-s-6);
+}

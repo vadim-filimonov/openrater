@@ -1,0 +1,137 @@
+/*
+ * <BreakpointScrubber> styles — Brief 26 PR 4.
+ *
+ * Mirrors <CurvePlot>'s token palette per ADR-0019 (hand-rolled
+ * SVG + design tokens, no chart library). Categorical band fills
+ * use the loading-orange accent (cat-loading) to match the banded
+ * dimension's category color (ADR-0023 §7 mapping in Brief 26
+ * §3.1).
+ */
+
+.rater-breakpoint-scrubber {
+  display: block;
+  touch-action: none; /* Pointer drag, not scroll. */
+  user-select: none;
+  font-family: var(--rater-font-sans);
+}
+
+/* Axis baseline */
+.rater-breakpoint-scrubber__axis {
+  stroke: var(--rater-hairline-strong);
+  stroke-width: 1.5;
+}
+
+/* Band regions */
+.rater-breakpoint-scrubber__band-fill {
+  fill: color-mix(in srgb, var(--rater-cat-loading) 12%, transparent);
+}
+.rater-breakpoint-scrubber__band--odd .rater-breakpoint-scrubber__band-fill {
+  fill: color-mix(in srgb, var(--rater-cat-loading) 22%, transparent);
+}
+
+.rater-breakpoint-scrubber__band-label {
+  fill: var(--rater-text-muted);
+  font-size: var(--rater-t-11);
+  font-weight: var(--rater-fw-medium);
+  font-variant-numeric: var(--rater-num-tabular);
+  pointer-events: none;
+}
+
+/* Endpoint labels (min / max) */
+.rater-breakpoint-scrubber__endpoint {
+  fill: var(--rater-text-faint);
+  font-size: var(--rater-t-10);
+  font-variant-numeric: var(--rater-num-tabular);
+  pointer-events: none;
+}
+
+/* Handles */
+.rater-breakpoint-scrubber__handle {
+  fill: var(--rater-surface-canvas);
+  stroke: var(--rater-cat-loading);
+  stroke-width: 2;
+  cursor: grab;
+  transition:
+    fill var(--rater-d-80) var(--rater-ease-snap),
+    stroke var(--rater-d-80) var(--rater-ease-snap);
+}
+
+.rater-breakpoint-scrubber__handle:hover,
+.rater-breakpoint-scrubber__handle:focus-visible {
+  fill: color-mix(in srgb, var(--rater-cat-loading) 18%, var(--rater-surface-canvas));
+}
+
+.rater-breakpoint-scrubber__handle:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: 2px;
+  /* SVG <circle> outline is browser-supported but bounding box
+   * approximation; the visible ring is the right signal here. */
+}
+
+.rater-breakpoint-scrubber__handle--dragging {
+  cursor: grabbing;
+  fill: var(--rater-cat-loading);
+  stroke: var(--rater-cat-loading);
+}
+
+.rater-breakpoint-scrubber__handle-tooltip {
+  fill: var(--rater-text-default);
+  font-size: var(--rater-t-11);
+  font-weight: var(--rater-fw-medium);
+  font-variant-numeric: var(--rater-num-tabular);
+  pointer-events: none;
+}
+
+/*
+ * Brief 27 PR 2 — Compact-mode tweaks.
+ *
+ * In compact mode the per-band text labels are suppressed (they
+ * would overlap at 11+ bands per Brief 27 §−1 Q3). The band-fill
+ * stripes are the only visual cue for band boundaries, so we
+ * deepen the alternating fill slightly to keep the eye anchored.
+ */
+.rater-breakpoint-scrubber--compact .rater-breakpoint-scrubber__band-fill {
+  fill: color-mix(in srgb, var(--rater-cat-loading) 16%, transparent);
+}
+.rater-breakpoint-scrubber--compact
+  .rater-breakpoint-scrubber__band--odd
+  .rater-breakpoint-scrubber__band-fill {
+  fill: color-mix(in srgb, var(--rater-cat-loading) 30%, transparent);
+}
+
+/*
+ * Handles in compact mode are slightly smaller — they crowd at
+ * density, so a 7px radius (vs. 8px in full mode) keeps the
+ * spacing readable without losing pointer/touch targets.
+ */
+.rater-breakpoint-scrubber--compact .rater-breakpoint-scrubber__handle {
+  r: 7;
+}
+
+/*
+ * Brief 30 PR 30.3 — Gap-band visual.
+ *
+ * When a band index is in the scrubber's `gapBandIndices` set, the
+ * band's fill replaces the alternating azure stripes with a
+ * dashed/diagonal orange pattern + dashed top/bottom borders.
+ * Matches the editor's gap-warning row + the autosave-pill warning
+ * state so the user sees one consistent signal across the surface.
+ */
+.rater-breakpoint-scrubber__band--gap .rater-breakpoint-scrubber__band-fill {
+  fill: color-mix(in srgb, var(--rater-cat-loading) 22%, transparent);
+  stroke: var(--rater-cat-loading);
+  stroke-width: 1;
+  stroke-dasharray: 4 3;
+}
+
+.rater-breakpoint-scrubber__band--gap .rater-breakpoint-scrubber__band-label {
+  fill: var(--rater-cat-loading-text);
+  font-weight: var(--rater-fw-semibold);
+}
+
+/* Respect prefers-reduced-motion (per design-language §17). */
+@media (prefers-reduced-motion: reduce) {
+  .rater-breakpoint-scrubber__handle {
+    transition: none;
+  }
+}

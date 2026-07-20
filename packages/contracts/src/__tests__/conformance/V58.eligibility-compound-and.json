@@ -1,0 +1,40 @@
+{
+  "name": "V58.eligibility-compound-and",
+  "description": "Brief 81 (finding E8) — a compound rule's conditions[] AND together: contractor receipts over $300k declines ONLY when the class rates on a payroll basis. Receipts alone (loi basis) fall through to the default. The V1 single-comparator sibling rule proves the shapes coexist in one gate.",
+  "plan": {
+    "id": "v58.eligibility_compound_and",
+    "version": "1.0.0",
+    "name": "Eligibility compound AND",
+    "lines": ["liability"],
+    "effective": "2026-01-01",
+    "nodes": [
+      {
+        "id": "gate",
+        "kind": "eligibility.gate",
+        "params": {
+          "rules": [
+            {
+              "rule_id": "contractor_receipts_payroll",
+              "conditions": [
+                { "variable": "contractor_receipts", "op": "gt", "value": 300000 },
+                { "variable": "liab_exposure_base", "op": "eq", "value": "payroll" }
+              ],
+              "tier": "decline",
+              "reasoning": "Contractor receipts over $300,000 on a payroll-rated class are outside appetite."
+            },
+            { "rule_id": "core_market", "variable": "state", "op": "in", "value": ["KS"], "tier": "preferred", "reasoning": "Core market state." }
+          ],
+          "default_tier": "standard",
+          "default_reasoning": "Standard appetite, no special handling."
+        },
+        "position": { "x": 0, "y": 0 }
+      },
+      { "id": "out_tier", "kind": "output", "params": { "fieldName": "tier", "fieldType": "string" }, "position": { "x": 200, "y": 0 } }
+    ],
+    "edges": [
+      { "from": { "node": "gate", "port": "tier" }, "to": { "node": "out_tier", "port": "value" } }
+    ]
+  },
+  "externalInputs": { "contractor_receipts": 300001, "liab_exposure_base": "payroll", "state": "MO" },
+  "expectedOutputs": { "tier": "decline" }
+}

@@ -1,0 +1,132 @@
+/* <PlanGenesis> — Brief 89 §2.1 (R2–R4). One reading column, one left
+   edge; equal-weight door cards (no azure until a door is taken). */
+
+.rater-genesis {
+  max-width: 1180px;
+  padding-top: var(--rater-s-24);
+}
+
+.rater-genesis__title {
+  margin: 0;
+  font-family: var(--rater-fonts-display);
+  font-size: 18px;
+  font-weight: var(--rater-fw-semibold);
+  letter-spacing: var(--rater-tracking-tight);
+  color: var(--rater-text-strong);
+}
+
+.rater-genesis__lede {
+  margin: 8px 0 0;
+  max-width: 560px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--rater-text-muted);
+}
+
+.rater-genesis__doors {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+@media (max-width: 860px) {
+  .rater-genesis__doors {
+    grid-template-columns: 1fr;
+  }
+}
+
+.rater-genesis__door {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-start;
+  text-align: left;
+  padding: 20px 20px 18px;
+  background: var(--rater-surface-1);
+  border: 1px solid var(--rater-border-default);
+  border-radius: 12px;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+  transition:
+    border-color 120ms ease,
+    transform 120ms ease;
+}
+
+.rater-genesis__door:hover:not(disabled) {
+  border-color: var(--rater-text-subtle);
+  transform: translateY(-1px);
+}
+
+.rater-genesis__door:focus-visible {
+  outline: 2px solid var(--rater-accent-primary);
+  outline-offset: 2px;
+}
+
+.rater-genesis__door:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rater-genesis__door,
+  .rater-genesis__door:hover:not(disabled) {
+    transition: none;
+    transform: none;
+  }
+}
+
+.rater-genesis__glyph {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--rater-border-default);
+  border-radius: 9px;
+  color: var(--rater-text-muted);
+}
+
+.rater-genesis__name {
+  font-size: 15.5px;
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-strong);
+}
+
+.rater-genesis__body {
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--rater-text-muted);
+}
+
+.rater-genesis__need {
+  align-self: stretch;
+  margin-top: 6px;
+  padding-top: 12px;
+  border-top: 1px solid var(--rater-border-subtle);
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--rater-text-subtle);
+}
+
+.rater-genesis__need b {
+  margin-right: 6px;
+  font-size: 10.5px;
+  font-weight: var(--rater-fw-semibold);
+  letter-spacing: var(--rater-tracking-label);
+  text-transform: uppercase;
+  color: var(--rater-text-muted);
+}
+
+.rater-genesis__alt {
+  margin: 18px 0 0;
+  font-size: 13px;
+  color: var(--rater-text-subtle);
+}
+
+.rater-genesis__readonly {
+  margin: 16px 0 0;
+  font-size: 13px;
+  color: var(--rater-text-subtle);
+}

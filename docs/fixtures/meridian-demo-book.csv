@@ -1,0 +1,21 @@
+case_id,name,class_code,building_limit,bpp_limit,annual_gross_sales,construction_class,protection_class,zip,sprinklered,years_in_business,expected_tier,expected_total
+mv_01,"Retail t2, sprinklered, preferred",c101,250000,80000,600000,jm,p1_4,68102,true,8,preferred,1898
+mv_02,"Restaurant t3, unsprinklered (endorsement fires)",c104,400000,150000,1200000,frame,p5_8,68502,false,12,standard,6484
+mv_03,"Office t1, tiny liability (clamp fires)",c103,180000,40000,30000,fr,p1_4,68001,false,20,standard,500
+mv_04,Micro florist (package floor fires),c107,40000,10000,25000,masonry,p5_8,68002,true,6,standard,500
+mv_05,Woodworking (submit tier),c111,350000,120000,900000,jm,p9_10,68104,true,15,submit,5429
+mv_06,Big young welding supply (decline tier),c112,900000,300000,6000000,masonry,p5_8,68505,false,2,decline,31574
+mv_07,Pharmacy at a band edge ($250K exactly),c109,250000,250000,250000,fr,p9_10,68015,true,9,standard,1689
+mv_08,"Hardware t3, defaults exercised implicitly",c108,1250000,400000,2400000,frame,p9_10,68510,false,30,standard,13941
+bk_09,"Neighborhood grocery t4, frame, sprinklered",c113,320000,95000,700000,frame,p5_8,68005,true,11,standard,2636
+bk_10,"Coffee shop t5, masonry",c115,150000,120000,380000,masonry,p1_4,68801,false,7,standard,1671
+bk_11,"Bookstore t6, joisted masonry",c117,210000,60000,520000,jm,p5_8,68025,true,4,standard,1313
+bk_12,"Jewelry store t1, fire-resistive",c119,275000,70000,430000,fr,p1_4,68001,true,16,preferred,1323
+bk_13,"Sporting goods t2, mid-band interpolated limit",c121,333000,45000,290000,jm,p9_10,68104,false,9,standard,1991
+bk_14,"Pet shop t3, tiny sales (clamp candidate)",c123,95000,25000,45000,frame,p5_8,68502,true,3,standard,565
+bk_15,"Tailor t4, unsprinklered (endorsement)",c126,480000,160000,1500000,masonry,p9_10,68123,false,22,standard,4467
+bk_16,"Picture framer t5, micro package (floor candidate)",c129,35000,8000,20000,jm,p1_4,68901,true,5,preferred,500
+bk_17,Woodworking t6 (submit tier),c111,300000,100000,800000,frame,p5_8,68601,true,13,submit,4193
+bk_18,Big young art gallery (decline tier),c131,1100000,350000,5600000,fr,p1_4,68102,true,1,decline,12627
+bk_19,"Insurance agency t1, band lower edge exactly",c134,500000,130000,1000000,masonry,p5_8,68003,true,18,standard,2755
+bk_20,"Veterinary office t2, top band",c138,2100000,600000,3800000,fr,p9_10,68105,false,27,standard,19294

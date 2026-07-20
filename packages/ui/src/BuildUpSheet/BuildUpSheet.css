@@ -1,0 +1,807 @@
+/* ============================================================================
+ * <BuildUpSheet> — the algorithm as a one-column filing exhibit
+ * (Brief 70 §2, rescoped by Brief 82).
+ * One reading column: coverage cards of numbered steps (Step · Value),
+ * a ghost add-coverage row, the Final-adjustments ledger. No sample
+ * machinery, no side panes (O-1 / D-A) — the selected step's editor
+ * opens IN PLACE under its row (D-B, R1 form).
+ * ============================================================================ */
+
+.rater-buildup {
+  padding: var(--rater-s-16) var(--rater-s-24) var(--rater-s-24);
+}
+
+.rater-buildup__col {
+  min-width: 0;
+  max-width: 880px;
+  margin: 0 auto;
+}
+
+/* ── Coverage sections ──────────────────────────────────────────── */
+
+.rater-buildup__section {
+  margin-bottom: var(--rater-s-24);
+}
+
+.rater-buildup__covhead {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-12);
+  min-height: 52px;
+  border-bottom: 1px solid var(--rater-hairline-base);
+  position: sticky;
+  top: 0;
+  background: var(--rater-surface-canvas);
+  z-index: 5;
+}
+
+.rater-buildup__covname {
+  margin: 0;
+  font-size: var(--rater-t-16);
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-strong);
+}
+
+.rater-buildup__covhead-hint {
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-subtle);
+}
+
+/* Brief 82 O-1 — the header's honest fact is the build's SIZE, never
+ * a computed number. */
+.rater-buildup__covcount {
+  margin-left: auto;
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-faint);
+  white-space: nowrap;
+}
+
+.rater-buildup__covhead-actions {
+  opacity: 0;
+  transition: opacity var(--rater-d-80) var(--rater-ease-snap);
+}
+.rater-buildup__covhead:hover .rater-buildup__covhead-actions,
+.rater-buildup__covhead:focus-within .rater-buildup__covhead-actions {
+  opacity: 1;
+}
+
+.rater-buildup__expo-wrap {
+  position: relative;
+  display: inline-flex;
+}
+
+.rater-buildup__expo-pill {
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-subtle);
+  border: 1px solid var(--rater-hairline-subtle);
+  border-radius: 12px;
+  background: none;
+  padding: 2px var(--rater-s-10);
+  font-family: inherit;
+  cursor: pointer;
+}
+.rater-buildup__expo-pill:hover:not(disabled) {
+  border-color: var(--rater-hairline-strong);
+  color: var(--rater-text-default);
+}
+.rater-buildup__expo-pill:disabled {
+  cursor: default;
+}
+.rater-buildup__expo-pill:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: 2px;
+}
+
+.rater-buildup__expo-pop {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 60;
+  width: 300px;
+  background: var(--rater-surface-1);
+  border: 1px solid var(--rater-hairline-base);
+  border-radius: var(--rater-r-12);
+  box-shadow: var(--rater-shadow-overlay, 0 16px 48px rgb(0 0 0 / 0.5));
+  padding: var(--rater-s-12);
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-10);
+}
+
+.rater-buildup__expo-label {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-4);
+  font-size: var(--rater-t-11);
+  font-weight: var(--rater-fw-semibold);
+  letter-spacing: var(--rater-tracking-label);
+  text-transform: uppercase;
+  color: var(--rater-text-subtle);
+}
+
+.rater-buildup__expo-select {
+  font: inherit;
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-strong);
+  background: var(--rater-surface-sunken, var(--rater-surface-canvas));
+  border: 1px solid var(--rater-hairline-base);
+  border-radius: var(--rater-r-6);
+  padding: var(--rater-s-4) var(--rater-s-8);
+}
+.rater-buildup__expo-select:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: -1px;
+}
+
+.rater-buildup__expo-note {
+  margin: 0;
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-faint);
+  text-transform: none;
+  letter-spacing: normal;
+  font-weight: var(--rater-fw-regular);
+}
+
+.rater-buildup__expo-options-note {
+  margin: var(--rater-s-8) 0 0;
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-muted);
+}
+
+/* ── Column contract (Brief 82 D-E) — stated once per card ─────── */
+
+.rater-buildup__cols {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--rater-s-8) var(--rater-s-10) var(--rater-s-4) 44px;
+  font-size: var(--rater-t-10);
+  font-weight: var(--rater-fw-semibold);
+  letter-spacing: var(--rater-tracking-label);
+  text-transform: uppercase;
+  color: var(--rater-text-faint);
+  border-bottom: 1px solid var(--rater-hairline-subtle);
+}
+
+.rater-buildup__cols-r {
+  text-align: right;
+}
+
+/* ── Step rows (body · value) ───────────────────────────────────── */
+
+.rater-buildup__step {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 190px;
+  align-items: center;
+  gap: var(--rater-s-10);
+  min-height: 40px;
+}
+
+/* Category tiles — the add-step picker's visual anchors. */
+.rater-buildup__tile {
+  width: 26px;
+  height: 26px;
+  border-radius: var(--rater-r-6);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.rater-buildup__tile--input {
+  color: var(--rater-cat-input);
+  background: color-mix(in srgb, var(--rater-cat-input) 12%, transparent);
+}
+.rater-buildup__tile--transform {
+  color: var(--rater-cat-transform);
+  background: color-mix(in srgb, var(--rater-cat-transform) 12%, transparent);
+}
+.rater-buildup__tile--lookup {
+  color: var(--rater-cat-lookup);
+  background: color-mix(in srgb, var(--rater-cat-lookup) 12%, transparent);
+}
+.rater-buildup__tile--math {
+  color: var(--rater-cat-math);
+  background: color-mix(in srgb, var(--rater-cat-math) 12%, transparent);
+}
+.rater-buildup__tile--loading {
+  color: var(--rater-cat-loading);
+  background: color-mix(in srgb, var(--rater-cat-loading) 12%, transparent);
+}
+.rater-buildup__tile--output {
+  color: var(--rater-cat-output);
+  background: color-mix(in srgb, var(--rater-cat-output) 12%, transparent);
+}
+
+.rater-buildup__step-body {
+  min-width: 0;
+}
+
+.rater-buildup__step-name {
+  font-size: var(--rater-t-13);
+  font-weight: var(--rater-fw-medium);
+  color: var(--rater-text-strong);
+}
+
+.rater-buildup__step-bind {
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-muted);
+  margin-top: 1px;
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-6);
+  flex-wrap: wrap;
+}
+
+.rater-buildup__bind-prompt {
+  color: var(--rater-feedback-warn);
+}
+
+.rater-buildup__wirechip {
+  font-size: var(--rater-t-11);
+  color: var(--rater-text-muted);
+  border: 1px solid var(--rater-hairline-subtle);
+  border-radius: 9px;
+  padding: 1px var(--rater-s-8);
+}
+
+/* The Value column: authored scalars edit in place; table steps show
+ * their shape. Never a computed number (O-1). */
+.rater-buildup__col-value {
+  font-family: var(--rater-fonts-mono, var(--rater-fonts-sans));
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-default);
+  white-space: nowrap;
+}
+
+.rater-buildup__meta {
+  font-size: var(--rater-t-11);
+  color: var(--rater-text-faint);
+}
+
+/* R3 (Law 2, structural) — a lookup whose table left the catalog
+ * refuses with a named chip. Warn semantics, never error: the SHEET
+ * is fine, the REFERENCE is broken. */
+.rater-buildup__blockchip {
+  display: inline-flex;
+  align-items: center;
+  font-size: var(--rater-t-11);
+  font-family: var(--rater-fonts-sans);
+  color: var(--rater-feedback-warn);
+  background: var(--rater-feedback-warn-bg);
+  border: 1px solid
+    color-mix(in srgb, var(--rater-feedback-warn) 25%, transparent);
+  border-radius: var(--rater-r-6);
+  padding: 1px var(--rater-s-8);
+  white-space: nowrap;
+}
+
+.rater-buildup__inline-val {
+  border: 0;
+  border-bottom: 1px dashed var(--rater-hairline-strong);
+  background: none;
+  padding: 0;
+  font: inherit;
+  color: var(--rater-text-strong);
+  cursor: text;
+}
+.rater-buildup__inline-val:disabled {
+  cursor: default;
+  border-bottom-color: transparent;
+}
+.rater-buildup__inline-val:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: 2px;
+}
+
+.rater-buildup__inline-input {
+  width: 72px;
+  background: var(--rater-surface-sunken, var(--rater-surface-canvas));
+  border: 0;
+  border-radius: var(--rater-r-4);
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: -1px;
+  font-family: var(--rater-fonts-mono, var(--rater-fonts-sans));
+  font-size: var(--rater-t-12);
+  text-align: right;
+  padding: 2px var(--rater-s-6);
+  color: var(--rater-text-strong);
+}
+
+/* ── The in-place row editor (Brief 82 D-B, R1 form) ────────────── */
+
+.rater-buildup__rowedit {
+  grid-column: 1 / -1;
+  margin: var(--rater-s-8) 0 var(--rater-s-4);
+  background: var(--rater-surface-sunken, var(--rater-surface-1));
+  border: 1px solid var(--rater-hairline-subtle);
+  border-radius: var(--rater-r-8);
+  padding: var(--rater-s-12);
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-12);
+  cursor: default;
+}
+
+.rater-buildup__insp-head {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--rater-s-10);
+}
+
+.rater-buildup__insp-title {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.rater-buildup__insp-name {
+  font-size: var(--rater-t-13);
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-strong);
+}
+
+.rater-buildup__insp-name-input {
+  font: inherit;
+  font-size: var(--rater-t-13);
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-strong);
+  background: none;
+  border: 0;
+  border-bottom: 1px dashed transparent;
+  padding: 0;
+}
+.rater-buildup__insp-name-input:hover {
+  border-bottom-color: var(--rater-hairline-strong);
+}
+.rater-buildup__insp-name-input:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: 2px;
+  border-bottom-color: transparent;
+}
+
+.rater-buildup__insp-kind {
+  font-size: var(--rater-t-11);
+  color: var(--rater-text-subtle);
+}
+
+/*  — the filed provenance, one quiet clause in the header. */
+.rater-buildup__insp-cite {
+  font-size: var(--rater-t-11);
+  color: var(--rater-text-muted);
+  white-space: nowrap;
+}
+
+.rater-buildup__insp-block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-8);
+  align-items: flex-start;
+}
+
+/* Brief 82 R2 — the inline grid fills the row editor's width. */
+.rater-buildup__insp-grid {
+  width: 100%;
+}
+
+/* Side-by-side predicate controls (field · value). */
+.rater-buildup__insp-row {
+  display: flex;
+  gap: var(--rater-s-12);
+  align-items: flex-end;
+  width: 100%;
+  flex-wrap: wrap;
+}
+.rater-buildup__insp-row .rater-buildup__insp-field {
+  width: auto;
+  min-width: 180px;
+}
+
+/* Brief 82 D-G — the typed boolean value control. */
+.rater-buildup__seg {
+  display: inline-flex;
+  border: 1px solid var(--rater-hairline-base);
+  border-radius: var(--rater-r-6);
+  overflow: hidden;
+}
+.rater-buildup__seg-btn {
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: var(--rater-t-12);
+  font-family: var(--rater-fonts-mono, var(--rater-fonts-sans));
+  color: var(--rater-text-muted);
+  padding: var(--rater-s-4) var(--rater-s-10);
+  cursor: pointer;
+}
+.rater-buildup__seg-btn + .rater-buildup__seg-btn {
+  border-left: 1px solid var(--rater-hairline-base);
+}
+.rater-buildup__seg-btn.is-on {
+  background: var(--rater-surface-2);
+  color: var(--rater-text-strong);
+}
+.rater-buildup__seg-btn:disabled {
+  cursor: default;
+}
+.rater-buildup__seg-btn:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: -2px;
+}
+
+.rater-buildup__insp-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-4);
+  width: 100%;
+  max-width: 320px;
+}
+
+.rater-buildup__insp-label {
+  font-size: var(--rater-t-11);
+  font-weight: var(--rater-fw-semibold);
+  letter-spacing: var(--rater-tracking-label);
+  text-transform: uppercase;
+  color: var(--rater-text-subtle);
+}
+
+.rater-buildup__insp-note {
+  margin: 0;
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-faint);
+}
+
+.rater-buildup__insp-foot {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--rater-s-8);
+  border-top: 1px solid var(--rater-hairline-subtle);
+  padding-top: var(--rater-s-10);
+}
+
+/* Shared small text input (row editor fields, add-coverage name). */
+.rater-buildup__field-input {
+  width: 100%;
+  background: var(--rater-surface-sunken, var(--rater-surface-canvas));
+  border: 1px solid var(--rater-hairline-base);
+  border-radius: var(--rater-r-6);
+  padding: var(--rater-s-4) var(--rater-s-8);
+  font: inherit;
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-strong);
+}
+.rater-buildup__field-input:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: -1px;
+}
+
+/* ── Add step + picker ──────────────────────────────────────────── */
+
+.rater-buildup__add-wrap {
+  position: relative;
+}
+
+.rater-buildup__add-step {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-8);
+  height: 42px;
+  width: 100%;
+  text-align: left;
+  padding: 0 var(--rater-s-10);
+  border: 0;
+  border-bottom: 1px solid var(--rater-hairline-subtle);
+  background: none;
+  font: inherit;
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-subtle);
+  cursor: pointer;
+}
+.rater-buildup__add-step:hover {
+  color: var(--rater-text-default);
+  background: var(--rater-row-hover-bg);
+}
+.rater-buildup__add-step:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: -2px;
+}
+
+.rater-buildup__picker {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  z-index: 60;
+  width: 420px;
+  max-height: 420px;
+  overflow-y: auto;
+  background: var(--rater-surface-1);
+  border: 1px solid var(--rater-hairline-base);
+  border-radius: var(--rater-r-12);
+  box-shadow: var(--rater-shadow-overlay, 0 16px 48px rgb(0 0 0 / 0.5));
+  padding: var(--rater-s-10);
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-2);
+}
+
+.rater-buildup__pick-group {
+  font-size: var(--rater-t-11);
+  font-weight: var(--rater-fw-semibold);
+  letter-spacing: var(--rater-tracking-label);
+  text-transform: uppercase;
+  color: var(--rater-text-subtle);
+  padding: var(--rater-s-10) var(--rater-s-6) var(--rater-s-4);
+}
+
+.rater-buildup__pick-row {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-10);
+  border: 0;
+  background: none;
+  padding: var(--rater-s-8) var(--rater-s-6);
+  border-radius: var(--rater-r-8);
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  width: 100%;
+}
+.rater-buildup__pick-row:hover:not(disabled) {
+  background: var(--rater-row-hover-bg);
+}
+.rater-buildup__pick-row:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.rater-buildup__pick-row:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: -2px;
+}
+
+.rater-buildup__pick-body {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.rater-buildup__pick-name {
+  font-size: var(--rater-t-13);
+  color: var(--rater-text-strong);
+}
+
+.rater-buildup__pick-sentence {
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-muted);
+}
+
+.rater-buildup__pick-range {
+  font-family: var(--rater-fonts-mono, var(--rater-fonts-sans));
+  font-variant-numeric: tabular-nums;
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-muted);
+}
+
+.rater-buildup__pick-refuse {
+  margin: 0;
+  padding: var(--rater-s-6);
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-muted);
+}
+
+.rater-buildup__pick-foot {
+  margin: var(--rater-s-6) 0 0;
+  padding: var(--rater-s-6);
+  border-top: 1px solid var(--rater-hairline-subtle);
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-faint);
+}
+
+/* ── Add coverage (Brief 82 D-A — re-homed from the dead side-nav) ─ */
+
+.rater-buildup__addcov-wrap {
+  position: relative;
+  margin: calc(var(--rater-s-8) * -1) 0 var(--rater-s-24);
+}
+
+.rater-buildup__addcov {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-8);
+  height: 42px;
+  width: 100%;
+  text-align: left;
+  padding: 0 var(--rater-s-10);
+  border: 1px dashed var(--rater-hairline-base);
+  border-radius: var(--rater-r-8);
+  background: none;
+  font: inherit;
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-subtle);
+  cursor: pointer;
+}
+.rater-buildup__addcov:hover {
+  color: var(--rater-text-default);
+  border-color: var(--rater-hairline-strong);
+}
+.rater-buildup__addcov:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: -2px;
+}
+
+.rater-buildup__addcov-pop {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  z-index: 60;
+  display: flex;
+  gap: var(--rater-s-8);
+  align-items: center;
+  background: var(--rater-surface-1);
+  border: 1px solid var(--rater-hairline-base);
+  border-radius: var(--rater-r-8);
+  box-shadow: var(--rater-shadow-overlay, 0 16px 48px rgb(0 0 0 / 0.5));
+  padding: var(--rater-s-10);
+  width: 320px;
+}
+
+/* ── Final adjustments ──────────────────────────────────────────── */
+
+.rater-buildup__fa-empty {
+  margin: 0;
+  padding: var(--rater-s-14) var(--rater-s-10);
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-muted);
+}
+
+/* Brief 82 R4 (D-F) — the ONE add menu (replaces five buttons). */
+.rater-buildup__fa-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  z-index: 60;
+  min-width: 280px;
+  background: var(--rater-surface-1);
+  border: 1px solid var(--rater-hairline-base);
+  border-radius: var(--rater-r-12);
+  box-shadow: var(--rater-shadow-overlay, 0 16px 48px rgb(0 0 0 / 0.5));
+  padding: var(--rater-s-6);
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.rater-buildup__fa-menu-row {
+  display: flex;
+  align-items: baseline;
+  gap: var(--rater-s-10);
+  border: 0;
+  background: none;
+  padding: var(--rater-s-8) var(--rater-s-10);
+  border-radius: var(--rater-r-8);
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  font-size: var(--rater-t-13);
+  color: var(--rater-text-default);
+  width: 100%;
+}
+.rater-buildup__fa-menu-row:hover {
+  background: var(--rater-row-hover-bg);
+  color: var(--rater-text-strong);
+}
+.rater-buildup__fa-menu-row:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: -2px;
+}
+
+.rater-buildup__fa-menu-hint {
+  margin-left: auto;
+  font-size: var(--rater-t-11);
+  color: var(--rater-text-faint);
+  white-space: nowrap;
+}
+
+.rater-buildup__fa-menu-hr {
+  border: 0;
+  border-top: 1px solid var(--rater-hairline-subtle);
+  margin: var(--rater-s-4) var(--rater-s-6);
+}
+
+/* Brief 78 P5.4 (D-F) — the ONE tail ledger's provenance tag. */
+.rater-buildup__prov {
+  display: inline-block;
+  margin-left: var(--rater-s-8);
+  font-size: var(--rater-t-10);
+  font-weight: var(--rater-fw-semibold);
+  letter-spacing: var(--rater-tracking-label);
+  text-transform: uppercase;
+  color: var(--rater-text-faint);
+  border: 1px solid var(--rater-hairline-soft);
+  border-radius: var(--rater-r-4);
+  padding: 0 var(--rater-s-6);
+  vertical-align: 1px;
+}
+
+/* ── Empty state (the creation question) ────────────────────────── */
+
+.rater-buildup.is-empty {
+  display: flex;
+  justify-content: center;
+}
+
+.rater-buildup__create {
+  max-width: 460px;
+  margin: 8vh auto 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--rater-s-12);
+}
+
+.rater-buildup__create-q {
+  margin: 0;
+  font-size: var(--rater-t-20);
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-strong);
+}
+
+.rater-buildup__create-sub {
+  margin: 0;
+  font-size: var(--rater-t-13);
+  color: var(--rater-text-muted);
+}
+
+.rater-buildup__create-or {
+  margin: var(--rater-s-8) 0 0;
+  font-size: var(--rater-t-11);
+  font-weight: var(--rater-fw-semibold);
+  letter-spacing: var(--rater-tracking-label);
+  text-transform: uppercase;
+  color: var(--rater-text-subtle);
+}
+
+.rater-buildup__create-list {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-2);
+  text-align: left;
+}
+
+.rater-buildup__create-count {
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-muted);
+}
+
+.rater-buildup__create-foot {
+  margin: var(--rater-s-8) 0 0;
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-muted);
+}
+
+.rater-buildup__create-link {
+  border: 0;
+  background: none;
+  padding: 0;
+  font: inherit;
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-strong);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rater-buildup__covhead-actions {
+    transition: none;
+  }
+}
+
+/* Brief 89 R5 — the CREATE group's inline type pick (Input "…"). */
+.rater-buildup__pick-dtype {
+  padding: var(--rater-s-4) var(--rater-s-16) var(--rater-s-12);
+}

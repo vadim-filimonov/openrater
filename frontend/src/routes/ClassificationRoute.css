@@ -1,0 +1,235 @@
+/* ============================================================================
+ * /rate-lab/:id/classification — A5.5 redesign.
+ *
+ * Master/Detail layout per design-language §2.4:
+ *   · Browser left at minmax(280px, 360px) — the master pane
+ *   · Detail right at minmax(0, 1fr) — takes remaining width
+ *   · Stack below 1279px (standard tier breakpoint per §2.2)
+ *
+ * Both panes are full-height columns (height: calc viewport - header)
+ * so the browser list and detail pane both fill the column naturally
+ * + scroll within themselves. No hardcoded max-height on either.
+ *
+ * Page chrome per §2.3:
+ *   · max-width 1440px (was 1400px)
+ *   · padding s-24 standard tier; s-32 wide tier
+ * ============================================================================ */
+
+.classification-route {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-20);
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: var(--rater-s-24);
+}
+
+@media (min-width: 1440px) {
+  .classification-route {
+    padding: var(--rater-s-32);
+  }
+}
+
+/* ----------------------------------------------------------------
+ * Header — back link, title block, scope chip
+ * ---------------------------------------------------------------- */
+
+.classification-route__header {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: auto auto;
+  align-items: start;
+  gap: var(--rater-s-8) var(--rater-s-16);
+}
+
+.classification-route__back {
+  grid-column: 1;
+  grid-row: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-4);
+  width: fit-content;
+  padding: var(--rater-s-4) var(--rater-s-6);
+  margin-left: calc(-1 * var(--rater-s-6));
+  border-radius: var(--rater-r-4);
+  color: var(--rater-text-muted);
+  text-decoration: none;
+  font-family: var(--rater-font-sans);
+  font-size: var(--rater-t-12);
+  font-weight: var(--rater-fw-medium);
+  transition:
+    color var(--rater-d-80) var(--rater-ease-snap),
+    background var(--rater-d-80) var(--rater-ease-snap);
+}
+
+.classification-route__back:hover {
+  color: var(--rater-text-strong);
+  background: var(--rater-surface-2);
+}
+
+.classification-route__back:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: 2px;
+}
+
+.classification-route__title-group {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+.classification-route__title {
+  margin: 0 0 var(--rater-s-4) 0;
+  font-size: var(--rater-t-24);
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-strong);
+  letter-spacing: var(--rater-tracking-tight);
+  line-height: var(--rater-lh-tight);
+}
+
+.classification-route__subtitle {
+  margin: 0;
+  max-width: 640px;
+  font-size: var(--rater-t-13);
+  color: var(--rater-text-muted);
+  line-height: var(--rater-lh-snug);
+}
+
+.classification-route__scope {
+  grid-column: 2;
+  grid-row: 2;
+  align-self: end;
+  padding: var(--rater-s-2) var(--rater-s-6);
+  background: var(--rater-surface-sunken);
+  border: 1px solid var(--rater-hairline-soft);
+  border-radius: var(--rater-r-4);
+  font-size: var(--rater-t-11);
+  font-weight: var(--rater-fw-medium);
+  text-transform: uppercase;
+  letter-spacing: var(--rater-tracking-label);
+  color: var(--rater-text-muted);
+}
+
+.classification-route__scope strong {
+  color: var(--rater-text-default);
+  font-weight: var(--rater-fw-semibold);
+}
+
+/* ----------------------------------------------------------------
+ * Loading state — centered spinner + label per §12.2
+ * ---------------------------------------------------------------- */
+
+.classification-route__loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--rater-s-8);
+  min-height: 200px;
+  padding: var(--rater-s-24);
+  background: var(--rater-surface-1);
+  border: 1px solid var(--rater-hairline-base);
+  border-radius: var(--rater-r-8);
+  color: var(--rater-text-muted);
+  font-family: var(--rater-font-sans);
+  font-size: var(--rater-t-13);
+}
+
+.classification-route__loading-icon {
+  color: var(--rater-text-subtle);
+  animation: classification-route-spin var(--rater-d-600) linear infinite;
+}
+
+@keyframes classification-route-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .classification-route__loading-icon {
+    /* Slow rotation to a barely-perceptible cycle rather than freezing
+     * entirely — the user still gets a "working" signal. */
+    animation-duration: 4s;
+  }
+}
+
+/* ----------------------------------------------------------------
+ * Error state — callout pattern per §12.3
+ * ---------------------------------------------------------------- */
+
+.classification-route__error {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: var(--rater-s-12);
+  padding: var(--rater-s-16) var(--rater-s-20);
+  background: var(--rater-feedback-error-soft);
+  border: 1px solid var(--rater-feedback-error);
+  border-radius: var(--rater-r-8);
+  font-family: var(--rater-font-sans);
+}
+
+.classification-route__error-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  color: var(--rater-feedback-error);
+}
+
+.classification-route__error-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-2);
+  min-width: 0;
+}
+
+.classification-route__error-title {
+  font-size: var(--rater-t-14);
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-strong);
+}
+
+.classification-route__error-text {
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-muted);
+  line-height: var(--rater-lh-snug);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ----------------------------------------------------------------
+ * Two-pane master/detail layout
+ * ---------------------------------------------------------------- */
+
+.classification-route__layout {
+  display: grid;
+  grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
+  gap: var(--rater-s-16);
+  /* Give the columns a height to fill so the inner panes can grow.
+   * Subtract chrome (header ~120px + page padding) from viewport. */
+  min-height: calc(100vh - 240px);
+}
+
+/* Stack below the standard tier (§2.2 — 1279px breakpoint) */
+@media (max-width: 1279px) {
+  .classification-route__layout {
+    grid-template-columns: 1fr;
+    min-height: 0;
+  }
+}
+
+.classification-route__browser-col,
+.classification-route__detail-col {
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+}
+
+/* On narrow stacked layout, give each pane a sensible height */
+@media (max-width: 1279px) {
+  .classification-route__browser-col,
+  .classification-route__detail-col {
+    min-height: 480px;
+  }
+}

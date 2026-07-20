@@ -1,0 +1,66 @@
+/* ============================================================================
+ * <InlineEdit> — click-to-edit text (Shell v3 polish; Wave 1).
+ *
+ * Idle = text-identical (transparent chrome, negative-margin optical
+ * trick). Hover = hairline + soft wash (the wash is what makes the
+ * affordance discoverable — a hairline alone doesn't read at a glance).
+ * Focus = the canonical text-entry ring.
+ * ========================================================================== */
+
+.rater-inline-edit {
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--rater-r-6);
+  color: inherit;
+  font-family: var(--rater-font-sans);
+  transition:
+    background var(--rater-d-80) var(--rater-ease-snap),
+    border-color var(--rater-d-80) var(--rater-ease-snap),
+    box-shadow var(--rater-d-80) var(--rater-ease-snap);
+}
+
+.rater-inline-edit::placeholder {
+  color: var(--rater-text-subtle);
+  font-weight: var(--rater-fw-medium);
+}
+
+.rater-inline-edit:hover {
+  border-color: var(--rater-border-subtle);
+  background: var(--rater-row-hover-bg);
+}
+
+.rater-inline-edit:focus {
+  outline: none;
+  border-color: var(--rater-focus-ring);
+  box-shadow: 0 0 0 2px var(--rater-focus-halo);
+  background: var(--rater-surface-canvas);
+}
+
+/* ── variants ───────────────────────────────────────────────────── */
+
+.rater-inline-edit--title {
+  width: 100%;
+  margin: -3px calc(-1 * var(--rater-s-8));
+  padding: 3px var(--rater-s-8);
+  font-size: var(--rater-t-20);
+  font-weight: var(--rater-fw-semibold);
+  letter-spacing: -0.01em;
+  color: var(--rater-text-strong);
+}
+
+.rater-inline-edit--body {
+  margin: -2px calc(-1 * var(--rater-s-6));
+  padding: 2px var(--rater-s-6);
+  font-size: var(--rater-t-13);
+  color: var(--rater-text-default);
+}
+
+.rater-inline-edit--mono {
+  min-width: 6ch;
+  max-width: 100%;
+  padding: 1px var(--rater-s-6);
+  font-family: var(--rater-font-mono);
+  letter-spacing: var(--rater-tracking-mono);
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-default);
+}

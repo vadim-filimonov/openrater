@@ -1,0 +1,116 @@
+/* ============================================================================
+ * <Tooltip> — accessible hover/focus label.
+ *
+ * Floating panel rendered via portal at document.body. Positioned by JS
+ * using getBoundingClientRect + window scroll offsets. The portal +
+ * page-coords approach means overflow:hidden ancestors can never clip
+ * the tooltip.
+ *
+ * Motion respects prefers-reduced-motion via the global tokens system.
+ * ============================================================================ */
+
+.rater-tooltip-anchor {
+  /* Wrap the anchor so onPointerEnter/Leave/Focus/Blur work without
+     modifying the child's behavior. inline-block preserves the
+     child's inline layout. */
+  display: inline-block;
+  /* Don't intercept hit-testing — clicks should go to the child. */
+  pointer-events: auto;
+}
+
+.rater-tooltip {
+  /* Floating positioned panel; coords set by JS. */
+  position: absolute;
+  z-index: var(--rater-z-tooltip);
+  pointer-events: auto;
+
+  /* Surface */
+  background: var(--rater-surface-3);
+  color: var(--rater-text-strong);
+  border: 1px solid var(--rater-border-strong);
+  border-radius: var(--rater-r-6);
+  box-shadow: var(--rater-shadow-floating);
+
+  /* Layout */
+  padding: var(--rater-s-6) var(--rater-s-10);
+  max-width: 320px;
+
+  /* Type */
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-12);
+  font-weight: var(--rater-fw-medium);
+  line-height: var(--rater-lh-snug);
+  letter-spacing: 0;
+
+  /* Motion — fade-in on appear */
+  animation: rater-tooltip-fade-in var(--rater-d-140) var(--rater-ease-soft);
+}
+
+.rater-tooltip__content {
+  /* Keep the content non-selectable so a stray drag doesn't grab
+     tooltip text instead of the underlying anchor. */
+  user-select: none;
+  white-space: normal;
+  display: block;
+}
+
+.rater-tooltip__arrow {
+  /* Caret pointing at the anchor. Implemented as a rotated square so
+     the same border-color flows around the corner cleanly. */
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: var(--rater-surface-3);
+  border: 1px solid var(--rater-border-strong);
+  border-radius: 1px;
+}
+
+/* Placement-specific caret position. The square rotates 45° so two of
+   its edges align with the tooltip panel and become invisible (covered
+   by the panel itself), leaving a clean caret. */
+.rater-tooltip__arrow[data-placement="top"] {
+  bottom: -5px;
+  left: 50%;
+  transform: translateX(-50%) rotate(45deg);
+  border-top: 0;
+  border-left: 0;
+}
+
+.rater-tooltip__arrow[data-placement="bottom"] {
+  top: -5px;
+  left: 50%;
+  transform: translateX(-50%) rotate(45deg);
+  border-bottom: 0;
+  border-right: 0;
+}
+
+.rater-tooltip__arrow[data-placement="left"] {
+  right: -5px;
+  top: 50%;
+  transform: translateY(-50%) rotate(45deg);
+  border-bottom: 0;
+  border-left: 0;
+}
+
+.rater-tooltip__arrow[data-placement="right"] {
+  left: -5px;
+  top: 50%;
+  transform: translateY(-50%) rotate(45deg);
+  border-top: 0;
+  border-right: 0;
+}
+
+@keyframes rater-tooltip-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* prefers-reduced-motion is handled globally by the tokens system —
+   the --rater-d-140 token collapses to 1ms, which makes the animation
+   effectively instant. No additional override needed here. */

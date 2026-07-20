@@ -1,0 +1,165 @@
+/**
+ * <ComputedExprEditor> styles (E03 / brief D3). BEM block `.rater-cee`.
+ * Tokens via @openrater/design-system; no inline styles, no raw palette.
+ */
+
+.rater-cee {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.rater-cee__rows {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.rater-cee__row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Operator select + the leading "=" glyph share a fixed slot so operands
+ * line up across rows. */
+.rater-cee__op {
+  flex: 0 0 auto;
+  width: 44px;
+  text-align: center;
+  background: var(--rater-surface-canvas);
+  border: 1px solid var(--rater-hairline-base);
+  border-radius: var(--rater-r-6);
+  padding: 7px 6px;
+  color: var(--rater-text-default);
+  font-family: var(--rater-fonts-mono);
+  font-size: var(--rater-t-13, 13px);
+}
+
+.rater-cee__op--lead {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--rater-text-subtle);
+  border-color: transparent;
+  background: transparent;
+}
+
+.rater-cee__kind {
+  flex: 0 0 auto;
+  width: 78px;
+  background: var(--rater-surface-canvas);
+  border: 1px solid var(--rater-hairline-base);
+  border-radius: var(--rater-r-6);
+  padding: 7px 8px;
+  color: var(--rater-text-default);
+  font-size: var(--rater-t-12, 12px);
+}
+
+.rater-cee__operand {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 0 8px;
+  background: var(--rater-surface-canvas);
+  border: 1px solid var(--rater-hairline-base);
+  border-radius: var(--rater-r-6);
+  color: var(--rater-text-subtle);
+}
+
+.rater-cee__field,
+.rater-cee__num {
+  flex: 1 1 auto;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  padding: 7px 0;
+  color: var(--rater-text-default);
+  font-family: var(--rater-fonts-mono);
+  font-size: var(--rater-t-13, 13px);
+  outline: none;
+}
+
+.rater-cee__op:focus-visible,
+.rater-cee__kind:focus-visible,
+.rater-cee__operand:focus-within {
+  border-color: var(--rater-cat-input);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--rater-cat-input) 30%, transparent);
+}
+
+.rater-cee__remove {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--rater-r-6);
+  color: var(--rater-text-subtle);
+  cursor: pointer;
+}
+
+.rater-cee__remove:hover {
+  color: var(--rater-feedback-error);
+  border-color: var(--rater-hairline-base);
+}
+
+.rater-cee__remove-spacer {
+  flex: 0 0 auto;
+  width: 28px;
+}
+
+.rater-cee__add {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--rater-surface-2);
+  border: 1px dashed var(--rater-hairline-base);
+  border-radius: var(--rater-r-6);
+  padding: 6px 10px;
+  color: var(--rater-text-default);
+  font-size: var(--rater-t-12, 12px);
+  cursor: pointer;
+}
+
+.rater-cee__add:hover {
+  background: var(--rater-surface-3);
+  border-color: var(--rater-hairline-strong);
+}
+
+.rater-cee__add:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: 1px;
+}
+
+.rater-cee__preview {
+  margin: 2px 0 0;
+  font-size: var(--rater-t-12, 12px);
+  color: var(--rater-text-subtle);
+}
+
+.rater-cee__formula {
+  font-family: var(--rater-fonts-mono);
+  font-size: var(--rater-t-12, 12px);
+  color: var(--rater-text-default);
+  background: var(--rater-surface-2);
+  padding: 2px 6px;
+  border-radius: var(--rater-r-4);
+}
+
+.rater-cee__value {
+  color: var(--rater-cat-math-text);
+  font-family: var(--rater-fonts-mono);
+  font-weight: var(--rater-fw-semibold);
+}
+
+.rater-cee__readonly {
+  margin: 0 0 6px;
+  font-size: var(--rater-t-12, 12px);
+  color: var(--rater-text-subtle);
+}

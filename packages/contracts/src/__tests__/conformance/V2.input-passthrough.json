@@ -1,0 +1,20 @@
+{
+  "name": "V2.input-passthrough",
+  "description": "externalInputs[x] -> input -> output. Value preserved.",
+  "plan": {
+    "id": "v2.passthrough",
+    "version": "1.0.0",
+    "name": "Passthrough",
+    "line": "bop",
+    "effective": "2026-01-01",
+    "nodes": [
+      { "id": "in_x", "kind": "input", "params": { "fieldName": "x", "fieldType": "float" }, "position": { "x": 0, "y": 0 } },
+      { "id": "out_x", "kind": "output", "params": { "fieldName": "x", "fieldType": "float" }, "position": { "x": 200, "y": 0 } }
+    ],
+    "edges": [
+      { "from": { "node": "in_x", "port": "value" }, "to": { "node": "out_x", "port": "value" } }
+    ]
+  },
+  "externalInputs": { "x": 42 },
+  "expectedOutputs": { "x": 42 }
+}

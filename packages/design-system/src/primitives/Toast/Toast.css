@@ -1,0 +1,92 @@
+/**
+ * <Toast> styles — fixed bottom-center, animated.
+ *
+ * Single-toast model. The viewport div is always mounted (so the
+ * aria-live region is stable across notify() calls); visibility is
+ * controlled by the --visible modifier and the content presence.
+ */
+
+.rater-toast {
+  position: fixed;
+  bottom: var(--rater-s-24);
+  left: 50%;
+
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-10);
+  min-width: 200px;
+  max-width: min(440px, calc(100vw - var(--rater-s-32)));
+  padding: var(--rater-s-10) var(--rater-s-14);
+
+  background: var(--rater-surface-2);
+  border: 1px solid var(--rater-border-default);
+  border-radius: var(--rater-r-8);
+  box-shadow: var(--rater-shadow-floating);
+  color: var(--rater-text-default);
+
+  font-family: var(--rater-font-sans);
+  font-size: var(--rater-t-13);
+  font-weight: var(--rater-fw-regular);
+  line-height: 1.4;
+  letter-spacing: var(--rater-tracking-tight);
+
+  z-index: var(--rater-z-toast);
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-50%, var(--rater-s-8));
+
+  transition:
+    opacity var(--rater-d-240) var(--rater-ease-soft),
+    transform var(--rater-d-240) var(--rater-ease-soft);
+}
+
+.rater-toast--visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translate(-50%, 0);
+}
+
+.rater-toast__message {
+  flex: 1;
+  min-width: 0;
+}
+
+.rater-toast__close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border: 0;
+  background: transparent;
+  color: var(--rater-text-muted);
+  font-size: var(--rater-t-16);
+  line-height: 1;
+  cursor: pointer;
+  border-radius: var(--rater-r-4);
+  transition: color var(--rater-d-80) var(--rater-ease-soft),
+    background var(--rater-d-80) var(--rater-ease-soft);
+}
+
+.rater-toast__close:hover {
+  color: var(--rater-text-default);
+  background: var(--rater-surface-3);
+}
+
+.rater-toast__close:focus-visible {
+  /* Polish PR 9 — semantic-token fallback chain (audit §C3 sweep).
+   * `--rater-focus-ring` already exists; `--rater-accent-primary` is
+   * the canonical accent fallback (was raw color-blue-500). */
+  outline: 2px solid var(--rater-focus-ring, var(--rater-accent-primary));
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rater-toast {
+    transition: opacity var(--rater-d-80) linear;
+    transform: translate(-50%, 0);
+  }
+  .rater-toast--visible {
+    transform: translate(-50%, 0);
+  }
+}

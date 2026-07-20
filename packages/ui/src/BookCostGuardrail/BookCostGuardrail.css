@@ -1,0 +1,102 @@
+/* ============================================================================
+ * <BookCostGuardrail> — connector book cost preview + confirm (Brief 62.6 §5).
+ * The one place Brief 62 spends real money: priced + gated before the run,
+ * with the actual spend rolled up after. Calm, evidentiary, unmissable.
+ * ============================================================================ */
+
+.rater-book-cost {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-8);
+  padding: var(--rater-s-10) var(--rater-s-12);
+  background: var(--rater-cat-input-soft);
+  border: 1px solid var(--rater-border-default);
+  border-radius: var(--rater-r-8);
+}
+
+.rater-book-cost__head {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-10);
+}
+
+.rater-book-cost__icon {
+  display: inline-flex;
+  flex: 0 0 auto;
+  color: var(--rater-cat-input-text);
+}
+
+.rater-book-cost__summary {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.rater-book-cost__est {
+  font-size: 12.5px;
+  color: var(--rater-text-default);
+  font-variant-numeric: tabular-nums;
+}
+.rater-book-cost__est strong {
+  font-weight: var(--rater-fw-bold);
+  color: var(--rater-text-strong);
+}
+
+.rater-book-cost__sub {
+  font-size: 11px;
+  color: var(--rater-text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rater-book-cost__running {
+  flex: 0 0 auto;
+  font-size: 12px;
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Post-run rollup — the actual spend from the snapshots. */
+.rater-book-cost__rollup {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1px;
+  flex: 0 0 auto;
+}
+.rater-book-cost__rollup-cost {
+  font-size: 13px;
+  font-weight: var(--rater-fw-bold);
+  color: var(--rater-text-strong);
+  font-variant-numeric: tabular-nums;
+}
+.rater-book-cost__rollup-meta {
+  font-size: 10.5px;
+  color: var(--rater-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* The above-threshold confirm prompt. */
+.rater-book-cost__confirm {
+  margin: 0;
+  padding: var(--rater-s-8) var(--rater-s-10);
+  background: var(--rater-feedback-warn-soft, var(--rater-cat-math-soft));
+  border-radius: var(--rater-r-6);
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--rater-text-default);
+}
+
+.rater-book-cost__cancel {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+  color: var(--rater-cat-input-text);
+  text-decoration: underline;
+}

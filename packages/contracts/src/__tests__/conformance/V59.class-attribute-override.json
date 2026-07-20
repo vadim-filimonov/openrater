@@ -1,0 +1,59 @@
+{
+  "name": "V59.class-attribute-override",
+  "description": "A declared, non-empty override supersedes the class-derived attribute. Fictional Meridian class c201 derives basis `sales`, but the declared `area` election wins and selects synthetic factor 0.6.",
+  "plan": {
+    "id": "v59.class_attribute_override",
+    "version": "1.0.0",
+    "name": "Meridian class-attribute declared override",
+    "lines": ["liability"],
+    "effective": "2026-01-01",
+    "nodes": [
+      {
+        "id": "in_class",
+        "kind": "input",
+        "params": { "fieldName": "class_code", "fieldType": "string" },
+        "position": { "x": 0, "y": 0 }
+      },
+      {
+        "id": "in_override",
+        "kind": "input",
+        "params": { "fieldName": "liab_exposure_basis_override", "fieldType": "string" },
+        "position": { "x": 0, "y": 120 }
+      },
+      {
+        "id": "derive_base",
+        "kind": "derive.class_attribute",
+        "params": {
+          "attributeKey": "liab_exposure_base",
+          "table": { "c201": "sales" },
+          "tableName": "Meridian synthetic class → exposure basis"
+        },
+        "position": { "x": 200, "y": 60 }
+      },
+      {
+        "id": "lk_base_factor",
+        "kind": "lookup.direct",
+        "params": {
+          "table": { "sales": 1.1, "area": 0.6 },
+          "defaultValue": 1.0,
+          "tableName": "Meridian synthetic factor by exposure basis"
+        },
+        "position": { "x": 400, "y": 60 }
+      },
+      {
+        "id": "out_factor",
+        "kind": "output",
+        "params": { "fieldName": "factor", "fieldType": "factor" },
+        "position": { "x": 600, "y": 60 }
+      }
+    ],
+    "edges": [
+      { "from": { "node": "in_class", "port": "value" }, "to": { "node": "derive_base", "port": "class_code" } },
+      { "from": { "node": "in_override", "port": "value" }, "to": { "node": "derive_base", "port": "override" } },
+      { "from": { "node": "derive_base", "port": "value" }, "to": { "node": "lk_base_factor", "port": "key" } },
+      { "from": { "node": "lk_base_factor", "port": "value" }, "to": { "node": "out_factor", "port": "value" } }
+    ]
+  },
+  "externalInputs": { "class_code": "c201", "liab_exposure_basis_override": "area" },
+  "expectedOutputs": { "factor": 0.6 }
+}

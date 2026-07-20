@@ -1,0 +1,259 @@
+/* ============================================================================
+ * <ChartPanel> — Brief 43 PR 43.4 chart exhibit.
+ *
+ * Row-based ranked chart. Grid columns match the mockup:
+ *   [rank 36px][label 1fr][bar-wrap 1fr][value 70px][delta 36px]
+ *
+ * Paired bars (baseline + comparison) stack vertically inside an
+ * 18px bar-wrap — baseline top half, comparison bottom half.
+ * ============================================================================ */
+
+.rater-analytics-chart {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-8);
+  background: var(--rater-surface-1);
+  border: 1px solid var(--rater-border-subtle);
+  border-radius: var(--rater-r-8);
+  padding: var(--rater-s-16);
+  min-height: 460px;
+}
+
+/* ── Header ────────────────────────────────────────────────────── */
+
+.rater-analytics-chart__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--rater-s-12);
+  padding-bottom: var(--rater-s-8);
+  border-bottom: 1px solid var(--rater-border-subtle);
+}
+
+.rater-analytics-chart__title-block {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-8);
+  min-width: 0;
+}
+
+.rater-analytics-chart__title-icon {
+  display: inline-flex;
+  color: var(--rater-text-subtle);
+  flex-shrink: 0;
+}
+
+.rater-analytics-chart__title {
+  margin: 0;
+  color: var(--rater-text-strong);
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-14);
+  font-weight: var(--rater-fw-semibold);
+  letter-spacing: -0.005em;
+  line-height: var(--rater-lh-snug);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rater-analytics-chart__legend {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-14);
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-11);
+  color: var(--rater-text-muted);
+  flex-shrink: 0;
+}
+
+.rater-analytics-chart__legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-6);
+}
+
+.rater-analytics-chart__legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  display: inline-block;
+}
+
+.rater-analytics-chart__legend-dot--baseline {
+  background: var(--rater-cat-categorical-1);
+  opacity: 0.65;
+}
+
+.rater-analytics-chart__legend-dot--comparison {
+  background: var(--rater-cat-categorical-1);
+}
+
+/* ── Axis row ──────────────────────────────────────────────────── */
+
+.rater-analytics-chart__axis {
+  display: grid;
+  grid-template-columns: 36px 1fr minmax(120px, 1fr) 70px 56px;
+  gap: var(--rater-s-8);
+  padding: 4px 6px 6px;
+  border-bottom: 1px solid var(--rater-border-subtle);
+}
+
+.rater-analytics-chart__axis-cell {
+  color: var(--rater-text-subtle);
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-10, 10px);
+  text-transform: uppercase;
+  letter-spacing: var(--rater-tracking-label);
+  font-weight: var(--rater-fw-semibold);
+}
+
+.rater-analytics-chart__axis-cell--rank {
+  text-align: right;
+}
+
+/* ── Rows ──────────────────────────────────────────────────────── */
+
+.rater-analytics-chart__rows {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow-y: auto;
+  max-height: 480px;
+  padding-right: var(--rater-s-6);
+}
+
+.rater-analytics-chart__row {
+  display: grid;
+  grid-template-columns: 36px 1fr minmax(120px, 1fr) 70px 56px;
+  align-items: center;
+  gap: var(--rater-s-8);
+  padding: var(--rater-s-6);
+  border-radius: var(--rater-r-4);
+  transition: background var(--rater-d-120) var(--rater-ease-snap);
+}
+
+.rater-analytics-chart__row[tabindex="0"] {
+  cursor: pointer;
+}
+
+.rater-analytics-chart__row:hover {
+  background: var(--rater-surface-2);
+}
+
+.rater-analytics-chart__row[tabindex="0"]:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: -1px;
+}
+
+/* Cross-filter selected row: matched ring + soft tint. */
+.rater-analytics-chart__row[data-selected="true"] {
+  background: color-mix(in oklab, var(--rater-accent-primary) 14%, transparent);
+  box-shadow: inset 0 0 0 1px
+    color-mix(in oklab, var(--rater-accent-primary) 40%, transparent);
+}
+
+.rater-analytics-chart__row[data-dimmed="true"] {
+  opacity: 0.32;
+}
+
+.rater-analytics-chart__rank {
+  font-family: var(--rater-fonts-mono);
+  font-size: var(--rater-t-10, 10px);
+  color: var(--rater-text-subtle);
+  text-align: right;
+  letter-spacing: var(--rater-tracking-mono);
+}
+
+.rater-analytics-chart__label {
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-default);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Paired bars ───────────────────────────────────────────────── */
+
+.rater-analytics-chart__bar-wrap {
+  position: relative;
+  height: 18px;
+  background: transparent;
+  border-radius: var(--rater-r-4);
+  overflow: hidden;
+}
+
+.rater-analytics-chart__bar {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  border-radius: var(--rater-r-4);
+  transition:
+    width var(--rater-d-240) var(--rater-ease-snap),
+    background var(--rater-d-140) var(--rater-ease-snap);
+}
+
+.rater-analytics-chart__bar--baseline {
+  background: var(--rater-cat-categorical-1);
+  opacity: 0.65;
+}
+
+.rater-analytics-chart__bar--comparison {
+  background: var(--rater-cat-categorical-1);
+}
+
+/* Paired: half-height bars stacked vertically. */
+.rater-analytics-chart__bar--paired {
+  height: 8px;
+}
+
+.rater-analytics-chart__bar--paired.rater-analytics-chart__bar--baseline {
+  top: 1px;
+}
+
+.rater-analytics-chart__bar--paired.rater-analytics-chart__bar--comparison {
+  top: 10px;
+}
+
+/* ── Value + delta ─────────────────────────────────────────────── */
+
+.rater-analytics-chart__value {
+  font-family: var(--rater-fonts-mono);
+  font-size: var(--rater-t-11);
+  color: var(--rater-text-strong);
+  text-align: right;
+  font-weight: var(--rater-fw-medium);
+  letter-spacing: var(--rater-tracking-mono);
+}
+
+.rater-analytics-chart__delta {
+  font-family: var(--rater-fonts-mono);
+  font-size: var(--rater-t-10, 10px);
+  text-align: right;
+  font-weight: var(--rater-fw-medium);
+  letter-spacing: var(--rater-tracking-mono);
+}
+
+.rater-analytics-chart__delta--up {
+  color: var(--rater-feedback-error);
+}
+
+.rater-analytics-chart__delta--down {
+  color: var(--rater-feedback-success);
+}
+
+.rater-analytics-chart__delta--flat,
+.rater-analytics-chart__delta--none {
+  color: var(--rater-text-subtle);
+}
+
+/* ── Empty state ──────────────────────────────────────────────── */
+
+.rater-analytics-chart__empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 320px;
+  padding: var(--rater-s-24);
+}

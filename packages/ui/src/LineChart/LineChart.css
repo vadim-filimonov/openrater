@@ -1,0 +1,196 @@
+/* ──────────────────────────────────────────────────────────────
+   LineChart — Brief 34 PR 34.1
+
+   SVG line chart for 1-D banded factor tables. Strict token-
+   discipline matching the polished mockup Frame 3.
+   ────────────────────────────────────────────────────────────── */
+
+.rater-line-chart {
+  position: relative;
+  width: 100%;
+  background: var(--rater-surface-1);
+  border-radius: var(--rater-r-8);
+  overflow: hidden;
+}
+.rater-line-chart-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  font-family: var(--rater-fonts-sans);
+}
+
+/* Empty state */
+.rater-line-chart--empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 220px;
+  background: var(--rater-surface-canvas);
+  border: 1px dashed var(--rater-hairline-base);
+}
+.rater-line-chart-empty-text {
+  font-size: 12px;
+  color: var(--rater-text-subtle);
+  font-style: italic;
+}
+
+/* Axes */
+.rater-line-chart-axis {
+  stroke: var(--rater-hairline-strong);
+  stroke-width: 1;
+}
+
+/* Gridlines */
+.rater-line-chart-gridline {
+  stroke: var(--rater-hairline-soft);
+  stroke-width: 0.5;
+}
+.rater-line-chart-gridline.is-baseline {
+  stroke: var(--rater-text-subtle);
+  stroke-dasharray: 3, 3;
+  stroke-width: 1;
+}
+
+/* Axis labels */
+.rater-line-chart-y-label,
+.rater-line-chart-x-label {
+  font-family: var(--rater-fonts-mono);
+  font-size: 9px;
+  fill: var(--rater-text-subtle);
+}
+.rater-line-chart-x-label.is-outlier {
+  fill: var(--rater-cat-output-text);
+}
+
+/* Brief 45 PR 45.3 — Area fill under the line. Vertical gradient
+   anchored to the baseline (orange-up / azure-down). The opacity
+   keeps it quiet so the markers + polyline stay dominant. */
+.rater-line-chart-area {
+  pointer-events: none;
+  opacity: 0.85;
+}
+
+/* Polyline (the line itself) — Brief 45 PR 45.3 softens the
+   stroke to a neutral so the gradient markers read as the
+   magnitude signal. The line is the shape; the markers are the
+   values. */
+.rater-line-chart-polyline {
+  fill: none;
+  stroke: var(--rater-text-subtle);
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  pointer-events: none;
+}
+
+/* Markers (data points) — Brief 45 PR 45.3 paints inline via
+   factorGradient. The CSS fill below is a fallback for the cases
+   where inline fill isn't supplied (e.g. outliers). */
+.rater-line-chart-marker {
+  fill: var(--rater-cat-input);
+  stroke: var(--rater-surface-canvas);
+  stroke-width: 1.5;
+  transition: r 80ms ease;
+  pointer-events: none;
+}
+.rater-line-chart-point.is-outlier .rater-line-chart-marker {
+  fill: var(--rater-accent-danger);
+  stroke: var(--rater-cat-output-border);
+}
+.rater-line-chart-point.is-focused .rater-line-chart-marker {
+  fill: var(--rater-cat-input-text);
+  stroke: var(--rater-cat-input);
+  stroke-width: 2;
+}
+.rater-line-chart-point.is-dimmed .rater-line-chart-marker {
+  opacity: 0.4;
+}
+
+/* Outlier callout (dashed line down to X axis) */
+.rater-line-chart-outlier-callout {
+  stroke: var(--rater-accent-danger);
+  stroke-width: 1;
+  stroke-dasharray: 2, 2;
+  pointer-events: none;
+}
+
+/* Brief 45 PR 45.3 — "= identity" label at the right end of the
+   baseline gridline. Italic + subtle, always visible. */
+.rater-line-chart-identity-label {
+  font-family: var(--rater-fonts-mono);
+  font-size: 9px;
+  font-style: italic;
+  fill: var(--rater-text-subtle);
+  pointer-events: none;
+}
+
+/* Hover area (invisible, wider than the marker for forgiving hit
+   testing). */
+.rater-line-chart-hover-area {
+  fill: transparent;
+  cursor: pointer;
+}
+
+/* Value label — PR 45.10: hover-only emit, smaller font (8px) so a
+   single label reads without dwarfing the marker. Bold for legibility
+   at the reduced size. */
+.rater-line-chart-value-label {
+  font-family: var(--rater-fonts-mono);
+  font-size: 8px;
+  font-weight: var(--rater-fw-semibold);
+  fill: var(--rater-text-strong);
+  pointer-events: none;
+  transition: opacity 80ms ease;
+}
+.rater-line-chart-point.is-outlier .rater-line-chart-value-label {
+  fill: var(--rater-cat-output-text);
+}
+.rater-line-chart-point.is-dimmed .rater-line-chart-value-label {
+  opacity: 0.5;
+}
+
+/* Brief 34 PR 34.6 — filed-overlay (compare-to-filed ghost line) */
+.rater-line-chart-filed-polyline {
+  fill: none;
+  stroke: var(--rater-text-subtle, #71717a);
+  stroke-width: 1.5;
+  stroke-dasharray: 4, 3;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  opacity: 0.6;
+  pointer-events: none;
+}
+.rater-line-chart-filed-marker {
+  fill: var(--rater-surface-1, #fff);
+  stroke: var(--rater-text-subtle, #71717a);
+  stroke-width: 1.2;
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+/* Brief 34 PR 34.5 — selection + brush */
+.rater-line-chart-point.is-selected .rater-line-chart-marker {
+  stroke: var(--rater-cat-input);
+  stroke-width: 2;
+}
+.rater-line-chart-selection-region {
+  fill: color-mix(in srgb, var(--rater-cat-input) 8%, transparent);
+  pointer-events: none;
+}
+.rater-line-chart-brush-rect {
+  fill: color-mix(in srgb, var(--rater-cat-input) 12%, transparent);
+  stroke: color-mix(in srgb, var(--rater-cat-input) 60%, transparent);
+  stroke-width: 1;
+  stroke-dasharray: 2, 2;
+}
+.rater-line-chart[data-brushing="true"] .rater-line-chart-svg {
+  cursor: crosshair;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .rater-line-chart-marker,
+  .rater-line-chart-value-label {
+    transition: none;
+  }
+}

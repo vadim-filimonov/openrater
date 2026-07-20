@@ -1,0 +1,1287 @@
+/* InputsPanelV2 — token-only BEM. The calm Inputs body. */
+
+.rater-inputs2 {
+  /* One shared left edge (V2_INTERFACE_SPEC §1.2): the page owns the
+     gutter; the panel left-aligns to it. The 1180px cap is the blessed
+     single-column reading width — capped, never centered. */
+  width: 100%;
+  max-width: 1180px;
+  margin: 0;
+  padding: var(--rater-s-20) 0 var(--rater-s-40);
+  font-family: var(--rater-fonts-sans);
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-20);
+}
+
+/* Section titles — the t-16 tier (Brief 65 §3.1): each act is a real
+   section, not an eyebrow. */
+.rater-inputs2__sect-title {
+  margin: 0;
+  font-size: var(--rater-t-16);
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-strong);
+  letter-spacing: var(--rater-tracking-tight);
+}
+
+/* Act 1 collapsed summary — the whole bar is the expand affordance. */
+.rater-inputs2__act-summary {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-10);
+  width: 100%;
+  padding: var(--rater-s-10) var(--rater-s-14);
+  background: var(--rater-surface-1);
+  border: 1px solid var(--rater-border-subtle);
+  border-radius: var(--rater-r-12);
+  color: var(--rater-text-default);
+  font-family: inherit;
+  font-size: var(--rater-t-13);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color var(--rater-d-120) var(--rater-ease-snap);
+}
+.rater-inputs2__act-summary:hover {
+  border-color: var(--rater-border-default);
+}
+.rater-inputs2__act-summary:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: 2px;
+}
+.rater-inputs2__act-summary-title {
+  font-size: var(--rater-t-13);
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-strong);
+}
+.rater-inputs2__act-summary-meta {
+  color: var(--rater-text-muted);
+  font-size: var(--rater-t-12);
+}
+.rater-inputs2__act-summary-warn {
+  color: var(--rater-feedback-warn);
+  font-size: var(--rater-t-12);
+}
+.rater-inputs2__act-summary-chev {
+  margin-left: auto;
+  color: var(--rater-text-subtle);
+  display: inline-flex;
+}
+
+/* Ghost rows — structure-required, not yet declared (Brief 65 §3.2). */
+.rater-inputs2__ghostrow td {
+  color: var(--rater-text-muted);
+}
+.rater-inputs2__ghost-origin {
+  font-size: var(--rater-t-11);
+  color: var(--rater-text-subtle);
+}
+
+/* Declared-but-unused — the quiet hint (only when the plan has structure). */
+.rater-inputs2__unused {
+  font-size: var(--rater-t-11);
+  color: var(--rater-text-subtle);
+}
+
+/* The Score-all result moment (Brief 65 §3.4) — the payoff lands on the
+   surface, not in the Downloads folder. */
+.rater-inputs2__scoredone {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-12);
+  flex-wrap: wrap;
+  padding: var(--rater-s-10) var(--rater-s-14);
+  background: var(--rater-surface-1);
+  border: 1px solid var(--rater-border-subtle);
+  border-radius: var(--rater-r-12);
+}
+.rater-inputs2__scoredone-line {
+  display: flex;
+  align-items: baseline;
+  gap: var(--rater-s-8);
+  flex: 1;
+  min-width: 0;
+}
+.rater-inputs2__scoredone-title {
+  font-size: var(--rater-t-13);
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-strong);
+}
+.rater-inputs2__scoredone-title::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: var(--rater-r-full);
+  background: var(--rater-feedback-success);
+  margin-right: var(--rater-s-6);
+  vertical-align: 1px;
+}
+.rater-inputs2__scoredone-meta {
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-muted);
+}
+.rater-inputs2__scoredone-acts {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-8);
+  flex: none;
+}
+
+/* Type-aware sample verdict — the mapped column's values don't parse as
+   the declared type (Brief 65 §3.5). */
+.rater-inputs2__dtype-warn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-4);
+  color: var(--rater-feedback-warn);
+  font-size: var(--rater-t-12);
+}
+
+/* ── Data source — the connect step ───────────────────────────── */
+.rater-inputs2__source {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-8);
+}
+
+.rater-inputs2__dropzone {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-14);
+  padding: var(--rater-s-16) var(--rater-s-20);
+  border: 1px dashed var(--rater-border-default);
+  border-radius: var(--rater-r-12);
+  background: var(--rater-surface-1);
+  cursor: pointer;
+  transition:
+    border-color var(--rater-d-80) var(--rater-ease-snap),
+    background var(--rater-d-80) var(--rater-ease-snap);
+}
+.rater-inputs2__dropzone:hover {
+  border-color: var(--rater-border-default);
+  background: var(--rater-surface-2);
+}
+/* drop-HERE is an interaction signal → accent, not an input-kind tint */
+.rater-inputs2__dropzone.is-dragover {
+  border-color: var(--rater-accent-primary);
+  background: color-mix(
+    in oklab,
+    var(--rater-accent-primary) 10%,
+    var(--rater-surface-1)
+  );
+}
+.rater-inputs2__dropzone:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: 2px;
+}
+.rater-inputs2__dropzone-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--rater-s-32);
+  height: var(--rater-s-32);
+  border-radius: var(--rater-r-8);
+  background: var(--rater-surface-2);
+  color: var(--rater-text-muted);
+  flex-shrink: 0;
+}
+.rater-inputs2__dropzone-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  flex: 1;
+  min-width: 0;
+}
+.rater-inputs2__dropzone-title {
+  font-size: var(--rater-t-13);
+  font-weight: var(--rater-fw-medium);
+  color: var(--rater-text-strong);
+}
+.rater-inputs2__dropzone-hint {
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-subtle);
+}
+.rater-inputs2__file {
+  display: none;
+}
+
+/* Connected book bar */
+.rater-inputs2__book {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-12);
+  padding: var(--rater-s-12) var(--rater-s-16);
+  /* §1.1 — workspace chrome is neutral; azure was wallpaper here */
+  border: 1px solid var(--rater-border-default);
+  border-radius: var(--rater-r-12);
+  background: var(--rater-surface-1);
+}
+.rater-inputs2__book-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--rater-s-32);
+  height: var(--rater-s-32);
+  border-radius: var(--rater-r-8);
+  background: var(--rater-surface-1);
+  color: var(--rater-accent-primary);
+  flex-shrink: 0;
+}
+.rater-inputs2__book-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  flex: 1;
+  min-width: 0;
+}
+.rater-inputs2__book-title {
+  font-size: var(--rater-t-13);
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-strong);
+}
+.rater-inputs2__book-meta {
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+/* Book actions (Enrich + Replace) — a tight group on the bar's right. */
+.rater-inputs2__book-acts {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-8);
+  flex-shrink: 0;
+}
+.rater-inputs2__source-error {
+  font-size: var(--rater-t-12);
+  color: var(--rater-feedback-warn);
+}
+/* G12 — parse-cap truncation notice under the book bar. Quiet, amber,
+   mirrors .rater-inputs2__prem-oor (never silent about dropped rows). */
+.rater-inputs2__book-capped {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--rater-s-6);
+  color: var(--rater-feedback-warn);
+  font-size: var(--rater-t-12);
+  line-height: var(--rater-lh-snug);
+}
+.rater-inputs2__book-capped svg {
+  flex-shrink: 0;
+  margin-top: var(--rater-s-2);
+}
+
+/* ── Webhook source (P2.1) ────────────────────────────────────────
+   Progressive: the common case (a public JSON GET) is one line — URL +
+   "Fetch sample". Method / auth / headers hide behind "Advanced". The
+   card mirrors the connected-book bar so the two source modes feel like
+   siblings, not two different surfaces. */
+.rater-inputs2__webhook {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-12);
+  padding: var(--rater-s-16);
+  border: 1px solid var(--rater-border-default);
+  border-radius: var(--rater-r-12);
+  background: var(--rater-surface-1);
+}
+.rater-inputs2__webhook-head {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-12);
+}
+.rater-inputs2__webhook-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--rater-s-32);
+  height: var(--rater-s-32);
+  border-radius: var(--rater-r-8);
+  background: var(--rater-surface-1);
+  color: var(--rater-accent-primary);
+  flex-shrink: 0;
+}
+.rater-inputs2__webhook-headcopy {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  flex: 1;
+  min-width: 0;
+}
+.rater-inputs2__webhook-title {
+  font-size: var(--rater-t-13);
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-strong);
+}
+.rater-inputs2__webhook-sub {
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-muted);
+}
+/* Quiet inline text-links: "Use a CSV instead" + the Advanced toggle.
+   Borderless on purpose — they're mode/reveal affordances, not standard
+   buttons (which always use the design-system <Button>). */
+.rater-inputs2__webhook-altlink,
+.rater-inputs2__webhook-advtoggle {
+  appearance: none;
+  background: none;
+  border: 0;
+  padding: 0;
+  font-family: inherit;
+  font-size: var(--rater-t-12);
+  color: var(--rater-accent-primary);
+  cursor: pointer;
+  border-radius: var(--rater-r-4);
+  transition: color var(--rater-d-80) var(--rater-ease-snap);
+}
+.rater-inputs2__webhook-altlink {
+  flex-shrink: 0;
+}
+.rater-inputs2__webhook-altlink:hover,
+.rater-inputs2__webhook-advtoggle:hover {
+  color: var(--rater-accent-primary-hover);
+}
+.rater-inputs2__webhook-altlink:focus-visible,
+.rater-inputs2__webhook-advtoggle:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: 2px;
+}
+.rater-inputs2__webhook-advtoggle {
+  align-self: flex-start;
+  color: var(--rater-text-muted);
+}
+
+.rater-inputs2__webhook-row {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-8);
+}
+.rater-inputs2__webhook-url,
+.rater-inputs2__webhook-hkey,
+.rater-inputs2__webhook-hval,
+.rater-inputs2__webhook-envinput {
+  min-width: 0;
+  height: var(--rater-s-28);
+  padding: 0 var(--rater-s-8);
+  border-radius: var(--rater-r-6);
+  border: 1px solid var(--rater-border-default);
+  background: var(--rater-surface-1);
+  color: var(--rater-text-default);
+  font-family: inherit;
+  font-size: var(--rater-t-12);
+}
+.rater-inputs2__webhook-url {
+  flex: 1;
+}
+.rater-inputs2__webhook-url:focus-visible,
+.rater-inputs2__webhook-hkey:focus-visible,
+.rater-inputs2__webhook-hval:focus-visible,
+.rater-inputs2__webhook-envinput:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: 1px;
+  border-color: var(--rater-accent-primary);
+}
+.rater-inputs2__webhook-url:disabled {
+  opacity: 0.7;
+}
+
+.rater-inputs2__webhook-result {
+  font-size: var(--rater-t-12);
+  color: var(--rater-feedback-success);
+}
+.rater-inputs2__webhook-result.is-error {
+  color: var(--rater-feedback-warn);
+}
+
+/* Advanced panel — revealed below the toggle. */
+.rater-inputs2__webhook-adv {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-12);
+  padding-top: var(--rater-s-12);
+  border-top: 1px solid var(--rater-border-subtle);
+}
+.rater-inputs2__webhook-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-6);
+}
+.rater-inputs2__webhook-field--env {
+  gap: var(--rater-s-4);
+}
+.rater-inputs2__webhook-label {
+  font-size: var(--rater-t-11);
+  letter-spacing: var(--rater-tracking-label);
+  text-transform: uppercase;
+  color: var(--rater-text-subtle);
+  font-weight: var(--rater-fw-semibold);
+}
+.rater-inputs2__webhook-auth {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-8);
+  padding: var(--rater-s-12);
+  border-radius: var(--rater-r-8);
+  background: var(--rater-surface-1);
+}
+.rater-inputs2__webhook-envinput {
+  max-width: 280px;
+  font-family: var(--rater-font-mono);
+  letter-spacing: var(--rater-tracking-mono);
+}
+.rater-inputs2__webhook-authnote {
+  margin: 0;
+  font-size: var(--rater-t-11);
+  line-height: 1.45;
+  color: var(--rater-text-subtle);
+}
+
+.rater-inputs2__webhook-headers {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-6);
+  align-items: flex-start;
+}
+.rater-inputs2__webhook-hrow {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-6);
+  width: 100%;
+}
+.rater-inputs2__webhook-hkey {
+  flex: 0 0 38%;
+  font-family: var(--rater-font-mono);
+  letter-spacing: var(--rater-tracking-mono);
+}
+.rater-inputs2__webhook-hval {
+  flex: 1;
+}
+
+/* ── Dictionary ───────────────────────────────────────────────── */
+.rater-inputs2__dict-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--rater-s-12);
+  min-height: var(--rater-s-28);
+  margin-bottom: calc(-1 * var(--rater-s-12));
+}
+.rater-inputs2__dict-eyebrow {
+  font-size: var(--rater-t-11);
+  letter-spacing: var(--rater-tracking-label);
+  text-transform: uppercase;
+  color: var(--rater-text-subtle);
+  font-weight: var(--rater-fw-semibold);
+}
+.rater-inputs2__dict-count {
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* The preflight sentence above the Match table:
+ * one quiet line naming ignored columns / suggestions / missing
+ * required inputs (the same sentence the chat door refuses with). */
+.rater-inputs2__preflight {
+  margin: 0 0 var(--rater-s-8);
+  font-size: var(--rater-t-12);
+  line-height: 1.5;
+  color: var(--rater-accent-warning);
+}
+
+/* ── Map columns (Phase B) ────────────────────────────────────── */
+.rater-inputs2__map-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-8);
+}
+/* Header action buttons now use the design-system <Button>/<IconButton>
+   primitives (variant=primary|ghost) — no bespoke button CSS here. */
+/* Map table: the source-column cell (3rd) takes the slack; Sample (4th)
+   stays snug. Overrides the base "2nd + 3rd snug" rule. */
+.rater-inputs2__table--map th:nth-child(3),
+.rater-inputs2__table--map td:nth-child(3) {
+  width: auto;
+  white-space: normal;
+}
+.rater-inputs2__table--map th:nth-child(4),
+.rater-inputs2__table--map td:nth-child(4) {
+  width: 1%;
+  white-space: nowrap;
+}
+.rater-inputs2__mapcell {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-8);
+}
+.rater-inputs2__conf {
+  width: var(--rater-s-6);
+  height: var(--rater-s-6);
+  border-radius: var(--rater-r-full);
+  flex-shrink: 0;
+  background: transparent;
+}
+.rater-inputs2__conf--auto {
+  background: var(--rater-accent-success);
+}
+.rater-inputs2__conf--suggested {
+  background: var(--rater-accent-warning);
+}
+/* ── API Lab provenance (P2.3) ────────────────────────────────────
+   An input fed by a connector route shows "API · via {route}" + its
+   resolved value (or "not run yet") + a jump to API Lab — in place of
+   the CSV-column select. */
+.rater-inputs2__api {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-8);
+  min-width: 0;
+}
+.rater-inputs2__api-val {
+  font-family: var(--rater-font-mono);
+  letter-spacing: var(--rater-tracking-mono);
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-default);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+.rater-inputs2__api-pending {
+  font-size: var(--rater-t-12);
+  font-style: italic;
+  color: var(--rater-text-subtle);
+}
+.rater-inputs2__select {
+  flex: 1;
+  min-width: 0;
+  max-width: 300px;
+  height: var(--rater-s-28);
+  padding: 0 var(--rater-s-8);
+  border-radius: var(--rater-r-6);
+  border: 1px solid var(--rater-border-default);
+  background: var(--rater-surface-2);
+  color: var(--rater-text-default);
+  font-family: inherit;
+  font-size: var(--rater-t-12);
+  cursor: pointer;
+}
+.rater-inputs2__select:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: 1px;
+}
+.rater-inputs2__select:disabled {
+  cursor: default;
+  opacity: 0.7;
+}
+.rater-inputs2__mapcell.is-unmapped .rater-inputs2__select {
+  color: var(--rater-text-subtle);
+}
+
+/* ── Premium preview (Phase C) ────────────────────────────────── */
+.rater-inputs2__score {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-12);
+}
+/* The shared __dict-head pulls its content up by -s-12 to tighten the
+   eyebrow→table gap in the s-20 panel context (→ 8px). Inside this s-12
+   section that would cancel the gap entirely and the header buttons would
+   touch the premium box — so neutralise it here for a clean s-12 gap. */
+.rater-inputs2__score .rater-inputs2__dict-head {
+  margin-bottom: 0;
+}
+/* B2 — the dictionary toolbar lives in a `block` container (no flex gap), so the
+   shared -s-12 pull had nothing to cancel against and the "+ Input" toolbar
+   overlapped the FIELD/TYPE header band by 12px. Neutralise the pull and give a
+   clean 8px eyebrow→table gap here (matching the intended tightness). */
+.rater-inputs2__act > .rater-inputs2__dict-head {
+  margin-bottom: var(--rater-s-8);
+}
+.rater-inputs2__premiums {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-12);
+  padding: var(--rater-s-16) var(--rater-s-20);
+  background: var(--rater-surface-1);
+  border: 1px solid var(--rater-border-subtle);
+  border-radius: var(--rater-r-12);
+}
+.rater-inputs2__prem-headline {
+  display: flex;
+  align-items: baseline;
+  gap: var(--rater-s-10);
+  flex-wrap: wrap;
+}
+.rater-inputs2__prem-avg {
+  font-size: var(--rater-t-28);
+  font-weight: var(--rater-fw-semibold);
+  /* A premium is DATA, not a status — neutral strong, matching the Test
+     tab's result figure (Brief 65 §3.5 / color governance). */
+  color: var(--rater-text-strong);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: var(--rater-tracking-tight);
+}
+.rater-inputs2__prem-cap {
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-muted);
+}
+.rater-inputs2__prem-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--rater-s-6);
+}
+.rater-inputs2__prem-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-6);
+  height: var(--rater-s-24);
+  padding: 0 var(--rater-s-10);
+  border-radius: var(--rater-r-6);
+  background: var(--rater-surface-2);
+  border: 1px solid var(--rater-border-subtle);
+  color: var(--rater-text-default);
+  font-family: inherit;
+  font-size: var(--rater-t-12);
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transition:
+    border-color var(--rater-d-80) var(--rater-ease-snap),
+    background var(--rater-d-80) var(--rater-ease-snap);
+}
+.rater-inputs2__prem-chip:hover {
+  border-color: var(--rater-border-strong);
+}
+.rater-inputs2__prem-chip.is-active {
+  border-color: var(--rater-accent-primary);
+  background: var(--rater-surface-3);
+}
+.rater-inputs2__prem-chip:focus-visible {
+  outline: 2px solid var(--rater-accent-primary);
+  outline-offset: 1px;
+}
+.rater-inputs2__prem-chip.is-empty {
+  color: var(--rater-text-subtle);
+}
+/* Attention dot — only on rows that need a second look. */
+.rater-inputs2__prem-dot {
+  width: var(--rater-s-6);
+  height: var(--rater-s-6);
+  border-radius: var(--rater-r-full);
+  flex: none;
+}
+.rater-inputs2__prem-dot[data-tier="submit"] {
+  background: var(--rater-feedback-warn);
+}
+.rater-inputs2__prem-dot[data-tier="decline"] {
+  background: var(--rater-feedback-error);
+}
+.rater-inputs2__prem-dot[data-tier="error"] {
+  background: var(--rater-feedback-error);
+}
+/* ADR-0056 — an unrateable row: red text, never confusable with the
+   quiet "no premium" em-dash or a real dollar. */
+.rater-inputs2__prem-chip.is-error {
+  color: var(--rater-feedback-error);
+  border-color: var(--rater-feedback-error-soft, var(--rater-border-subtle));
+}
+/* Out-of-range clamp note — quiet, amber, one line. */
+.rater-inputs2__prem-oor {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-6);
+  color: var(--rater-feedback-warn);
+  font-size: var(--rater-t-12);
+  line-height: var(--rater-lh-snug);
+}
+/* ADR-0056 — the policy-row error pill (grouped view): the tri-facet's
+   error arm, in the tier-chip position. */
+.rater-inputs2__policy-err {
+  display: inline-flex;
+  align-items: center;
+  height: var(--rater-s-20);
+  padding: 0 var(--rater-s-8);
+  border-radius: var(--rater-r-full);
+  background: var(--rater-feedback-error-soft, var(--rater-surface-3));
+  color: var(--rater-feedback-error);
+  font-size: var(--rater-t-11);
+  font-weight: var(--rater-fw-semibold);
+}
+
+/* ADR-0056 — unrateable-rows note: same grammar as the clamp note, red. */
+.rater-inputs2__prem-err {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-6);
+  color: var(--rater-feedback-error);
+  font-size: var(--rater-t-12);
+  line-height: var(--rater-lh-snug);
+}
+
+/* ── ADR-0056 — projection issues strip (above the premium preview) ── */
+.rater-inputs2__proj-issues {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-6);
+  padding: var(--rater-s-10) var(--rater-s-12);
+  background: var(--rater-surface-2);
+  border: 1px solid var(--rater-feedback-error);
+  border-radius: var(--rater-r-6);
+}
+.rater-inputs2__proj-issues-head {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-6);
+  color: var(--rater-feedback-error);
+  font-size: var(--rater-t-12);
+  font-weight: var(--rater-fw-semibold);
+}
+.rater-inputs2__proj-issues-list {
+  margin: 0;
+  padding-left: var(--rater-s-16);
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-2);
+}
+.rater-inputs2__proj-issue {
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-muted);
+  line-height: var(--rater-lh-snug);
+}
+.rater-inputs2__proj-issue.is-error {
+  color: var(--rater-text-default);
+}
+.rater-inputs2__prem-empty {
+  font-size: var(--rater-t-13);
+  color: var(--rater-text-muted);
+  padding: var(--rater-s-12) 0;
+}
+
+/* ── Per-row factor trace (P1.3) — the audit "why" on chip click ── */
+.rater-inputs2__trace {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-8);
+  padding: var(--rater-s-12) var(--rater-s-14);
+  background: var(--rater-surface-2);
+  border: 1px solid var(--rater-border-subtle);
+  border-radius: var(--rater-r-6);
+}
+.rater-inputs2__trace-head {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-8);
+}
+.rater-inputs2__trace-title {
+  font-size: var(--rater-t-12);
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-default);
+}
+.rater-inputs2__trace-premium {
+  margin-left: auto;
+  font-size: var(--rater-t-12);
+  font-variant-numeric: tabular-nums;
+  color: var(--rater-text-muted);
+}
+.rater-inputs2__trace-premium.is-error {
+  color: var(--rater-feedback-error);
+  font-weight: var(--rater-fw-semibold);
+}
+/* ADR-0056 — the row's structured issues (the WHY, above the steps). */
+.rater-inputs2__trace-issues {
+  margin: 0;
+  padding-left: var(--rater-s-16);
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-2);
+}
+.rater-inputs2__trace-issue {
+  font-size: var(--rater-t-12);
+  color: var(--rater-feedback-warn);
+  line-height: var(--rater-lh-snug);
+}
+.rater-inputs2__trace-issue.is-error {
+  color: var(--rater-feedback-error);
+}
+.rater-inputs2__trace-empty {
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-muted);
+}
+.rater-inputs2__trace-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.rater-inputs2__trace-item {
+  display: flex;
+  align-items: baseline;
+  gap: var(--rater-s-10);
+  padding: var(--rater-s-4) 0;
+  border-top: 1px solid var(--rater-border-subtle);
+  font-size: var(--rater-t-12);
+}
+.rater-inputs2__trace-item:first-child {
+  border-top: none;
+}
+.rater-inputs2__trace-item.is-bad .rater-inputs2__trace-val {
+  color: var(--rater-feedback-error);
+}
+.rater-inputs2__trace-kind {
+  flex: none;
+  min-width: 9rem;
+  color: var(--rater-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+.rater-inputs2__trace-val {
+  color: var(--rater-text-default);
+}
+
+/* ── Policy roll-up (P2.2) — group locations into policies ────── */
+.rater-inputs2__score-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-8);
+}
+/* Leading check slot for a toggle menu item (Factor breakdown, P2.7) — a
+   fixed width so the label doesn't shift between checked + unchecked. */
+.rater-inputs2__menucheck {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--rater-s-16);
+  flex: none;
+  color: var(--rater-accent-primary);
+}
+
+.rater-inputs2__policies {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-4);
+}
+.rater-inputs2__policy {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-10);
+  width: 100%;
+  padding: var(--rater-s-10) var(--rater-s-12);
+  border-radius: var(--rater-r-6);
+  border: 1px solid var(--rater-border-subtle);
+  background: var(--rater-surface-2);
+  color: var(--rater-text-default);
+  font-family: inherit;
+  font-size: var(--rater-t-13);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color var(--rater-d-80) var(--rater-ease-snap);
+}
+.rater-inputs2__policy:hover {
+  border-color: var(--rater-border-strong);
+}
+.rater-inputs2__policy.is-open {
+  border-color: var(--rater-accent-primary);
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.rater-inputs2__policy:focus-visible {
+  outline: 2px solid var(--rater-accent-primary);
+  outline-offset: 1px;
+}
+.rater-inputs2__policy-caret {
+  flex: none;
+  color: var(--rater-text-muted);
+  transition: transform var(--rater-d-120) var(--rater-ease-snap);
+}
+.rater-inputs2__policy.is-open .rater-inputs2__policy-caret {
+  transform: rotate(90deg);
+}
+.rater-inputs2__policy-id {
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-default);
+}
+.rater-inputs2__policy-locs {
+  color: var(--rater-text-muted);
+  font-size: var(--rater-t-12);
+}
+.rater-inputs2__policy-right {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-10);
+  margin-left: auto;
+}
+.rater-inputs2__policy-prem {
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-feedback-success);
+}
+/* G11 — a declined policy's premium is indicative, never written: muted,
+   regular weight, so the green written figures stand apart. */
+.rater-inputs2__policy-prem.is-indicative {
+  color: var(--rater-text-muted);
+  font-weight: var(--rater-fw-regular);
+}
+.rater-inputs2__policy-detail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-8);
+  margin-top: -1px;
+  padding: var(--rater-s-10) var(--rater-s-12) var(--rater-s-12);
+  border: 1px solid var(--rater-accent-primary);
+  border-top: none;
+  border-bottom-left-radius: var(--rater-r-6);
+  border-bottom-right-radius: var(--rater-r-6);
+  background: var(--rater-surface-1);
+}
+.rater-inputs2__policy-reason {
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-muted);
+}
+.rater-inputs2__policy-locrows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.rater-inputs2__policy-locrow {
+  display: flex;
+  align-items: baseline;
+  gap: var(--rater-s-10);
+  padding: var(--rater-s-4) 0;
+  border-top: 1px solid var(--rater-border-subtle);
+  font-size: var(--rater-t-12);
+}
+.rater-inputs2__policy-locrow:first-child {
+  border-top: none;
+}
+.rater-inputs2__policy-locid {
+  min-width: 8rem;
+  color: var(--rater-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+.rater-inputs2__policy-locval {
+  margin-left: auto;
+  color: var(--rater-text-default);
+  font-variant-numeric: tabular-nums;
+}
+
+/* P2.2b — roll-up config: a quiet summary + a tucked-away editor. */
+.rater-inputs2__rollup-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-8);
+  flex-wrap: wrap;
+}
+.rater-inputs2__rollup-summary {
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-muted);
+}
+.rater-inputs2__rollup-editor {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-6);
+  padding: var(--rater-s-12);
+  border: 1px solid var(--rater-border-subtle);
+  border-radius: var(--rater-r-6);
+  background: var(--rater-surface-1);
+}
+.rater-inputs2__rollup-row {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-8);
+}
+.rater-inputs2__rollup-field {
+  flex: 1;
+  font-size: var(--rater-t-12);
+  font-variant-numeric: tabular-nums;
+  color: var(--rater-text-default);
+}
+.rater-inputs2__rollup-add {
+  align-self: flex-start;
+}
+
+/* P2.5 — derived-ratio binding: a compact A ÷ B picker in the source cell. */
+.rater-inputs2__ratio {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-6);
+  width: 100%;
+}
+.rater-inputs2__ratio-sel {
+  flex: 1;
+  min-width: 0; /* let the selects shrink within the cell — no overflow */
+}
+.rater-inputs2__ratio-div {
+  flex: none;
+  color: var(--rater-text-muted);
+  font-size: var(--rater-t-13);
+}
+/* ── Dictionary authoring (P0.1) — quietly editable ───────────── */
+/* The name reads as plain text; hover reveals it's editable, click edits. */
+.rater-inputs2__fname-edit {
+  display: inline-block;
+  max-width: 100%;
+  padding: var(--rater-s-2) var(--rater-s-6);
+  margin: calc(-1 * var(--rater-s-2)) calc(-1 * var(--rater-s-6));
+  border: 0;
+  border-radius: var(--rater-r-4);
+  background: transparent;
+  color: var(--rater-text-strong);
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-13);
+  font-weight: var(--rater-fw-medium);
+  text-align: left;
+  cursor: text;
+  transition: background var(--rater-d-80) var(--rater-ease-snap);
+}
+.rater-inputs2__fname-edit:hover:not(disabled) {
+  background: var(--rater-surface-2);
+}
+.rater-inputs2__fname-edit:disabled,
+.rater-inputs2__fname-edit.is-static {
+  cursor: default;
+}
+.rater-inputs2__cell-input {
+  width: 100%;
+  max-width: 280px;
+  height: var(--rater-s-24);
+  padding: 0 var(--rater-s-6);
+  border: 1px solid var(--rater-accent-primary);
+  border-radius: var(--rater-r-4);
+  background: var(--rater-surface-1);
+  color: var(--rater-text-strong);
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-13);
+  font-weight: var(--rater-fw-medium);
+  outline: none;
+}
+
+/* The type chip becomes a clickable button when editable. */
+button.rater-inputs2__type {
+  font-family: var(--rater-fonts-sans);
+  cursor: default;
+}
+button.rater-inputs2__type.is-editable {
+  cursor: pointer;
+}
+button.rater-inputs2__type.is-editable:hover:not(disabled) {
+  border-color: var(--rater-border-strong);
+  color: var(--rater-text-default);
+}
+button.rater-inputs2__type:disabled {
+  cursor: default;
+}
+.rater-inputs2__select--type {
+  max-width: 170px;
+  height: var(--rater-s-24);
+}
+
+/* Row actions — the delete reveals on hover, two-click "Remove" to confirm. */
+.rater-inputs2__rowact {
+  text-align: right;
+  white-space: nowrap;
+}
+.rater-inputs2__del {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--rater-s-24);
+  padding: 0 var(--rater-s-6);
+  border: 0;
+  border-radius: var(--rater-r-4);
+  background: transparent;
+  color: var(--rater-text-subtle);
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-12);
+  cursor: pointer;
+  opacity: 0;
+  transition:
+    opacity var(--rater-d-80) var(--rater-ease-snap),
+    color var(--rater-d-80) var(--rater-ease-snap),
+    background var(--rater-d-80) var(--rater-ease-snap);
+}
+.rater-inputs2__table--dict tbody tr:hover .rater-inputs2__del,
+.rater-inputs2__draftrow .rater-inputs2__del {
+  opacity: 1;
+}
+.rater-inputs2__del:hover:not(disabled) {
+  color: var(--rater-feedback-warn);
+  background: var(--rater-surface-2);
+}
+.rater-inputs2__del.is-armed {
+  opacity: 1;
+  color: var(--rater-feedback-warn);
+  font-weight: var(--rater-fw-semibold);
+  padding: 0 var(--rater-s-8);
+}
+.rater-inputs2__del:disabled {
+  cursor: default;
+  opacity: 0.4;
+}
+/* a draft row is a SELECTION state, not an input-kind */
+.rater-inputs2__draftrow td {
+  background: var(--rater-row-selected-bg);
+}
+
+/* ── Mismatch (P1) — a quiet on-row signal + inline resolve ────── */
+.rater-inputs2__mm {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-6);
+  height: var(--rater-s-24);
+  padding: 0 var(--rater-s-8);
+  border: 1px solid var(--rater-cat-lookup-border);
+  border-radius: var(--rater-r-6);
+  background: var(--rater-feedback-warn-soft);
+  color: var(--rater-feedback-warn);
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-11);
+  font-weight: var(--rater-fw-medium);
+  cursor: pointer;
+  transition: filter var(--rater-d-80) var(--rater-ease-snap);
+}
+.rater-inputs2__mm:hover {
+  filter: brightness(1.06);
+}
+.rater-inputs2__mm.is-hard {
+  border-color: var(--rater-feedback-warn);
+}
+.rater-inputs2__mmrow td {
+  padding: 0;
+  border-bottom: 1px solid var(--rater-border-subtle);
+}
+.rater-inputs2__mm-detail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-8);
+  padding: var(--rater-s-12) var(--rater-s-14);
+  background: var(--rater-feedback-warn-soft);
+}
+.rater-inputs2__mm-head {
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-default);
+}
+.rater-inputs2__mm-head code {
+  font-family: var(--rater-fonts-mono);
+  color: var(--rater-text-strong);
+}
+.rater-inputs2__mm-item {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-10);
+}
+.rater-inputs2__mm-val {
+  font-family: var(--rater-fonts-mono);
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-strong);
+  min-width: var(--rater-s-32);
+}
+.rater-inputs2__mm-count {
+  font-size: var(--rater-t-11);
+  color: var(--rater-text-muted);
+  flex: 1;
+}
+
+.rater-inputs2__tablewrap {
+  background: var(--rater-surface-1);
+  border: 1px solid var(--rater-border-subtle);
+  border-radius: var(--rater-r-12);
+  overflow: hidden;
+}
+.rater-inputs2__table {
+  width: 100%;
+  border-collapse: collapse;
+}
+/* Field takes the slack; Type + Source stay snug. */
+.rater-inputs2__table th:nth-child(2),
+.rater-inputs2__table th:nth-child(3),
+.rater-inputs2__table td:nth-child(2),
+.rater-inputs2__table td:nth-child(3) {
+  width: 1%;
+  white-space: nowrap;
+}
+.rater-inputs2__table thead th {
+  text-align: left;
+  font-size: var(--rater-t-11);
+  letter-spacing: var(--rater-tracking-label);
+  text-transform: uppercase;
+  color: var(--rater-text-subtle);
+  font-weight: var(--rater-fw-semibold);
+  padding: var(--rater-s-10) var(--rater-s-14);
+  border-bottom: 1px solid var(--rater-border-subtle);
+}
+.rater-inputs2__table tbody td {
+  padding: var(--rater-s-10) var(--rater-s-14);
+  border-bottom: 1px solid var(--rater-border-subtle);
+  vertical-align: middle;
+}
+.rater-inputs2__table tbody tr:last-child td {
+  border-bottom: 0;
+}
+.rater-inputs2__table tbody tr:hover {
+  background: var(--rater-row-hover-bg);
+}
+.rater-inputs2__fname {
+  color: var(--rater-text-strong);
+  font-weight: var(--rater-fw-medium);
+  font-size: var(--rater-t-13);
+}
+.rater-inputs2__fslug {
+  color: var(--rater-text-subtle);
+  font-size: var(--rater-t-11);
+  font-family: var(--rater-fonts-mono);
+  margin-top: var(--rater-s-2);
+}
+.rater-inputs2__type {
+  display: inline-flex;
+  align-items: center;
+  height: var(--rater-s-20);
+  padding: 0 var(--rater-s-8);
+  border-radius: var(--rater-r-full);
+  font-size: var(--rater-t-11);
+  border: 1px solid var(--rater-border-default);
+  color: var(--rater-text-muted);
+  background: var(--rater-surface-2);
+}
+/* §1.1 — dtype pills are neutral; the label says the type */
+.rater-inputs2__type--money,
+.rater-inputs2__type--bool {
+  color: var(--rater-text-muted);
+  border-color: var(--rater-border-default);
+}
+.rater-inputs2__src {
+  color: var(--rater-text-muted);
+  font-size: var(--rater-t-12);
+}
+
+/* ── Brief 89 §2.2 — the promoted declare-from-book bridge ─────────
+   Renders only while a book sits on an EMPTY dictionary: the payoff
+   action front and center, never behind the collapsed act summary. */
+.rater-inputs2__bridge {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-16);
+  padding: var(--rater-s-16);
+  border: 1px solid var(--rater-border-default);
+  border-radius: var(--rater-r-12);
+  background: var(--rater-surface-1);
+}
+.rater-inputs2__bridge-text {
+  flex: 1;
+  min-width: 0;
+}
+.rater-inputs2__bridge-title {
+  font-size: var(--rater-t-14);
+  font-weight: var(--rater-fw-medium);
+  color: var(--rater-text-strong);
+}
+.rater-inputs2__bridge-receipt {
+  margin-top: var(--rater-s-4);
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-muted);
+}
+.rater-inputs2__genesis-back {
+  align-self: flex-start;
+}

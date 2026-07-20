@@ -1,0 +1,38 @@
+{
+  "name": "V48.lookup-multi-wired",
+  "description": "A lookup.multi node wired through derived per-key ports receives fictional Meridian territory and exposure-basis inputs and returns a synthetic factor.",
+  "plan": {
+    "id": "v48.multi",
+    "version": "1.0.0",
+    "name": "Meridian multi-key lookup (wired per-key ports)",
+    "line": "bop",
+    "effective": "2026-01-01",
+    "nodes": [
+      { "id": "in_terr", "kind": "input", "params": { "fieldName": "territory", "fieldType": "string" }, "position": { "x": 0, "y": 0 } },
+      { "id": "in_exp", "kind": "input", "params": { "fieldName": "exposure_base", "fieldType": "string" }, "position": { "x": 0, "y": 120 } },
+      { "id": "lkp", "kind": "lookup.multi",
+        "params": {
+          "keyNames": ["territory", "exposure_base"],
+          "rows": [
+            { "keys": ["t1", "area"], "factor": 0.05 },
+            { "keys": ["t1", "sales"], "factor": 1.5 },
+            { "keys": ["t1", "payroll"], "factor": 10.0 },
+            { "keys": ["t2", "area"], "factor": 0.06 },
+            { "keys": ["t2", "sales"], "factor": 1.6 },
+            { "keys": ["t2", "payroll"], "factor": 10.5 }
+          ],
+          "defaultValue": 1.0,
+          "tableName": "Meridian synthetic liability factor"
+        },
+        "position": { "x": 220, "y": 60 } },
+      { "id": "out_f", "kind": "output", "params": { "fieldName": "base_lc", "fieldType": "float" }, "position": { "x": 440, "y": 60 } }
+    ],
+    "edges": [
+      { "from": { "node": "in_terr", "port": "value" }, "to": { "node": "lkp", "port": "territory" } },
+      { "from": { "node": "in_exp", "port": "value" }, "to": { "node": "lkp", "port": "exposure_base" } },
+      { "from": { "node": "lkp", "port": "value" }, "to": { "node": "out_f", "port": "value" } }
+    ]
+  },
+  "externalInputs": { "territory": "t2", "exposure_base": "sales" },
+  "expectedOutputs": { "base_lc": 1.6 }
+}

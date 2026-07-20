@@ -1,0 +1,143 @@
+/**
+ * <PremiumShadowControl> — plan-level shadow re-rate (filed-premium impact of
+ * a model-version swap). BEM + design tokens.
+ */
+
+.rater-premium-shadow {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-12);
+  margin-top: var(--rater-s-20);
+  padding-top: var(--rater-s-16);
+  border-top: 1px solid var(--rater-border-subtle);
+}
+
+.rater-premium-shadow__head {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-8);
+}
+
+.rater-premium-shadow__icon {
+  color: var(--rater-cat-transform);
+  flex: none;
+}
+
+.rater-premium-shadow__title {
+  font-size: 13px;
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-strong);
+}
+
+.rater-premium-shadow__hint {
+  font-size: 12px;
+  color: var(--rater-text-faint);
+}
+
+.rater-premium-shadow__controls {
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: var(--rater-s-12);
+}
+
+.rater-premium-shadow__field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-4);
+  min-width: 180px;
+}
+
+.rater-premium-shadow__label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: var(--rater-tracking-label);
+  color: var(--rater-text-muted);
+}
+
+.rater-premium-shadow__select {
+  padding: var(--rater-s-6) var(--rater-s-10);
+  background: var(--rater-surface-sunken);
+  border: 1px solid var(--rater-border-default);
+  border-radius: var(--rater-r-6);
+  color: var(--rater-text-default);
+  font-size: 13px;
+}
+
+.rater-premium-shadow__select--mono {
+  font-family: var(--rater-fonts-mono);
+}
+
+.rater-premium-shadow__select:focus {
+  outline: none;
+  border-color: var(--rater-cat-transform);
+}
+
+.rater-premium-shadow__select:disabled {
+  opacity: 0.5;
+}
+
+/* The premium impact: pinned → shadow → Δ. */
+.rater-premium-shadow__impact {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-16);
+  padding: var(--rater-s-12) var(--rater-s-16);
+  background: var(--rater-surface-2);
+  border: 1px solid var(--rater-border-subtle);
+  border-radius: var(--rater-r-8);
+}
+
+.rater-premium-shadow__cell {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-2);
+}
+
+.rater-premium-shadow__cell--delta {
+  margin-left: auto;
+  text-align: right;
+}
+
+.rater-premium-shadow__cell-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: var(--rater-tracking-label);
+  color: var(--rater-text-muted);
+}
+
+.rater-premium-shadow__arrow {
+  color: var(--rater-text-faint);
+  font-size: 16px;
+}
+
+.rater-premium-shadow__amount {
+  font-size: 19px;
+  font-weight: var(--rater-fw-bold);
+  font-variant-numeric: tabular-nums;
+  color: var(--rater-text-strong);
+}
+
+.rater-premium-shadow__amount--muted {
+  color: var(--rater-text-faint);
+}
+
+.rater-premium-shadow__delta--up {
+  color: var(--rater-feedback-warn);
+}
+.rater-premium-shadow__delta--down {
+  color: var(--rater-feedback-success);
+}
+.rater-premium-shadow__delta--flat {
+  color: var(--rater-text-faint);
+}
+
+.rater-premium-shadow__hint-empty {
+  margin: 0;
+  padding: var(--rater-s-10) var(--rater-s-12);
+  font-size: 12.5px;
+  color: var(--rater-text-faint);
+  background: var(--rater-surface-sunken);
+  border: 1px dashed var(--rater-border-subtle);
+  border-radius: var(--rater-r-8);
+}

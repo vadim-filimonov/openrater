@@ -1,0 +1,29 @@
+{
+  "name": "V8.class-exposure-primary",
+  "description": "input.class_exposure resolves fictional Meridian class c101 to its primary sales exposure.",
+  "plan": {
+    "id": "v8.class_exposure_primary",
+    "version": "1.0.0",
+    "name": "Meridian class exposure (primary)",
+    "lines": ["liability"],
+    "effective": "2026-01-01",
+    "nodes": [
+      { "id": "cls_exp", "kind": "input.class_exposure", "params": { "coverage_scope": null, "classCodeFieldName": "class_code" }, "position": { "x": 0, "y": 0 } },
+      { "id": "out", "kind": "output", "params": { "fieldName": "exposure", "fieldType": "money" }, "position": { "x": 200, "y": 0 } }
+    ],
+    "edges": [
+      { "from": { "node": "cls_exp", "port": "value" }, "to": { "node": "out", "port": "value" } }
+    ]
+  },
+  "externalInputs": { "class_code": "c101", "annual_sales": 1500000 },
+  "expectedOutputs": { "exposure": 1500000 },
+  "classLibraryEntries": [
+    {
+      "class_code": "c101",
+      "display_name": "Meridian Cafe",
+      "exposure_bases": [
+        { "code": "sales", "is_primary": true, "unit": "USD" }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,354 @@
+/* ──────────────────────────────────────────────────────────────
+   HeatmapGrid — Brief 34 PR 34.2
+
+   The 2-D heatmap. Visually matches FactorTableGrid2D's skeleton
+   (Brief 33) plus a 7-bucket heat encoding on the body cells.
+   Per mockup Frame 4 + the `mini-cell.heat-N` styles at the same
+   lines.
+   ────────────────────────────────────────────────────────────── */
+
+.rater-heatmap-grid-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-8);
+}
+
+.rater-heatmap-grid {
+  display: grid;
+  grid-template-columns: 160px minmax(0, 1fr);
+  grid-template-rows: 36px minmax(0, 1fr);
+  background: var(--rater-surface-1);
+  border: 1px solid var(--rater-hairline-soft);
+  border-radius: var(--rater-r-8);
+  overflow: hidden;
+}
+
+/* ── Corner ─────────────────────────────────────────────────────── */
+
+.rater-heatmap-grid-corner {
+  grid-column: 1;
+  grid-row: 1;
+  background: var(--rater-surface-canvas);
+  border-right: 1px solid var(--rater-hairline-base);
+  border-bottom: 1px solid var(--rater-hairline-base);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--rater-fonts-mono);
+  font-size: 10px;
+  color: var(--rater-text-subtle);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 0 var(--rater-s-6);
+}
+
+/* ── Headers ────────────────────────────────────────────────────── */
+
+.rater-heatmap-grid-header-row {
+  grid-column: 2;
+  grid-row: 1;
+  display: grid;
+  grid-template-columns: repeat(var(--heatmap-col-count, 5), minmax(0, 1fr));
+  background: var(--rater-surface-canvas);
+  border-bottom: 1px solid var(--rater-hairline-base);
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+.rater-heatmap-grid-col-h {
+  padding: var(--rater-s-6) var(--rater-s-12);
+  font-size: 11px;
+  color: var(--rater-text-strong);
+  border-left: 1px solid var(--rater-hairline-soft);
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-6);
+  font-weight: var(--rater-fw-medium);
+  min-width: 0;
+  overflow: hidden;
+  transition: background 80ms ease, color 80ms ease;
+}
+.rater-heatmap-grid-col-h:first-child {
+  border-left: none;
+}
+.rater-heatmap-grid-col-h.is-focused {
+  background: color-mix(in srgb, var(--rater-cat-input) 14%, transparent);
+  color: var(--rater-cat-input-text);
+}
+.rater-heatmap-grid-col-h-label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.rater-heatmap-grid-col-h-sub {
+  font-family: var(--rater-fonts-mono);
+  font-size: 10px;
+  color: var(--rater-text-subtle);
+  margin-left: 2px;
+}
+
+.rater-heatmap-grid-header-col {
+  grid-column: 1;
+  grid-row: 2;
+  display: grid;
+  grid-template-rows: repeat(var(--heatmap-row-count, 5), 36px);
+  background: var(--rater-surface-canvas);
+  border-right: 1px solid var(--rater-hairline-base);
+  position: sticky;
+  left: 0;
+  z-index: 1;
+}
+.rater-heatmap-grid-row-h {
+  padding: var(--rater-s-6) var(--rater-s-12);
+  font-size: 12px;
+  color: var(--rater-text-default);
+  border-top: 1px solid var(--rater-hairline-soft);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--rater-s-6);
+  white-space: nowrap;
+  overflow: hidden;
+  transition: background 80ms ease, color 80ms ease;
+}
+.rater-heatmap-grid-row-h:first-child {
+  border-top: none;
+}
+.rater-heatmap-grid-row-h.is-focused {
+  background: color-mix(in srgb, var(--rater-cat-input) 14%, transparent);
+  color: var(--rater-cat-input-text);
+}
+.rater-heatmap-grid-row-h-label {
+  font-weight: var(--rater-fw-medium);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.rater-heatmap-grid-row-h-sub {
+  font-family: var(--rater-fonts-mono);
+  font-size: 10px;
+  color: var(--rater-text-subtle);
+  flex-shrink: 0;
+}
+
+/* ── Body ──────────────────────────────────────────────────────── */
+
+.rater-heatmap-grid-body {
+  grid-column: 2;
+  grid-row: 2;
+  display: grid;
+  grid-template-columns: repeat(var(--heatmap-col-count, 5), minmax(0, 1fr));
+  grid-template-rows: repeat(var(--heatmap-row-count, 5), 36px);
+}
+
+/* Base cell */
+.rater-heatmap-grid-cell {
+  padding: var(--rater-s-6) var(--rater-s-12);
+  border-top: 1px solid var(--rater-hairline-soft);
+  border-left: 1px solid var(--rater-hairline-soft);
+  font-family: var(--rater-fonts-mono);
+  font-size: 12px;
+  color: var(--rater-text-default);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  font-variant-numeric: tabular-nums;
+  min-width: 0;
+  overflow: hidden;
+  cursor: default;
+  transition: box-shadow 80ms ease;
+}
+.rater-heatmap-grid-cell.is-empty {
+  color: var(--rater-text-subtle);
+  font-style: italic;
+}
+.rater-heatmap-grid-cell.is-focused {
+  box-shadow: inset 0 0 0 2px var(--rater-cat-input);
+}
+
+/* ── 7-bucket heat encoding ────────────────────────────────────── */
+/* Buckets 1–2: discount (azure). 3: baseline (neutral). 4–7:
+   surcharge (orange / loading hue). The `--rater-viz-low` and
+   `--rater-viz-high` tokens fall back to the design system's azure
+   + loading colors when not defined. */
+
+.rater-heatmap-grid-cell.heat-1 {
+  background: color-mix(
+    in srgb,
+    var(--rater-viz-low, var(--rater-cat-input)) 24%,
+    var(--rater-surface-canvas)
+  );
+  color: var(--rater-text-strong);
+}
+.rater-heatmap-grid-cell.heat-2 {
+  background: color-mix(
+    in srgb,
+    var(--rater-viz-low, var(--rater-cat-input)) 12%,
+    var(--rater-surface-canvas)
+  );
+  color: var(--rater-text-strong);
+}
+.rater-heatmap-grid-cell.heat-3 {
+  background: var(--rater-surface-canvas);
+  color: var(--rater-text-default);
+}
+.rater-heatmap-grid-cell.heat-4 {
+  background: color-mix(
+    in srgb,
+    var(--rater-viz-high, var(--rater-cat-loading)) 12%,
+    var(--rater-surface-canvas)
+  );
+  color: var(--rater-text-strong);
+}
+.rater-heatmap-grid-cell.heat-5 {
+  background: color-mix(
+    in srgb,
+    var(--rater-viz-high, var(--rater-cat-loading)) 22%,
+    var(--rater-surface-canvas)
+  );
+  color: var(--rater-text-strong);
+}
+.rater-heatmap-grid-cell.heat-6 {
+  background: color-mix(
+    in srgb,
+    var(--rater-viz-high, var(--rater-cat-loading)) 36%,
+    var(--rater-surface-canvas)
+  );
+  color: var(--rater-text-strong);
+}
+.rater-heatmap-grid-cell.heat-7 {
+  background: color-mix(
+    in srgb,
+    var(--rater-viz-high, var(--rater-cat-loading)) 52%,
+    var(--rater-surface-canvas)
+  );
+  color: var(--rater-text-strong);
+}
+
+/* ── Legend ────────────────────────────────────────────────────── */
+
+.rater-heatmap-grid-legend {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--rater-s-12);
+  padding: var(--rater-s-6) var(--rater-s-12);
+  background: var(--rater-surface-canvas);
+  border: 1px solid var(--rater-hairline-soft);
+  border-radius: var(--rater-r-8);
+}
+.rater-heatmap-grid-legend-label {
+  font-size: 10px;
+  letter-spacing: var(--rater-tracking-label);
+  text-transform: uppercase;
+  color: var(--rater-text-subtle);
+  font-weight: var(--rater-fw-semibold);
+}
+.rater-heatmap-grid-legend-entry {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-4);
+  font-size: 11px;
+  color: var(--rater-text-muted);
+}
+.rater-heatmap-grid-legend-swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: var(--rater-r-4);
+  display: inline-block;
+  border: 1px solid var(--rater-hairline-base);
+  flex-shrink: 0;
+}
+.rater-heatmap-grid-legend-swatch.heat-1 {
+  background: color-mix(
+    in srgb,
+    var(--rater-viz-low, var(--rater-cat-input)) 24%,
+    var(--rater-surface-canvas)
+  );
+}
+.rater-heatmap-grid-legend-swatch.heat-2 {
+  background: color-mix(
+    in srgb,
+    var(--rater-viz-low, var(--rater-cat-input)) 12%,
+    var(--rater-surface-canvas)
+  );
+}
+.rater-heatmap-grid-legend-swatch.heat-3 {
+  background: var(--rater-surface-canvas);
+}
+.rater-heatmap-grid-legend-swatch.heat-4 {
+  background: color-mix(
+    in srgb,
+    var(--rater-viz-high, var(--rater-cat-loading)) 12%,
+    var(--rater-surface-canvas)
+  );
+}
+.rater-heatmap-grid-legend-swatch.heat-5 {
+  background: color-mix(
+    in srgb,
+    var(--rater-viz-high, var(--rater-cat-loading)) 22%,
+    var(--rater-surface-canvas)
+  );
+}
+.rater-heatmap-grid-legend-swatch.heat-6 {
+  background: color-mix(
+    in srgb,
+    var(--rater-viz-high, var(--rater-cat-loading)) 36%,
+    var(--rater-surface-canvas)
+  );
+}
+.rater-heatmap-grid-legend-swatch.heat-7 {
+  background: color-mix(
+    in srgb,
+    var(--rater-viz-high, var(--rater-cat-loading)) 52%,
+    var(--rater-surface-canvas)
+  );
+}
+
+/* Brief 34 PR 34.5 — selection ring (no brush in v1; the grid pane
+ * already handles rectangular selection via shift-click). */
+.rater-heatmap-grid-cell.is-selected {
+  box-shadow: inset 0 0 0 2px
+    color-mix(in srgb, var(--rater-cat-input) 70%, transparent);
+}
+.rater-heatmap-grid-cell[role="button"] {
+  cursor: pointer;
+}
+
+/* Brief 34 PR 34.6 — compare-overlay delta annotation. The cell
+ * stacks vertically (value top-aligned right, delta below) only
+ * when a delta is present; otherwise the row-direction single-line
+ * default still applies. */
+.rater-heatmap-grid-cell:has(.rater-heatmap-grid-cell-delta) {
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 2px;
+}
+.rater-heatmap-grid-cell-value {
+  /* Inherit the cell's existing value typography. */
+  font-variant-numeric: tabular-nums;
+}
+.rater-heatmap-grid-cell-delta {
+  font-family: var(--rater-fonts-mono);
+  font-size: 9px;
+  color: var(--rater-text-subtle);
+  font-variant-numeric: tabular-nums;
+  opacity: 0.85;
+  white-space: nowrap;
+}
+.rater-heatmap-grid-cell-delta.is-positive {
+  color: var(--rater-cat-loading-text, var(--rater-cat-loading));
+}
+.rater-heatmap-grid-cell-delta.is-negative {
+  color: var(--rater-cat-input-text, var(--rater-cat-input));
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .rater-heatmap-grid-cell,
+  .rater-heatmap-grid-col-h,
+  .rater-heatmap-grid-row-h {
+    transition: none;
+  }
+}

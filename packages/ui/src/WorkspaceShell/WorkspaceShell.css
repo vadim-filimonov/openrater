@@ -1,0 +1,97 @@
+/* ============================================================================
+ * <WorkspaceShell> — sub-brief 24.F
+ *
+ * The consistent chrome every Brief 24 workspace inherits. Header strip
+ * on top + 268px tool pane on the left + content area on the right.
+ *
+ * Tokens consumed (Phase A.5 contract):
+ *   --rater-surface-1            (content area body)
+ *   --rater-surface-2            (tool pane body + header strip)
+ *   --rater-hairline-base, -soft (outlines + separators)
+ *   --rater-text-strong, -muted
+ *   --rater-t-{12,13,20}
+ *   --rater-fw-{medium,semibold}
+ *   --rater-s-{8,12,16,20,24}
+ *   --rater-r-8
+ * ============================================================================ */
+
+.rater-workspace-shell {
+  display: flex;
+  flex-direction: column;
+  background: var(--rater-surface-1);
+  border: 1px solid var(--rater-hairline-base);
+  border-radius: var(--rater-r-8);
+  overflow: hidden;
+  font-family: var(--rater-font-sans);
+  /* Fill the available section-pane height so the tool pane reads as
+   * a sidebar to the workspace, not as a tiny column. Min-height keeps
+   * empty workspaces tall enough to feel like real surfaces. */
+  min-height: 540px;
+}
+
+/* ── Context strip (24.F3 — replaces the big header) ──────────── */
+
+.rater-workspace-shell__context {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--rater-s-16);
+  padding: var(--rater-s-12) var(--rater-s-20);
+  background: var(--rater-surface-1);
+  border-bottom: 1px solid var(--rater-hairline-soft);
+  min-height: 44px;
+}
+
+.rater-workspace-shell__description {
+  margin: 0;
+  font-size: var(--rater-t-13);
+  color: var(--rater-text-muted);
+  line-height: var(--rater-lh-snug);
+  flex: 1;
+  min-width: 0;
+  /* Truncate long descriptions — context strip, not a paragraph */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rater-workspace-shell__actions {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-8);
+  flex-shrink: 0;
+}
+
+/* ── Body (tool pane + content) ────────────────────────────────── */
+
+.rater-workspace-shell__body {
+  display: grid;
+  grid-template-columns: 264px 1fr;
+  flex: 1;
+  min-height: 0;
+}
+
+.rater-workspace-shell__tool-pane {
+  background: var(--rater-surface-2);
+  border-right: 1px solid var(--rater-hairline-soft);
+  padding: var(--rater-s-16);
+  overflow-y: auto;
+}
+
+.rater-workspace-shell__content {
+  background: var(--rater-surface-1);
+  padding: var(--rater-s-20) var(--rater-s-24) var(--rater-s-24);
+  overflow-y: auto;
+  min-width: 0;
+}
+
+/* Narrow viewports — collapse to single column, tool pane on top. */
+@media (max-width: 960px) {
+  .rater-workspace-shell__body {
+    grid-template-columns: 1fr;
+  }
+  .rater-workspace-shell__tool-pane {
+    border-right: 0;
+    border-bottom: 1px solid var(--rater-hairline-soft);
+  }
+}

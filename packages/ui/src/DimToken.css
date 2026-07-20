@@ -1,0 +1,131 @@
+/* ============================================================================
+ * <DimToken> — the canonical dimension renderer (Brief 70 Phase 1).
+ *
+ * The dims2 visual recipe, extracted: neutral tile (surface-2, r-6,
+ * text-muted glyph — the glyph is the ONE shape signal, V2 spec §1.1),
+ * name in t-13 medium strong, slug in t-11 mono subtle, count muted.
+ * ============================================================================ */
+
+.rater-dimtoken {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-10);
+  min-width: 0;
+  font-family: var(--rater-fonts-sans);
+  text-align: left;
+}
+
+/* Button reset (the pick-list row contract) */
+button.rater-dimtoken {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+}
+button.rater-dimtoken:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+button.rater-dimtoken:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: 2px;
+  border-radius: var(--rater-r-6);
+}
+
+/* ── densities ── */
+/* A3 — the row density carries the pick-list inset, but the button reset above
+   (`button.rater-dimtoken { padding: 0 }`, specificity 0-1-1) beat the bare class
+   (0-1-0), so the trailing count sat flush at the row edge. Match the reset's
+   specificity (`button.rater-dimtoken--row`) so the later rule wins; keep the
+   bare class for non-button rows. (header/inline keep padding:0 by design.) */
+button.rater-dimtoken--row,
+.rater-dimtoken--row {
+  width: 100%;
+  padding: var(--rater-s-10) var(--rater-s-12);
+  border-radius: var(--rater-r-8);
+}
+button.rater-dimtoken--row:hover:not(disabled),
+.rater-dimtoken--row.is-selected {
+  background: var(--rater-row-hover-bg);
+}
+.rater-dimtoken--header {
+  gap: var(--rater-s-12);
+}
+.rater-dimtoken--inline {
+  gap: var(--rater-s-6);
+}
+
+/* ── the tile (the dims2 recipe) ── */
+.rater-dimtoken__tile {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: var(--rater-r-6);
+  background: var(--rater-surface-2);
+  color: var(--rater-text-muted);
+}
+.rater-dimtoken__tile--row {
+  width: 26px;
+  height: 26px;
+}
+.rater-dimtoken__tile--row svg {
+  width: 15px;
+  height: 15px;
+}
+.rater-dimtoken__tile--inline {
+  width: 18px;
+  height: 18px;
+  border-radius: 5px;
+}
+.rater-dimtoken__tile--inline svg {
+  width: 12px;
+  height: 12px;
+}
+.rater-dimtoken__tile--header {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--rater-r-8);
+}
+.rater-dimtoken__tile--header svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* ── text ── */
+.rater-dimtoken__body {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+  flex: 1;
+}
+.rater-dimtoken__name {
+  color: var(--rater-text-strong);
+  font-size: var(--rater-t-13);
+  font-weight: var(--rater-fw-medium);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rater-dimtoken--inline .rater-dimtoken__name {
+  font-weight: var(--rater-fw-regular);
+  color: var(--rater-text-default);
+}
+.rater-dimtoken__slug {
+  color: var(--rater-text-subtle);
+  font-size: var(--rater-t-11);
+  font-family: var(--rater-fonts-mono, var(--rater-fonts-sans));
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rater-dimtoken__count {
+  margin-left: auto;
+  flex-shrink: 0;
+  color: var(--rater-text-muted);
+  font-size: var(--rater-t-12);
+  white-space: nowrap;
+}

@@ -1,0 +1,82 @@
+{
+  "name": "V18.endorsement-rate-branch",
+  "description": "endorsement.rate_branch composition test. Per Brief 40 §−1 + Brief 42 §−1: when trigger fires, the branch_chain runs as a mini-chain whose output is ADDED (additive composition per Brief 40 §−1 Q3) to the incoming premium. Branch LCM is independent of the main chain per Brief 42 §−1 Q5. STATUS: ✓ implemented in Phase H.4 — EndorsementRateBranchKind is registered as a builtin; this fixture executes as part of the conformance suite.",
+  "plan": {
+    "id": "v18.endorsement_rate_branch",
+    "version": "1.0.0",
+    "name": "Endorsement rate-branch composition",
+    "lines": ["property"],
+    "effective": "2026-01-01",
+    "nodes": [
+      {
+        "id": "base",
+        "kind": "constant",
+        "params": { "value": 1000 },
+        "position": { "x": 0, "y": 0 }
+      },
+      {
+        "id": "end_branch",
+        "kind": "endorsement.rate_branch",
+        "params": {
+          "form_number": "CG-2147",
+          "display_name": "Liquor Liability",
+          "trigger": {
+            "variable": "has_liquor_sales",
+            "op": "eq",
+            "value": true
+          },
+          "branch_chain": {
+            "name": "liquor_premium",
+            "base_input": "form_input.liquor_receipts",
+            "factor_lookups": [],
+            "lcm": {
+              "factor_kind": "lcm",
+              "input_path": "form_input.lcm",
+              "citation_rule": "(carrier-set)",
+              "citation_page": "(carrier-set)",
+              "description_template": "Loss Cost Multiplier (carrier): {value}"
+            },
+            "exposure_input": "form_input.liquor_receipts",
+            "exposure_unit_divisor": 1,
+            "output_field": "liquor_premium"
+          }
+        },
+        "position": { "x": 200, "y": 0 }
+      },
+      {
+        "id": "out_premium",
+        "kind": "output",
+        "params": { "fieldName": "final_premium", "fieldType": "number" },
+        "position": { "x": 400, "y": 0 }
+      },
+      {
+        "id": "out_contribution",
+        "kind": "output",
+        "params": { "fieldName": "branch_contribution", "fieldType": "number" },
+        "position": { "x": 400, "y": 100 }
+      },
+      {
+        "id": "out_fired",
+        "kind": "output",
+        "params": { "fieldName": "branch_fired", "fieldType": "boolean" },
+        "position": { "x": 400, "y": 200 }
+      }
+    ],
+    "edges": [
+      { "from": { "node": "base", "port": "value" }, "to": { "node": "end_branch", "port": "premium" } },
+      { "from": { "node": "end_branch", "port": "premium_out" }, "to": { "node": "out_premium", "port": "value" } },
+      { "from": { "node": "end_branch", "port": "contribution" }, "to": { "node": "out_contribution", "port": "value" } },
+      { "from": { "node": "end_branch", "port": "fired" }, "to": { "node": "out_fired", "port": "value" } }
+    ]
+  },
+  "externalInputs": {
+    "has_liquor_sales": true,
+    "liquor_receipts": 500,
+    "lcm": 1.0
+  },
+  "expectedOutputs": {
+    "final_premium": 1500,
+    "branch_contribution": 500,
+    "branch_fired": true
+  }
+}

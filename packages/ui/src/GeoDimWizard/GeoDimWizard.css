@@ -1,0 +1,471 @@
+/* ──────────────────────────────────────────────────────────────────
+   Brief 44 PR 44.2 — <GeoDimWizard> styles.
+
+   BEM + design tokens only. Visual lock: Frames 1+2 from
+   rate-lab/frontend/public/mockup/44-geographic-rating.html.
+
+   The wizard ships its own card chrome but no modal wrapper —
+   consumers embed it in a <Modal> or <Drawer> as preferred.
+   ────────────────────────────────────────────────────────────────── */
+
+.rater-geo-wizard {
+  display: flex;
+  flex-direction: column;
+  background: var(--rater-surface-1);
+  border: 1px solid var(--rater-hairline-base);
+  border-radius: var(--rater-r-12);
+  padding: 32px 36px;
+  max-width: 720px;
+  width: 100%;
+  margin: 0 auto;
+  font-family: var(--rater-fonts-sans);
+  color: var(--rater-text-default);
+}
+
+/* ── Step indicator ─────────────────────────────────────────────── */
+.rater-geo-wizard__steps {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 24px;
+  font-size: 11px;
+  letter-spacing: var(--rater-tracking-label);
+  text-transform: uppercase;
+  color: var(--rater-text-subtle);
+}
+.rater-geo-wizard__step-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.rater-geo-wizard__step {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.rater-geo-wizard__step--is-active {
+  color: var(--rater-text-strong);
+  font-weight: var(--rater-fw-semibold);
+}
+.rater-geo-wizard__step--is-done {
+  color: var(--rater-cat-math-text);
+}
+.rater-geo-wizard__step-dot {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--rater-surface-2);
+  color: var(--rater-text-subtle);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--rater-fonts-mono);
+  font-size: 11px;
+  font-weight: var(--rater-fw-semibold);
+  letter-spacing: 0;
+}
+.rater-geo-wizard__step--is-active .rater-geo-wizard__step-dot {
+  background: var(--rater-cat-transform);
+  color: var(--rater-text-inverse);
+}
+.rater-geo-wizard__step--is-done .rater-geo-wizard__step-dot {
+  background: var(--rater-cat-math);
+  color: var(--rater-text-inverse);
+}
+.rater-geo-wizard__step-line {
+  width: 48px;
+  height: 1px;
+  background: var(--rater-hairline-soft);
+}
+
+/* ── Body ───────────────────────────────────────────────────────── */
+.rater-geo-wizard__body {
+  flex: 1;
+}
+.rater-geo-wizard__title {
+  font-size: 20px;
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-strong);
+  letter-spacing: -0.01em;
+  margin: 0 0 6px;
+}
+.rater-geo-wizard__sub {
+  font-size: 13px;
+  color: var(--rater-text-muted);
+  margin: 0 0 22px;
+  line-height: 1.55;
+  max-width: 600px;
+}
+
+/* ── Step 1 — radio options ─────────────────────────────────────── */
+.rater-geo-wizard__options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.rater-geo-wizard__opt {
+  display: grid;
+  grid-template-columns: 24px 1fr auto;
+  gap: 14px;
+  align-items: center;
+  padding: 14px 18px;
+  background: var(--rater-surface-canvas);
+  border: 1px solid var(--rater-hairline-soft);
+  border-radius: var(--rater-r-8);
+  cursor: pointer;
+  transition: border-color var(--rater-d-120) var(--rater-ease-soft),
+              background var(--rater-d-120) var(--rater-ease-soft);
+}
+.rater-geo-wizard__opt:hover {
+  border-color: var(--rater-hairline-strong);
+  background: var(--rater-surface-2);
+}
+.rater-geo-wizard__opt.is-selected {
+  border-color: var(--rater-cat-transform);
+  background: color-mix(in srgb, var(--rater-cat-transform) 8%, var(--rater-surface-canvas));
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--rater-cat-transform) 50%, transparent);
+}
+.rater-geo-wizard__opt-input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  width: 0;
+  height: 0;
+}
+.rater-geo-wizard__opt-radio {
+  width: 18px;
+  height: 18px;
+  border: 1.5px solid var(--rater-hairline-strong);
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.rater-geo-wizard__opt.is-selected .rater-geo-wizard__opt-radio {
+  border-color: var(--rater-cat-transform);
+}
+.rater-geo-wizard__opt.is-selected .rater-geo-wizard__opt-radio::after {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--rater-cat-transform);
+}
+.rater-geo-wizard__opt-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.rater-geo-wizard__opt-title {
+  font-size: 14px;
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-strong);
+}
+.rater-geo-wizard__opt-format {
+  font-family: var(--rater-fonts-mono);
+  font-size: 10px;
+  font-weight: var(--rater-fw-medium);
+  color: var(--rater-text-subtle);
+  margin-left: 6px;
+  text-transform: uppercase;
+  letter-spacing: var(--rater-tracking-label);
+}
+.rater-geo-wizard__opt-hint {
+  font-size: 12px;
+  color: var(--rater-text-muted);
+  line-height: 1.5;
+}
+.rater-geo-wizard__opt-aside {
+  font-family: var(--rater-fonts-mono);
+  font-size: 11px;
+  color: var(--rater-text-subtle);
+  text-align: right;
+  white-space: nowrap;
+}
+
+/* ── Step 2 — toggle + state grid ───────────────────────────────── */
+.rater-geo-wizard__toggle {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 14px 18px;
+  background: var(--rater-surface-canvas);
+  border: 1px solid var(--rater-hairline-soft);
+  border-radius: var(--rater-r-8);
+  text-align: left;
+  cursor: pointer;
+  margin-bottom: 16px;
+  color: var(--rater-text-default);
+  font-family: var(--rater-fonts-sans);
+}
+.rater-geo-wizard__toggle:hover {
+  border-color: var(--rater-hairline-strong);
+}
+.rater-geo-wizard__toggle.is-on {
+  border-color: var(--rater-cat-transform);
+  background: color-mix(in srgb, var(--rater-cat-transform) 8%, var(--rater-surface-canvas));
+}
+.rater-geo-wizard__toggle-switch {
+  width: 34px;
+  height: 20px;
+  background: var(--rater-surface-2);
+  border-radius: var(--rater-r-full);
+  position: relative;
+  flex-shrink: 0;
+  transition: background var(--rater-d-120) var(--rater-ease-soft);
+}
+.rater-geo-wizard__toggle-switch::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  background: var(--rater-text-default);
+  border-radius: 50%;
+  transition: left var(--rater-d-120) var(--rater-ease-soft),
+              background var(--rater-d-120) var(--rater-ease-soft);
+}
+.rater-geo-wizard__toggle.is-on .rater-geo-wizard__toggle-switch {
+  background: var(--rater-cat-transform);
+}
+.rater-geo-wizard__toggle.is-on .rater-geo-wizard__toggle-switch::after {
+  left: 16px;
+  background: var(--rater-text-strong);
+}
+.rater-geo-wizard__toggle-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+.rater-geo-wizard__toggle-title {
+  color: var(--rater-text-strong);
+  font-weight: var(--rater-fw-medium);
+  font-size: 13px;
+}
+.rater-geo-wizard__toggle-hint {
+  color: var(--rater-text-subtle);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.rater-geo-wizard__states {
+  padding: 14px 16px;
+  background: var(--rater-surface-canvas);
+  border: 1px solid var(--rater-hairline-soft);
+  border-radius: var(--rater-r-8);
+}
+.rater-geo-wizard__states-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  font-size: 12px;
+  color: var(--rater-text-muted);
+}
+.rater-geo-wizard__states-title {
+  color: var(--rater-text-default);
+  font-weight: var(--rater-fw-medium);
+}
+.rater-geo-wizard__states-hint {
+  color: var(--rater-text-subtle);
+}
+.rater-geo-wizard__states-grid {
+  display: grid;
+  grid-template-columns: repeat(13, minmax(0, 1fr));
+  gap: 4px;
+}
+.rater-geo-wizard__state-cell {
+  aspect-ratio: 1;
+  background: var(--rater-surface-2);
+  border-radius: var(--rater-r-4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--rater-fonts-mono);
+  font-size: 10px;
+  color: var(--rater-text-muted);
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background var(--rater-d-120) var(--rater-ease-soft),
+              color var(--rater-d-120) var(--rater-ease-soft);
+  user-select: none;
+}
+.rater-geo-wizard__state-cell:hover {
+  background: var(--rater-surface-3);
+  color: var(--rater-text-default);
+}
+.rater-geo-wizard__state-cell.is-selected {
+  background: var(--rater-cat-transform);
+  color: var(--rater-text-inverse);
+  font-weight: var(--rater-fw-semibold);
+}
+.rater-geo-wizard__states-count {
+  margin-top: 12px;
+  font-size: 12px;
+  color: var(--rater-text-muted);
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.rater-geo-wizard__states-count strong {
+  color: var(--rater-cat-transform-text);
+  font-weight: var(--rater-fw-semibold);
+}
+.rater-geo-wizard__states-codes {
+  font-family: var(--rater-fonts-mono);
+  font-size: 11px;
+  color: var(--rater-text-default);
+}
+.rater-geo-wizard__states-empty {
+  color: var(--rater-text-subtle);
+  font-style: italic;
+}
+
+/* ── Step 3 — review ────────────────────────────────────────────── */
+.rater-geo-wizard__review {
+  margin: 0;
+  padding: 18px 20px;
+  background: var(--rater-surface-canvas);
+  border: 1px solid var(--rater-hairline-soft);
+  border-radius: var(--rater-r-8);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.rater-geo-wizard__review-row {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  gap: 12px;
+  align-items: baseline;
+  font-size: 13px;
+}
+.rater-geo-wizard__review-row dt {
+  margin: 0;
+  font-size: 11px;
+  letter-spacing: var(--rater-tracking-label);
+  text-transform: uppercase;
+  color: var(--rater-text-subtle);
+  font-weight: var(--rater-fw-semibold);
+}
+.rater-geo-wizard__review-row dd {
+  margin: 0;
+  color: var(--rater-text-default);
+}
+.rater-geo-wizard__review-row dd strong {
+  color: var(--rater-text-strong);
+  font-family: var(--rater-fonts-mono);
+}
+.rater-geo-wizard__review-format {
+  font-family: var(--rater-fonts-mono);
+  font-size: 11px;
+  color: var(--rater-text-subtle);
+  letter-spacing: var(--rater-tracking-label);
+  text-transform: uppercase;
+  margin-left: 6px;
+}
+.rater-geo-wizard__review-warn {
+  color: var(--rater-cat-loading-text);
+  font-size: 12px;
+}
+
+/* ── Footer ─────────────────────────────────────────────────────── */
+.rater-geo-wizard__footer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 28px;
+  padding-top: 22px;
+  border-top: 1px solid var(--rater-hairline-soft);
+}
+.rater-geo-wizard__footer-spacer {
+  flex: 1;
+}
+.rater-geo-wizard__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: var(--rater-surface-2);
+  color: var(--rater-text-default);
+  border: 1px solid var(--rater-hairline-base);
+  border-radius: var(--rater-r-6);
+  font-size: 13px;
+  font-weight: var(--rater-fw-medium);
+  cursor: pointer;
+  font-family: var(--rater-fonts-sans);
+  transition: background var(--rater-d-120) var(--rater-ease-soft);
+}
+.rater-geo-wizard__btn:hover:not(disabled) {
+  background: var(--rater-surface-3);
+}
+.rater-geo-wizard__btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.rater-geo-wizard__btn--ghost {
+  background: transparent;
+  color: var(--rater-text-muted);
+  border-color: transparent;
+}
+.rater-geo-wizard__btn--ghost:hover:not(disabled) {
+  background: var(--rater-surface-2);
+  color: var(--rater-text-default);
+}
+.rater-geo-wizard__btn--primary {
+  background: var(--rater-cat-transform);
+  color: var(--rater-text-inverse);
+  border-color: var(--rater-cat-transform);
+  font-weight: var(--rater-fw-semibold);
+}
+.rater-geo-wizard__btn--primary:hover:not(disabled) {
+  background: color-mix(in srgb, var(--rater-cat-transform) 80%, white);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rater-geo-wizard__opt,
+  .rater-geo-wizard__toggle,
+  .rater-geo-wizard__toggle-switch,
+  .rater-geo-wizard__toggle-switch::after,
+  .rater-geo-wizard__state-cell,
+  .rater-geo-wizard__btn {
+    transition: none;
+  }
+}
+
+/* ADR-0038 — Dimension name field on the Review step. */
+.rater-geo-wizard__name-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.rater-geo-wizard__name-label {
+  font-size: 11px;
+  font-weight: var(--rater-fw-semibold);
+  letter-spacing: var(--rater-tracking-label);
+  text-transform: uppercase;
+  color: var(--rater-text-subtle);
+}
+
+.rater-geo-wizard__name-input {
+  font-family: var(--rater-fonts-sans);
+  font-size: 14px;
+  color: var(--rater-text-strong);
+  background: var(--rater-surface-canvas);
+  border: 1px solid var(--rater-hairline-soft);
+  border-radius: var(--rater-r-8);
+  padding: 8px 10px;
+  transition: border-color var(--rater-d-120) var(--rater-ease-soft);
+}
+
+.rater-geo-wizard__name-input:focus-visible {
+  outline: none;
+  border-color: var(--rater-cat-math-text);
+  box-shadow: 0 0 0 3px var(--rater-focus-ring);
+}

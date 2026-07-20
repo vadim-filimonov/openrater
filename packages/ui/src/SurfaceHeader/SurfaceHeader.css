@@ -1,0 +1,39 @@
+/* SurfaceHeader — Brief 88 §3.3: one greeting row for every Lab
+   landing. 48px, one hairline, three slots. Token-only BEM. */
+
+.rater-surface-header {
+  min-height: 48px;
+  display: flex;
+  align-items: stretch;
+  gap: var(--rater-s-16);
+  border-bottom: 1px solid var(--rater-border-subtle);
+}
+
+.rater-surface-header__title {
+  display: flex;
+  align-items: center;
+  margin: 0;
+  font-family: var(--rater-font-display);
+  font-size: var(--rater-t-16);
+  font-weight: var(--rater-fw-semibold);
+  letter-spacing: var(--rater-tracking-tight);
+  color: var(--rater-text-strong);
+  white-space: nowrap;
+}
+
+/* The room's own controls; underline acts pin their marker to the
+   row's bottom edge, Segmenteds center — both via the slot's stretch. */
+.rater-surface-header__acts {
+  display: flex;
+  align-items: center;
+}
+
+.rater-surface-header__spacer {
+  flex: 1;
+}
+
+.rater-surface-header__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-8);
+}

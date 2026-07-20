@@ -1,0 +1,146 @@
+/* ============================================================================
+ * <Modal> — centered overlay panel.
+ *
+ * Like <Drawer> but smaller + centered + truly blocking. Used for
+ * delete-confirm + ISO override warnings + sign-off dialogs.
+ *
+ * Motion respects prefers-reduced-motion via the global tokens system.
+ * ============================================================================ */
+
+.rater-modal__backdrop {
+  position: fixed;
+  inset: 0;
+  background: var(--rater-surface-overlay);
+  z-index: var(--rater-z-overlay);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--rater-s-24);
+  animation: rater-modal-backdrop-in var(--rater-d-240) var(--rater-ease-soft);
+}
+
+.rater-modal {
+  position: relative;
+  z-index: var(--rater-z-modal);
+  background: var(--rater-surface-1);
+  border: 1px solid var(--rater-border-default);
+  border-radius: var(--rater-r-8);
+  box-shadow: var(--rater-shadow-floating);
+  max-width: calc(100vw - var(--rater-s-24) * 2);
+  max-height: calc(100vh - var(--rater-s-24) * 2);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+  /* Motion — slide-up + fade-in for "this is important" weight */
+  animation: rater-modal-in var(--rater-d-240) var(--rater-ease-soft);
+}
+
+.rater-modal__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--rater-s-16);
+  padding: var(--rater-s-20) var(--rater-s-24);
+  border-bottom: 1px solid var(--rater-border-subtle);
+  flex-shrink: 0;
+}
+
+.rater-modal__title-block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-4);
+  min-width: 0; /* allow text to wrap rather than push the close button */
+}
+
+.rater-modal__title {
+  margin: 0;
+  color: var(--rater-text-strong);
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-16);
+  font-weight: var(--rater-fw-semibold);
+  line-height: var(--rater-lh-snug);
+  letter-spacing: -0.01em;
+}
+
+.rater-modal__subtitle {
+  margin: 0;
+  color: var(--rater-text-muted);
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-13);
+  line-height: var(--rater-lh-normal);
+}
+
+.rater-modal__close {
+  /* Reset native button look; use unicode × for the close affordance.
+     This is a CHROME glyph, not a primary affordance, so unicode is
+     acceptable here (the typography is the design language; the close
+     is part of the chrome). */
+  appearance: none;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--rater-r-4);
+  color: var(--rater-text-muted);
+  cursor: pointer;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  line-height: 1;
+  padding: 0;
+  flex-shrink: 0;
+  transition:
+    background var(--rater-d-80) var(--rater-ease-soft),
+    border-color var(--rater-d-80) var(--rater-ease-soft),
+    color var(--rater-d-80) var(--rater-ease-soft);
+}
+
+.rater-modal__close:hover {
+  background: var(--rater-surface-2);
+  color: var(--rater-text-strong);
+}
+
+.rater-modal__close:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: 1px;
+}
+
+.rater-modal__body {
+  padding: var(--rater-s-20) var(--rater-s-24);
+  color: var(--rater-text-default);
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-14);
+  line-height: var(--rater-lh-normal);
+  overflow-y: auto;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.rater-modal__footer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: var(--rater-s-12);
+  padding: var(--rater-s-16) var(--rater-s-24);
+  border-top: 1px solid var(--rater-border-subtle);
+  flex-shrink: 0;
+  background: var(--rater-surface-1);
+}
+
+@keyframes rater-modal-backdrop-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes rater-modal-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}

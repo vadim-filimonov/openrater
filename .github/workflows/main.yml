@@ -1,0 +1,99 @@
+# Build, test, design, contract, and repository-hygiene checks on every
+# pull request and every push to main. The desktop-build workflow owns
+# release artifacts; this workflow owns source correctness.
+
+name: main
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  js:
+    name: typecheck · tests · design gates
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - name: Install
+        run: pnpm install --frozen-lockfile
+      - name: Typecheck
+        run: pnpm typecheck
+      - name: Unit + integration tests (includes the Meridian oracle gate)
+        run: pnpm test
+      - name: Design-system gates
+        run: pnpm design:check
+      - name: Lint
+        run: pnpm lint
+
+  server:
+    name: server pytest
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+      - name: Python env
+        # dev extra = pytest + httpx + pyjwt (the test-only deps)
+        run: uv sync --project server --extra dev
+      - name: Pytest
+        working-directory: server
+        run: uv run pytest -q
+
+  contract:
+    name: server ⇄ scoring HTTP contract
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          # This job leaves two services running across steps. They are
+          # stopped explicitly, so skip the post-job cache prune.
+          prune-cache: false
+      - name: Install
+        run: pnpm install --frozen-lockfile
+      - name: Python env
+        run: uv sync --project server
+      - name: Build the scoring bundle
+        run: pnpm --filter @openrater/scoring build
+      - name: Boot both services + seed the Meridian plan
+        run: |
+          export RATER_DB_PATH="$RUNNER_TEMP/contract.db"
+          export RATER_SCORING_URL="http://127.0.0.1:8080"
+          (cd services/scoring && PORT=8080 API_LAB_BASE=http://127.0.0.1:8001 node dist/server.mjs &)
+          (cd server && PYTHONPATH=src uv run uvicorn openrater.main:app --host 127.0.0.1 --port 8001 --log-level warning &)
+          for i in $(seq 1 60); do
+            curl -fsS http://127.0.0.1:8001/health >/dev/null 2>&1 && break; sleep 1;
+          done
+          curl -fsS http://127.0.0.1:8001/health
+          python3 scripts/plan_fixture.py load meridian-shopfront-bop-ne-2026 \
+            docs/fixtures/meridian-shopfront-bop-ne-2026.plan.json \
+            --db "$RATER_DB_PATH"
+      - name: Run the contract check
+        run: |
+          export RATER_DB_PATH="$RUNNER_TEMP/contract.db"
+          uv run --project server python scripts/ci/contract_server_scoring.py
+      - name: Stop the services
+        if: always()
+        run: |
+          pkill -f "uvicorn openrater.main:app" || true
+          pkill -f "node dist/server.mjs" || true
+
+  hygiene:
+    name: identity · synthetic content · public surface · provenance
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Hygiene gates
+        run: ./scripts/ci/hygiene_gates.sh

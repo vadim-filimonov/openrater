@@ -1,0 +1,1324 @@
+/* ----------------------------------------------------------------
+ * Page shell + back link
+ * ---------------------------------------------------------------- */
+
+.plan-detail-page {
+  /* V2_INTERFACE_SPEC §1.2 — ONE content geometry: 1700px max-width,
+   * a 24px gutter (12px below 1366px) that the plan header, the tab
+   * strip, and every section body share — one left edge. Top gutter
+   * stays 0: the header band IS the top of the page. */
+  max-width: 1700px;
+  margin: 0 auto;
+  padding: 0 var(--rater-s-24) var(--rater-s-48);
+}
+
+@media (max-width: 1366px) {
+  .plan-detail-page {
+    padding: 0 var(--rater-s-12) var(--rater-s-48);
+  }
+}
+
+.plan-detail-page__back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-6);
+  /* L28 — trim the back-link's bottom margin (24 → 12); the sticky
+   * header below it already provides separation. */
+  margin-bottom: var(--rater-s-12);
+  padding: var(--rater-s-4) var(--rater-s-8);
+  margin-left: calc(var(--rater-s-8) * -1);
+  border-radius: var(--rater-r-4);
+
+  font-size: var(--rater-t-12);
+  font-weight: var(--rater-fw-medium);
+  color: var(--rater-text-muted);
+  text-decoration: none;
+
+  transition: color var(--rater-d-80) var(--rater-ease-soft),
+    background var(--rater-d-80) var(--rater-ease-soft);
+}
+
+.plan-detail-page__back:hover {
+  color: var(--rater-text-default);
+  background: var(--rater-surface-2);
+}
+
+/* ----------------------------------------------------------------
+ * PlanStudioHeader — thin sticky control-tower top bar
+ * (replaces the bulky PR #4 header per plan-control-tower brief)
+ * ---------------------------------------------------------------- */
+
+.plan-studio-header {
+  position: sticky;
+  top: 0;
+  z-index: var(--rater-z-sticky);
+
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--rater-s-12) var(--rater-s-16);
+  padding: var(--rater-s-12) 0;
+  /* L28 — trim the studio header's bottom margin (20 → 12) to lift
+   * the tab bar + workspace content. */
+  margin-bottom: var(--rater-s-12);
+  border-bottom: 1px solid var(--rater-border-subtle);
+  background: var(--rater-surface-canvas);
+}
+
+.plan-studio-header__main {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-12);
+  min-width: 0;
+  flex: 1 1 280px;
+}
+
+.plan-studio-header__title-block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-2);
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.plan-studio-header__title {
+  margin: 0;
+  font-family: var(--rater-font-display);
+  font-size: var(--rater-t-20);
+  font-weight: var(--rater-fw-semibold);
+  letter-spacing: var(--rater-tracking-tight);
+  line-height: var(--rater-leading-snug);
+  color: var(--rater-text-strong);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.plan-studio-header__meta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-6);
+  font-size: var(--rater-t-11);
+  color: var(--rater-text-subtle);
+}
+
+.plan-studio-header__meta-cell {
+  text-transform: uppercase;
+  letter-spacing: var(--rater-tracking-label);
+  font-weight: var(--rater-fw-medium);
+}
+
+.plan-studio-header__meta-cell--mono {
+  font-family: var(--rater-font-mono);
+  font-feature-settings: var(--rater-num-tabular);
+  text-transform: none;
+  letter-spacing: normal;
+  font-weight: var(--rater-fw-regular);
+}
+
+.plan-studio-header__meta-sep {
+  color: var(--rater-text-disabled);
+}
+
+.plan-studio-header__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-8);
+  flex-shrink: 0;
+}
+
+/* Inline "next step" hint — appears next to the status chip when
+ * the plan isn't yet compile-ready. Replaces the bloated
+ * PlanCompletenessWidget bar. Hidden on narrow viewports so the
+ * status chip doesn't wrap. */
+.plan-studio-header__next-step {
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-muted);
+  font-style: italic;
+  line-height: var(--rater-leading-snug);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+@media (max-width: 720px) {
+  .plan-studio-header__next-step {
+    display: none;
+  }
+}
+
+/* Screen-reader-only utility used for visually-hidden section headings. */
+.rater-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ----------------------------------------------------------------
+ * Plan Studio — the active workspace's content area (below the tabs)
+ * ---------------------------------------------------------------- */
+
+.plan-studio {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: var(--rater-s-24);
+  align-items: start;
+}
+
+/* 24.F2 — when the top tabs replace the rail, the route uses a
+ * single-column layout. The workspace content fills the full width
+ * (constrained only by the page max-width). */
+.plan-studio--no-rail {
+  display: block;
+  /* L28 — drop the top inset (16 → 0). The WorkspaceTabs strip + the
+   * workspace's own internal padding already separate the content
+   * from the tab bar; the extra 16px just pushed exhibits below the
+   * fold. Bottom stays 32 for scroll comfort. */
+  padding: 0 0 var(--rater-s-32);
+}
+
+/* ----------------------------------------------------------------
+ * Section Detail Pane (right side, active section's content)
+ * ---------------------------------------------------------------- */
+
+.section-pane {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-20);
+  padding: var(--rater-s-12) 0 var(--rater-s-32);
+  min-width: 0;
+}
+
+.section-pane__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--rater-s-16);
+  flex-wrap: wrap;
+}
+
+.section-pane__title-block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-4);
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.section-pane__title {
+  margin: 0;
+  font-family: var(--rater-font-display);
+  font-size: var(--rater-t-20);
+  font-weight: var(--rater-fw-semibold);
+  letter-spacing: var(--rater-tracking-tight);
+  color: var(--rater-text-strong);
+}
+
+.section-pane__num {
+  color: var(--rater-text-subtle);
+  font-weight: var(--rater-fw-regular);
+}
+
+.section-pane__subtitle {
+  margin: 0;
+  font-size: var(--rater-t-13);
+  line-height: var(--rater-leading-snug);
+  color: var(--rater-text-muted);
+  max-width: 64ch;
+}
+
+.section-pane__header-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-6);
+  flex-shrink: 0;
+}
+
+.section-pane__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-12);
+}
+
+.section-pane__stages {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-6);
+}
+
+.section-pane__add {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: var(--rater-s-12);
+  padding-top: var(--rater-s-4);
+  flex-wrap: wrap;
+}
+
+/* Brief 62.4 — the after-rating tail editor, separated from the in-plan
+ * clamp/round/flat stages above it. */
+.section-pane__tail {
+  margin-top: var(--rater-s-20);
+  padding-top: var(--rater-s-16);
+  border-top: 1px solid var(--rater-border-default);
+}
+
+/* Brief 82 (D-A) — the Rating tab, ONE column: toolbar → the build-up
+ * sheet at reading width → the readiness footer. The takeover replaces
+ * the column wholesale when a table opens or creation runs — full
+ * width, breadcrumb back. */
+.rater-rating-page {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 100%;
+}
+
+.rater-rating-page__toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-10);
+  max-width: 880px;
+  width: 100%;
+  margin: 0 auto;
+  padding: var(--rater-s-12) var(--rater-s-24) 0;
+}
+
+.rater-rating-page__toolbar-spacer {
+  flex: 1;
+}
+
+.rater-rating-page__menu-wrap {
+  position: relative;
+  display: inline-flex;
+}
+
+.rater-rating-page__toolbtn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-6);
+  border: 1px solid var(--rater-hairline-subtle);
+  border-radius: var(--rater-r-8);
+  background: none;
+  padding: var(--rater-s-4) var(--rater-s-10);
+  font: inherit;
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-muted);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.rater-rating-page__toolbtn b {
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-default);
+}
+.rater-rating-page__toolbtn:hover {
+  color: var(--rater-text-strong);
+  background: var(--rater-surface-1);
+}
+.rater-rating-page__toolbtn:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: 2px;
+}
+
+/* The sheet's own column caps at 880px; the footer sticks below. */
+.rater-rating-page > .rater-buildup {
+  flex: 1;
+}
+
+.rater-rating-takeover {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.rater-rating-takeover__crumb {
+  display: flex;
+  align-items: center;
+  padding: var(--rater-s-8) 0 var(--rater-s-12);
+}
+
+/* M4.14 — "Add surcharge or fee" hint clarifying the scope-limit
+ * (clamp + round editors land in a follow-up). */
+.section-pane__add-hint {
+  margin: 0;
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-muted);
+  flex-basis: 100%;
+}
+
+/* Section-specific deep links (e.g. Classification → /classification).
+ * Rendered next to the Add button in both the empty + populated
+ * states. */
+.section-pane__deep-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-4);
+  padding: var(--rater-s-6) var(--rater-s-8);
+  color: var(--rater-text-muted);
+  text-decoration: none;
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-12);
+  border-radius: var(--rater-r-6);
+  transition: color 120ms ease, background-color 120ms ease;
+}
+
+.section-pane__deep-link:hover {
+  color: var(--rater-text-strong);
+  background: var(--rater-surface-sunken);
+}
+
+.section-pane__deep-link:focus-visible {
+  outline: 2px solid var(--rater-brand-accent, var(--rater-text-strong));
+  outline-offset: 1px;
+}
+
+/* ----------------------------------------------------------------
+ * Stage Chip — kind-aware row used inside section pane
+ * ---------------------------------------------------------------- */
+
+.stage-chip {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-10);
+  width: 100%;
+  padding: var(--rater-s-10) var(--rater-s-12);
+  border: 1px solid var(--rater-border-subtle);
+  background: var(--rater-surface-2);
+  border-radius: var(--rater-r-6);
+  cursor: pointer;
+  text-align: left;
+  font-family: var(--rater-font-sans);
+  font-size: var(--rater-t-13);
+  color: var(--rater-text-default);
+  transition:
+    border-color var(--rater-d-80) var(--rater-ease-soft),
+    background var(--rater-d-80) var(--rater-ease-soft),
+    transform var(--rater-d-80) var(--rater-ease-soft);
+}
+
+.stage-chip:hover {
+  border-color: var(--rater-accent-primary);
+  background: var(--rater-surface-3);
+}
+
+.stage-chip:focus-visible {
+  outline: 2px solid var(--rater-focus-ring, var(--rater-accent-primary));
+  outline-offset: 2px;
+}
+
+.stage-chip__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--rater-r-4);
+  background: var(--rater-accent-primary);
+  color: white;
+  flex-shrink: 0;
+}
+
+.stage-chip__name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: var(--rater-fw-medium);
+  color: var(--rater-text-strong);
+}
+
+/* ----------------------------------------------------------------
+ * EmptyPlanChooser — two-card first-touch panel (shown when 0 stages)
+ * ---------------------------------------------------------------- */
+
+.empty-chooser {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-20);
+  padding: var(--rater-s-12) 0 var(--rater-s-32);
+}
+
+.empty-chooser__header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-6);
+}
+
+.empty-chooser__title {
+  margin: 0;
+  font-family: var(--rater-font-display);
+  font-size: var(--rater-t-20);
+  font-weight: var(--rater-fw-semibold);
+  letter-spacing: var(--rater-tracking-tight);
+  color: var(--rater-text-strong);
+}
+
+.empty-chooser__subtitle {
+  margin: 0;
+  font-size: var(--rater-t-13);
+  line-height: var(--rater-leading-snug);
+  color: var(--rater-text-muted);
+  max-width: 64ch;
+}
+
+.empty-chooser__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--rater-s-16);
+}
+
+.chooser-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-14);
+  padding: var(--rater-s-20);
+  background: var(--rater-surface-1);
+  border: 1px solid var(--rater-border-default);
+  border-radius: var(--rater-r-8);
+  text-align: left;
+  cursor: pointer;
+  font-family: var(--rater-font-sans);
+  color: var(--rater-text-default);
+  transition:
+    border-color var(--rater-d-140) var(--rater-ease-soft),
+    background var(--rater-d-140) var(--rater-ease-soft),
+    transform var(--rater-d-140) var(--rater-ease-soft);
+}
+
+.chooser-card:hover {
+  border-color: var(--rater-accent-primary);
+  background: var(--rater-surface-2);
+  transform: translateY(-1px);
+}
+
+.chooser-card:focus-visible {
+  outline: 2px solid var(--rater-focus-ring, var(--rater-accent-primary));
+  outline-offset: 2px;
+}
+
+.chooser-card--recommended {
+  border-color: var(--rater-accent-primary);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--rater-accent-primary) 7%, var(--rater-surface-1)) 0%,
+    var(--rater-surface-1) 60%
+  );
+}
+
+.chooser-card__icon-wrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--rater-r-8);
+  background: var(--rater-surface-3);
+  color: var(--rater-text-muted);
+}
+
+.chooser-card__icon-wrap--recommended {
+  background: var(--rater-accent-primary);
+  color: white;
+}
+
+.chooser-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-8);
+}
+
+.chooser-card__title-row {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-8);
+  flex-wrap: wrap;
+}
+
+.chooser-card__title {
+  margin: 0;
+  font-family: var(--rater-font-display);
+  font-size: var(--rater-t-16);
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-strong);
+}
+
+.chooser-card__copy {
+  margin: 0;
+  font-size: var(--rater-t-13);
+  line-height: var(--rater-leading-snug);
+  color: var(--rater-text-muted);
+}
+
+.chooser-card__tag {
+  display: inline-block;
+  font-size: var(--rater-t-11);
+  color: var(--rater-text-subtle);
+  text-transform: uppercase;
+  letter-spacing: var(--rater-tracking-label);
+  padding-top: var(--rater-s-4);
+}
+
+.chooser-card__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-4);
+  padding-top: var(--rater-s-4);
+  font-size: var(--rater-t-12);
+  font-weight: var(--rater-fw-medium);
+  color: var(--rater-accent-primary);
+}
+
+/* ----------------------------------------------------------------
+ * Settings drawer (mounted inside <Drawer>)
+ * ---------------------------------------------------------------- */
+
+.settings-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-10);
+  padding-bottom: var(--rater-s-20);
+  border-bottom: 1px solid var(--rater-border-subtle);
+}
+
+.settings-section:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.settings-section__title {
+  margin: 0;
+  font-size: var(--rater-t-11);
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-subtle);
+  text-transform: uppercase;
+  letter-spacing: var(--rater-tracking-label);
+}
+
+.settings-section__copy {
+  margin: 0;
+  font-size: var(--rater-t-13);
+  line-height: var(--rater-leading-snug);
+  color: var(--rater-text-muted);
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--rater-s-4);
+}
+
+.settings-section__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--rater-s-8);
+}
+
+.settings-meta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-6);
+  margin: 0;
+}
+
+.settings-meta__row {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: var(--rater-s-12);
+  align-items: baseline;
+}
+
+.settings-meta__label {
+  margin: 0;
+  font-size: var(--rater-t-11);
+  font-weight: var(--rater-fw-medium);
+  color: var(--rater-text-subtle);
+  text-transform: uppercase;
+  letter-spacing: var(--rater-tracking-label);
+}
+
+.settings-meta__value {
+  margin: 0;
+  font-size: var(--rater-t-13);
+  color: var(--rater-text-default);
+  overflow-wrap: anywhere;
+}
+
+.settings-meta__value--mono {
+  font-family: var(--rater-font-mono);
+  font-size: var(--rater-t-12);
+  font-feature-settings: var(--rater-num-tabular);
+}
+
+/* ----------------------------------------------------------------
+ * Narrow viewport — collapse the studio layout to a single column
+ * ---------------------------------------------------------------- */
+
+@media (max-width: 900px) {
+  .plan-studio {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ----------------------------------------------------------------
+ * Section card
+ * ---------------------------------------------------------------- */
+
+.section-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-10);
+  min-height: 140px;
+}
+
+.section-card__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--rater-s-8);
+}
+
+.section-card__title {
+  margin: 0;
+  font-family: var(--rater-font-sans);
+  font-size: var(--rater-t-13);
+  font-weight: var(--rater-fw-medium);
+  color: var(--rater-text-default);
+  line-height: var(--rater-leading-snug);
+}
+
+.section-card__num {
+  color: var(--rater-text-subtle);
+  font-feature-settings: var(--rater-num-tabular);
+  font-variant-numeric: tabular-nums;
+  margin-right: var(--rater-s-2);
+}
+
+.section-card__body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-6);
+}
+
+.section-card__hint {
+  margin: 0;
+  font-size: var(--rater-t-12);
+  line-height: var(--rater-leading-snug);
+  color: var(--rater-text-muted);
+}
+
+.section-card__stages {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-4);
+}
+
+.section-card__stage {
+  margin: 0;
+}
+
+.section-card__stage-chip {
+  display: flex;
+  align-items: baseline;
+  gap: var(--rater-s-8);
+  width: 100%;
+  padding: var(--rater-s-6) var(--rater-s-8);
+  border: 1px solid var(--rater-border-subtle);
+  background: var(--rater-surface-2);
+  border-radius: var(--rater-r-4);
+  cursor: pointer;
+  text-align: left;
+  color: var(--rater-text-default);
+  font-family: var(--rater-font-sans);
+  font-size: var(--rater-t-12);
+  transition: border-color var(--rater-d-80) var(--rater-ease-soft),
+    background var(--rater-d-80) var(--rater-ease-soft);
+}
+
+.section-card__stage-chip:hover {
+  border-color: var(--rater-border-strong);
+  background: var(--rater-surface-3);
+}
+
+.section-card__stage-kind {
+  font-family: var(--rater-font-mono);
+  font-size: var(--rater-t-10);
+  color: var(--rater-text-subtle);
+  text-transform: uppercase;
+  letter-spacing: var(--rater-tracking-label);
+  flex-shrink: 0;
+}
+
+.section-card__stage-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.section-card__footer {
+  display: flex;
+  justify-content: flex-start;
+  padding-top: var(--rater-s-4);
+  border-top: 1px solid var(--rater-border-subtle);
+}
+
+/* ----------------------------------------------------------------
+ * Skeleton (loading)
+ * ---------------------------------------------------------------- */
+
+.plan-detail-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-16);
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--rater-surface-1) 0%,
+    var(--rater-surface-2) 50%,
+    var(--rater-surface-1) 100%
+  );
+  background-size: 200% 100%;
+  border-radius: var(--rater-r-4);
+  animation: plan-detail-shimmer 1400ms linear infinite;
+}
+
+.skeleton--title {
+  height: 32px;
+  width: 60%;
+}
+
+.skeleton--id {
+  height: 14px;
+  width: 35%;
+}
+
+.skeleton--cell {
+  height: 38px;
+}
+
+.skeleton--card {
+  height: 140px;
+}
+
+.plan-detail-skeleton__meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: var(--rater-s-16);
+}
+
+.plan-detail-skeleton__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--rater-s-12);
+  margin-top: var(--rater-s-12);
+}
+
+@keyframes plan-detail-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none;
+    background: var(--rater-surface-2);
+  }
+}
+
+/* ----------------------------------------------------------------
+ * Empty / not-found / error states
+ * ---------------------------------------------------------------- */
+
+.plan-detail-empty,
+.plan-detail-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--rater-s-12);
+  padding: var(--rater-s-64) var(--rater-s-24);
+  background: var(--rater-surface-1);
+  border: 1px solid var(--rater-border-subtle);
+  border-radius: var(--rater-r-8);
+  color: var(--rater-text-muted);
+}
+
+.plan-detail-error {
+  border-color: var(--rater-cat-output-border);
+  background: var(--rater-cat-output-soft);
+  color: var(--rater-cat-output-text);
+}
+
+.plan-detail-empty__title {
+  margin: 0;
+  font-family: var(--rater-font-display);
+  font-size: var(--rater-t-20);
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-strong);
+}
+
+.plan-detail-empty__body {
+  margin: 0;
+  max-width: 48ch;
+  line-height: var(--rater-leading-snug);
+}
+
+.plan-detail-empty__body code {
+  font-family: var(--rater-font-mono);
+  font-size: var(--rater-t-12);
+  background: var(--rater-surface-2);
+  padding: var(--rater-s-1) var(--rater-s-4);
+  border-radius: var(--rater-r-2);
+}
+
+/* ── Brief 75 — the Run zone's persisted history rail ─────────────── */
+.rater-runhist {
+  max-width: 1180px;
+  margin-top: var(--rater-s-20);
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-8);
+}
+.rater-runhist__title {
+  margin: 0;
+  font-size: var(--rater-t-13);
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-strong);
+  text-transform: uppercase;
+  letter-spacing: var(--rater-tracking-label);
+}
+.rater-runhist__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--rater-border-subtle);
+  border-radius: var(--rater-r-8);
+  background: var(--rater-surface-1);
+}
+.rater-runhist__row {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-10);
+  padding: var(--rater-s-8) var(--rater-s-12);
+  font-size: var(--rater-t-12);
+}
+.rater-runhist__row + .rater-runhist__row {
+  border-top: 1px solid var(--rater-border-subtle);
+}
+
+/* book intake — a done book/probe row IS a door (it always looked
+ * like one); the affordance says where it goes. */
+.rater-runhist__row.is-door {
+  cursor: pointer;
+}
+.rater-runhist__row.is-door:hover {
+  background: var(--rater-surface-2);
+}
+.rater-runhist__door {
+  margin-left: auto;
+  flex: none;
+  font-size: var(--rater-t-11);
+  color: var(--rater-text-muted);
+  white-space: nowrap;
+}
+
+/* ── The run detail (book intake): rows get a home ─────────── */
+.rater-rundetail__head {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-10);
+  flex-wrap: wrap;
+  margin-bottom: var(--rater-s-12);
+}
+.rater-rundetail__totals {
+  font-size: var(--rater-t-13);
+  color: var(--rater-text-default);
+}
+.rater-rundetail__filter {
+  border: 1px solid var(--rater-border-default);
+  border-radius: var(--rater-r-full);
+  background: transparent;
+  color: var(--rater-text-muted);
+  font-size: var(--rater-t-12);
+  padding: var(--rater-s-2) var(--rater-s-10);
+  cursor: pointer;
+  margin-bottom: var(--rater-s-10);
+}
+.rater-rundetail__filter.is-on {
+  border-color: var(--rater-accent-warning);
+  color: var(--rater-accent-warning);
+}
+.rater-rundetail__tablewrap {
+  overflow-x: auto;
+}
+.rater-rundetail__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--rater-t-12);
+}
+.rater-rundetail__table th {
+  text-align: left;
+  font-size: var(--rater-t-11);
+  text-transform: uppercase;
+  letter-spacing: var(--rater-tracking-label);
+  color: var(--rater-text-muted);
+  padding: var(--rater-s-6) var(--rater-s-8);
+  border-bottom: 1px solid var(--rater-border-default);
+}
+.rater-rundetail__table td {
+  padding: var(--rater-s-6) var(--rater-s-8);
+  border-bottom: 1px solid var(--rater-border-subtle);
+  vertical-align: top;
+}
+.rater-rundetail__table .is-num {
+  text-align: right;
+  font-family: var(--rater-font-mono);
+  font-variant-numeric: tabular-nums;
+}
+.rater-rundetail__table tr.is-error td {
+  color: var(--rater-accent-danger);
+}
+.rater-rundetail__table tr.is-declined td {
+  color: var(--rater-text-muted);
+}
+.rater-rundetail__issue {
+  max-width: 360px;
+}
+.rater-runhist__kind {
+  flex: none;
+  padding: 0 var(--rater-s-6);
+  border-radius: var(--rater-r-4);
+  background: var(--rater-surface-2);
+  color: var(--rater-text-muted);
+  font-size: var(--rater-t-11);
+  text-transform: uppercase;
+  letter-spacing: var(--rater-tracking-label);
+}
+.rater-runhist__premium {
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-strong);
+}
+.rater-runhist__premium.is-error {
+  color: var(--rater-feedback-error);
+}
+.rater-runhist__meta {
+  color: var(--rater-text-muted);
+}
+/* Brief 95 D1 — the inline book-template download in the empty state. */
+.rater-runhist__meta-link {
+  color: var(--rater-text-subtle);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color 160ms ease;
+}
+.rater-runhist__meta-link:hover {
+  color: var(--rater-text-default);
+}
+
+/* ── Ship zone (Brief 76 / v4 P4.5) — versions + the API panel ────── */
+.rater-ship {
+  max-width: 1180px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-20);
+}
+.rater-ship__pane {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-8);
+}
+.rater-ship__head {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-10);
+}
+.rater-ship__title {
+  margin: 0;
+  font-size: var(--rater-t-13);
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-strong);
+  text-transform: uppercase;
+  letter-spacing: var(--rater-tracking-label);
+}
+.rater-ship__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--rater-border-subtle);
+  border-radius: var(--rater-r-8);
+  background: var(--rater-surface-1);
+}
+.rater-ship__row {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-10);
+  padding: var(--rater-s-8) var(--rater-s-12);
+  font-size: var(--rater-t-12);
+}
+.rater-ship__row + .rater-ship__row {
+  border-top: 1px solid var(--rater-border-subtle);
+}
+.rater-ship__row--bare {
+  padding: 0;
+}
+.rater-ship__name {
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-strong);
+}
+.rater-ship__meta {
+  margin: 0;
+  color: var(--rater-text-muted);
+  font-size: var(--rater-t-12);
+}
+.rater-ship__spacer {
+  flex: 1;
+}
+.rater-ship__live {
+  color: var(--rater-feedback-success);
+  font-size: var(--rater-t-11);
+  font-weight: var(--rater-fw-semibold);
+  text-transform: uppercase;
+  letter-spacing: var(--rater-tracking-label);
+}
+.rater-ship__diverge {
+  margin: 0;
+  padding: var(--rater-s-8) var(--rater-s-12);
+  border: 1px solid var(--rater-feedback-warn);
+  border-radius: var(--rater-r-8);
+  background: var(--rater-feedback-warn-bg);
+  color: var(--rater-text-strong);
+  font-size: var(--rater-t-12);
+}
+
+/* ── 84.2 — the status hero (Zone 1 of the go-live console) ── */
+.rater-ship__hero {
+  padding: var(--rater-s-16);
+  border: 1px solid var(--rater-border-subtle);
+  border-radius: var(--rater-r-12);
+  background: var(--rater-surface-1);
+  gap: var(--rater-s-10);
+}
+.rater-ship__sentence {
+  margin: 0;
+  font-size: var(--rater-t-16);
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-strong);
+}
+.rater-ship__sentence--live {
+  color: var(--rater-feedback-success);
+}
+.rater-ship__since {
+  font-size: var(--rater-t-12);
+  font-weight: var(--rater-fw-regular);
+  color: var(--rater-text-muted);
+}
+.rater-ship__ready {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--rater-s-16);
+}
+.rater-ship__check {
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-muted);
+}
+.rater-ship__check.is-ok {
+  color: var(--rater-feedback-success);
+}
+.rater-ship__heroact {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-10);
+  margin-top: var(--rater-s-4);
+}
+.rater-ship__hint {
+  font-size: var(--rater-t-11);
+  color: var(--rater-text-subtle);
+}
+
+/* 84.2 D-H — the run-footer go-live nudge */
+.rater-runhist__golive {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-4);
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-muted);
+}
+
+/* ── 84.3 D-D — the Connect card (Zone 2 of the go-live console) ── */
+.rater-ship__hublink {
+  color: var(--rater-text-muted);
+  font-size: var(--rater-t-12);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.rater-ship__hublink:hover {
+  color: var(--rater-text-strong);
+  text-decoration: underline;
+}
+.rater-ship__journey {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-8);
+  flex-wrap: wrap;
+}
+.rater-ship__step {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-4);
+  padding: 0 var(--rater-s-8);
+  height: 20px;
+  border: 1px solid var(--rater-border-subtle);
+  border-radius: var(--rater-r-6);
+  color: var(--rater-text-subtle);
+  font-size: var(--rater-t-11);
+  white-space: nowrap;
+}
+.rater-ship__step--done {
+  color: var(--rater-text-muted);
+}
+/* The republish tripwire (2026-07-11 audit) — an amber fact on a
+   Connect row: a stale test receipt, or a republish that opened
+   required-input gaps. Same warn family as .rater-ship__diverge. */
+.rater-ship__warn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-4);
+  padding: 0 var(--rater-s-8);
+  height: 20px;
+  border: 1px solid var(--rater-feedback-warn);
+  border-radius: var(--rater-r-6);
+  background: var(--rater-feedback-warn-bg);
+  color: var(--rater-text-strong);
+  font-size: var(--rater-t-11);
+  white-space: nowrap;
+}
+.rater-ship__k {
+  flex: none;
+  padding: 0 var(--rater-s-6);
+  border-radius: var(--rater-r-4);
+  background: var(--rater-surface-2);
+  color: var(--rater-text-muted);
+  font-size: var(--rater-t-11);
+  text-transform: uppercase;
+  letter-spacing: var(--rater-tracking-label);
+}
+.rater-ship__code {
+  font-family: var(--rater-font-mono);
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-strong);
+  overflow-wrap: anywhere;
+}
+.rater-ship__icon {
+  color: var(--rater-text-muted);
+  flex: none;
+}
+.rater-ship__key {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-6);
+  margin-right: var(--rater-s-10);
+}
+.rater-ship__revoke {
+  border: 0;
+  padding: 0;
+  background: none;
+  color: var(--rater-text-muted);
+  font-size: var(--rater-t-11);
+  text-decoration: underline;
+  cursor: pointer;
+}
+.rater-ship__revoke:hover {
+  color: var(--rater-feedback-error);
+}
+.rater-ship__secret {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-10);
+  padding: var(--rater-s-8) var(--rater-s-12);
+  border: 1px solid var(--rater-feedback-success);
+  border-radius: var(--rater-r-8);
+  background: var(--rater-surface-1);
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-strong);
+}
+.rater-ship__tryit {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-8);
+}
+.rater-ship__request {
+  width: 100%;
+  box-sizing: border-box;
+  padding: var(--rater-s-10) var(--rater-s-12);
+  border: 1px solid var(--rater-border-subtle);
+  border-radius: var(--rater-r-8);
+  background: var(--rater-surface-1);
+  color: var(--rater-text-strong);
+  font-family: var(--rater-font-mono);
+  font-size: var(--rater-t-12);
+  line-height: 1.5;
+  resize: vertical;
+}
+.rater-ship__request:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: 1px;
+}
+.rater-ship__toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-6);
+  color: var(--rater-text-muted);
+  font-size: var(--rater-t-12);
+}
+.rater-ship__result {
+  margin: 0;
+  font-size: var(--rater-t-13);
+  color: var(--rater-text-strong);
+  font-variant-numeric: tabular-nums;
+}
+.rater-ship__result.is-error {
+  color: var(--rater-feedback-error);
+}
+
+/* Brief 92.R — the build-report history pager in the drawer. */
+.plan-detail__report-pager {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--rater-s-8);
+  margin-bottom: var(--rater-s-10);
+}
+
+.plan-detail__report-pager-label {
+  font-size: var(--rater-t-11);
+  color: var(--rater-text-subtle);
+}

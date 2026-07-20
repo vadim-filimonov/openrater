@@ -1,0 +1,252 @@
+/* ──────────────────────────────────────────────────────────────
+   FactorTableGrid2D — Brief 33 PR 33.3
+
+   The materialized 2-D grid rendered inside <FactorTableNode> once
+   the user clicks Generate. Strict token-discipline; matches the
+   polished mockup at `/mockup/33-parametrize-as-canvas.html` Frame 5.
+
+   Spacing only on the canonical scale: --rater-s-{4,6,8,12,16,20}.
+   ────────────────────────────────────────────────────────────── */
+
+.rater-ft-grid-2d {
+  display: grid;
+  /* Row-header column is 160px (matches the axis-drop frame's corner
+     width so the swap from frame → grid is seamless).
+     Body column fills remaining space. */
+  grid-template-columns: 160px minmax(0, 1fr);
+  grid-template-rows: 36px minmax(0, 1fr);
+  background: var(--rater-surface-1);
+  min-height: 260px;
+  overflow-x: auto;
+}
+
+/* ── Corner ─────────────────────────────────────────────────────── */
+
+.rater-ft-grid-2d-corner {
+  grid-column: 1;
+  grid-row: 1;
+  background: var(--rater-surface-canvas);
+  border-right: 1px solid var(--rater-hairline-base);
+  border-bottom: 1px solid var(--rater-hairline-base);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--rater-fonts-mono);
+  font-size: var(--rater-t-10);
+  color: var(--rater-text-subtle);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 0 var(--rater-s-6);
+}
+.rater-ft-grid-2d-corner[role="button"] {
+  cursor: pointer;
+  transition: background var(--rater-d-120) var(--rater-ease-snap);
+}
+.rater-ft-grid-2d-corner[role="button"]:hover {
+  background: var(--rater-surface-2);
+}
+
+/* ── Column header row (sticky to top of scroll container) ──────── */
+
+.rater-ft-grid-2d-header-row {
+  grid-column: 2;
+  grid-row: 1;
+  display: grid;
+  grid-template-columns: repeat(var(--ft-grid-2d-col-count, 5), minmax(72px, 1fr));
+  background: var(--rater-surface-canvas);
+  border-bottom: 1px solid var(--rater-hairline-base);
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+.rater-ft-grid-2d-col-h {
+  padding: var(--rater-s-6) var(--rater-s-12);
+  font-size: var(--rater-t-11);
+  color: var(--rater-text-strong);
+  border-left: 1px solid var(--rater-hairline-soft);
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-6);
+  font-weight: var(--rater-fw-medium);
+  min-width: 0;
+  overflow: hidden;
+}
+.rater-ft-grid-2d-col-h:first-child { border-left: none; }
+.rater-ft-grid-2d-col-h[aria-label]:hover {
+  background: var(--rater-surface-2);
+  cursor: pointer;
+}
+.rater-ft-grid-2d-col-h:hover { background: var(--rater-surface-1); }
+.rater-ft-grid-2d-col-h-label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.rater-ft-grid-2d-col-h-sub {
+  font-family: var(--rater-fonts-mono);
+  font-size: var(--rater-t-10);
+  color: var(--rater-text-subtle);
+  margin-left: 2px;
+}
+
+/* ── Row header column (sticky to left of scroll container) ─────── */
+
+.rater-ft-grid-2d-header-col {
+  grid-column: 1;
+  grid-row: 2;
+  display: grid;
+  grid-template-rows: repeat(var(--ft-grid-2d-row-count, 5), 36px);
+  background: var(--rater-surface-canvas);
+  border-right: 1px solid var(--rater-hairline-base);
+  position: sticky;
+  left: 0;
+  z-index: 1;
+}
+.rater-ft-grid-2d-row-h {
+  padding: var(--rater-s-6) var(--rater-s-12);
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-default);
+  border-top: 1px solid var(--rater-hairline-soft);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--rater-s-6);
+  white-space: nowrap;
+  overflow: hidden;
+}
+.rater-ft-grid-2d-row-h:first-child { border-top: none; }
+.rater-ft-grid-2d-row-h[aria-label]:hover {
+  background: var(--rater-surface-2);
+  cursor: pointer;
+}
+.rater-ft-grid-2d-row-h:hover { background: var(--rater-surface-1); }
+.rater-ft-grid-2d-row-h-label {
+  font-weight: var(--rater-fw-medium);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.rater-ft-grid-2d-row-h-sub {
+  font-family: var(--rater-fonts-mono);
+  font-size: var(--rater-t-10);
+  color: var(--rater-text-subtle);
+  flex-shrink: 0;
+}
+
+/* ── Body — cell grid ───────────────────────────────────────────── */
+
+.rater-ft-grid-2d-body {
+  grid-column: 2;
+  grid-row: 2;
+  display: grid;
+  grid-template-columns: repeat(var(--ft-grid-2d-col-count, 5), minmax(72px, 1fr));
+  grid-template-rows: repeat(var(--ft-grid-2d-row-count, 5), 36px);
+}
+
+.rater-ft-grid-2d-cell {
+  padding: var(--rater-s-6) var(--rater-s-12);
+  border-top: 1px solid var(--rater-hairline-soft);
+  border-left: 1px solid var(--rater-hairline-soft);
+  font-family: var(--rater-fonts-mono);
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-default);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  cursor: cell;
+  font-variant-numeric: tabular-nums;
+  min-width: 0;
+  overflow: hidden;
+  transition: background var(--rater-d-80) var(--rater-ease-snap), box-shadow var(--rater-d-80) var(--rater-ease-snap);
+}
+
+/* Cell variants */
+.rater-ft-grid-2d-cell.is-empty {
+  color: var(--rater-text-subtle);
+  font-style: italic;
+}
+.rater-ft-grid-2d-cell.is-default {
+  background: color-mix(in srgb, var(--rater-cat-input) 4%, transparent);
+  color: var(--rater-cat-input-text);
+}
+.rater-ft-grid-2d-cell.is-pending {
+  background: color-mix(in srgb, var(--rater-cat-loading) 8%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--rater-cat-loading) 40%, transparent);
+}
+.rater-ft-grid-2d-cell.is-pending::after {
+  content: "*";
+  color: var(--rater-cat-loading-text);
+  margin-left: var(--rater-s-4);
+}
+/* PR 33.4 — selected cells. Soft azure fill + inset outline. */
+.rater-ft-grid-2d-cell.is-selected {
+  background: color-mix(in srgb, var(--rater-cat-input) 16%, transparent);
+  box-shadow: inset 0 0 0 1px var(--rater-cat-input);
+}
+.rater-ft-grid-2d-cell.is-selected.is-default {
+  /* Selection overlay on top of default tint — keep azure but
+     stronger so the selection still reads. */
+  background: color-mix(in srgb, var(--rater-cat-input) 18%, transparent);
+}
+.rater-ft-grid-2d-cell.is-focused {
+  box-shadow: inset 0 0 0 2px var(--rater-cat-input);
+  background: var(--rater-surface-canvas);
+}
+.rater-ft-grid-2d-cell:hover:not(.is-focused) {
+  background: color-mix(in srgb, var(--rater-cat-input) 6%, transparent);
+}
+/* Brief 34 PR 34.5 — cross-highlight from the chart side.
+ *
+ *   is-cross-focused: cell receives an azure ring (less visually
+ *   loud than is-focused, which is reserved for editing). Headers
+ *   on the same row + col pick up a soft tint (.is-tinted). */
+.rater-ft-grid-2d-cell.is-cross-focused {
+  box-shadow: inset 0 0 0 2px
+    color-mix(in srgb, var(--rater-cat-input) 80%, transparent);
+}
+.rater-ft-grid-2d-cell.is-cross-focused.is-selected {
+  /* Selection + cross-focus share the same azure family; keep the
+   * 2px ring + restore the selection's softer fill underneath. */
+  background: color-mix(in srgb, var(--rater-cat-input) 16%, transparent);
+}
+.rater-ft-grid-2d-col-h.is-tinted,
+.rater-ft-grid-2d-row-h.is-tinted {
+  background: color-mix(in srgb, var(--rater-cat-input) 10%, transparent);
+  color: var(--rater-cat-input-text);
+}
+
+.rater-ft-grid-2d-cell-input {
+  background: transparent;
+  border: none;
+  color: inherit;
+  font-family: inherit;
+  font-size: inherit;
+  width: 100%;
+  text-align: right;
+  /* In-cell edit: the canonical ring, inset (the cell is the frame). */
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: -2px;
+  padding: 0;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .rater-ft-grid-2d-cell {
+    transition: none;
+  }
+}
+
+/* Brief 67 §3.2 — the keyboard layer's roving ACTIVE cell (the
+   selection anchor). A solid ring distinguishes "where the next
+   keystroke lands" from the softer range tint — Excel's active-cell
+   border, in the platform's selection color. */
+.rater-ft-grid-2d-cell.is-active {
+  box-shadow: inset 0 0 0 2px var(--rater-cat-input);
+}
+
+/* The grid container is focusable (the keyboard layer rides it);
+   the canonical focus ring only when focus is keyboard-driven. */
+.rater-ft-grid-2d:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: 2px;
+}

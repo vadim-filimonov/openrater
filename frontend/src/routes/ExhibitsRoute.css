@@ -1,0 +1,972 @@
+/* ExhibitsRoute — token-only BEM (current Exhibits design).
+ * One page: header bar · lede · the wall · provenance footer. */
+
+.rater-exh {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: var(--rater-s-24) var(--rater-s-24) var(--rater-s-64);
+}
+
+/* ── Header bar — the only chrome ── */
+.rater-exh__bar {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-10);
+  flex-wrap: wrap;
+}
+.rater-exh__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-8);
+  padding: var(--rater-s-6) var(--rater-s-12);
+  border-radius: var(--rater-r-full);
+  border: 1px solid var(--rater-cat-input-border);
+  background: var(--rater-cat-input-soft);
+  color: var(--rater-cat-input-text);
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-13);
+  cursor: pointer;
+}
+.rater-exh__chip b {
+  font-weight: var(--rater-fw-semibold);
+}
+.rater-exh__chip:hover {
+  border-color: var(--rater-cat-input-text);
+}
+.rater-exh__chip:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: 2px;
+}
+.rater-exh__chip-dot {
+  width: var(--rater-s-6);
+  height: var(--rater-s-6);
+  border-radius: var(--rater-r-full);
+  background: var(--rater-cat-input);
+  flex: none;
+}
+
+/* ── Compare mode (P2) — the B side speaks violet (cat-transform) ── */
+.rater-exh__chip--b {
+  border-color: var(--rater-cat-transform-border);
+  background: var(--rater-cat-transform-soft);
+  color: var(--rater-cat-transform-text);
+  cursor: default;
+}
+.rater-exh__chip-dot--b {
+  background: var(--rater-cat-transform);
+}
+.rater-exh__chip-x {
+  display: inline-flex;
+  align-items: center;
+  border: none;
+  background: none;
+  color: inherit;
+  opacity: 0.7;
+  cursor: pointer;
+  padding: 0;
+  margin-left: var(--rater-s-2);
+}
+.rater-exh__chip-x:hover {
+  opacity: 1;
+}
+.rater-exh__chip-x:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: 2px;
+  border-radius: var(--rater-r-2);
+}
+.rater-exh__ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-6);
+  padding: var(--rater-s-6) var(--rater-s-12);
+  border-radius: var(--rater-r-full);
+  border: 1px dashed var(--rater-border-strong);
+  background: none;
+  color: var(--rater-text-subtle);
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-13);
+  cursor: pointer;
+}
+.rater-exh__ghost:hover {
+  color: var(--rater-text-muted);
+  background: var(--rater-surface-1);
+}
+.rater-exh__ghost:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: 2px;
+}
+.rater-exh__swap {
+  width: var(--rater-s-28);
+  height: var(--rater-s-28);
+  border-radius: var(--rater-r-full);
+  border: 1px solid var(--rater-border-default);
+  background: none;
+  color: var(--rater-text-muted);
+  font-size: var(--rater-t-13);
+  cursor: pointer;
+}
+.rater-exh__swap:hover {
+  background: var(--rater-surface-2);
+}
+.rater-exh__swap:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: 2px;
+}
+.rater-exh__b {
+  color: var(--rater-cat-transform-text);
+}
+
+/* ── Book mode (P3) — the book speaks amber (cat-lookup) ── */
+.rater-exh__bar-right {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-8);
+}
+.rater-exh__file {
+  display: none;
+}
+.rater-exh__chip--book {
+  border-color: var(--rater-cat-lookup-border);
+  background: var(--rater-cat-lookup-soft);
+  color: var(--rater-cat-lookup-text);
+  cursor: default;
+}
+.rater-exh__chip-dot--book {
+  background: var(--rater-cat-lookup);
+}
+.rater-exh__chip-count {
+  font-family: var(--rater-fonts-mono);
+  font-size: var(--rater-t-11);
+  opacity: 0.85;
+}
+.rater-exh__book-error {
+  margin: var(--rater-s-10) 0 0;
+  font-size: var(--rater-t-12);
+  color: var(--rater-accent-danger-text);
+  max-width: 72ch;
+}
+
+.rater-exh__money {
+  margin-top: var(--rater-s-16);
+  padding: var(--rater-s-14) var(--rater-s-20);
+  background: var(--rater-surface-1);
+  border: 1px solid var(--rater-border-subtle);
+  border-left: 3px solid var(--rater-cat-lookup);
+  border-radius: var(--rater-r-8);
+}
+.rater-exh__money-row {
+  display: flex;
+  gap: var(--rater-s-24);
+  flex-wrap: wrap;
+  align-items: baseline;
+}
+.rater-exh__money-cell {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-2);
+  min-width: 0;
+}
+.rater-exh__money-label {
+  font-size: var(--rater-t-10);
+  letter-spacing: var(--rater-tracking-label);
+  text-transform: uppercase;
+  color: var(--rater-text-subtle);
+}
+.rater-exh__money-value {
+  font-family: var(--rater-fonts-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--rater-t-20);
+  color: var(--rater-text-strong);
+}
+.rater-exh__money-value--a {
+  color: var(--rater-cat-input-text);
+}
+.rater-exh__money-value--b {
+  color: var(--rater-cat-transform-text);
+}
+.rater-exh__money-tiers {
+  font-family: var(--rater-fonts-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--rater-t-13);
+  color: var(--rater-text-default);
+  padding-top: var(--rater-s-4);
+}
+.rater-exh__money-sub {
+  font-size: var(--rater-t-11);
+  color: var(--rater-text-subtle);
+}
+.rater-exh__money-hist {
+  margin-top: var(--rater-s-12);
+  max-width: 520px;
+}
+.rater-exh__movers {
+  margin-top: var(--rater-s-12);
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-4);
+}
+.rater-exh__mover {
+  margin: 0;
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-muted);
+}
+.rater-exh__mover .rater-exh__num {
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-default);
+}
+.rater-exh__mover-up {
+  color: var(--rater-cat-transform-text);
+}
+.rater-exh__mover-down {
+  color: var(--rater-accent-success);
+}
+.rater-exh__mover-driver {
+  font-family: var(--rater-fonts-mono);
+  font-size: var(--rater-t-11);
+  color: var(--rater-text-subtle);
+}
+.rater-exh__refusal {
+  margin: var(--rater-s-10) 0 0;
+  padding: var(--rater-s-8) var(--rater-s-12);
+  border: 1px solid var(--rater-cat-output-border);
+  border-radius: var(--rater-r-6);
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-muted);
+}
+.rater-exh__refusal .rater-exh__num {
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-default);
+}
+.rater-exh__refusal-why {
+  color: var(--rater-accent-danger-text);
+}
+
+/* ── The strip — the plan's counted facts, one quiet line (P6) ── */
+.rater-exh__strip {
+  margin: var(--rater-s-16) 0 0;
+  font-size: var(--rater-t-13);
+  color: var(--rater-text-muted);
+  max-width: 110ch;
+}
+.rater-exh__num {
+  font-family: var(--rater-fonts-mono);
+  font-variant-numeric: tabular-nums;
+  color: var(--rater-text-default);
+}
+
+/* 2-D mini grid */
+.rater-exh__grid {
+  display: grid;
+  gap: var(--rater-s-2);
+  font-family: var(--rater-fonts-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--rater-t-10);
+}
+.rater-exh__grid-head {
+  color: var(--rater-text-subtle);
+  align-self: center;
+  padding: 0 var(--rater-s-4);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rater-exh__grid-cell {
+  background: var(--rater-surface-2);
+  border-radius: var(--rater-r-4);
+  padding: var(--rater-s-6) var(--rater-s-4);
+  text-align: center;
+  color: var(--rater-text-default);
+}
+/* Compare: the grid is the delta — moved cells speak violet %, the
+ * rest go quiet so a big grid reads at a glance. */
+.rater-exh__grid-cell--chg {
+  color: var(--rater-cat-transform-text);
+}
+.rater-exh__grid-cell--quiet {
+  color: var(--rater-text-subtle);
+}
+
+/* ── The workbench (P5): the rail of variables + the stage ── */
+.rater-exh__bench {
+  margin-top: var(--rater-s-24);
+  display: grid;
+  grid-template-columns: 252px minmax(0, 1fr);
+  gap: var(--rater-s-20);
+  align-items: start;
+}
+@media (max-width: 900px) {
+  .rater-exh__bench {
+    grid-template-columns: 1fr;
+  }
+}
+/* The rail is ONE card — same surface as the stage, so the bench
+ * reads as two panels of a single instrument. Items are single rows:
+ * name left, mini span bar right in an aligned column on one common
+ * scale (the rail IS the tornado), with the ×1.00 tick running the
+ * same vertical rhythm down every track. */
+.rater-exh__rail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-12);
+  position: sticky;
+  top: var(--rater-s-16);
+  background: var(--rater-surface-1);
+  border: 1px solid var(--rater-border-subtle);
+  border-radius: var(--rater-r-8);
+  padding: var(--rater-s-12) var(--rater-s-8);
+}
+@media (max-width: 900px) {
+  .rater-exh__rail {
+    position: static;
+    flex-direction: row;
+    overflow-x: auto;
+    gap: var(--rater-s-16);
+  }
+}
+.rater-exh__rail-group {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 200px;
+}
+.rater-exh__rail-group + .rater-exh__rail-group {
+  border-top: 1px solid var(--rater-border-subtle);
+  padding-top: var(--rater-s-10);
+}
+@media (max-width: 900px) {
+  .rater-exh__rail-group + .rater-exh__rail-group {
+    border-top: none;
+    padding-top: 0;
+  }
+}
+.rater-exh__rail-label {
+  margin: 0 0 var(--rater-s-4);
+  padding: 0 var(--rater-s-8);
+  font-size: var(--rater-t-10);
+  font-weight: var(--rater-fw-medium);
+  letter-spacing: var(--rater-tracking-label);
+  text-transform: uppercase;
+  color: var(--rater-text-subtle);
+}
+.rater-exh__rail-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 56px;
+  align-items: center;
+  gap: var(--rater-s-10);
+  padding: var(--rater-s-6) var(--rater-s-8);
+  border: none;
+  border-radius: var(--rater-r-4);
+  background: none;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  color: inherit;
+  min-width: 0;
+}
+.rater-exh__rail-item:hover {
+  background: var(--rater-surface-2);
+}
+.rater-exh__rail-item--on {
+  background: var(--rater-surface-2);
+  box-shadow: inset 2px 0 0 var(--rater-cat-input);
+}
+.rater-exh__rail-item:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: 1px;
+}
+.rater-exh__rail-name {
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-6);
+}
+.rater-exh__rail-item--on .rater-exh__rail-name {
+  color: var(--rater-text-strong);
+  font-weight: var(--rater-fw-medium);
+}
+.rater-exh__rail-dot {
+  width: var(--rater-s-6);
+  height: var(--rater-s-6);
+  border-radius: var(--rater-r-full);
+  background: var(--rater-cat-transform);
+  flex: none;
+}
+.rater-exh__rail-new {
+  font-size: var(--rater-t-10);
+  color: var(--rater-cat-transform-text);
+}
+.rater-exh__rail-track {
+  position: relative;
+  display: block;
+  height: 3px;
+  border-radius: var(--rater-r-2);
+  background: var(--rater-surface-3);
+}
+.rater-exh__rail-tick {
+  position: absolute;
+  top: calc(-1 * var(--rater-s-2));
+  bottom: calc(-1 * var(--rater-s-2));
+  width: 1px;
+  background: var(--rater-border-default);
+}
+.rater-exh__rail-span {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-radius: var(--rater-r-2);
+  background: var(--rater-cat-input);
+  opacity: 0.8;
+}
+/* "What changed" — the comparison's opening rail entry. */
+.rater-exh__rail-over {
+  margin-bottom: var(--rater-s-8);
+}
+.rater-exh__rail-count {
+  font-family: var(--rater-fonts-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--rater-t-11);
+  color: var(--rater-cat-transform-text);
+  text-align: right;
+}
+
+/* ── The stage ── */
+.rater-exh__stage {
+  background: var(--rater-surface-1);
+  border: 1px solid var(--rater-border-subtle);
+  border-radius: var(--rater-r-8);
+  padding: var(--rater-s-20) var(--rater-s-24);
+  min-width: 0;
+}
+.rater-exh__stage-head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--rater-s-10);
+  min-width: 0;
+}
+.rater-exh__stage-name {
+  margin: 0;
+  font-family: var(--rater-fonts-display);
+  font-size: var(--rater-t-18);
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-strong);
+  letter-spacing: var(--rater-tracking-tight);
+}
+.rater-exh__stage-badge {
+  margin-left: auto;
+  font-family: var(--rater-fonts-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-muted);
+  white-space: nowrap;
+}
+.rater-exh__stage-story {
+  margin: var(--rater-s-6) 0 0;
+  font-size: var(--rater-t-13);
+  color: var(--rater-text-muted);
+  max-width: 70ch;
+}
+.rater-exh__stage-extra {
+  margin: var(--rater-s-4) 0 0;
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-subtle);
+  max-width: 78ch;
+}
+.rater-exh__stage-chart {
+  margin-top: var(--rater-s-16);
+  min-width: 0;
+  overflow-x: auto;
+}
+.rater-exh__stage-foot {
+  margin-top: var(--rater-s-14);
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-12);
+  min-width: 0;
+}
+
+/* Diverging rows — labels · bar around ×1.00 · exact values. */
+.rater-exh__rows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-2);
+}
+.rater-exh__rows--scroll {
+  max-height: 460px;
+  overflow-y: auto;
+  padding-right: var(--rater-s-6);
+}
+.rater-exh__row {
+  display: grid;
+  grid-template-columns: 156px minmax(0, 1fr) 118px;
+  gap: var(--rater-s-10);
+  align-items: center;
+}
+.rater-exh__row--axis {
+  height: var(--rater-s-14);
+}
+.rater-exh__row--axis .rater-exh__row-track {
+  background: none;
+}
+.rater-exh__row-label {
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: right;
+}
+.rater-exh__row-track {
+  position: relative;
+  height: var(--rater-s-16);
+}
+.rater-exh__row-base {
+  position: absolute;
+  top: calc(-1 * var(--rater-s-2));
+  bottom: calc(-1 * var(--rater-s-2));
+  width: 1px;
+  background: var(--rater-border-default);
+}
+.rater-exh__row-baselabel {
+  position: absolute;
+  transform: translateX(-50%);
+  font-family: var(--rater-fonts-mono);
+  font-size: var(--rater-t-10);
+  color: var(--rater-text-subtle);
+}
+.rater-exh__row-bar {
+  position: absolute;
+  top: 2px;
+  bottom: 2px;
+  border-radius: var(--rater-r-2);
+}
+.rater-exh__row-bar--up {
+  background: var(--rater-cat-loading);
+}
+.rater-exh__row-bar--down {
+  background: var(--rater-cat-input);
+}
+.rater-exh__row-tickb {
+  position: absolute;
+  top: -1px;
+  bottom: -1px;
+  width: 2px;
+  border-radius: var(--rater-r-2);
+  background: var(--rater-cat-transform);
+}
+.rater-exh__row-value {
+  font-family: var(--rater-fonts-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-default);
+  white-space: nowrap;
+}
+.rater-exh__row-arrow {
+  color: var(--rater-text-subtle);
+  padding: 0 var(--rater-s-2);
+}
+.rater-exh__row-bval {
+  color: var(--rater-cat-transform-text);
+}
+.rater-exh__row-same {
+  color: var(--rater-text-disabled);
+  padding-left: var(--rater-s-4);
+}
+
+/* The stage curve. */
+.rater-exh__curve {
+  display: block;
+  width: 100%;
+  max-width: 720px;
+  height: auto;
+}
+.rater-exh__curve-one {
+  stroke: var(--rater-border-default);
+  stroke-dasharray: 3 4;
+}
+.rater-exh__curve-line {
+  fill: none;
+  stroke: var(--rater-cat-input);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.rater-exh__curve-fill {
+  fill: var(--rater-cat-input);
+  opacity: 0.08;
+}
+.rater-exh__curve-dot {
+  fill: var(--rater-cat-input);
+  stroke: var(--rater-surface-1);
+  stroke-width: 1.5;
+}
+.rater-exh__curve-dot-b {
+  fill: var(--rater-cat-transform);
+  stroke: var(--rater-surface-1);
+  stroke-width: 1;
+}
+.rater-exh__curve-line-b {
+  fill: none;
+  stroke: var(--rater-cat-transform);
+  stroke-width: 2;
+  stroke-dasharray: 6 5;
+  stroke-linecap: round;
+}
+.rater-exh__curve-axis,
+.rater-exh__curve-xlabel {
+  font-family: var(--rater-fonts-mono);
+  font-size: 10px;
+  fill: var(--rater-text-subtle);
+}
+.rater-exh__curve-val {
+  font-family: var(--rater-fonts-mono);
+  font-size: 11px;
+  fill: var(--rater-text-default);
+}
+.rater-exh__curve-val--b {
+  fill: var(--rater-cat-transform-text);
+}
+
+/* ── The territory map (P6) — geography in the diverging language ── */
+.rater-exh__map {
+  display: block;
+  width: 100%;
+  max-width: 760px;
+  height: auto;
+}
+/* The state fill is surface-2 (zinc-800 dark), so the seams must sit
+ * one step up the ramp to read at all: counties whisper at
+ * border-default, the silhouette edges crisp at border-strong. */
+.rater-exh__map-state {
+  fill: var(--rater-surface-2);
+  stroke: var(--rater-border-strong);
+  stroke-width: 1;
+}
+.rater-exh__map-county {
+  fill: none;
+  stroke: var(--rater-border-default);
+  stroke-width: 0.6;
+}
+/* The stroke carries the same hue as the fill, so a geographically
+ * tiny urban ZCTA still reads its color instead of an outline. */
+.rater-exh__map-shape--up {
+  fill: var(--rater-cat-loading);
+  stroke: var(--rater-cat-loading);
+  stroke-width: 0.8;
+}
+.rater-exh__map-shape--down {
+  fill: var(--rater-cat-input);
+  stroke: var(--rater-cat-input);
+  stroke-width: 0.8;
+}
+.rater-exh__map-ring {
+  fill: none;
+  stroke: var(--rater-cat-transform);
+  stroke-width: 1.5;
+}
+.rater-exh__map-legend {
+  margin-top: var(--rater-s-12);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--rater-s-6) var(--rater-s-16);
+}
+.rater-exh__map-key {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-6);
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-muted);
+}
+.rater-exh__map-key-dot {
+  width: var(--rater-s-8);
+  height: var(--rater-s-8);
+  border-radius: var(--rater-r-full);
+  flex: none;
+}
+.rater-exh__map-key-dot--up {
+  background: var(--rater-cat-loading);
+}
+.rater-exh__map-key-dot--down {
+  background: var(--rater-cat-input);
+}
+.rater-exh__map-key-val {
+  font-family: var(--rater-fonts-mono);
+  font-variant-numeric: tabular-nums;
+  color: var(--rater-text-default);
+}
+.rater-exh__map-key-b {
+  color: var(--rater-cat-transform-text);
+}
+.rater-exh__map-note {
+  margin: var(--rater-s-8) 0 0;
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-subtle);
+}
+
+/* ── The Overview ledger (P7) — every variable, one row, one door ── */
+.rater-exh__ledger {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-2);
+  min-width: 560px;
+}
+.rater-exh__ledger-glabel {
+  margin: var(--rater-s-10) 0 var(--rater-s-4);
+  font-size: var(--rater-t-10);
+  font-weight: var(--rater-fw-medium);
+  letter-spacing: var(--rater-tracking-label);
+  text-transform: uppercase;
+  color: var(--rater-text-subtle);
+}
+.rater-exh__ledger > div:first-child .rater-exh__ledger-glabel {
+  margin-top: 0;
+}
+.rater-exh__ledger-row {
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1.1fr) 84px minmax(0, 1.6fr) minmax(0, 1fr);
+  gap: var(--rater-s-10);
+  align-items: center;
+  width: 100%;
+  padding: var(--rater-s-4) var(--rater-s-6);
+  border: none;
+  border-radius: var(--rater-r-4);
+  background: none;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  color: inherit;
+  min-width: 0;
+}
+.rater-exh__ledger-row:hover {
+  background: var(--rater-surface-2);
+}
+/*  — underwriting rows: same grammar, not doors (mark · name ·
+ * the one-line change spans the numeric columns). */
+.rater-exh__ledger-row--static {
+  grid-template-columns: 16px minmax(0, 1.1fr) minmax(0, 2.6fr);
+  cursor: default;
+}
+.rater-exh__ledger-row--static:hover {
+  background: none;
+}
+.rater-exh__ledger-uw-change {
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rater-exh__ledger-row--static:not(.rater-exh__ledger-row--same)
+  .rater-exh__ledger-uw-change {
+  color: var(--rater-text-default);
+}
+.rater-exh__ledger-row:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: 1px;
+}
+.rater-exh__ledger-mark {
+  display: inline-flex;
+  justify-content: center;
+}
+.rater-exh__ledger-name {
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-default);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rater-exh__ledger-row--same .rater-exh__ledger-name {
+  color: var(--rater-text-subtle);
+}
+.rater-exh__ledger-note {
+  color: var(--rater-text-subtle);
+  font-size: var(--rater-t-10);
+}
+.rater-exh__ledger-moved {
+  font-family: var(--rater-fonts-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--rater-t-11);
+  color: var(--rater-text-muted);
+  white-space: nowrap;
+}
+.rater-exh__ledger-row--same .rater-exh__ledger-moved {
+  color: var(--rater-text-disabled);
+}
+.rater-exh__ledger-big {
+  display: flex;
+  align-items: baseline;
+  gap: var(--rater-s-4);
+  font-family: var(--rater-fonts-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--rater-t-11);
+  color: var(--rater-text-default);
+  min-width: 0;
+}
+/* Long level labels give way; the values never do. */
+.rater-exh__ledger-big-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+.rater-exh__ledger-big-vals {
+  flex: none;
+  white-space: nowrap;
+}
+.rater-exh__ledger-big-b {
+  color: var(--rater-cat-transform-text);
+}
+.rater-exh__ledger-span {
+  font-family: var(--rater-fonts-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--rater-t-11);
+  color: var(--rater-text-subtle);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rater-exh__ledger-vs {
+  color: var(--rater-text-subtle);
+}
+.rater-exh__ledger-add {
+  color: var(--rater-cat-transform-text);
+}
+.rater-exh__ledger-rm {
+  color: var(--rater-text-subtle);
+}
+.rater-exh__ledger-q {
+  margin-top: var(--rater-s-14);
+  min-width: 560px;
+}
+.rater-exh__ledger-q p {
+  margin: 0 0 var(--rater-s-2);
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-muted);
+}
+.rater-exh__ledger-q .rater-exh__num {
+  font-size: var(--rater-t-12);
+}
+
+/* Shared bits the stage reuses from the tile era. */
+.rater-exh__mono {
+  font-size: var(--rater-t-10);
+  white-space: nowrap;
+}
+.rater-exh__mono--ok {
+  color: var(--rater-accent-success);
+}
+.rater-exh__mono--broken {
+  color: var(--rater-accent-warning);
+}
+.rater-exh__tile-badge-b {
+  color: var(--rater-cat-transform-text);
+}
+.rater-exh__tile-cite {
+  margin: 0;
+  font-family: var(--rater-fonts-mono);
+  font-size: var(--rater-t-10);
+  color: var(--rater-text-subtle);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rater-exh__tile-foot-spacer {
+  flex: 1;
+}
+.rater-exh__door {
+  font-size: var(--rater-t-12);
+  color: var(--rater-cat-input-text);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.rater-exh__door:hover {
+  text-decoration: underline;
+}
+.rater-exh__tile-flat {
+  margin: 0;
+  font-family: var(--rater-fonts-mono);
+  font-size: var(--rater-t-24);
+  color: var(--rater-text-strong);
+}
+.rater-exh__tile-fallback {
+  margin: 0;
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-subtle);
+}
+
+/* 2-D grid on the stage — roomy. */
+.rater-exh__stage .rater-exh__grid {
+  max-width: 560px;
+  font-size: var(--rater-t-12);
+}
+.rater-exh__stage .rater-exh__grid-cell {
+  padding: var(--rater-s-10) var(--rater-s-8);
+}
+
+/* ── Quiet states + footer ── */
+.rater-exh__quiet {
+  margin-top: var(--rater-s-24);
+  font-size: var(--rater-t-13);
+  color: var(--rater-text-subtle);
+}
+.rater-exh__quiet a {
+  color: var(--rater-cat-input-text);
+}
+.rater-exh__empty {
+  margin-top: var(--rater-s-64);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--rater-s-12);
+}
+.rater-exh__empty-title {
+  margin: 0;
+  font-family: var(--rater-fonts-display);
+  font-size: var(--rater-t-24);
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-strong);
+  letter-spacing: var(--rater-tracking-tight);
+  text-wrap: balance;
+}
+.rater-exh__empty-sub {
+  margin: 0;
+  font-size: var(--rater-t-13);
+  color: var(--rater-text-muted);
+}
+.rater-exh__foot {
+  margin-top: var(--rater-s-24);
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-subtle);
+}
+.rater-exh__foot .rater-exh__num {
+  font-size: var(--rater-t-11);
+}
+.rater-exh__foot a {
+  color: var(--rater-cat-input-text);
+  text-decoration: none;
+}
+.rater-exh__foot a:hover {
+  text-decoration: underline;
+}
+.rater-exh__foot-action {
+  border: none;
+  background: none;
+  padding: 0;
+  font-family: inherit;
+  font-size: var(--rater-t-12);
+  color: var(--rater-cat-input-text);
+  cursor: pointer;
+}
+.rater-exh__foot-action:hover {
+  text-decoration: underline;
+}
+.rater-exh__foot-action:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: 2px;
+  border-radius: var(--rater-r-2);
+}

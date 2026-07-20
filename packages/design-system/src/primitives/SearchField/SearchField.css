@@ -1,0 +1,83 @@
+/* ============================================================================
+ * <SearchField> — the search/filter input (Shell v3 polish; Wave 1).
+ *
+ * Metrics mirror <Input> (32px md / 28px sm); focus uses the canonical
+ * text-entry ring so tabbing between a search box and any other field
+ * reads as one system.
+ * ========================================================================== */
+
+.rater-searchfield {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-8);
+  padding: 0 var(--rater-s-6) 0 var(--rater-s-10);
+  background: var(--rater-surface-canvas);
+  border: 1px solid var(--rater-border-subtle);
+  border-radius: var(--rater-r-8);
+  color: var(--rater-text-subtle);
+  font-family: var(--rater-font-sans);
+  transition:
+    border-color var(--rater-d-80) var(--rater-ease-soft),
+    box-shadow var(--rater-d-80) var(--rater-ease-soft);
+}
+
+.rater-searchfield--md {
+  height: 32px;
+}
+
+.rater-searchfield--sm {
+  height: 28px;
+}
+
+.rater-searchfield:hover {
+  border-color: var(--rater-border-default);
+}
+
+.rater-searchfield:focus-within {
+  border-color: var(--rater-focus-ring);
+  box-shadow: 0 0 0 2px var(--rater-focus-halo);
+}
+
+.rater-searchfield__icon {
+  display: inline-flex;
+  flex: none;
+}
+
+.rater-searchfield__icon svg {
+  width: 14px;
+  height: 14px;
+}
+
+.rater-searchfield__input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: var(--rater-text-default);
+  font-family: inherit;
+  font-size: var(--rater-t-13);
+  outline: none;
+}
+
+.rater-searchfield--sm .rater-searchfield__input {
+  font-size: var(--rater-t-12);
+}
+
+.rater-searchfield__input::placeholder {
+  color: var(--rater-text-subtle);
+}
+
+/* hide the UA's own clear decoration — ours is the IconButton */
+.rater-searchfield__input::-webkit-search-cancel-button {
+  display: none;
+}
+
+.rater-searchfield__hint {
+  display: inline-flex;
+  flex: none;
+  padding-right: var(--rater-s-4);
+}
+
+.rater-searchfield__clear {
+  flex: none;
+}

@@ -1,0 +1,424 @@
+.plans-page {
+  /* V2_INTERFACE_SPEC §1.2 — the table wants width; share the plan
+   * page's geometry (1700 max, 24px gutter). */
+  max-width: 1700px;
+  margin: 0 auto;
+  padding: var(--rater-s-24) var(--rater-s-24) var(--rater-s-48);
+}
+
+/* Brief 88 §3.3 (88.3) — the bespoke header row (big H1 + floating
+   cluster) is replaced by the shared <SurfaceHeader>. */
+
+.plans-page__cta-link {
+  flex-shrink: 0;
+}
+
+.plans-page__body {
+  min-height: 320px;
+  margin-top: var(--rater-s-24);
+}
+
+/* Grid */
+
+.plans-page__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: var(--rater-s-16);
+}
+
+/* Plan card */
+
+.plan-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-16);
+}
+
+.plan-card__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--rater-s-12);
+}
+
+.plan-card__title-block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-2);
+  min-width: 0;
+}
+
+.plan-card__title {
+  margin: 0;
+  font-family: var(--rater-font-display);
+  font-size: var(--rater-t-16);
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-strong);
+  letter-spacing: var(--rater-tracking-tight);
+  line-height: var(--rater-leading-snug);
+  /* Brief 55, item 3 — wrap into the available room instead of clipping on a
+     single line; clamp very long titles at 2 lines so card heights stay even.
+     (Was white-space:nowrap + ellipsis, which truncated even with room.) */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+
+.plan-card__id {
+  font-family: var(--rater-font-mono);
+  font-size: var(--rater-t-11);
+  color: var(--rater-text-subtle);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.plan-card__meta {
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  row-gap: var(--rater-s-6);
+  column-gap: var(--rater-s-12);
+  margin: 0;
+  font-size: var(--rater-t-12);
+}
+
+.plan-meta {
+  display: contents;
+}
+
+.plan-meta__label {
+  color: var(--rater-text-subtle);
+  text-transform: uppercase;
+  letter-spacing: var(--rater-tracking-label);
+  font-size: var(--rater-t-10);
+  font-weight: var(--rater-fw-medium);
+  align-self: center;
+}
+
+.plan-meta__value {
+  margin: 0;
+  color: var(--rater-text-default);
+}
+
+.plan-meta__value--mono {
+  font-family: var(--rater-font-mono);
+  font-feature-settings: var(--rater-num-tabular);
+}
+
+.plan-card__footer {
+  margin-top: auto;
+  padding-top: var(--rater-s-12);
+  border-top: 1px solid var(--rater-border-subtle);
+  display: flex;
+  justify-content: flex-end;
+}
+
+.plan-card__open {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-4);
+  font-size: var(--rater-t-12);
+  font-weight: var(--rater-fw-medium);
+  color: var(--rater-accent-primary);
+  text-decoration: none;
+}
+
+.plan-card__open:hover {
+  text-decoration: underline;
+}
+
+/* Empty / loading / error states */
+
+.plans-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--rater-s-12);
+  padding: var(--rater-s-64) var(--rater-s-24);
+  background: var(--rater-surface-1);
+  border: 1px solid var(--rater-border-subtle);
+  border-radius: var(--rater-r-8);
+  color: var(--rater-text-muted);
+}
+
+.plans-state__title {
+  margin: 0;
+  font-family: var(--rater-font-display);
+  font-size: var(--rater-t-20);
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-strong);
+}
+
+.plans-state__body {
+  margin: 0;
+  max-width: 48ch;
+  line-height: var(--rater-leading-snug);
+}
+
+.plans-state__hint {
+  margin: 0;
+  max-width: 48ch;
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-subtle);
+}
+
+.plans-state__hint code {
+  font-family: var(--rater-font-mono);
+  font-size: var(--rater-t-11);
+  background: var(--rater-surface-2);
+  padding: var(--rater-s-1) var(--rater-s-4);
+  border-radius: var(--rater-r-2);
+}
+
+.plans-state--loading {
+  font-family: var(--rater-font-mono);
+}
+
+.plans-state--error {
+  border-color: var(--rater-cat-output-border);
+  background: var(--rater-cat-output-soft);
+  color: var(--rater-cat-output-text);
+}
+
+/* ─── K1.5 — Toolbar (Show archived toggle) ─── */
+/* Sits between the header + grid. Only renders when archived plans
+ * exist, so the toolbar disappears for the typical "drafts + active"
+ * default view. */
+
+.plans-page__toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--rater-s-12);
+  margin-bottom: var(--rater-s-16);
+}
+
+/* V9 — plans-list search */
+.plans-page__search {
+  flex: 1 1 auto;
+  max-width: 360px;
+  padding: var(--rater-s-8) var(--rater-s-12);
+  background: var(--rater-surface-2);
+  border: 1px solid var(--rater-hairline-base);
+  border-radius: var(--rater-r-8);
+  font-family: var(--rater-font-sans);
+  font-size: var(--rater-t-13);
+  color: var(--rater-text-default);
+}
+.plans-page__search::placeholder {
+  color: var(--rater-text-subtle);
+}
+.plans-page__search:focus {
+  outline: none;
+  border-color: var(--rater-hairline-strong);
+  box-shadow: var(--rater-focus-ring);
+}
+.plans-page__no-match {
+  padding: var(--rater-s-24) 0;
+  color: var(--rater-text-muted);
+  font-size: var(--rater-t-13);
+}
+
+.plans-page__toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-6);
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-muted);
+  cursor: pointer;
+  user-select: none;
+}
+
+.plans-page__toggle input[type="checkbox"] {
+  /* Use the form default but align with the label baseline. */
+  margin: 0;
+  accent-color: var(--rater-accent-primary);
+}
+
+/* ─── K1.5 — Card kebab menu ─── */
+/* The kebab is part of a flex cluster with the status chip so the
+ * card header still reads chip-first, menu-second from the user's
+ * point of view. */
+
+.plan-card__header-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-6);
+  flex-shrink: 0;
+}
+
+.plan-card__menu-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--rater-r-6);
+  color: var(--rater-text-subtle);
+  cursor: pointer;
+  transition: background 120ms ease, color 120ms ease, border-color 120ms ease;
+}
+
+.plan-card__menu-btn:hover,
+.plan-card__menu-btn:focus-visible {
+  background: var(--rater-surface-2);
+  color: var(--rater-text-default);
+  border-color: var(--rater-border-subtle);
+  outline: none;
+}
+
+/* ============================================================================
+ * V2_INTERFACE_SPEC mockup M3 — the plans TABLE (replaces the card grid;
+ * the .plan-card / .plans-page__grid rules above are retired with it and
+ * get swept in the P3 cohesion pass).
+ * ========================================================================== */
+
+/* 88.3 — the cluster wrapper retired with the bespoke header; the
+   search keeps its working width inside the SurfaceHeader actions. */
+.plans-page__search {
+  width: 260px;
+}
+
+.plans-table {
+  background: var(--rater-surface-1);
+  border: 1px solid var(--rater-border-subtle);
+  border-radius: var(--rater-r-12);
+  overflow: hidden;
+}
+
+.plans-table__table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+/* one label DNA: the eyebrow spec on the canvas-toned header strip */
+.plans-table__table thead th {
+  height: 36px;
+  padding: 0 var(--rater-s-14);
+  background: var(--rater-surface-canvas);
+  border-bottom: 1px solid var(--rater-border-subtle);
+  font-size: var(--rater-t-11);
+  font-weight: var(--rater-fw-semibold);
+  letter-spacing: var(--rater-tracking-label);
+  text-transform: uppercase;
+  color: var(--rater-text-subtle);
+  text-align: left;
+}
+
+.plans-table__table thead th:first-child {
+  padding-left: var(--rater-s-20);
+}
+
+/* A1 — header alignment follows cell alignment for numeric/temporal columns.
+   The bare class (specificity 0-1-0) lost to `.plans-table__table thead th`
+   (0-1-2), so the LAST EDITED header rendered left while its values rendered
+   right. Up-specify so the header wins. */
+.plans-table__table thead th.plans-table__th-right {
+  text-align: right;
+}
+
+.plans-table__row {
+  border-bottom: 1px solid var(--rater-border-subtle);
+  transition: background var(--rater-d-80) var(--rater-ease-snap);
+}
+
+.plans-table__row:last-child {
+  border-bottom: 0;
+}
+
+.plans-table__row:hover,
+.plans-table__row:focus-within {
+  background: var(--rater-row-hover-bg);
+}
+
+.plans-table__table td {
+  height: 40px;
+  padding: 0 var(--rater-s-14);
+  font-size: var(--rater-t-13);
+  color: var(--rater-text-default);
+  vertical-align: middle;
+}
+
+.plans-table__table td:first-child {
+  padding-left: var(--rater-s-20);
+}
+
+.plans-table__name {
+  color: var(--rater-text-strong);
+  font-weight: var(--rater-fw-medium);
+  text-decoration: none;
+}
+
+/* First-run §5.5 — the seeded reference plan's provenance note. */
+.plans-table__ref-note {
+  display: block;
+  font-size: var(--rater-t-11);
+  color: var(--rater-text-muted);
+}
+
+.plans-table__name:hover {
+  color: var(--rater-accent-primary);
+}
+
+.plans-table__name:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: 2px;
+  border-radius: var(--rater-r-4);
+}
+
+.plans-table__muted {
+  color: var(--rater-text-muted);
+  font-size: var(--rater-t-12);
+}
+
+.plans-table__num {
+  font-variant-numeric: tabular-nums;
+}
+
+.plans-table__right {
+  text-align: right;
+}
+
+/* Brief 84 — the status cell renders <PlanStatusChip> (@openrater/ui); the
+   local neutral-chip + status-dot styles it replaced are deleted. */
+
+/* the ⋯ reveals on row intent (calm rows) */
+.plans-table__actions {
+  width: 44px;
+  text-align: right;
+}
+
+.plans-table__actions .rater-icon-button {
+  opacity: 0;
+  transition: opacity var(--rater-d-80) var(--rater-ease-snap);
+}
+
+.plans-table__row:hover .plans-table__actions .rater-icon-button,
+.plans-table__row:focus-within .plans-table__actions .rater-icon-button {
+  opacity: 1;
+}
+
+@media (hover: none) {
+  .plans-table__actions .rater-icon-button {
+    opacity: 1;
+  }
+}
+
+/* Brief 94 (U2) — the workbook door from the empty state. */
+.plans-state__workbook-line {
+  margin-top: var(--rater-s-12);
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-subtle);
+}
+
+.plans-state__workbook-line a {
+  color: var(--rater-accent-primary);
+  text-decoration: none;
+  border-bottom: 1px dotted var(--rater-accent-primary);
+}

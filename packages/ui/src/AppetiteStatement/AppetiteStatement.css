@@ -1,0 +1,238 @@
+/* ============================================================================
+ * <AppetiteStatement> — the Eligibility document (Brief 70 §3).
+ * One reading column; sentences, chips, a quiet closing seat.
+ * ============================================================================ */
+
+.rater-appetite {
+  max-width: 1180px;
+  padding: var(--rater-s-16) var(--rater-s-24) var(--rater-s-24);
+  display: flex;
+  flex-direction: column;
+}
+
+.rater-appetite__head {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--rater-s-12);
+}
+
+.rater-appetite__title {
+  margin: 0;
+  font-size: var(--rater-t-16);
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-strong);
+}
+
+.rater-appetite__def {
+  margin: 2px 0 0;
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-muted);
+}
+
+.rater-appetite__grow {
+  flex: 1;
+}
+
+/* The pill is the shared <SavePill> primitive (SavePill.css). Only its
+   call-site layout — vertical centering in the flex-start header — stays. */
+.rater-appetite__savepill {
+  align-self: center;
+}
+
+.rater-appetite__doctrine {
+  margin: var(--rater-s-12) 0 0;
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-muted);
+}
+
+.rater-appetite__migrate {
+  margin-top: var(--rater-s-12);
+  padding: var(--rater-s-10) var(--rater-s-12);
+  border: 1px solid var(--rater-hairline-base);
+  border-radius: var(--rater-r-8);
+  background: var(--rater-surface-1);
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-default);
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-12);
+}
+
+.rater-appetite__lede {
+  margin: var(--rater-s-14) 0 var(--rater-s-10);
+  font-size: var(--rater-t-13);
+  color: var(--rater-text-default);
+}
+.rater-appetite__lede b {
+  color: var(--rater-text-strong);
+  font-weight: var(--rater-fw-semibold);
+}
+
+.rater-appetite__panel {
+  background: var(--rater-surface-1);
+  border: 1px solid var(--rater-hairline-subtle);
+  border-radius: var(--rater-r-12);
+  overflow: visible;
+}
+
+.rater-appetite__chapter-head {
+  padding: var(--rater-s-12) var(--rater-s-14) var(--rater-s-4);
+  font-size: var(--rater-t-11);
+  font-weight: var(--rater-fw-semibold);
+  letter-spacing: var(--rater-tracking-label);
+  text-transform: uppercase;
+  color: var(--rater-text-subtle);
+}
+
+.rater-appetite__rule {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-10);
+  flex-wrap: wrap;
+}
+
+.rater-appetite__sent {
+  font-size: var(--rater-t-13);
+  color: var(--rater-text-default);
+}
+.rater-appetite__sent b {
+  font-weight: var(--rater-fw-medium);
+  color: var(--rater-text-strong);
+}
+.rater-appetite__val {
+  font-family: var(--rater-fonts-mono, var(--rater-fonts-sans));
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-strong);
+}
+
+.rater-appetite__cite {
+  color: var(--rater-text-faint);
+  font-size: var(--rater-t-12);
+  cursor: help;
+}
+
+.rater-appetite__editing-note {
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-faint);
+  font-style: italic;
+}
+
+.rater-appetite__crossnote {
+  margin: 0;
+  padding: var(--rater-s-6) var(--rater-s-14) var(--rater-s-12);
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-faint);
+}
+
+.rater-appetite__empty {
+  margin: 0;
+  padding: var(--rater-s-20);
+  text-align: center;
+  font-size: var(--rater-t-13);
+  color: var(--rater-text-muted);
+}
+
+.rater-appetite__closing {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-8);
+  padding: var(--rater-s-12) var(--rater-s-14);
+  border-top: 1px solid var(--rater-hairline-base);
+  font-size: var(--rater-t-13);
+  color: var(--rater-text-default);
+}
+
+.rater-appetite__seat {
+  position: relative;
+  display: inline-flex;
+}
+.rater-appetite__seat-btn {
+  border: 0;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+  border-radius: var(--rater-r-8);
+}
+.rater-appetite__seat-btn:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: 2px;
+}
+.rater-appetite__seat-pop {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 0;
+  z-index: 60;
+  width: 340px;
+  background: var(--rater-surface-1);
+  border: 1px solid var(--rater-hairline-base);
+  border-radius: var(--rater-r-12);
+  box-shadow: var(--rater-shadow-overlay, 0 16px 48px rgb(0 0 0 / 0.5));
+  /* B/F9 — 8px container so the 8/10 option rows' hover fills don't graze the
+     popover edge. */
+  padding: var(--rater-s-8);
+  display: flex;
+  flex-direction: column;
+}
+.rater-appetite__seat-opt {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-10);
+  border: 0;
+  background: none;
+  padding: var(--rater-s-8) var(--rater-s-10);
+  border-radius: var(--rater-r-8);
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+}
+.rater-appetite__seat-opt:hover {
+  background: var(--rater-row-hover-bg);
+}
+.rater-appetite__seat-desc {
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-muted);
+}
+
+.rater-appetite__composer {
+  padding: var(--rater-s-14);
+  border-top: 1px solid var(--rater-hairline-base);
+  background: var(--rater-surface-sunken, var(--rater-surface-canvas));
+  border-radius: 0 0 var(--rater-r-12) var(--rater-r-12);
+}
+.rater-appetite__composer-foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--rater-s-10);
+  margin-top: var(--rater-s-12);
+}
+.rater-appetite__nudge {
+  margin: var(--rater-s-10) 0 0;
+  font-size: var(--rater-t-12);
+  color: var(--rater-feedback-warn);
+}
+.rater-appetite__nudge-fix {
+  border: 0;
+  background: none;
+  padding: 0;
+  font: inherit;
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-strong);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.rater-appetite__add {
+  align-self: flex-start;
+  margin-top: var(--rater-s-12);
+}
+
+/* ── Brief 81 D-D — clause chrome layout (the controls themselves are
+ * design-system <Button>s per the v2 button rule) ─────────────────── */
+
+.rater-appetite__clauses {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--rater-s-6);
+  margin-top: var(--rater-s-6);
+}

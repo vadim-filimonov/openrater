@@ -1,0 +1,211 @@
+/**
+ * Brief 45 PR 45.4 — OutlierDrawer styles.
+ *
+ * Self-portal'd dialog with a backdrop. The drawer occupies the
+ * right 480px of the viewport, sliding in from the right edge.
+ */
+
+.rater-outlier-drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: var(--rater-z-modal, 1100);
+  display: flex;
+  justify-content: flex-end;
+  animation: rater-outlier-fade-in var(--rater-d-180, 180ms) ease forwards;
+}
+
+@keyframes rater-outlier-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.rater-outlier-drawer {
+  background: var(--rater-surface-1);
+  border-left: 1px solid var(--rater-hairline-base);
+  width: 100%;
+  max-width: 520px;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 0 60px -10px rgba(0, 0, 0, 0.5);
+  animation: rater-outlier-slide-in var(--rater-d-240, 240ms)
+    var(--rater-ease-soft, cubic-bezier(0.32, 0.72, 0, 1)) forwards;
+}
+
+@keyframes rater-outlier-slide-in {
+  from {
+    transform: translateX(24px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rater-outlier-drawer-backdrop,
+  .rater-outlier-drawer {
+    animation-duration: 1ms;
+  }
+}
+
+/* ─────────────── Header ─────────────── */
+
+.rater-outlier-drawer__head {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: var(--rater-s-4, 18px) var(--rater-s-5, 22px) var(--rater-s-3, 14px);
+  border-bottom: 1px solid
+    var(--rater-hairline-soft);
+  background: var(--rater-surface-canvas);
+}
+
+.rater-outlier-drawer__title {
+  flex: 1;
+  font-size: 14px;
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-strong);
+  letter-spacing: -0.01em;
+  line-height: 1.4;
+}
+
+.rater-outlier-drawer__sub {
+  font-size: 11px;
+  font-weight: var(--rater-fw-regular);
+  font-family: var(--rater-fonts-mono);
+  color: var(--rater-text-subtle);
+  display: block;
+  margin-top: 4px;
+}
+
+.rater-outlier-drawer__close {
+  background: transparent;
+  border: 1px solid var(--rater-hairline-base);
+  color: var(--rater-text-muted);
+  width: 24px;
+  height: 24px;
+  border-radius: var(--rater-r-6, 6px);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--rater-d-120, 120ms) ease;
+}
+
+.rater-outlier-drawer__close:hover {
+  color: var(--rater-text-strong);
+  border-color: var(--rater-hairline-strong);
+  background: var(--rater-surface-2);
+}
+
+.rater-outlier-drawer__close:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: 2px;
+}
+
+/* ─────────────── List ─────────────── */
+
+.rater-outlier-drawer__list {
+  flex: 1;
+  list-style: none;
+  margin: 0;
+  padding: 4px 0 24px;
+  overflow-y: auto;
+}
+
+.rater-outlier-drawer__row-wrap {
+  margin: 0;
+  padding: 0;
+}
+
+.rater-outlier-drawer__row {
+  display: grid;
+  grid-template-columns: 28px 1fr auto auto;
+  gap: 12px;
+  align-items: center;
+  padding: 8px 22px;
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-left: 2px solid transparent;
+  text-align: left;
+  cursor: pointer;
+  font-family: var(--rater-fonts-sans);
+  font-size: 12px;
+  color: var(--rater-text-default);
+  transition: background var(--rater-d-120, 120ms) ease;
+}
+
+.rater-outlier-drawer__row:hover {
+  background: var(--rater-surface-2);
+  border-left-color: var(--rater-cat-input);
+}
+
+.rater-outlier-drawer__row:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: -2px;
+  border-radius: var(--rater-r-4, 4px);
+}
+
+.rater-outlier-drawer__rank {
+  font-family: var(--rater-fonts-mono);
+  font-size: 11px;
+  font-weight: var(--rater-fw-semibold);
+  text-align: right;
+  /* color inlined via factorGradient for visual gradient on rank chips */
+}
+
+.rater-outlier-drawer__label {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.rater-outlier-drawer__label-primary {
+  color: var(--rater-text-default);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rater-outlier-drawer__label-sub {
+  font-size: 10px;
+  font-family: var(--rater-fonts-mono);
+  color: var(--rater-text-subtle);
+  margin-top: 1px;
+}
+
+.rater-outlier-drawer__val {
+  font-family: var(--rater-fonts-sans);
+  font-feature-settings: "tnum";
+  font-variant-numeric: tabular-nums;
+  font-size: 13px;
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-strong);
+}
+
+.rater-outlier-drawer__dev {
+  font-family: var(--rater-fonts-mono);
+  font-size: 10px;
+  letter-spacing: -0.02em;
+  min-width: 50px;
+  text-align: right;
+}
+
+.rater-outlier-drawer__dev.is-up {
+  color: var(--rater-cat-loading-text);
+}
+.rater-outlier-drawer__dev.is-down {
+  color: var(--rater-cat-input-text);
+}
+
+.rater-outlier-drawer__empty {
+  padding: 40px 22px;
+  text-align: center;
+  color: var(--rater-text-subtle);
+  font-style: italic;
+  font-size: 12px;
+}

@@ -1,0 +1,556 @@
+/* ──────────────────────────────────────────────────────────────
+   FactorTableNode — Brief 33 PR 33.2
+
+   The axis-drop frame inside <ParametrizeCanvas>'s canvas mode.
+   Matches the polished mockup; same token discipline as
+   <ParametrizeCanvas>.
+   ────────────────────────────────────────────────────────────── */
+
+.rater-ft-node {
+  background: var(--rater-surface-1);
+  border: 1px solid var(--rater-hairline-base);
+  border-radius: var(--rater-r-12);
+  overflow: hidden;
+  /* Brief 67 §3.2 — the co-rendered chart pane stacks under the grid
+     when the NODE is narrow (container query, not viewport). */
+  container-type: inline-size;
+}
+
+/* ── Head ─────────────────────────────────────────────────────── */
+
+.rater-ft-node-head {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-12);
+  padding: var(--rater-s-12) var(--rater-s-20);
+  background: var(--rater-surface-canvas);
+  border-bottom: 1px solid var(--rater-hairline-soft);
+}
+.rater-ft-node-title {
+  font-size: var(--rater-t-13);
+  font-weight: var(--rater-fw-medium);
+  color: var(--rater-text-strong);
+  background: transparent;
+  border: 1px solid transparent;
+  padding: var(--rater-s-4) var(--rater-s-8);
+  border-radius: var(--rater-r-4);
+  flex: 0 0 auto;
+  min-width: 220px;
+  font-family: inherit;
+}
+.rater-ft-node-title::placeholder {
+  color: var(--rater-text-subtle);
+  font-style: italic;
+}
+.rater-ft-node-title:hover {
+  border-color: var(--rater-hairline-soft);
+}
+.rater-ft-node-title:focus {
+  /* W1.6 — the canonical text-entry focus treatment. */
+  outline: none;
+  border-color: var(--rater-focus-ring);
+  box-shadow: 0 0 0 2px var(--rater-focus-halo);
+  background: var(--rater-surface-1);
+}
+.rater-ft-node-meta {
+  font-family: var(--rater-fonts-mono);
+  font-size: var(--rater-t-11);
+  color: var(--rater-text-subtle);
+}
+.rater-ft-node-spacer { flex: 1; }
+/* Brief 53 — small "Phase E" marker on the Import PDF head button so the
+   deferred state reads at-rest, not only inside the drawer. */
+.rater-ft-node-head-btn-phase {
+  margin-left: var(--rater-s-4);
+  padding: 0 var(--rater-s-4);
+  border-radius: var(--rater-r-4);
+  background: var(--rater-surface-2);
+  color: var(--rater-text-subtle);
+  font-size: var(--rater-t-10);
+  font-weight: var(--rater-fw-semibold);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+/* Brief 34 follow-up — Apple-style segmented Table ⇄ Chart toggle.
+ *
+ *   Two pills inside a hairline-bordered track. Active pill has a
+ *   raised "thumb" feel (surface-1 fill + subtle elevation) inside
+ *   the surface-canvas track. var(--rater-d-120) var(--rater-ease-snap) on every transition.
+ *   Sized to sit comfortably next to the other head-bar buttons
+ *   without dominating them. */
+
+@media (prefers-reduced-motion: reduce) {
+  .rater-ft-node-view-toggle-btn { transition: none; }
+}
+
+.rater-ft-node-status {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-6);
+  font-size: var(--rater-t-11);
+  padding: 2px var(--rater-s-8);
+  border-radius: var(--rater-r-full);
+  background: var(--rater-surface-2);
+  color: var(--rater-text-muted);
+}
+.rater-ft-node-status::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.7;
+}
+.rater-ft-node-status--draft {
+  color: var(--rater-cat-loading-text);
+  background: color-mix(in srgb, var(--rater-cat-loading) 14%, transparent);
+}
+.rater-ft-node-status--saved {
+  color: var(--rater-cat-math-text, #6ee7b7);
+  background: color-mix(in srgb, var(--rater-cat-math) 14%, transparent);
+}
+
+/* ── Subhead row — Brief 34 follow-up ─────────────────────────────
+   Holds the power-tools "X cells selected" pill (left) + the
+   segmented Table ⇄ Chart toggle (right). Renders below the head
+   bar and above the body so the toggle stays visible in both
+   table + chart modes. Spacing tokens only. */
+.rater-ft-node-subhead {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-12);
+  padding: var(--rater-s-8) var(--rater-s-16);
+  background: var(--rater-surface-1);
+  border-top: 1px solid var(--rater-hairline-soft);
+  min-height: 44px;
+}
+/* Power-tools when nested inside the subhead row: strip its own
+   padding + background + border so the toolbar integrates into the
+   row instead of looking like a second stacked card. */
+.rater-ft-node-subhead .rater-ft-pt {
+  padding: 0;
+  background: transparent;
+  border-bottom: none;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+/* Right-align the segmented toggle. `margin-left: auto` makes it
+   the last child of a flex row and pushes everything else to the
+   left — clean even when the power-tools are hidden (chart view). */
+.rater-ft-node-subhead .rater-ft-node-view-toggle {
+  margin-left: auto;
+  flex: 0 0 auto;
+}
+
+/* ── Materialized body — Brief 34 follow-up ───────────────────────
+   The 60/40 split was replaced by an exclusive Table ⇄ Chart toggle
+   in the subhead row. Each view gets the full width of the node
+   body so neither feels squished, and the active panel breathes
+   inside generous padding instead of cramming two panels together. */
+
+.rater-ft-node-body {
+  background: var(--rater-surface-1);
+  /* L19 — trim the body's top gutter (16 → 12) so the chart pane
+     starts higher. Bottom stays 12. */
+  padding: var(--rater-s-12);
+  /* Subtle fade when the user flips views. */
+  animation: rater-ft-node-body-fade var(--rater-d-240) var(--rater-ease-soft);
+}
+@keyframes rater-ft-node-body-fade {
+  from { opacity: 0.6; transform: translateY(2px); }
+  to   { opacity: 1;   transform: translateY(0); }
+}
+
+/* Scrollable grid wrap so the embedded <FactorTableGrid2D>'s sticky
+   col + row headers anchor against this container, not the page. */
+.rater-ft-node-grid-wrap {
+  max-height: 560px;
+  overflow: auto;
+  background: var(--rater-surface-1);
+  border: 1px solid var(--rater-hairline-soft);
+  border-radius: var(--rater-r-8);
+}
+
+/* Chart pane wrap — matches the grid's surface treatment so the
+   two views read as the same "card" filled with different content
+   (Apple-grade: identical envelopes, different fills). */
+.rater-ft-node-chart-wrap {
+  background: var(--rater-surface-1);
+  border: 1px solid var(--rater-hairline-soft);
+  border-radius: var(--rater-r-8);
+  /* L19 — trim padding 16 → 12; the inner <FactorTableViz> owns its
+     own 8px gutter, so 12px here is plenty. Drop the 360px min-height:
+     it stacked on top of the viz body's own min-height (200px) +
+     padding, forcing the pane taller than the chart needs and pushing
+     the x-axis below the fold. The viz body now governs the height. */
+  padding: var(--rater-s-12);
+}
+
+/* Honor reduced motion. */
+@media (prefers-reduced-motion: reduce) {
+  .rater-ft-node-body { animation: none; }
+}
+
+/* ── Axis-drop frame ──────────────────────────────────────────── */
+
+.rater-ft-node-frame {
+  display: grid;
+  grid-template-columns: 160px minmax(0, 1fr);
+  grid-template-rows: 56px minmax(0, 1fr);
+  background: var(--rater-surface-1);
+}
+.rater-ft-node-frame-corner {
+  grid-column: 1;
+  grid-row: 1;
+  background: var(--rater-surface-canvas);
+  border-right: 1px solid var(--rater-hairline-soft);
+  border-bottom: 1px solid var(--rater-hairline-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.rater-ft-node-col-slot {
+  grid-column: 2;
+  grid-row: 1;
+  padding: var(--rater-s-12) var(--rater-s-16);
+  border-bottom: 1px solid var(--rater-hairline-soft);
+  background: var(--rater-surface-canvas);
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-12);
+  min-width: 0;
+  transition: background var(--rater-d-120) var(--rater-ease-snap), box-shadow var(--rater-d-120) var(--rater-ease-snap);
+}
+.rater-ft-node-row-slot {
+  grid-column: 1;
+  grid-row: 2;
+  padding: var(--rater-s-12);
+  border-right: 1px solid var(--rater-hairline-soft);
+  background: var(--rater-surface-canvas);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--rater-d-120) var(--rater-ease-snap), box-shadow var(--rater-d-120) var(--rater-ease-snap);
+}
+/* Drop-target highlight — visible only while the user is dragging
+   over this slot. */
+.rater-ft-node-col-slot.is-droptarget,
+.rater-ft-node-row-slot.is-droptarget {
+  background: color-mix(in srgb, var(--rater-cat-input) 14%, var(--rater-surface-canvas));
+  box-shadow: inset 0 0 0 1px var(--rater-cat-input);
+}
+
+/* Body */
+.rater-ft-node-frame-body {
+  grid-column: 2;
+  grid-row: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 260px;
+  padding: var(--rater-s-24);
+  background:
+    repeating-linear-gradient(0deg,
+      var(--rater-hairline-soft) 0 1px,
+      transparent 1px 40px),
+    repeating-linear-gradient(90deg,
+      var(--rater-hairline-soft) 0 1px,
+      transparent 1px 100px);
+}
+
+/* ── Slot states ─────────────────────────────────────────────── */
+
+.rater-ft-node-slot-empty {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-6);
+  padding: var(--rater-s-6) var(--rater-s-12);
+  background: transparent;
+  border: 1px dashed var(--rater-hairline-base);
+  border-radius: var(--rater-r-6);
+  color: var(--rater-text-subtle);
+  font-size: var(--rater-t-11);
+  pointer-events: none; /* Don't intercept drops; the parent slot listens. */
+}
+.rater-ft-node-slot-empty--vertical {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  transform: rotate(180deg);
+  padding: var(--rater-s-12) var(--rater-s-6);
+}
+
+/* Brief 53 — "+ Coverage split" shortcut in the empty column slot.
+   Mirrors the head-btn ghost style; pointer-events: auto so it stays
+   clickable even though the sibling hint is pointer-events: none. */
+.rater-ft-node-coverage-split {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-4);
+  padding: var(--rater-s-4) var(--rater-s-8);
+  background: transparent;
+  border: 1px solid var(--rater-hairline-soft);
+  border-radius: var(--rater-r-4);
+  color: var(--rater-text-muted);
+  font-size: var(--rater-t-11);
+  font-family: inherit;
+  cursor: pointer;
+  pointer-events: auto;
+  transition: border-color var(--rater-d-120) var(--rater-ease-snap), color var(--rater-d-120) var(--rater-ease-snap);
+}
+.rater-ft-node-coverage-split:hover:not(disabled) {
+  color: var(--rater-text-default);
+  border-color: var(--rater-hairline-strong);
+}
+.rater-ft-node-coverage-split:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: 2px;
+}
+.rater-ft-node-coverage-split:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.rater-ft-node-coverage-split-sub {
+  color: var(--rater-text-subtle);
+}
+@media (prefers-reduced-motion: reduce) {
+  .rater-ft-node-coverage-split { transition: none; }
+}
+
+.rater-ft-node-slot-filled {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-8);
+  padding: var(--rater-s-4) var(--rater-s-6) var(--rater-s-4) var(--rater-s-8);
+  background: var(--rater-surface-2);
+  border: 1px solid var(--rater-cat-input);
+  border-radius: var(--rater-r-6);
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-default);
+}
+.rater-ft-node-slot-filled--vertical {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  transform: rotate(180deg);
+  padding: var(--rater-s-6) var(--rater-s-4) var(--rater-s-6) var(--rater-s-8);
+}
+.rater-ft-node-slot-icon {
+  width: 18px;
+  height: 18px;
+  border-radius: var(--rater-r-4);
+  background: var(--rater-cat-input-soft);
+  color: var(--rater-cat-input-text);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--rater-t-10);
+  font-weight: var(--rater-fw-semibold);
+  font-family: var(--rater-fonts-mono);
+  flex-shrink: 0;
+}
+.rater-ft-node-slot-name {
+  font-weight: var(--rater-fw-medium);
+  white-space: nowrap;
+}
+.rater-ft-node-slot-count {
+  font-family: var(--rater-fonts-mono);
+  font-size: var(--rater-t-11);
+  color: var(--rater-text-subtle);
+  white-space: nowrap;
+}
+.rater-ft-node-slot-clear {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  color: var(--rater-text-subtle);
+  font-size: var(--rater-t-11);
+  cursor: pointer;
+  border-radius: var(--rater-r-4);
+  transition: background var(--rater-d-120) var(--rater-ease-snap), color var(--rater-d-120) var(--rater-ease-snap);
+  flex-shrink: 0;
+}
+.rater-ft-node-slot-clear:hover {
+  background: var(--rater-surface-3);
+  color: var(--rater-text-default);
+}
+
+/* ── CTA ──────────────────────────────────────────────────────── */
+
+.rater-ft-node-cta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--rater-s-8);
+  text-align: center;
+  max-width: 400px;
+}
+.rater-ft-node-cta-title {
+  font-size: var(--rater-t-14);
+  font-weight: var(--rater-fw-medium);
+  color: var(--rater-text-default);
+}
+.rater-ft-node-cta-title.is-muted { color: var(--rater-text-muted); }
+.rater-ft-node-cta-sub {
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-subtle);
+  line-height: 1.5;
+}
+/* I9 — Hint promoting the 2-D upgrade while only ONE axis is filled.
+ * Visually subordinate to the main "Ready" copy + uses the accent
+ * tone so the eye picks it up as an actionable suggestion rather
+ * than another descriptive blurb. */
+.rater-ft-node-cta-hint {
+  font-size: var(--rater-t-12);
+  color: var(--rater-cat-input-text);
+  line-height: 1.4;
+  font-weight: var(--rater-fw-medium);
+  margin-top: 4px;
+}
+.rater-ft-node-cta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-6);
+  padding: var(--rater-s-8) var(--rater-s-16);
+  font-size: var(--rater-t-13);
+  font-family: inherit;
+  background: var(--rater-cat-input);
+  border: 1px solid var(--rater-cat-input);
+  color: #fff;
+  border-radius: var(--rater-r-6);
+  cursor: pointer;
+  transition: background var(--rater-d-120) var(--rater-ease-snap);
+}
+.rater-ft-node-cta-btn:hover:not(disabled) {
+  background: var(--rater-cat-input-border);
+  border-color: var(--rater-cat-input-border);
+}
+.rater-ft-node-cta-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+
+/* Utility — label-mini scoped to this primitive (matches PC's). */
+.rater-ft-node-label-mini {
+  font-size: var(--rater-t-10);
+  letter-spacing: var(--rater-tracking-label);
+  text-transform: uppercase;
+  color: var(--rater-text-subtle);
+  font-weight: var(--rater-fw-semibold);
+}
+
+/* Empty-levels card — shown when the user dropped a dim that has
+   no levels[] yet. */
+.rater-ft-node-empty-levels {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--rater-s-8);
+  padding: var(--rater-s-20) var(--rater-s-24);
+  margin: var(--rater-s-16) var(--rater-s-12) var(--rater-s-12);
+  background: var(--rater-surface-canvas);
+  border: 1px dashed var(--rater-hairline-strong);
+  border-radius: var(--rater-r-8);
+}
+.rater-ft-node-empty-levels-title {
+  font-size: var(--rater-t-14);
+  color: var(--rater-text-strong);
+  font-family: var(--rater-fonts-mono);
+}
+.rater-ft-node-empty-levels-sub {
+  font-size: var(--rater-t-12);
+  line-height: 1.55;
+  color: var(--rater-text-muted);
+  max-width: 540px;
+}
+.rater-ft-node-empty-levels-btn {
+  padding: var(--rater-s-6) var(--rater-s-12);
+  background: transparent;
+  border: 1px solid var(--rater-hairline-strong);
+  border-radius: var(--rater-r-4);
+  color: var(--rater-text-default);
+  font-family: inherit;
+  font-size: var(--rater-t-11);
+  cursor: pointer;
+  transition: border-color var(--rater-d-120) var(--rater-ease-snap), color var(--rater-d-120) var(--rater-ease-snap);
+}
+.rater-ft-node-empty-levels-btn:hover {
+  border-color: var(--rater-cat-input);
+  color: var(--rater-cat-input-text);
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .rater-ft-node-col-slot,
+  .rater-ft-node-row-slot,
+  .rater-ft-node-cta-btn,
+  .rater-ft-node-slot-clear {
+    transition: none;
+  }
+}
+
+/* Brief 67 §3.2 — co-render: grid (the work) + chart side pane. */
+.rater-ft-node-subhead-grow {
+  flex: 1;
+}
+
+.rater-ft-node-body[data-chart-open="true"] {
+  display: flex;
+  align-items: stretch;
+  gap: var(--rater-s-16);
+  min-width: 0;
+}
+
+.rater-ft-node-body[data-chart-open="true"] .rater-ft-node-grid-wrap {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.rater-ft-node-chart-side {
+  flex: 0 0 380px;
+  min-width: 0;
+  border-left: 1px solid var(--rater-hairline-subtle);
+  padding-left: var(--rater-s-16);
+  display: flex;
+  flex-direction: column;
+  /* The viz internals (hero-strip KPIs) respond to THIS pane's width
+     via container queries — display-1 stats were sized for a
+     full-width pane. */
+  container-type: inline-size;
+}
+
+/* Below ~1100px of node width the side pane would squish the grid —
+   stack the chart under the grid instead (container query on the
+   node body keeps this local, no viewport coupling). */
+@container (max-width: 1100px) {
+  .rater-ft-node-body[data-chart-open="true"] {
+    flex-direction: column;
+  }
+  .rater-ft-node-chart-side {
+    flex: 1 1 auto;
+    border-left: 0;
+    padding-left: 0;
+    border-top: 1px solid var(--rater-hairline-subtle);
+    padding-top: var(--rater-s-16);
+  }
+}
+
+/* Brief 67 §3.5 — the meaning line: states what the numbers ARE,
+   once, quietly (the cold-test sentence). */
+.rater-ft-node-meaning {
+  margin: 0;
+  padding: var(--rater-s-6) var(--rater-s-16) var(--rater-s-12);
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-muted);
+}
+
+/* The head actions never squeeze — the title input absorbs instead
+   (a shrunk button overlaps its own label; not Apple-grade). */
+.rater-ft-node-head .rater-button {
+  flex-shrink: 0;
+}

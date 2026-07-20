@@ -1,0 +1,24 @@
+{
+  "name": "V10.chain-lob-sum",
+  "description": "chain.lob_sum fans in two coverage premiums into a property-LOB total (Brief 17 multi-LOB).",
+  "plan": {
+    "id": "v10.chain_lob_sum",
+    "version": "1.0.0",
+    "name": "LOB sum",
+    "lines": ["property"],
+    "effective": "2026-01-01",
+    "nodes": [
+      { "id": "building_premium", "kind": "constant", "params": { "value": 5200, "type": "money" }, "position": { "x": 0, "y": 0 } },
+      { "id": "contents_premium", "kind": "constant", "params": { "value": 3250, "type": "money" }, "position": { "x": 0, "y": 100 } },
+      { "id": "property_sum", "kind": "chain.lob_sum", "params": { "lob_tag": "property" }, "position": { "x": 200, "y": 50 } },
+      { "id": "out", "kind": "output", "params": { "fieldName": "property_premium", "fieldType": "money" }, "position": { "x": 400, "y": 50 } }
+    ],
+    "edges": [
+      { "from": { "node": "building_premium", "port": "value" }, "to": { "node": "property_sum", "port": "premiums" } },
+      { "from": { "node": "contents_premium", "port": "value" }, "to": { "node": "property_sum", "port": "premiums" } },
+      { "from": { "node": "property_sum", "port": "value" }, "to": { "node": "out", "port": "value" } }
+    ]
+  },
+  "externalInputs": {},
+  "expectedOutputs": { "property_premium": 8450 }
+}

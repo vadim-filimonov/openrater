@@ -1,0 +1,92 @@
+/* ──────────────────────────────────────────────────────────────────
+   Brief 44 PR 44.6 — <GeoTransformerPicker> styles.
+
+   BEM + design tokens. Visual lock: §1.5 ASCII frame in the
+   Brief 44 markdown.
+   ────────────────────────────────────────────────────────────────── */
+
+.rater-geo-transformer-picker {
+  display: grid;
+  grid-template-columns: minmax(140px, 1.2fr) minmax(140px, 1fr) minmax(180px, 1.5fr) minmax(180px, 1.5fr);
+  gap: 12px;
+  padding: 10px 14px;
+  background: var(--rater-surface-1);
+  border: 1px solid var(--rater-hairline-soft);
+  border-radius: var(--rater-r-8);
+  font-family: var(--rater-fonts-sans);
+  color: var(--rater-text-default);
+}
+
+.rater-geo-transformer-picker__col {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.rater-geo-transformer-picker__label {
+  font-size: 10px;
+  letter-spacing: var(--rater-tracking-label);
+  text-transform: uppercase;
+  color: var(--rater-text-subtle);
+  font-weight: var(--rater-fw-semibold);
+}
+.rater-geo-transformer-picker__value {
+  font-size: 12px;
+  color: var(--rater-text-default);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  flex-wrap: wrap;
+}
+.rater-geo-transformer-picker__value strong {
+  color: var(--rater-text-strong);
+  font-weight: var(--rater-fw-semibold);
+}
+.rater-geo-transformer-picker__hint {
+  color: var(--rater-text-subtle);
+  font-size: 11px;
+}
+.rater-geo-transformer-picker__code {
+  font-family: var(--rater-fonts-mono);
+  font-size: 11px;
+  background: var(--rater-surface-canvas);
+  color: var(--rater-text-default);
+  padding: 1px 6px;
+  border-radius: var(--rater-r-4);
+}
+.rater-geo-transformer-picker__code--out {
+  color: var(--rater-cat-transform-text);
+  background: var(--rater-cat-transform-soft);
+}
+.rater-geo-transformer-picker__arrow {
+  color: var(--rater-text-subtle);
+  font-family: var(--rater-fonts-mono);
+}
+.rater-geo-transformer-picker__bad {
+  color: var(--rater-cat-loading-text);
+  font-size: 11px;
+  font-style: italic;
+}
+
+.rater-geo-transformer-picker__select {
+  background: var(--rater-surface-canvas);
+  border: 1px solid var(--rater-hairline-base);
+  color: var(--rater-text-default);
+  border-radius: var(--rater-r-6);
+  padding: 6px 10px;
+  font-size: 12px;
+  font-family: var(--rater-fonts-sans);
+  cursor: pointer;
+}
+.rater-geo-transformer-picker__select:focus {
+  outline: none;
+  border-color: var(--rater-cat-transform);
+}
+
+@media (max-width: 880px) {
+  .rater-geo-transformer-picker {
+    grid-template-columns: 1fr 1fr;
+  }
+}

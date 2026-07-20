@@ -1,0 +1,177 @@
+/**
+ * <PolicyRollupPanel> styles (E08/E03 brief D6). BEM block `.rater-prp`.
+ * Tokens via @openrater/design-system; no inline styles, no raw palette.
+ */
+
+.rater-prp {
+  display: flex;
+  flex-direction: column;
+  background: var(--rater-surface-canvas);
+  border-left: 1px solid var(--rater-hairline-soft);
+  min-height: 200px;
+}
+
+.rater-prp__head {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--rater-hairline-soft);
+}
+
+.rater-prp__head-title {
+  font-size: var(--rater-t-11, 11px);
+  letter-spacing: var(--rater-tracking-label);
+  text-transform: uppercase;
+  color: var(--rater-text-subtle);
+  font-weight: var(--rater-fw-semibold);
+}
+
+.rater-prp__head-count {
+  font-family: var(--rater-fonts-mono);
+  font-size: var(--rater-t-11, 11px);
+  color: var(--rater-text-subtle);
+}
+
+.rater-prp__empty {
+  padding: 28px 16px;
+  text-align: center;
+  font-size: var(--rater-t-12, 12px);
+  color: var(--rater-text-subtle);
+}
+
+.rater-prp__list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 4px 0;
+}
+
+.rater-prp__row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--rater-hairline-soft);
+  font-size: var(--rater-t-12, 12px);
+  color: var(--rater-text-default);
+  text-align: left;
+}
+
+.rater-prp__row--policy {
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--rater-hairline-soft);
+  cursor: pointer;
+}
+
+.rater-prp__row--policy:hover {
+  background: var(--rater-surface-1);
+}
+
+.rater-prp__caret {
+  flex: 0 0 auto;
+  color: var(--rater-text-muted);
+  transition: transform 120ms ease;
+}
+
+.rater-prp__row--policy.is-open .rater-prp__caret {
+  transform: rotate(90deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rater-prp__caret {
+    transition: none;
+  }
+}
+
+.rater-prp__id {
+  font-family: var(--rater-fonts-mono);
+  font-size: var(--rater-t-12, 12px);
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-strong);
+}
+
+.rater-prp__locs {
+  font-size: var(--rater-t-11, 11px);
+  color: var(--rater-text-subtle);
+}
+
+.rater-prp__vals {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-left: auto;
+}
+
+.rater-prp__val {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+}
+
+.rater-prp__val-label {
+  font-size: var(--rater-t-10, 10px);
+  letter-spacing: var(--rater-tracking-label);
+  text-transform: uppercase;
+  color: var(--rater-text-subtle);
+}
+
+.rater-prp__val-num {
+  font-family: var(--rater-fonts-mono);
+  font-size: var(--rater-t-12, 12px);
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-cat-math-text);
+}
+
+.rater-prp__locations {
+  background: var(--rater-surface-1);
+}
+
+.rater-prp__row--location {
+  padding-left: 37px;
+}
+
+.rater-prp__loc-id {
+  font-family: var(--rater-fonts-mono);
+  font-size: var(--rater-t-11, 11px);
+  color: var(--rater-text-default);
+}
+
+.rater-prp__row--location .rater-prp__val-num {
+  color: var(--rater-text-default);
+  font-weight: var(--rater-fw-regular);
+}
+
+/* Brief glm-irpm-lightbox-in-policy-rollup — the IRPM-composed FINAL premium
+   (shown only when a policy tail is authored) + its expandable build-up. */
+.rater-prp__final {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-left: 6px;
+  padding-left: 14px;
+  border-left: 1px solid var(--rater-hairline-soft);
+}
+
+.rater-prp__final-label {
+  font-size: var(--rater-t-10, 10px);
+  letter-spacing: var(--rater-tracking-label);
+  text-transform: uppercase;
+  color: var(--rater-text-subtle);
+}
+
+.rater-prp__final-num {
+  font-family: var(--rater-fonts-mono);
+  font-size: var(--rater-t-13, 13px);
+  font-weight: var(--rater-fw-bold);
+  /* The bound premium reads as the affirmative result — success, NOT the
+     output-category red (which is a debit tone in the dark theme). */
+  color: var(--rater-feedback-success);
+}
+
+.rater-prp__buildup {
+  background: var(--rater-surface-1);
+  padding: 4px 16px 12px 37px;
+  border-bottom: 1px solid var(--rater-hairline-soft);
+}

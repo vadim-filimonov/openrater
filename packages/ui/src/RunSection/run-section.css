@@ -1,0 +1,214 @@
+/* ============================================================================
+ * <RunSection> — the Test tab (V2_INTERFACE_SPEC §2.4).
+ *
+ * Constitution: panels surface-1 · border-subtle · r-12 · 16/20 padding;
+ * eyebrow DNA; the premium is the one large number (28px, text-strong,
+ * never green); 40px output rows; token-only BEM.
+ * ========================================================================== */
+
+.rater-run {
+  display: grid;
+  grid-template-columns: minmax(320px, 42fr) 58fr;
+  gap: var(--rater-s-20);
+  align-items: start;
+  padding: var(--rater-s-20) 0 var(--rater-s-48);
+}
+
+@media (max-width: 1080px) {
+  .rater-run {
+    grid-template-columns: 1fr;
+  }
+}
+
+.rater-run--empty {
+  display: grid;
+  place-items: center;
+  min-height: 360px;
+}
+
+.rater-run__panel {
+  background: var(--rater-surface-1);
+  border: 1px solid var(--rater-border-subtle);
+  border-radius: var(--rater-r-12);
+  padding: var(--rater-s-16) var(--rater-s-20);
+}
+
+.rater-run__panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--rater-s-8);
+}
+
+.rater-run__eyebrow {
+  margin: 0;
+  font-size: var(--rater-t-11);
+  font-weight: var(--rater-fw-semibold);
+  letter-spacing: var(--rater-tracking-label);
+  text-transform: uppercase;
+  color: var(--rater-text-subtle);
+}
+
+.rater-run__panel-tools {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-8);
+}
+
+/* Brief 95 D1 — the book-template CSV download (plain-link affordance,
+   same register as the starter-kit anchors). */
+.rater-run__book-template {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-4);
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-subtle);
+  text-decoration: none;
+  transition: color 160ms ease;
+}
+
+.rater-run__book-template:hover {
+  color: var(--rater-text-default);
+}
+
+.rater-run__hint {
+  margin: 0 0 var(--rater-s-12);
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-subtle);
+}
+
+.rater-run__fields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-10);
+}
+
+.rater-run__field {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 160px;
+  align-items: center;
+  gap: var(--rater-s-12);
+}
+
+.rater-run__field-label {
+  font-size: var(--rater-t-13);
+  color: var(--rater-text-default);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── the result ─────────────────────────────────────────────────── */
+
+.rater-run__ranat {
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.rater-run__premium {
+  margin: var(--rater-s-4) 0 var(--rater-s-8);
+  font-size: 28px;
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-strong);
+  letter-spacing: var(--rater-tracking-tight);
+  font-variant-numeric: tabular-nums;
+}
+
+.rater-run__outputs {
+  list-style: none;
+  margin: 0 0 var(--rater-s-8);
+  padding: 0;
+}
+
+.rater-run__output {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--rater-s-12);
+  height: 40px;
+  border-bottom: 1px solid var(--rater-border-subtle);
+}
+
+.rater-run__output:last-child {
+  border-bottom: 0;
+}
+
+.rater-run__output-field {
+  font-family: var(--rater-font-mono);
+  letter-spacing: var(--rater-tracking-mono);
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-muted);
+}
+
+.rater-run__output-value {
+  font-size: var(--rater-t-13);
+  color: var(--rater-text-default);
+  font-variant-numeric: tabular-nums;
+}
+
+.rater-run__qualifier {
+  margin: 0 0 var(--rater-s-8);
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-subtle);
+}
+
+.rater-run__waiting {
+  margin: var(--rater-s-8) 0 0;
+  font-size: var(--rater-t-13);
+  color: var(--rater-text-subtle);
+}
+
+.rater-run__error {
+  margin: var(--rater-s-8) 0 0;
+  font-size: var(--rater-t-13);
+  color: var(--rater-feedback-error);
+}
+
+/* ── §14 (audit P4-01) — the evaluated-trace disclosure ─────── */
+
+.rater-run__trace {
+  margin-top: var(--rater-s-12);
+  border-top: 1px solid var(--rater-border-subtle);
+  padding-top: var(--rater-s-10);
+}
+
+.rater-run__trace-summary {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-4);
+  padding: var(--rater-s-2) var(--rater-s-4);
+  border-radius: var(--rater-r-2);
+  cursor: pointer;
+  list-style: none;
+  color: var(--rater-text-muted);
+  font-size: var(--rater-t-12);
+  font-weight: var(--rater-fw-medium);
+}
+
+.rater-run__trace-summary::-webkit-details-marker {
+  display: none;
+}
+
+.rater-run__trace-summary:hover {
+  color: var(--rater-text-default);
+  background: var(--rater-surface-2);
+}
+
+.rater-run__trace-summary:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: 1px;
+}
+
+.rater-run__trace-disclosure-icon {
+  flex-shrink: 0;
+  transition: transform var(--rater-d-140) var(--rater-ease-soft);
+}
+
+.rater-run__trace[open] .rater-run__trace-disclosure-icon {
+  transform: rotate(90deg);
+}
+
+.rater-run__trace-body {
+  margin-top: var(--rater-s-10);
+}

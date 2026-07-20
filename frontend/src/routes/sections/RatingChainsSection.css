@@ -1,0 +1,75 @@
+/* ============================================================================
+ * <RatingChainsSection> — Coverage Chains section pane content.
+ *
+ * Styles the empty state, the cards grid, and the parse-error fallback.
+ * The <RatingChainCard> primitives ship their own styles; this CSS only
+ * styles the wrappers + state-level concerns.
+ *
+ * Tokens consumed:
+ *   - --rater-s-* (spacing scale)
+ *   - --rater-text-muted, --rater-text-strong
+ *   - --rater-feedback-error, --rater-feedback-error-bg
+ *   - --rater-r-6
+ * ============================================================================ */
+
+.rating-chains-section__cards {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-14);
+}
+
+/* ── Empty state ─────────────────────────────────────────────── */
+
+.rating-chains-section__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--rater-s-10);
+  padding: var(--rater-s-20) var(--rater-s-14);
+  border: 1px dashed var(--rater-border-default);
+  border-radius: var(--rater-r-6);
+  background: var(--rater-surface-2, transparent);
+}
+
+.rating-chains-section__empty-headline {
+  margin: 0;
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-14);
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-strong);
+}
+
+.rating-chains-section__empty-subtext {
+  margin: 0;
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-13);
+  color: var(--rater-text-muted);
+  line-height: var(--rater-lh-normal);
+  max-width: 60ch;
+}
+
+.rating-chains-section__empty-subtext code {
+  font-family: var(--rater-fonts-mono);
+  font-size: 0.95em;
+  background: var(--rater-surface-3, rgba(0, 0, 0, 0.04));
+  padding: 0 4px;
+  border-radius: var(--rater-r-4);
+}
+
+/* ── Parse-error per stage ───────────────────────────────────── */
+
+.rating-chains-section__parse-error {
+  border: 1px solid var(--rater-feedback-error);
+  background: var(--rater-feedback-error-bg, rgba(239, 68, 68, 0.06));
+  color: var(--rater-feedback-error);
+  border-radius: var(--rater-r-6);
+  padding: var(--rater-s-10) var(--rater-s-12);
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-13);
+  line-height: var(--rater-lh-normal);
+}
+
+.rating-chains-section__parse-error code {
+  font-family: var(--rater-fonts-mono);
+  font-size: 0.95em;
+}

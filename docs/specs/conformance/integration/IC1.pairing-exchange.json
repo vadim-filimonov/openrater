@@ -1,0 +1,72 @@
+{
+  "id": "IC1",
+  "name": "pairing-exchange",
+  "spec": "§2",
+  "asserts": "A pairing code exchanges once for an integrator key + descriptor, and only once.",
+  "contract_version": "1.0",
+  "world": {
+    "integration": { "name": "Example Integrator — fixture", "paired": false },
+    "plans": []
+  },
+  "steps": [
+    {
+      "note": "operator generates a pairing code",
+      "actor": "operator",
+      "call": {
+        "method": "POST",
+        "path": "/api/v1/integrations/{{integration_id}}/pairing-codes",
+        "body": {}
+      },
+      "expect": {
+        "status": 201,
+        "body": {
+          "code": { "$type": "string" },
+          "expires_at": { "$present": true }
+        }
+      },
+      "capture": { "code": "$.code" }
+    },
+    {
+      "note": "the peer exchanges the code, uploading its catalog in the same call",
+      "actor": "anonymous",
+      "call": {
+        "method": "POST",
+        "path": "/api/v1/integrations/pair",
+        "body": {
+          "code": "{{code}}",
+          "peer_name": "Example Integrator (fixture)",
+          "catalog": [
+            { "key": "rest.gross_receipts", "label": "Annual gross receipts", "dtype": "number", "unit": "USD", "example": 1250000 },
+            { "key": "property.construction", "label": "Construction type", "dtype": "enum", "example": "JM" },
+            { "key": "property.tiv", "label": "Total insured value", "dtype": "number", "unit": "USD", "example": 1500000 }
+          ]
+        }
+      },
+      "expect": {
+        "status": 200,
+        "body": {
+          "integration_id": { "$same": "integration_id" },
+          "integrator_key": { "$type": "string" },
+          "descriptor": {
+            "contract_version": "1.0",
+            "integration_id": { "$same": "integration_id" }
+          }
+        }
+      },
+      "capture": { "exchanged_key": "$.integrator_key" }
+    },
+    {
+      "note": "replaying the same code fails — single-use",
+      "actor": "anonymous",
+      "call": {
+        "method": "POST",
+        "path": "/api/v1/integrations/pair",
+        "body": { "code": "{{code}}", "peer_name": "replay", "catalog": [] }
+      },
+      "expect": {
+        "status": 401,
+        "body": { "error": { "code": "pairing_code_invalid" } }
+      }
+    }
+  ]
+}

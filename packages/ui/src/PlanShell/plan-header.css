@@ -1,0 +1,218 @@
+/* ============================================================================
+ * PlanHeader + PlanLifecycleStepper — V2_INTERFACE_SPEC §2.1.
+ *
+ * The 64px plan identity strip (no horizontal padding of its own — the
+ * page container owns the gutter, so the title shares the content left
+ * edge with the tab labels) and the top-of-page lifecycle stepper.
+ * Token-only BEM.
+ * ========================================================================== */
+
+.rater-planhdr {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-24);
+  height: 64px;
+}
+
+.rater-planhdr__identity {
+  flex: 1;
+  min-width: 0;
+}
+
+.rater-planhdr__titlerow {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-10);
+}
+
+.rater-planhdr__title {
+  margin: 0;
+  font-size: var(--rater-t-20);
+  font-weight: var(--rater-fw-semibold);
+  letter-spacing: var(--rater-tracking-tight);
+  color: var(--rater-text-strong);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* status chip — read-only plans only (drafts live in the stepper);
+ * neutral per color governance: state rides dots, not colored chips */
+.rater-planhdr__status {
+  height: 18px;
+  padding: 0 var(--rater-s-6);
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+  border: 1px solid var(--rater-border-default);
+  border-radius: var(--rater-r-4);
+  color: var(--rater-text-muted);
+  font-size: var(--rater-t-11);
+  font-weight: var(--rater-fw-medium);
+  letter-spacing: var(--rater-tracking-label);
+  text-transform: capitalize;
+}
+
+.rater-planhdr__meta {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-10);
+  margin-top: 3px;
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-subtle);
+  white-space: nowrap;
+}
+
+.rater-planhdr__meta-sep {
+  width: 1px;
+  height: 10px;
+  background: var(--rater-border-default);
+  flex: none;
+}
+
+.rater-planhdr__health {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-6);
+}
+
+.rater-planhdr__health-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--rater-r-full);
+  background: var(--rater-feedback-success);
+}
+
+.rater-planhdr__health--warn .rater-planhdr__health-dot {
+  background: var(--rater-feedback-warn);
+}
+
+.rater-planhdr__health--readonly {
+  color: var(--rater-text-muted);
+}
+
+.rater-planhdr__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-8);
+  flex: none;
+}
+
+/* ── The plan status chip (Brief 84 — replaces the lifecycle stepper) ──
+   One derived status, three words. The chip stays neutral; status rides
+   the dot (plans-table governance). Warn tint is reserved for the drift
+   suffix — the only second signal the chip carries. */
+
+.rater-plan-status {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-6);
+  height: 24px;
+  padding: 0 var(--rater-s-10);
+  border-radius: var(--rater-r-full);
+  border: 1px solid var(--rater-border-default);
+  background: transparent;
+  color: var(--rater-text-default);
+  font-size: var(--rater-t-11);
+  font-weight: var(--rater-fw-medium);
+  white-space: nowrap;
+  flex: none;
+}
+
+button.rater-plan-status {
+  font-family: inherit;
+  cursor: pointer;
+  transition:
+    color var(--rater-d-80) var(--rater-ease-snap),
+    background var(--rater-d-80) var(--rater-ease-snap);
+}
+
+button.rater-plan-status:hover {
+  background: var(--rater-surface-1);
+  color: var(--rater-text-strong);
+}
+
+button.rater-plan-status:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: -2px;
+}
+
+.rater-plan-status__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--rater-r-full);
+  background: var(--rater-focus-ring);
+  flex: none;
+}
+
+.rater-plan-status--live .rater-plan-status__dot {
+  background: var(--rater-feedback-success);
+}
+
+.rater-plan-status--archived {
+  color: var(--rater-text-muted);
+}
+
+.rater-plan-status--archived .rater-plan-status__dot {
+  background: var(--rater-text-disabled);
+}
+
+/* Version names are user-authored ("filed_2026_q3") until 84.2 auto-names
+   them vN — truncate so a long filing tag can't blow up the header. */
+.rater-plan-status__name {
+  max-width: 14ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--rater-text-muted);
+}
+
+.rater-plan-status__drift {
+  color: var(--rater-feedback-warn);
+}
+
+/* the health pill as a Menu trigger (the clickable build checklist) */
+button.rater-planhdr__health--button {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+  border-radius: var(--rater-r-4);
+}
+
+button.rater-planhdr__health--button:hover {
+  color: var(--rater-text-default);
+}
+
+/* The menu caret rides faint at rest (a quiet "opens a menu" hint) and lifts
+   to muted on hover so the whole pill reads as one interactive control. */
+.rater-planhdr__health-caret {
+  color: var(--rater-text-faint);
+}
+
+button.rater-planhdr__health--button:hover .rater-planhdr__health-caret {
+  color: var(--rater-text-muted);
+}
+
+button.rater-planhdr__health--button:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: 2px;
+}
+
+.rater-planhdr__check {
+  width: 14px;
+  height: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  color: var(--rater-feedback-success);
+}
+
+.rater-planhdr__check:not(.rater-planhdr__check--done)::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: var(--rater-r-full);
+  background: var(--rater-feedback-warn);
+}

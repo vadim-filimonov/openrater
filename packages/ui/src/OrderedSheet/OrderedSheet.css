@@ -1,0 +1,111 @@
+/* ============================================================================
+ * <OrderedSheet> — the shared ordered-list grammar (Brief 70 Phase 1).
+ * Numbered rows · hover grip · insertion line · hover actions.
+ * ============================================================================ */
+
+.rater-osheet {
+  display: flex;
+  flex-direction: column;
+}
+
+.rater-osheet__announce {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.rater-osheet__row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-10);
+  min-height: 42px;
+  padding: var(--rater-s-6) var(--rater-s-10);
+  border-bottom: 1px solid var(--rater-hairline-subtle);
+}
+.rater-osheet__row:last-child {
+  border-bottom: 0;
+}
+.rater-osheet__row:hover {
+  background: var(--rater-row-hover-bg);
+}
+.rater-osheet__row.is-clickable {
+  cursor: pointer;
+}
+.rater-osheet__row:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: -2px;
+}
+.rater-osheet__row.is-selected {
+  background: var(--rater-row-selected-bg, var(--rater-row-hover-bg));
+  box-shadow: inset 2px 0 0 var(--rater-focus-ring);
+}
+
+/* the insertion line (drop preview) */
+.rater-osheet__row.is-drop-above::before,
+.rater-osheet__row.is-drop-below::after {
+  content: "";
+  position: absolute;
+  left: var(--rater-s-10);
+  right: var(--rater-s-10);
+  height: 2px;
+  border-radius: 1px;
+  background: var(--rater-focus-ring);
+}
+.rater-osheet__row.is-drop-above::before {
+  top: -1px;
+}
+.rater-osheet__row.is-drop-below::after {
+  bottom: -1px;
+}
+
+.rater-osheet__gutter {
+  width: 18px;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+}
+.rater-osheet__grip {
+  color: var(--rater-text-faint);
+  opacity: 0;
+  cursor: grab;
+  transition: opacity var(--rater-d-80) var(--rater-ease-snap);
+}
+.rater-osheet__row:hover .rater-osheet__grip,
+.rater-osheet__row:focus-within .rater-osheet__grip {
+  opacity: 1;
+}
+
+.rater-osheet__num {
+  width: 24px;
+  flex-shrink: 0;
+  text-align: right;
+  font-family: var(--rater-fonts-mono, var(--rater-fonts-sans));
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-faint);
+}
+
+.rater-osheet__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.rater-osheet__actions {
+  flex-shrink: 0;
+  opacity: 0;
+  transition: opacity var(--rater-d-80) var(--rater-ease-snap);
+}
+.rater-osheet__row:hover .rater-osheet__actions,
+.rater-osheet__row:focus-within .rater-osheet__actions {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rater-osheet__grip,
+  .rater-osheet__actions {
+    transition: none;
+  }
+}

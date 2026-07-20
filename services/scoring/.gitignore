@@ -1,0 +1,5 @@
+# Build output (also ignored at repo root)
+dist/
+# Local filesystem ResultStore default root (FilesystemResultStore)
+.scoring-data/
+*.tsbuildinfo

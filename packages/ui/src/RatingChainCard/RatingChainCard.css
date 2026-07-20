@@ -1,0 +1,234 @@
+/* ============================================================================
+ * <RatingChainCard> — A5.8 redesign.
+ *
+ * Per-chain visualization card. Per design-language §14 (card density)
+ * + §16 (row hover/selection). The most actuary-time-spent surface;
+ * the audit's §6.1-§6.4 issues all close here.
+ *
+ * Tokens consumed:
+ *   --rater-surface-1, -sunken
+ *   --rater-hairline-base, -soft
+ *   --rater-text-strong, -default, -muted, -subtle
+ *   --rater-row-hover-bg (A5.3a semantic token)
+ *   --rater-feedback-error (remove-button hover)
+ *   --rater-focus-ring
+ *   --rater-t-{11..14}, --rater-tracking-{label, normal}
+ *   --rater-font-sans, -mono, --rater-num-tabular
+ *   --rater-s-{2,4,6,8,10,12}, --rater-r-{4,8}
+ *   --rater-d-80, --rater-ease-snap
+ * ============================================================================ */
+
+.rater-rating-chain-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--rater-surface-1);
+  border: 1px solid var(--rater-hairline-base);
+  border-radius: var(--rater-r-8);
+  overflow: hidden;
+  font-family: var(--rater-font-sans);
+}
+
+/* ----------------------------------------------------------------
+ * Header (sunken strip with title + kind/operator badge)
+ * ---------------------------------------------------------------- */
+
+.rater-rating-chain-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--rater-s-10);
+  padding: var(--rater-s-10) var(--rater-s-12);
+  background: var(--rater-surface-sunken);
+  border-bottom: 1px solid var(--rater-hairline-soft);
+}
+
+.rater-rating-chain-card__title {
+  margin: 0;
+  font-size: var(--rater-t-14);
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-strong);
+}
+
+.rater-rating-chain-card__kind {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-2);
+  font-family: var(--rater-font-mono);
+  font-size: var(--rater-t-11);
+  color: var(--rater-text-muted);
+  letter-spacing: var(--rater-tracking-label);
+}
+
+.rater-rating-chain-card__symbol {
+  font-weight: var(--rater-fw-medium);
+  color: var(--rater-text-strong);
+}
+
+/* ----------------------------------------------------------------
+ * Body — base row + factor list + add-row
+ * ---------------------------------------------------------------- */
+
+.rater-rating-chain-card__body {
+  display: flex;
+  flex-direction: column;
+  padding: var(--rater-s-8) var(--rater-s-12);
+}
+
+.rater-rating-chain-card__row {
+  display: grid;
+  grid-template-columns: 24px 1fr auto 24px;
+  align-items: center;
+  gap: var(--rater-s-8);
+  padding: var(--rater-s-4) 0;
+}
+
+/* Base row uses a solid hairline separator (was dashed — §17.10
+ * forbids decorative dashed borders) */
+.rater-rating-chain-card__row--base {
+  border-bottom: 1px solid var(--rater-hairline-soft);
+  padding-bottom: var(--rater-s-8);
+  margin-bottom: var(--rater-s-4);
+}
+
+.rater-rating-chain-card__op {
+  font-family: var(--rater-font-mono);
+  font-variant-numeric: var(--rater-num-tabular);
+  font-size: var(--rater-t-14);
+  color: var(--rater-text-muted);
+  text-align: center;
+}
+
+.rater-rating-chain-card__label {
+  font-size: var(--rater-t-13);
+  color: var(--rater-text-strong);
+}
+
+.rater-rating-chain-card__value {
+  font-family: var(--rater-font-mono);
+  font-variant-numeric: var(--rater-num-tabular);
+  font-size: var(--rater-t-13);
+  color: var(--rater-text-strong);
+}
+
+.rater-rating-chain-card__action-placeholder {
+  /* Reserved column for action column alignment with factor rows. */
+}
+
+/* ----------------------------------------------------------------
+ * Factor list — no max-height cap (was 320px which hid the
+ * scrollbar; audit §6.2). Page scrolls naturally when chains have
+ * >10 factors.
+ * ---------------------------------------------------------------- */
+
+.rater-rating-chain-card__factors {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* Row hover uses semantic --rater-row-hover-bg per §16 */
+.rater-rating-chain-card__row--factor {
+  transition: background var(--rater-d-80) var(--rater-ease-snap);
+}
+
+.rater-rating-chain-card__row--factor:hover {
+  background: var(--rater-row-hover-bg);
+}
+
+.rater-rating-chain-card__factor-button {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: baseline;
+  gap: var(--rater-s-6);
+  width: 100%;
+  padding: var(--rater-s-2) var(--rater-s-4);
+  border: 0;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  font-family: inherit;
+  color: inherit;
+}
+
+.rater-rating-chain-card__factor-button:disabled {
+  cursor: default;
+}
+
+.rater-rating-chain-card__factor-button:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: 2px;
+  border-radius: var(--rater-r-4);
+}
+
+/* Kind chip — standard density per §13.1 (was 1px tight padding;
+ * audit §6.3 baseline misalignment). */
+.rater-rating-chain-card__kind-chip {
+  display: inline-block;
+  padding: var(--rater-s-2) var(--rater-s-6);
+  background: var(--rater-surface-sunken);
+  border-radius: var(--rater-r-4);
+  font-family: var(--rater-font-mono);
+  font-variant-numeric: var(--rater-num-tabular);
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-muted);
+  letter-spacing: var(--rater-tracking-normal);
+}
+
+.rater-rating-chain-card__resolves {
+  font-family: var(--rater-font-mono);
+  font-variant-numeric: var(--rater-num-tabular);
+  font-size: var(--rater-t-11);
+  color: var(--rater-text-muted);
+}
+
+/* Remove button — now an IconButton; the class is preserved for
+ * any per-row layout adjustments (currently none needed; the grid
+ * column auto-fits the 24px box). The button is ALWAYS visible
+ * (text-subtle), no longer opacity-hidden until hover (audit §6.1). */
+.rater-rating-chain-card__remove {
+  /* The IconButton primitive owns size, focus, hover, disabled.
+   * No custom CSS overrides — keep it stock so audits stay clean. */
+}
+
+/* ----------------------------------------------------------------
+ * Empty + Add row
+ * ---------------------------------------------------------------- */
+
+.rater-rating-chain-card__empty {
+  padding: var(--rater-s-10);
+  text-align: center;
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-muted);
+}
+
+/* Add-row separator solid (was dashed; §17.10) */
+.rater-rating-chain-card__add-row {
+  display: flex;
+  padding-top: var(--rater-s-6);
+  margin-top: var(--rater-s-4);
+  border-top: 1px solid var(--rater-hairline-soft);
+}
+
+/* ----------------------------------------------------------------
+ * Footer — output label
+ * ---------------------------------------------------------------- */
+
+.rater-rating-chain-card__footer {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-8);
+  padding: var(--rater-s-8) var(--rater-s-12);
+  background: var(--rater-surface-sunken);
+  border-top: 1px solid var(--rater-hairline-soft);
+}
+
+.rater-rating-chain-card__output-arrow {
+  font-family: var(--rater-font-mono);
+  color: var(--rater-text-muted);
+}
+
+.rater-rating-chain-card__output-label {
+  font-size: var(--rater-t-12);
+  font-weight: var(--rater-fw-medium);
+  color: var(--rater-text-strong);
+}

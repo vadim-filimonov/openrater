@@ -1,0 +1,28 @@
+/**
+ * Inputs workspace mount layout — Brief 52.
+ *
+ * Stacks the new "Declare" panel (<InputDictionaryEditor>) above the
+ * existing "Map & score" panel (<InputsWorkspace>). Tokens only.
+ */
+
+.rater-inputs-ws {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.rater-inputs-ws__map {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border-top: 1px solid var(--rater-hairline-soft);
+  padding-top: 20px;
+}
+
+.rater-inputs-ws__eyebrow {
+  font-size: var(--rater-t-11);
+  font-weight: var(--rater-fw-semibold);
+  text-transform: uppercase;
+  letter-spacing: var(--rater-tracking-label);
+  color: var(--rater-text-faint);
+}

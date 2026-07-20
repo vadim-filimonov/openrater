@@ -1,0 +1,175 @@
+/* ============================================================================
+ * <Canvas> — sub-brief 24.G
+ *
+ * Wrapper-only CSS. @xyflow/react ships its own stylesheet (imported
+ * from the .tsx); this file applies our design-token overrides on
+ * top.
+ *
+ * Tokens consumed:
+ *   --rater-surface-1, -sunken
+ *   --rater-hairline-base, -soft
+ *   --rater-text-strong, -muted
+ *   --rater-accent-primary
+ *   --rater-cat-input / -transform / -lookup / -math / -loading / -output
+ *   --rater-r-{4,6,8}
+ *   --rater-d-80
+ * ============================================================================ */
+
+.rater-canvas {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 480px;
+  background: var(--rater-surface-sunken);
+  border-radius: var(--rater-r-8);
+  overflow: hidden;
+}
+
+/* ── ReactFlow viewport background ─────────────────────────────── */
+
+.rater-canvas .react-flow {
+  background: transparent;
+}
+
+/* ── Dotted grid (--xy-* are @xyflow/react's CSS vars) ─────────── */
+
+.rater-canvas .react-flow__background {
+  background-color: var(--rater-surface-sunken);
+}
+
+.rater-canvas .react-flow__background-pattern {
+  fill: var(--rater-hairline-soft);
+}
+
+/* ── Edges ─────────────────────────────────────────────────────── */
+
+.rater-canvas .react-flow__edge-path {
+  stroke: var(--rater-hairline-strong);
+  stroke-width: 1.5;
+}
+
+.rater-canvas .react-flow__edge.selected .react-flow__edge-path,
+.rater-canvas .react-flow__edge:focus-visible .react-flow__edge-path {
+  stroke: var(--rater-accent-primary);
+  stroke-width: 2;
+}
+
+.rater-canvas .react-flow__edge-text {
+  fill: var(--rater-text-muted);
+  font-family: var(--rater-font-sans);
+  font-size: var(--rater-t-11);
+}
+
+.rater-canvas .react-flow__edge-textbg {
+  fill: var(--rater-surface-1);
+}
+
+/* Connection line drawn during a drag-from-handle gesture */
+.rater-canvas .react-flow__connectionline {
+  stroke: var(--rater-accent-primary);
+  stroke-width: 2;
+  stroke-dasharray: 4 4;
+}
+
+/* ── Node defaults (overridable by custom nodeTypes) ──────────── */
+
+.rater-canvas .react-flow__node {
+  font-family: var(--rater-font-sans);
+  font-size: var(--rater-t-13);
+  color: var(--rater-text-strong);
+}
+
+.rater-canvas .react-flow__node-default {
+  background: var(--rater-surface-1);
+  border: 1px solid var(--rater-hairline-base);
+  border-radius: var(--rater-r-6);
+  padding: var(--rater-s-8) var(--rater-s-12);
+  box-shadow: none;
+}
+
+.rater-canvas .react-flow__node.selected .react-flow__node-default,
+.rater-canvas .react-flow__node-default.selected {
+  border-color: var(--rater-accent-primary);
+  box-shadow: 0 0 0 2px var(--rater-cat-input-soft, rgba(91, 153, 240, 0.18));
+}
+
+/* ── Handles ──────────────────────────────────────────────────── */
+
+.rater-canvas .react-flow__handle {
+  background: var(--rater-surface-1);
+  border: 1.5px solid var(--rater-hairline-strong);
+  width: 8px;
+  height: 8px;
+  transition:
+    background var(--rater-d-80) var(--rater-ease-snap),
+    border-color var(--rater-d-80) var(--rater-ease-snap);
+}
+
+.rater-canvas .react-flow__handle:hover {
+  background: var(--rater-accent-primary);
+  border-color: var(--rater-accent-primary);
+}
+
+.rater-canvas .react-flow__handle.connecting {
+  background: var(--rater-accent-primary);
+  border-color: var(--rater-accent-primary);
+}
+
+/* ── Controls (bottom-left zoom / fit / lock) ─────────────────── */
+
+.rater-canvas .react-flow__controls {
+  background: var(--rater-surface-1);
+  border: 1px solid var(--rater-hairline-soft);
+  border-radius: var(--rater-r-6);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+}
+
+.rater-canvas .react-flow__controls-button {
+  background: var(--rater-surface-1);
+  border: 0;
+  border-bottom: 1px solid var(--rater-hairline-soft);
+  color: var(--rater-text-muted);
+  transition:
+    background var(--rater-d-80) var(--rater-ease-snap),
+    color var(--rater-d-80) var(--rater-ease-snap);
+}
+
+.rater-canvas .react-flow__controls-button:hover {
+  background: var(--rater-row-hover-bg);
+  color: var(--rater-text-strong);
+}
+
+.rater-canvas .react-flow__controls-button:last-child {
+  border-bottom: 0;
+}
+
+.rater-canvas .react-flow__controls-button svg {
+  fill: currentColor;
+}
+
+/* ── MiniMap (bottom-right, opt-in) ───────────────────────────── */
+
+.rater-canvas__minimap.react-flow__minimap {
+  background: var(--rater-surface-1);
+  border: 1px solid var(--rater-hairline-soft);
+  border-radius: var(--rater-r-6);
+  overflow: hidden;
+}
+
+.rater-canvas .react-flow__minimap-mask {
+  fill: rgba(0, 0, 0, 0.04);
+}
+
+.rater-canvas .react-flow__minimap-node {
+  fill: var(--rater-text-muted);
+  stroke: none;
+}
+
+/* ── Selection rectangle (marquee) ────────────────────────────── */
+
+.rater-canvas .react-flow__nodesselection-rect,
+.rater-canvas .react-flow__selection {
+  background: var(--rater-cat-input-soft, rgba(91, 153, 240, 0.12));
+  border: 1px solid var(--rater-accent-primary);
+}

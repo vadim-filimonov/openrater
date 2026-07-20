@@ -1,0 +1,91 @@
+/* ──────────────────────────────────────────────────────────────
+   ClampVisualizer — Phase H.6 (Brief 41 §−1 Q3)
+
+   Compact horizontal number-line. Token-disciplined, matches the
+   LineChart styling so the modifier-editor surface feels cohesive.
+   ────────────────────────────────────────────────────────────── */
+
+.rater-clamp-visualizer {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-8);
+}
+
+.rater-clamp-visualizer__svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: var(--rater-surface-1);
+  border: 1px solid var(--rater-hairline-soft);
+  border-radius: var(--rater-r-6);
+  font-family: var(--rater-fonts-sans);
+}
+
+/* Clamp band — subtle tint of the input/cat accent. */
+.rater-clamp-visualizer__band {
+  fill: var(--rater-cat-input);
+  fill-opacity: 0.18;
+  stroke: var(--rater-cat-input);
+  stroke-opacity: 0.45;
+  stroke-width: 1;
+  rx: 2;
+}
+
+/* Axis line — single hairline at the midline. */
+.rater-clamp-visualizer__axis {
+  stroke: var(--rater-hairline-strong);
+  stroke-width: 1;
+}
+
+/* Baseline (1.0) — dashed vertical. */
+.rater-clamp-visualizer__baseline {
+  stroke: var(--rater-text-subtle);
+  stroke-width: 1;
+  stroke-dasharray: 2, 3;
+}
+
+/* Tick marks + labels. */
+.rater-clamp-visualizer__tick-line {
+  stroke: var(--rater-hairline-strong);
+  stroke-width: 1;
+}
+.rater-clamp-visualizer__tick-line.is-clamp-edge {
+  stroke: var(--rater-cat-input);
+  stroke-width: 1.5;
+}
+.rater-clamp-visualizer__tick-label {
+  font-family: var(--rater-fonts-mono);
+  font-size: 9px;
+  fill: var(--rater-text-subtle);
+}
+.rater-clamp-visualizer__tick-label.is-clamp-edge {
+  fill: var(--rater-cat-input);
+  font-weight: var(--rater-fw-semibold);
+}
+
+/* Fallback marker — diamond glyph. */
+.rater-clamp-visualizer__fallback-glyph {
+  fill: var(--rater-surface-1);
+  stroke: var(--rater-text-default);
+  stroke-width: 1.5;
+}
+
+/* Actual factor marker — solid dot. */
+.rater-clamp-visualizer__actual {
+  fill: var(--rater-cat-input);
+  stroke: var(--rater-surface-1);
+  stroke-width: 1.5;
+}
+
+/* Invalid state (min > max). */
+.rater-clamp-visualizer.is-invalid .rater-clamp-visualizer__svg {
+  border-color: var(--rater-cat-output-text);
+}
+.rater-clamp-visualizer__warning {
+  margin: 0;
+  font-size: 11px;
+  color: var(--rater-cat-output-text);
+  line-height: 1.4;
+}

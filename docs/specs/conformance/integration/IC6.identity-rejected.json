@@ -1,0 +1,76 @@
+{
+  "id": "IC6",
+  "name": "identity-rejected",
+  "spec": "§7",
+  "asserts": "Identity-class fact keys are rejected with a 422 that names every offending key — never silently stripped.",
+  "contract_version": "1.0",
+  "world": {
+    "integration": { "name": "Example Integrator — fixture", "paired": true },
+    "plans": ["plan-alpha"]
+  },
+  "steps": [
+    {
+      "note": "the facts smuggle a legal name and an email; geography stays legal",
+      "actor": "integrator",
+      "call": {
+        "method": "POST",
+        "path": "/api/v1/integrations/{{integration_id}}/quote-set",
+        "headers": { "X-OpenRater-Integration-Key": "{{integrator_key}}" },
+        "body": {
+          "risk_ref": "r-fixture-0004",
+          "request_hash": "sha256:ic6-fixture",
+          "effective_date": "2026-08-01",
+          "trace": "none",
+          "facts": {
+            "rest.gross_receipts": 1250000,
+            "property.construction": "JM",
+            "property.tiv": 1500000,
+            "geo.county_fips": "53033",
+            "identity.legal_name": "La Tavola LLC",
+            "contact.email": "owner@latavola.example"
+          }
+        }
+      },
+      "expect": {
+        "status": 422,
+        "body": {
+          "error": {
+            "code": "identity_keys_rejected",
+            "details": {
+              "keys": { "$contains": ["identity.legal_name", "contact.email"] }
+            }
+          }
+        }
+      }
+    },
+    {
+      "note": "the same request without the identity keys computes — geography alone is not identity",
+      "actor": "integrator",
+      "call": {
+        "method": "POST",
+        "path": "/api/v1/integrations/{{integration_id}}/quote-set",
+        "headers": { "X-OpenRater-Integration-Key": "{{integrator_key}}" },
+        "body": {
+          "risk_ref": "r-fixture-0004",
+          "request_hash": "sha256:ic6-fixture-clean",
+          "effective_date": "2026-08-01",
+          "trace": "none",
+          "facts": {
+            "rest.gross_receipts": 1250000,
+            "property.construction": "JM",
+            "property.tiv": 1500000,
+            "geo.county_fips": "53033"
+          }
+        }
+      },
+      "expect": {
+        "status": 200,
+        "body": {
+          "quotes": [
+            { "carrier": "acme-mutual", "row_status": "ok", "premium": { "$type": "number" } }
+          ]
+        }
+      }
+    }
+  ]
+}

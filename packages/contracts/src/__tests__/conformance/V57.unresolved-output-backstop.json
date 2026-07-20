@@ -1,0 +1,27 @@
+{
+  "name": "V57.unresolved-output-backstop",
+  "description": "ADR-0056 - a numeric output that computes to NaN (missing input poisons the arithmetic) is WITHHELD from outputs with an unresolved_output error; a non-number never leaves the engine looking like a premium.",
+  "plan": {
+    "id": "v57.unresolved-output",
+    "version": "1.0.0",
+    "name": "Unresolved output backstop",
+    "effective": "2026-01-01",
+    "nodes": [
+      { "id": "in_rev", "kind": "input", "params": { "fieldName": "revenue", "fieldType": "number" }, "position": { "x": 0, "y": 0 } },
+      { "id": "const_rate", "kind": "constant", "params": { "value": 2, "type": "number" }, "position": { "x": 0, "y": 100 } },
+      { "id": "mul", "kind": "math.op", "params": { "op": "mul" }, "position": { "x": 200, "y": 0 } },
+      { "id": "out_p", "kind": "output", "params": { "fieldName": "premium", "fieldType": "money" }, "position": { "x": 400, "y": 0 } }
+    ],
+    "edges": [
+      { "from": { "node": "in_rev", "port": "value" }, "to": { "node": "mul", "port": "x" } },
+      { "from": { "node": "const_rate", "port": "value" }, "to": { "node": "mul", "port": "y" } },
+      { "from": { "node": "mul", "port": "result" }, "to": { "node": "out_p", "port": "value" } }
+    ]
+  },
+  "externalInputs": {},
+  "expectedOutputs": {},
+  "expectedRowStatus": "error",
+  "expectedIssues": [
+    { "nodeId": "out_p", "code": "unresolved_output", "severity": "error" }
+  ]
+}

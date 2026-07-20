@@ -1,0 +1,304 @@
+/* /rate-lab/new — Brief 91: one centered card, two questions.
+ * Scenes (blank form ↔ copy picker) share the card shell; the card
+ * remounts on scene swap (key={mode}) so the entrance motion re-fires. */
+
+.plan-new-page {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: var(--rater-s-64) var(--rater-s-24) var(--rater-s-64);
+}
+
+.plan-new-page__card {
+  width: 480px;
+  max-width: 100%;
+  padding: var(--rater-s-28) var(--rater-s-28) var(--rater-s-20);
+  background: var(--rater-surface-1);
+  border: 1px solid var(--rater-border-subtle);
+  border-radius: var(--rater-r-12);
+  animation: plan-new-card-in var(--rater-d-140) var(--rater-ease-soft);
+}
+
+@keyframes plan-new-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .plan-new-page__card {
+    animation: none;
+  }
+}
+
+.plan-new-page__header {
+  margin-bottom: var(--rater-s-20);
+}
+
+.plan-new-page__title {
+  margin: 0 0 var(--rater-s-4);
+  font-family: var(--rater-font-display);
+  font-size: var(--rater-t-20);
+  font-weight: var(--rater-fw-semibold);
+  letter-spacing: var(--rater-tracking-tight);
+  color: var(--rater-text-strong);
+}
+
+.plan-new-page__subtitle {
+  margin: 0;
+  font-size: var(--rater-t-13);
+  line-height: var(--rater-leading-snug);
+  color: var(--rater-text-muted);
+}
+
+.plan-new-page__error {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-4);
+  padding: var(--rater-s-10) var(--rater-s-12);
+  margin-bottom: var(--rater-s-16);
+  background: var(--rater-feedback-error-soft);
+  border: 1px solid var(--rater-feedback-error);
+  border-radius: var(--rater-r-6);
+  color: var(--rater-feedback-error);
+  font-size: var(--rater-t-13);
+  line-height: var(--rater-leading-snug);
+}
+
+.plan-new-page__error strong {
+  font-weight: var(--rater-fw-semibold);
+}
+
+.plan-new-page__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-16);
+}
+
+.plan-new-page__field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-6);
+}
+
+.plan-new-page__field-error {
+  color: var(--rater-feedback-error);
+  font-size: var(--rater-t-12);
+  font-weight: var(--rater-fw-medium);
+  line-height: var(--rater-leading-snug);
+}
+
+.plan-new-page__field-hint {
+  margin: 0;
+  font-size: var(--rater-t-12);
+  line-height: var(--rater-leading-snug);
+  color: var(--rater-text-muted);
+}
+
+/* Quiet text actions (note toggle, the copy door, back) align with the
+ * field edge — cancel the <Button>'s 12px inline padding on the left. */
+.plan-new-page__flush-left {
+  margin-left: calc(-1 * var(--rater-s-12));
+}
+
+.plan-new-page__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--rater-s-12);
+  padding-top: var(--rater-s-16);
+  margin-top: var(--rater-s-4);
+  border-top: 1px solid var(--rater-border-subtle);
+}
+
+.plan-new-page__actions {
+  display: flex;
+  gap: var(--rater-s-8);
+}
+
+/* ── Scene 2 — the copy picker ─────────────────────────────────────── */
+
+.plan-new-page__copy {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-12);
+}
+
+.plan-new-page__copy-search {
+  width: 100%;
+}
+
+.plan-new-page__copy-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-2);
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.plan-new-page__copy-row {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+  width: 100%;
+  padding: var(--rater-s-8) var(--rater-s-10);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--rater-r-6);
+  font-family: var(--rater-font-sans);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background var(--rater-d-80) var(--rater-ease-soft),
+    border-color var(--rater-d-80) var(--rater-ease-soft);
+}
+
+.plan-new-page__copy-row:hover:not(disabled) {
+  background: var(--rater-surface-2);
+  border-color: var(--rater-border-subtle);
+}
+
+.plan-new-page__copy-row:focus-visible {
+  outline: none;
+  border-color: var(--rater-focus-ring);
+}
+
+.plan-new-page__copy-row:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.plan-new-page__copy-row-name {
+  font-size: var(--rater-t-13);
+  font-weight: var(--rater-fw-medium);
+  color: var(--rater-text-strong);
+}
+
+.plan-new-page__copy-row-meta {
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-muted);
+}
+
+.plan-new-page__copy-empty {
+  margin: 0;
+  padding: var(--rater-s-16) var(--rater-s-4);
+  font-size: var(--rater-t-13);
+  color: var(--rater-text-muted);
+}
+
+/* Brief 92 — the workbook flow needs report-table room; the card widens
+ * for that mode only (the two-question card stays 440px). */
+.plan-new-page__card--wide {
+  width: 680px;
+}
+
+/* ── The workbook door (Brief 92, promoted 2026-07-15) ──────────────
+ * Automatic ingestion is a flagship capability: a first-class door card
+ * under the header (the PlanGenesis whole-card idiom), never a footer
+ * text link. Hover = container shade, per the platform affordance. */
+.plan-new-page__ingest {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-12);
+  width: 100%;
+  margin-bottom: var(--rater-s-16);
+  padding: var(--rater-s-12) var(--rater-s-14);
+  background: var(--rater-surface-1);
+  border: 1px solid var(--rater-border-default);
+  border-radius: var(--rater-r-8);
+  font-family: var(--rater-font-sans);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background var(--rater-d-80) var(--rater-ease-snap),
+    border-color var(--rater-d-80) var(--rater-ease-snap);
+}
+
+.plan-new-page__ingest:hover {
+  background: var(--rater-row-hover-bg);
+  border-color: var(--rater-border-strong);
+}
+
+.plan-new-page__ingest:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: 2px;
+}
+
+.plan-new-page__ingest-ico {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--rater-s-32);
+  height: var(--rater-s-32);
+  flex: none;
+  border-radius: var(--rater-r-6);
+  background: var(--rater-brand-accent-soft);
+  color: var(--rater-accent-primary);
+}
+
+.plan-new-page__ingest-ico svg {
+  width: var(--rater-icon-16);
+  height: var(--rater-icon-16);
+}
+
+.plan-new-page__ingest-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+  flex: 1;
+}
+
+.plan-new-page__ingest-name {
+  font-size: var(--rater-t-13);
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-strong);
+}
+
+.plan-new-page__ingest-what {
+  font-size: var(--rater-t-12);
+  line-height: var(--rater-leading-snug);
+  color: var(--rater-text-muted);
+}
+
+.plan-new-page__ingest-go {
+  width: var(--rater-icon-16);
+  height: var(--rater-icon-16);
+  flex: none;
+  color: var(--rater-text-subtle);
+}
+
+/* "or start blank" — a hairline divider between the door and the form. */
+.plan-new-page__or {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-10);
+  margin-bottom: var(--rater-s-16);
+  font-size: var(--rater-t-11);
+  letter-spacing: var(--rater-tracking-label);
+  text-transform: uppercase;
+  color: var(--rater-text-subtle);
+}
+
+.plan-new-page__or::before,
+.plan-new-page__or::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--rater-border-subtle);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .plan-new-page__ingest {
+    transition-duration: 1ms;
+  }
+}

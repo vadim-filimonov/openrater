@@ -1,0 +1,170 @@
+/* ──────────────────────────────────────────────────────────────
+   LineMultiples — Brief 34 PR 34.2
+
+   Small multiples line chart for 2-D banded × categorical factor
+   tables. One line per column. Matches the polished mockup Frame 1.
+   ────────────────────────────────────────────────────────────── */
+
+.rater-line-multiples {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-8);
+  width: 100%;
+}
+.rater-line-multiples-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  font-family: var(--rater-fonts-sans);
+  background: var(--rater-surface-1);
+  border-radius: var(--rater-r-8);
+}
+
+/* Empty state */
+.rater-line-multiples--empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 220px;
+  background: var(--rater-surface-canvas);
+  border: 1px dashed var(--rater-hairline-base);
+  border-radius: var(--rater-r-8);
+}
+.rater-line-multiples-empty-text {
+  font-size: 12px;
+  color: var(--rater-text-subtle);
+  font-style: italic;
+}
+
+/* Axes + grid */
+.rater-line-multiples-axis {
+  stroke: var(--rater-hairline-strong);
+  stroke-width: 1;
+}
+.rater-line-multiples-gridline {
+  stroke: var(--rater-hairline-soft);
+  stroke-width: 0.5;
+}
+.rater-line-multiples-gridline.is-baseline {
+  stroke: var(--rater-text-subtle);
+  stroke-dasharray: 3, 3;
+  stroke-width: 1;
+}
+.rater-line-multiples-y-label,
+.rater-line-multiples-x-label {
+  font-family: var(--rater-fonts-mono);
+  font-size: 9px;
+  fill: var(--rater-text-subtle);
+}
+
+/* Series */
+.rater-line-multiples-series {
+  transition: opacity 80ms ease;
+}
+.rater-line-multiples-polyline {
+  fill: none;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  pointer-events: stroke;
+}
+.rater-line-multiples-marker {
+  pointer-events: none;
+  transition: r 80ms ease;
+}
+.rater-line-multiples-series.is-dimmed {
+  opacity: 0.4;
+}
+.rater-line-multiples-series.is-focused {
+  opacity: 1;
+}
+
+/* Legend (below the chart) */
+.rater-line-multiples-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--rater-s-8);
+  padding: var(--rater-s-6) 0;
+}
+.rater-line-multiples-legend-entry {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-6);
+  padding: var(--rater-s-4) var(--rater-s-8);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--rater-r-full);
+  cursor: pointer;
+  font-family: inherit;
+  color: var(--rater-text-muted);
+  font-size: 11px;
+  transition: background 80ms ease, border-color 80ms ease, color 80ms ease,
+    opacity 80ms ease;
+}
+.rater-line-multiples-legend-entry:hover,
+.rater-line-multiples-legend-entry.is-focused {
+  background: var(--rater-surface-2);
+  color: var(--rater-text-default);
+  border-color: var(--rater-hairline-soft);
+}
+.rater-line-multiples-legend-entry.is-dimmed {
+  opacity: 0.5;
+}
+.rater-line-multiples-legend-entry.is-all-default {
+  font-style: italic;
+}
+.rater-line-multiples-legend-swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: var(--rater-r-4);
+  display: inline-block;
+  flex-shrink: 0;
+}
+.rater-line-multiples-legend-entry.is-all-default .rater-line-multiples-legend-swatch {
+  outline: 2px dashed var(--rater-text-muted);
+  outline-offset: -1px;
+  background: transparent !important;
+}
+.rater-line-multiples-legend-label {
+  white-space: nowrap;
+}
+.rater-line-multiples-legend-note {
+  color: var(--rater-text-subtle);
+  font-size: 10px;
+}
+
+/* Brief 34 PR 34.6 — filed-overlay (per-series ghost line) */
+.rater-line-multiples-filed-polyline {
+  fill: none;
+  stroke: var(--rater-text-subtle, #71717a);
+  stroke-width: 1.5;
+  stroke-dasharray: 4, 3;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+/* Brief 34 PR 34.5 — selection + brush */
+.rater-line-multiples-selection-region {
+  fill: color-mix(in srgb, var(--rater-cat-input) 8%, transparent);
+  pointer-events: none;
+}
+.rater-line-multiples-brush-rect {
+  fill: color-mix(in srgb, var(--rater-cat-input) 12%, transparent);
+  stroke: color-mix(in srgb, var(--rater-cat-input) 60%, transparent);
+  stroke-width: 1;
+  stroke-dasharray: 2, 2;
+}
+.rater-line-multiples[data-brushing="true"] .rater-line-multiples-svg {
+  cursor: crosshair;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .rater-line-multiples-series,
+  .rater-line-multiples-marker,
+  .rater-line-multiples-legend-entry {
+    transition: none;
+  }
+}

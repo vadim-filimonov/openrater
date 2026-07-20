@@ -1,0 +1,136 @@
+/* ============================================================================
+ * <DimensionDeletePrompt> — self-styled (Brief 66 cutover: extracted from
+ * the deleted legacy DimensionEditor.css — the prompt is a KEEPER, the
+ * editor is not). Token-only BEM.
+ * ========================================================================== */
+
+.rater-dim-delete-prompt {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-12);
+}
+
+.rater-dim-delete-prompt__intro {
+  margin: 0;
+  font-size: var(--rater-t-13);
+  color: var(--rater-text-default);
+  line-height: 1.5;
+}
+
+.rater-dim-delete-prompt__warning {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-10);
+  padding: var(--rater-s-8) var(--rater-s-12);
+  background: color-mix(in srgb, var(--rater-accent-danger) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--rater-accent-danger) 25%, transparent);
+  border-radius: var(--rater-r-6);
+  color: var(--rater-text-default);
+  font-size: var(--rater-t-12);
+  line-height: 1.4;
+}
+
+.rater-dim-delete-prompt__warning-icon {
+  flex-shrink: 0;
+  color: var(--rater-cat-output-text);
+  display: inline-flex;
+  align-items: center;
+}
+
+.rater-dim-delete-prompt__refs {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-4);
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.rater-dim-delete-prompt__ref {
+  display: grid;
+  grid-template-columns: 22px 1fr auto 50px;
+  gap: var(--rater-s-10);
+  align-items: center;
+  width: 100%;
+  padding: var(--rater-s-8) var(--rater-s-12);
+  background: var(--rater-surface-2);
+  border: 1px solid var(--rater-hairline-soft);
+  border-radius: var(--rater-r-6);
+  cursor: pointer;
+  font-family: var(--rater-font-sans);
+  font-size: var(--rater-t-12);
+  text-align: left;
+  color: var(--rater-text-default);
+  transition: background-color var(--rater-d-80) var(--rater-ease-snap);
+}
+
+.rater-dim-delete-prompt__ref:hover:not(disabled) {
+  background: var(--rater-surface-3);
+}
+
+.rater-dim-delete-prompt__ref:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: 2px;
+}
+
+.rater-dim-delete-prompt__ref:disabled {
+  cursor: default;
+  opacity: 0.7;
+}
+
+.rater-dim-delete-prompt__ref-icon {
+  width: 22px;
+  height: 22px;
+  border-radius: var(--rater-r-4);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rater-dim-delete-prompt__ref-icon--chain {
+  background: color-mix(in srgb, var(--rater-cat-math) 20%, transparent);
+  color: var(--rater-cat-math);
+}
+
+.rater-dim-delete-prompt__ref-icon--factor-table {
+  background: var(--rater-cat-lookup-soft);
+  color: var(--rater-cat-lookup-text);
+}
+
+.rater-dim-delete-prompt__ref-icon--modifier {
+  background: color-mix(in srgb, var(--rater-cat-transform) 22%, transparent);
+  color: var(--rater-cat-transform-text);
+}
+
+.rater-dim-delete-prompt__ref-icon--curve {
+  background: color-mix(in srgb, var(--rater-cat-loading) 22%, transparent);
+  color: var(--rater-cat-loading-text);
+}
+
+.rater-dim-delete-prompt__ref-label code {
+  font-family: var(--rater-font-mono);
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-default);
+}
+
+.rater-dim-delete-prompt__ref-context {
+  font-size: var(--rater-t-11);
+  color: var(--rater-text-muted);
+  white-space: nowrap;
+}
+
+.rater-dim-delete-prompt__ref-jump {
+  font-size: var(--rater-t-11);
+  color: var(--rater-text-subtle);
+  text-align: right;
+}
+
+.rater-dim-delete-prompt__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--rater-s-8);
+  padding-top: var(--rater-s-8);
+  border-top: 1px solid var(--rater-hairline-soft);
+}

@@ -1,0 +1,38 @@
+{
+  "name": "V43.eligibility-decline-knockout-still-computes",
+  "description": "The fictional Meridian gate fires DECLINE for synthetic class c999 while a parallel premium computation still completes. This proves a decline verdict does not abort deterministic calculation.",
+  "plan": {
+    "id": "v43.eligibility_decline_knockout_still_computes",
+    "version": "1.0.0",
+    "name": "Meridian fictional appetite gate (decline still computes)",
+    "lines": ["bop"],
+    "effective": "2025-10-01",
+    "nodes": [
+      {
+        "id": "gate",
+        "kind": "eligibility.gate",
+        "params": {
+          "rules": [
+            { "rule_id": "decline_ineligible_class", "variable": "class_code", "op": "in", "value": ["c999"], "tier": "decline", "reasoning": "Synthetic class c999 is outside Meridian demo appetite." },
+            { "rule_id": "floor_area_cap", "variable": "total_floor_area_sqft", "op": "gt", "value": 40000, "tier": "submit", "reasoning": "Floor area exceeds the fictional Meridian 40,000 sq ft referral threshold." },
+            { "rule_id": "preferred_protection", "variable": "protection_grade", "op": "eq", "value": "preferred", "tier": "preferred", "reasoning": "The synthetic preferred protection grade qualifies for preferred terms." }
+          ],
+          "default_tier": "standard",
+          "default_reasoning": "Within the fictional Meridian appetite at standard demo rates."
+        },
+        "position": { "x": 0, "y": 0 }
+      },
+      { "id": "base", "kind": "constant", "params": { "value": 1000, "type": "money" }, "position": { "x": 0, "y": 200 } },
+      { "id": "out_tier", "kind": "output", "params": { "fieldName": "tier", "fieldType": "string" }, "position": { "x": 200, "y": 0 } },
+      { "id": "out_rule", "kind": "output", "params": { "fieldName": "matched_rule_id", "fieldType": "string" }, "position": { "x": 200, "y": 100 } },
+      { "id": "out_premium", "kind": "output", "params": { "fieldName": "premium", "fieldType": "money" }, "position": { "x": 200, "y": 200 } }
+    ],
+    "edges": [
+      { "from": { "node": "gate", "port": "tier" }, "to": { "node": "out_tier", "port": "value" } },
+      { "from": { "node": "gate", "port": "matched_rule_id" }, "to": { "node": "out_rule", "port": "value" } },
+      { "from": { "node": "base", "port": "value" }, "to": { "node": "out_premium", "port": "value" } }
+    ]
+  },
+  "externalInputs": { "class_code": "c999", "total_floor_area_sqft": 5000, "annual_gross_sales": 100000, "protection_grade": "standard" },
+  "expectedOutputs": { "tier": "decline", "matched_rule_id": "decline_ineligible_class", "premium": 1000 }
+}

@@ -1,0 +1,783 @@
+/* ============================================================================
+ * @openrater/design-system — design tokens.
+ *
+ * The single source of truth for color, type, spacing, radius, motion,
+ * shadow, icon size, and z-index in openrater. Every primitive, every
+ * OpenRater component, every chrome surface reads tokens from this
+ * file via CSS custom properties — never from hard-coded values, never
+ * from inline styles.
+ *
+ * Three-tier system:
+ *
+ *   1. RAW PALETTE        — 7 hues × 11 stops, plus zinc neutrals.
+ *                           Never referenced directly in components.
+ *                           Prefix: `--rater-color-<hue>-<stop>`.
+ *
+ *   2. SCALES             — type, weight, spacing, radius, motion,
+ *                           shadow, icon, z-index. Locked. No magic
+ *                           numbers in components.
+ *                           Prefix: `--rater-{t,fw,s,r,d,ease,shadow,icon,z}-*`.
+ *
+ *   3. SEMANTIC TOKENS    — `--rater-surface-canvas`, `--rater-text-strong`,
+ *                           `--rater-border-default`, `--rater-cat-input`,
+ *                           etc. These are what components consume.
+ *                           Theming = re-aliasing this layer.
+ *
+ * Mode model:
+ *
+ *   - Dark mode is DEFAULT (zinc-950 canvas). Light mode opt-in via
+ *     `[data-theme="light"]` on `<html>`. WCAG AA contrast verified
+ *     for both modes.
+ *
+ *   - `prefers-reduced-motion: reduce` collapses every transition to
+ *     1ms automatically. No manual override token — `prefers-reduced-
+ *     motion` is sufficient.
+ *
+ * Namespace:
+ *
+ *   - Every token starts with `--rater-` so embedders can drop OpenRater
+ *     UI CSS into a host page without colliding with the host's
+ *     own custom properties.
+ * ============================================================================ */
+
+:root {
+  /* ============================================================
+   * 1. RAW PALETTE
+   *
+   * 88 colors total: 11 zinc neutrals + 7 category hues × 11 stops.
+   * Each hue holds at ~60% lightness on the 500 stop so a single
+   * accent color survives at both ends of the light/dark spectrum.
+   * Scales follow Tailwind's progression.
+   *
+   * Components NEVER reference these directly. Components reference
+   * the SEMANTIC tokens defined in §3.
+   * ============================================================ */
+
+  /* --- Zinc (neutrals) --- */
+  --rater-color-zinc-50: #fafafa;
+  --rater-color-zinc-100: #f4f4f5;
+  --rater-color-zinc-200: #e4e4e7;
+  --rater-color-zinc-300: #d4d4d8;
+  --rater-color-zinc-400: #a1a1aa;
+  --rater-color-zinc-500: #71717a;
+  --rater-color-zinc-600: #52525b;
+  --rater-color-zinc-700: #3f3f46;
+  --rater-color-zinc-800: #27272a;
+  --rater-color-zinc-900: #18181b;
+  --rater-color-zinc-950: #09090b;
+
+  /* --- Azure (inputs — where data enters) --- */
+  --rater-color-azure-50: #eff6ff;
+  --rater-color-azure-100: #dbeafe;
+  --rater-color-azure-200: #bfdbfe;
+  --rater-color-azure-300: #93c5fd;
+  --rater-color-azure-400: #60a5fa;
+  --rater-color-azure-500: #3b82f6;
+  --rater-color-azure-600: #2563eb;
+  --rater-color-azure-700: #1d4ed8;
+  --rater-color-azure-800: #1e40af;
+  --rater-color-azure-900: #1e3a8a;
+  --rater-color-azure-950: #172554;
+
+  /* --- Cyan (Model Lab — built/governed models; Brief 65 §11) --- */
+  --rater-color-cyan-50: #ecfeff;
+  --rater-color-cyan-300: #67e8f9;
+  --rater-color-cyan-500: #06b6d4;
+  --rater-color-cyan-700: #0e7490;
+  --rater-color-cyan-950: #083344;
+
+  /* --- Violet (transforms — resolvers, predicates, formulas) --- */
+  --rater-color-violet-50: #faf5ff;
+  --rater-color-violet-100: #f3e8ff;
+  --rater-color-violet-200: #e9d5ff;
+  --rater-color-violet-300: #d8b4fe;
+  --rater-color-violet-400: #c084fc;
+  --rater-color-violet-500: #a855f7;
+  --rater-color-violet-600: #9333ea;
+  --rater-color-violet-700: #7e22ce;
+  --rater-color-violet-800: #6b21a8;
+  --rater-color-violet-900: #581c87;
+  --rater-color-violet-950: #3b0764;
+
+  /* --- Amber (lookups — factor tables, dimension joins) --- */
+  --rater-color-amber-50: #fffbeb;
+  --rater-color-amber-100: #fef3c7;
+  --rater-color-amber-200: #fde68a;
+  --rater-color-amber-300: #fcd34d;
+  --rater-color-amber-400: #fbbf24;
+  --rater-color-amber-500: #f59e0b;
+  --rater-color-amber-600: #d97706;
+  --rater-color-amber-700: #b45309;
+  --rater-color-amber-800: #92400e;
+  --rater-color-amber-900: #78350f;
+  --rater-color-amber-950: #451a03;
+
+  /* --- Emerald (math — multiply, add, clamp, round) --- */
+  --rater-color-emerald-50: #ecfdf5;
+  --rater-color-emerald-100: #d1fae5;
+  --rater-color-emerald-200: #a7f3d0;
+  --rater-color-emerald-300: #6ee7b7;
+  --rater-color-emerald-400: #34d399;
+  --rater-color-emerald-500: #10b981;
+  --rater-color-emerald-600: #059669;
+  --rater-color-emerald-700: #047857;
+  --rater-color-emerald-800: #065f46;
+  --rater-color-emerald-900: #064e3b;
+  --rater-color-emerald-950: #022c22;
+
+  /* --- Orange (loadings — LCM, expense, terror, IRPM, schedule mod) --- */
+  --rater-color-orange-50: #fff7ed;
+  --rater-color-orange-100: #ffedd5;
+  --rater-color-orange-200: #fed7aa;
+  --rater-color-orange-300: #fdba74;
+  --rater-color-orange-400: #fb923c;
+  --rater-color-orange-500: #f97316;
+  --rater-color-orange-600: #ea580c;
+  --rater-color-orange-700: #c2410c;
+  --rater-color-orange-800: #9a3412;
+  --rater-color-orange-900: #7c2d12;
+  --rater-color-orange-950: #431407;
+
+  /* --- Red (outputs — final premium, decline, refer) --- */
+  --rater-color-red-50: #fef2f2;
+  --rater-color-red-100: #fee2e2;
+  --rater-color-red-200: #fecaca;
+  --rater-color-red-300: #fca5a5;
+  --rater-color-red-400: #f87171;
+  --rater-color-red-500: #ef4444;
+  --rater-color-red-600: #dc2626;
+  --rater-color-red-700: #b91c1c;
+  --rater-color-red-800: #991b1b;
+  --rater-color-red-900: #7f1d1d;
+  --rater-color-red-950: #450a0a;
+
+  /* ============================================================
+   * 2.a — TYPE families + scale.
+   *
+   * Mono for numerics, paths, citations, factor values.
+   * Sans (Inter Tight display + Inter text) for everything else.
+   *
+   * Type scale: 8 sizes (10, 11, 12, 13, 14, 16, 20, 28). Nothing
+   * in between. If a UI surface wants a size not on the scale, the
+   * scale is wrong — amend it explicitly, don't override per-component.
+   * ============================================================ */
+
+  --rater-font-sans:
+    "Inter Variable", "Inter", -apple-system, BlinkMacSystemFont,
+    system-ui, "Segoe UI", Helvetica, Arial, sans-serif;
+  --rater-font-display:
+    "Inter Tight Variable", "Inter Tight", -apple-system,
+    BlinkMacSystemFont, system-ui, sans-serif;
+  --rater-font-mono:
+    "JetBrains Mono Variable", "JetBrains Mono", ui-monospace,
+    SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+
+  --rater-t-10: 0.625rem;   /* 10px — micro labels */
+  --rater-t-11: 0.6875rem;  /* 11px — chip body */
+  --rater-t-12: 0.75rem;    /* 12px — small button, caption */
+  --rater-t-13: 0.8125rem;  /* 13px — default body */
+  --rater-t-14: 0.875rem;   /* 14px — emphasized body */
+  --rater-t-16: 1rem;       /* 16px — section heading */
+  --rater-t-18: 1.125rem;   /* 18px — editor titles, intermediate headings */
+  --rater-t-20: 1.25rem;    /* 20px — page heading */
+  --rater-t-24: 1.5rem;     /* 24px — section landmark, route H1 */
+  --rater-t-28: 1.75rem;    /* 28px — display heading */
+
+  /* Font-family aliases — components reference --rater-fonts-* (plural)
+   * via convention; the canonical names are singular above. */
+  --rater-fonts-sans: var(--rater-font-sans);
+  --rater-fonts-display: var(--rater-font-display);
+  --rater-fonts-mono: var(--rater-font-mono);
+
+  --rater-leading-tight: 1.15;   /* Display headings */
+  --rater-leading-snug: 1.35;    /* Default body */
+  --rater-leading-relaxed: 1.55; /* Long-form prose */
+
+  /* Line-height aliases — `--rater-lh-*` matches the component naming
+   * convention. `normal` fills the gap between snug + relaxed. */
+  --rater-lh-tight: var(--rater-leading-tight);
+  --rater-lh-snug: var(--rater-leading-snug);
+  --rater-lh-normal: 1.5;
+  --rater-lh-relaxed: var(--rater-leading-relaxed);
+
+  --rater-tracking-tight: -0.011em; /* Headings */
+  --rater-tracking-normal: 0;       /* Body */
+  --rater-tracking-label: 0.06em;   /* UPPERCASE LABELS */
+  --rater-tracking-mono: 0.01em;    /* Code, monospace numerics */
+
+  --rater-num-tabular: "tnum" 1;
+  --rater-num-currency: "tnum" 1, "zero" 1;
+
+  /* ============================================================
+   * 2.b — FONT WEIGHT scale (NEW vs v2 source).
+   *
+   * Source has no font-weight scale; primitives hard-code 400/500/
+   * 600 inline. Adding tokens makes weight changes one-line edits.
+   * ============================================================ */
+
+  --rater-fw-regular: 400;
+  --rater-fw-medium: 500;
+  --rater-fw-semibold: 600;
+  --rater-fw-bold: 700;
+
+  /* ============================================================
+   * 3. SPACING — 4px grid (16 stops).
+   *
+   * 0, 1, 2, 4, 6, 8, 10, 12, 14, 16, 20, 24, 28, 32, 40, 48, 64.
+   * Components compose with these only. If a layout wants a value
+   * not on the scale, the layout is wrong.
+   * ============================================================ */
+
+  --rater-s-0: 0;
+  --rater-s-1: 1px;
+  --rater-s-2: 2px;
+  --rater-s-4: 4px;
+  --rater-s-6: 6px;
+  --rater-s-8: 8px;
+  --rater-s-10: 10px;
+  --rater-s-12: 12px;
+  --rater-s-14: 14px;
+  --rater-s-16: 16px;
+  --rater-s-20: 20px;
+  --rater-s-24: 24px;
+  --rater-s-28: 28px;
+  --rater-s-32: 32px;
+  --rater-s-40: 40px;
+  --rater-s-48: 48px;
+  --rater-s-64: 64px;
+
+  /* Card-padding tiers — universal rule for containers with a
+   * visible border / background:
+   *   - INNER cards (sub-cards inside outer cards):  16 / 20
+   *   - OUTER cards (sections, top-level surfaces):  20 / 24
+   * Inline pills, chips, badges DON'T use these — they're intentionally
+   * compact (4-6 / 10-12 typical). */
+
+  --rater-card-pad-y: var(--rater-s-16);
+  --rater-card-pad-x: var(--rater-s-20);
+  --rater-card-pad-y-lg: var(--rater-s-20);
+  --rater-card-pad-x-lg: var(--rater-s-24);
+
+  /* ============================================================
+   * 4. RADIUS — 5 stops + full.
+   * ============================================================ */
+
+  --rater-r-2: 2px;     /* Tiny chips */
+  --rater-r-4: 4px;     /* Inputs, small buttons */
+  --rater-r-6: 6px;     /* Cards, panels, buttons */
+  --rater-r-8: 8px;     /* Drawers, modals */
+  --rater-r-12: 12px;   /* Canvas nodes */
+  --rater-r-full: 9999px; /* Pills */
+
+  /* ============================================================
+   * 5. MOTION — duration ladder + easing presets.
+   *
+   * Every animated property picks ONE preset; no ad-hoc easings.
+   * `prefers-reduced-motion: reduce` collapses every duration to
+   * 1ms — see the @media block at the bottom of this file.
+   *
+   * Dropped vs v2 source: the `--spring-*` tokens
+   * (`480 / 32` strings). They were JS-only and unparseable in CSS.
+   * If a JS animation lib needs spring physics, it imports its own
+   * config — not from this token layer.
+   * ============================================================ */
+
+  --rater-d-80: 80ms;    /* State transitions (hover, focus) */
+  --rater-d-120: 120ms;  /* Snap actions (chip hover, tab underline) */
+  --rater-d-140: 140ms;  /* Small surfaces (chips, tooltips) */
+  --rater-d-240: 240ms;  /* Panels, drawers, edges */
+  --rater-d-380: 380ms;  /* Route changes, large overlays */
+  --rater-d-600: 600ms;  /* Trace step, premium count-up, skeleton shimmer */
+
+  --rater-ease-snap: cubic-bezier(0.16, 1, 0.3, 1);
+  --rater-ease-soft: cubic-bezier(0.32, 0.72, 0, 1);
+  --rater-ease-float: cubic-bezier(0.4, 0, 0.2, 1);
+  --rater-ease-drift: cubic-bezier(0.6, 0, 0.4, 1);
+
+  /* ============================================================
+   * 6. SHADOW — three rungs (resting / lifted / floating).
+   *
+   * Each is tuned for zinc-950 surfaces (dark-mode native).
+   * Light mode re-defines below.
+   * ============================================================ */
+
+  --rater-shadow-resting:
+    0 1px 2px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.04);
+  --rater-shadow-lifted:
+    0 4px 12px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(255, 255, 255, 0.06);
+  --rater-shadow-floating:
+    0 16px 40px rgba(0, 0, 0, 0.6),
+    0 0 0 1px rgba(255, 255, 255, 0.08);
+  /* Shell v3 polish — the "machined" raised-surface light: a 1px inner
+   * top edge on accent-filled controls (primary/danger buttons, the
+   * lifecycle-stepper thumb, the active pipeline tile). Pairs with a
+   * soft drop for physicality. Pressing removes it (the press flattens). */
+  --rater-edge-highlight:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    0 1px 2px rgba(0, 0, 0, 0.4);
+
+  /* ============================================================
+   * 7. ICON SIZE (NEW vs v2 source).
+   *
+   * Source has no icon-size scale; lucide icons get hard-coded
+   * size={14} / size={16} inline. Adding tokens lets us swap
+   * across surfaces consistently.
+   * ============================================================ */
+
+  --rater-icon-12: 12px;
+  --rater-icon-14: 14px;
+  --rater-icon-16: 16px;
+  --rater-icon-20: 20px;
+  --rater-icon-24: 24px;
+
+  /* ============================================================
+   * 8. Z-INDEX (NEW vs v2 source).
+   *
+   * Source has no z-index scale; chrome and overlays use inline
+   * z-index: 9999 / 10000 / etc. A scale prevents the "two modals
+   * stacking weirdly" class of bug.
+   * ============================================================ */
+
+  --rater-z-base: 0;
+  --rater-z-dropdown: 100;
+  --rater-z-sticky: 200;
+  --rater-z-overlay: 300;
+  --rater-z-modal: 400;
+  --rater-z-popover: 500;
+  --rater-z-toast: 600;
+  --rater-z-tooltip: 700;
+
+  /* ============================================================
+   * 9. SEMANTIC TOKENS — DARK MODE (default).
+   *
+   * Components reference THESE, not the raw palette above.
+   * Theming = re-aliasing this layer.
+   * ============================================================ */
+
+  /* Surfaces — background hierarchy, ascending. */
+  --rater-surface-canvas: var(--rater-color-zinc-950);
+  --rater-surface-1: var(--rater-color-zinc-900); /* Cards, nodes */
+  --rater-surface-2: var(--rater-color-zinc-800); /* Hover, raised */
+  --rater-surface-3: var(--rater-color-zinc-700); /* Active, selected */
+  --rater-surface-overlay: rgba(9, 9, 11, 0.85); /* Modal backdrop */
+
+  /* Text — foreground hierarchy, descending. */
+  --rater-text-strong: var(--rater-color-zinc-50);
+  --rater-text-default: var(--rater-color-zinc-200);
+  --rater-text-muted: var(--rater-color-zinc-400);
+  --rater-text-subtle: var(--rater-color-zinc-500);
+  --rater-text-disabled: var(--rater-color-zinc-600);
+  --rater-text-inverse: var(--rater-color-zinc-950);
+
+  /* Borders. */
+  --rater-border-subtle: var(--rater-color-zinc-800);
+  --rater-border-default: var(--rater-color-zinc-700);
+  --rater-border-strong: var(--rater-color-zinc-600);
+
+  /* Focus ring — visible against any surface. */
+  --rater-focus-ring: var(--rater-color-azure-500);
+  /* Focus halo — the 2px soft wash behind a focused text entry (the
+   * W1.6 canonical treatment). Interaction domain: same hue family as
+   * the ring, NOT a computation-kind token. */
+  --rater-focus-halo: var(--rater-color-azure-950);
+
+  /* Category — semantic aliases for the 6 hues + 4 token roles each
+   * (fill / soft / border / text). Used by node visual language +
+   * any surface that wants categorical color. */
+
+  --rater-cat-input: var(--rater-color-azure-500);
+  --rater-cat-input-soft: var(--rater-color-azure-950);
+  --rater-cat-input-border: var(--rater-color-azure-700);
+  --rater-cat-input-text: var(--rater-color-azure-300);
+
+  --rater-cat-transform: var(--rater-color-violet-500);
+  --rater-cat-transform-soft: var(--rater-color-violet-950);
+  --rater-cat-transform-border: var(--rater-color-violet-700);
+  --rater-cat-transform-text: var(--rater-color-violet-300);
+
+  --rater-cat-lookup: var(--rater-color-amber-500);
+  --rater-cat-lookup-soft: var(--rater-color-amber-950);
+  --rater-cat-lookup-border: var(--rater-color-amber-700);
+  --rater-cat-lookup-text: var(--rater-color-amber-300);
+
+  --rater-cat-math: var(--rater-color-emerald-500);
+  --rater-cat-math-soft: var(--rater-color-emerald-950);
+  --rater-cat-math-border: var(--rater-color-emerald-700);
+  --rater-cat-math-text: var(--rater-color-emerald-300);
+
+  /* Model Lab — built/governed models (Brief 65 §11). */
+  --rater-cat-model: var(--rater-color-cyan-500);
+  --rater-cat-model-soft: var(--rater-color-cyan-950);
+  --rater-cat-model-border: var(--rater-color-cyan-700);
+  --rater-cat-model-text: var(--rater-color-cyan-300);
+
+  --rater-cat-loading: var(--rater-color-orange-500);
+  --rater-cat-loading-soft: var(--rater-color-orange-950);
+  --rater-cat-loading-border: var(--rater-color-orange-700);
+  --rater-cat-loading-text: var(--rater-color-orange-300);
+
+  --rater-cat-output: var(--rater-color-red-500);
+  --rater-cat-output-soft: var(--rater-color-red-950);
+  --rater-cat-output-border: var(--rater-color-red-700);
+  --rater-cat-output-text: var(--rater-color-red-300);
+
+  /* Semantic accents — reuse the category palette. */
+  /* F02 — primary is azure-600 (not -500) so a white label on the primary
+     fill clears WCAG AA 4.5:1 for text (≈4.6:1; -500 measured ≈3.3:1). This
+     drives buttons + active borders + checkbox accents + accent outlines.
+     The focus ring is a SEPARATE token (--rater-focus-ring) and stays the
+     brighter azure-500. */
+  --rater-accent-primary: var(--rater-color-azure-600);
+  --rater-accent-success: var(--rater-color-emerald-500);
+  --rater-accent-warning: var(--rater-color-amber-500);
+  --rater-accent-danger: var(--rater-color-red-500);
+
+  /* Polish PR 9 — accent hover + on-accent text aliases.
+   *
+   * Adds the semantic naming for "one step darker" hover states +
+   * "text on top of an accent fill" so components stop reaching past
+   * the alias layer for these common patterns. Audit §C3.
+   *
+   *   --rater-on-accent             — high-contrast text/icon color
+   *                                  to use on top of ANY accent fill
+   *                                  (primary, success, warning,
+   *                                  danger). Maps to zinc-50 in both
+   *                                  themes because accent fills stay
+   *                                  saturated regardless of mode.
+   *   --rater-accent-primary-hover  — one step darker than primary,
+   *                                  used by buttons + chips on hover.
+   *   --rater-accent-danger-hover   — one step darker than danger.
+   *   --rater-accent-danger-text    — lighter red used by `danger-text`
+   *                                  variant on hover (text-only
+   *                                  destructive buttons). */
+  --rater-on-accent: var(--rater-color-zinc-50);
+  /* The base uses azure-600, so hover steps to azure-700 to keep the
+     "one step darker" feedback (white-on-700 is darker still → AA-safe). */
+  --rater-accent-primary-hover: var(--rater-color-azure-700);
+  --rater-accent-danger-hover: var(--rater-color-red-600);
+  --rater-accent-danger-text: var(--rater-color-red-400);
+
+  /* ============================================================
+   * 9.a — SEMANTIC ALIASES (component-naming compatibility).
+   *
+   * Component CSS uses several semantic names that didn't exist
+   * in §9 before. Rather than rewriting every component, these
+   * aliases route the names to existing semantic tokens. Components
+   * can migrate off the aliases if a cleaner name lands.
+   * ============================================================ */
+
+  /* Surfaces — extended hierarchy.
+   *   sunken    = below-canvas surface (sidebars, drawer bodies,
+   *               empty states, sunken cards). Dark mode: slightly
+   *               lighter than canvas (zinc-900). Light mode below.
+   *   emphasis  = raised surface for tooltips / popovers / floating
+   *               panels. Above surface-1.
+   */
+  --rater-surface-sunken: var(--rater-color-zinc-900);
+  --rater-surface-emphasis: var(--rater-color-zinc-800);
+  /* raised = the "Hover, raised" role (cards, hover/selected rows,
+   * stat cells). Routes onto surface-2 so it tracks the ramp in both
+   * modes. */
+  --rater-surface-raised: var(--rater-surface-2);
+
+  /* Text — additional steps.
+   *   base   = default body text (alias for text-default).
+   *   faint  = below subtle, above disabled. Hairline-level fade.
+   */
+  --rater-text-base: var(--rater-text-default);
+  --rater-text-faint: var(--rater-color-zinc-600);
+
+  /* Hairlines — alias layer mapping to the existing border scale.
+   * `hairline` names the visual role (a 1px divider). Adopted by
+   * component CSS broadly; mapped 1:1 onto --rater-border-*. */
+  --rater-hairline-subtle: var(--rater-border-subtle);
+  --rater-hairline-soft: var(--rater-border-subtle);
+  --rater-hairline-base: var(--rater-border-default);
+  --rater-hairline-strong: var(--rater-border-strong);
+
+  /* Brand accent — alias for accent-primary + a soft companion
+   * tint suitable for backgrounds. */
+  --rater-brand-accent: var(--rater-accent-primary);
+  --rater-brand-accent-soft: var(--rater-color-azure-950);
+
+  /* Feedback tokens — semantic status messaging (callouts,
+   * banners, chips, validation rows).
+   *
+   * Three variants per kind:
+   *   <kind>      — foreground (text + icon color)
+   *   <kind>-bg   — solid background fill (callout box)
+   *   <kind>-soft — translucent wash (subtle row background)
+   *
+   * Maps:
+   *   success → emerald   (validation passes, save confirmation)
+   *   warn    → amber     (missing citation, soft warning)
+   *   error   → red       (filing-blocking issue, save failure)
+   *   info    → azure     (advisory, neutral notice)
+   */
+  /* ============================================================
+   * COLOR GOVERNANCE — four domains:
+   *   1. INTERACTION  = accent-primary / focus-ring (azure). The one
+   *      primary per screen, links, active indicators, selection.
+   *      Never decorative.
+   *   2. STATUS       = feedback-success/-warn/-error ONLY (dots,
+   *      small text, the save pill). Chips stay neutral.
+   *   3. COMPUTATION KIND = cat-input/transform/lookup/math/loading/
+   *      output — ONLY where the artifact IS a computation step
+   *      (canvas nodes, stage chips, trace rows, the tower spine).
+   *   4. DATA-VIZ     = cat-categorical-* series, the choropleth ramp,
+   *      and the viz-delta pair below. Charts never borrow cat-* kinds.
+   * The two meanings of red (final premium = cat-output vs error =
+   * feedback-error) are DELIBERATE separate tokens so themes can split
+   * them.
+   * ============================================================ */
+
+  /* Diverging deltas for exhibits — "rate increase / decrease" must
+   * not be token-identical to the loading/math STAGE kinds. */
+  --rater-viz-delta-up: var(--rater-color-orange-500);
+  --rater-viz-delta-down: var(--rater-color-emerald-500);
+  --rater-viz-delta-up-text: var(--rater-color-orange-300);
+  --rater-viz-delta-down-text: var(--rater-color-emerald-300);
+
+  --rater-feedback-success: var(--rater-color-emerald-300);
+  --rater-feedback-success-bg: var(--rater-color-emerald-950);
+  --rater-feedback-success-soft:
+    color-mix(in oklab, var(--rater-color-emerald-500) 12%, transparent);
+
+  --rater-feedback-warn: var(--rater-color-amber-300);
+  --rater-feedback-warn-bg: var(--rater-color-amber-950);
+  --rater-feedback-warn-soft:
+    color-mix(in oklab, var(--rater-color-amber-500) 12%, transparent);
+
+  --rater-feedback-error: var(--rater-color-red-300);
+  --rater-feedback-error-bg: var(--rater-color-red-950);
+  --rater-feedback-error-soft:
+    color-mix(in oklab, var(--rater-color-red-500) 12%, transparent);
+
+  --rater-feedback-info: var(--rater-color-azure-300);
+  --rater-feedback-info-soft:
+    color-mix(in oklab, var(--rater-color-azure-500) 12%, transparent);
+
+  /* Palette aliases for common color names — components occasionally
+   * reference --rater-color-blue-* / --rater-color-green-* using
+   * conventional english names. Map them to the canonical hue. */
+  --rater-color-blue-500: var(--rater-color-azure-500);
+  --rater-color-green-500: var(--rater-color-emerald-500);
+
+  /* Row interaction tokens — semantic names for table row backgrounds.
+   * The "selected" state mixes 18% of accent-primary into surface-1 via
+   * oklab for perceptual brightness consistency. Hover is just surface-2. */
+  --rater-row-hover-bg: var(--rater-surface-2);
+  --rater-row-selected-bg:
+    color-mix(in oklab, var(--rater-accent-primary) 18%, var(--rater-surface-1));
+
+  /* ============================================================
+   * 9.b — CATEGORICAL PALETTE (territory polygons, plan-compare
+   *       track lines, etc.).
+   *
+   * Eight-color cycle for surfaces that need a categorical palette. Wrap modulo
+   * length when there are more series than colors.
+   * ============================================================ */
+  --rater-cat-categorical-1: var(--rater-color-azure-500);
+  --rater-cat-categorical-2: var(--rater-color-emerald-500);
+  --rater-cat-categorical-3: var(--rater-color-amber-500);
+  --rater-cat-categorical-4: var(--rater-color-violet-500);
+  --rater-cat-categorical-5: var(--rater-color-red-500);
+  --rater-cat-categorical-6: var(--rater-color-orange-500);
+  --rater-cat-categorical-7: var(--rater-color-emerald-600);
+  --rater-cat-categorical-8: var(--rater-color-azure-600);
+
+  /* ============================================================
+   * 9.c — SEQUENTIAL CHOROPLETH RAMP (analytics map buckets).
+   *
+   * A single-hue azure ramp (dark → light) for choropleth bucket
+   * tinting in <MapPanel> — a SEQUENTIAL scale, distinct from the
+   * QUALITATIVE --rater-cat-categorical-* palette above. Bucket
+   * indices -3..3 map to choropleth-1..7.
+   *
+   * Like the categorical palette, these are data-encoding colors
+   * and stay constant across light/dark (the ramp survives against
+   * either canvas). Added by the raw-palette re-sweep (audit §C3)
+   * to move MapPanel off the raw azure-950..azure-400 stops.
+   * ============================================================ */
+  /* Navy → brand-cyan sequential ramp (maps next-gen): crosses azure→cyan at
+     the top so high values read brighter + on-brand. Mirrored as raw hex in
+     map-bucket.ts BUCKET_TO_COLOR for the SVG `fill` attribute. */
+  --rater-cat-choropleth-1: var(--rater-color-azure-950);
+  --rater-cat-choropleth-2: var(--rater-color-azure-900);
+  --rater-cat-choropleth-3: var(--rater-color-azure-800);
+  --rater-cat-choropleth-4: var(--rater-color-azure-600);
+  --rater-cat-choropleth-5: var(--rater-color-azure-500);
+  --rater-cat-choropleth-6: var(--rater-color-cyan-500);
+  --rater-cat-choropleth-7: var(--rater-color-cyan-300);
+
+  /* DIVERGING choropleth ramp (maps next-gen) — for SIGNED metrics
+     (rate change, loss ratio) where direction carries valence: emerald
+     below the book center (shrank / better), neutral at it, orange above
+     (grew / worse). Reuses the sanctioned data-viz delta hues so it stays
+     in-domain (emerald-500 = --rater-viz-delta-down, orange-500 =
+     --rater-viz-delta-up); the `choropleth-` prefix keeps it data-viz-legal.
+     Mirrored value-for-value in map-bucket.ts divergingColor() for SVG
+     `fill`. Index -3..3 → div-1..7. */
+  --rater-cat-choropleth-div-1: var(--rater-color-emerald-500);
+  --rater-cat-choropleth-div-2: var(--rater-color-emerald-500);
+  --rater-cat-choropleth-div-3: var(--rater-color-emerald-800);
+  --rater-cat-choropleth-div-4: var(--rater-color-zinc-700);
+  --rater-cat-choropleth-div-5: var(--rater-color-orange-800);
+  --rater-cat-choropleth-div-6: var(--rater-color-orange-500);
+  --rater-cat-choropleth-div-7: var(--rater-color-orange-500);
+}
+
+/* ============================================================
+ * 10. SEMANTIC TOKENS — LIGHT MODE (opt-in via [data-theme=light]).
+ *
+ * Re-aliases the semantic layer against the same raw palette.
+ * Components don't change; only the alias layer flips.
+ *
+ * WCAG AA contrast verified for body text + UI elements in both
+ * modes (4.5:1 body, 3:1 large text + UI elements per W4 §4.4).
+ * ============================================================ */
+
+:root[data-theme="light"] {
+  --rater-surface-canvas: var(--rater-color-zinc-50);
+  --rater-surface-1: #ffffff;
+  --rater-surface-2: var(--rater-color-zinc-100);
+  --rater-surface-3: var(--rater-color-zinc-200);
+  --rater-surface-overlay: rgba(9, 9, 11, 0.55);
+
+  --rater-text-strong: var(--rater-color-zinc-950);
+  --rater-text-default: var(--rater-color-zinc-800);
+  --rater-text-muted: var(--rater-color-zinc-600);
+  --rater-text-subtle: var(--rater-color-zinc-500);
+  --rater-text-disabled: var(--rater-color-zinc-400);
+  --rater-text-inverse: var(--rater-color-zinc-50);
+
+  --rater-border-subtle: var(--rater-color-zinc-200);
+  --rater-border-default: var(--rater-color-zinc-300);
+  --rater-border-strong: var(--rater-color-zinc-400);
+
+  --rater-shadow-resting:
+    0 1px 2px rgba(15, 23, 42, 0.08),
+    0 0 0 1px rgba(15, 23, 42, 0.04);
+  --rater-shadow-lifted:
+    0 4px 12px rgba(15, 23, 42, 0.1),
+    0 0 0 1px rgba(15, 23, 42, 0.06);
+  --rater-shadow-floating:
+    0 16px 40px rgba(15, 23, 42, 0.15),
+    0 0 0 1px rgba(15, 23, 42, 0.08);
+
+  --rater-focus-halo: var(--rater-color-azure-50);
+  --rater-cat-input-soft: var(--rater-color-azure-50);
+  --rater-cat-input-border: var(--rater-color-azure-300);
+  --rater-cat-input-text: var(--rater-color-azure-700);
+
+  --rater-cat-transform-soft: var(--rater-color-violet-50);
+  --rater-cat-transform-border: var(--rater-color-violet-300);
+  --rater-cat-transform-text: var(--rater-color-violet-700);
+
+  --rater-cat-lookup-soft: var(--rater-color-amber-50);
+  --rater-cat-lookup-border: var(--rater-color-amber-300);
+  --rater-cat-lookup-text: var(--rater-color-amber-700);
+
+  --rater-cat-math-soft: var(--rater-color-emerald-50);
+  --rater-cat-math-border: var(--rater-color-emerald-300);
+  --rater-cat-math-text: var(--rater-color-emerald-700);
+
+  /* Model Lab cyan — light mode (base --rater-cat-model stays cyan-500). */
+  --rater-cat-model-soft: var(--rater-color-cyan-50);
+  --rater-cat-model-border: var(--rater-color-cyan-300);
+  --rater-cat-model-text: var(--rater-color-cyan-700);
+
+  --rater-cat-loading-soft: var(--rater-color-orange-50);
+  --rater-cat-loading-border: var(--rater-color-orange-300);
+  --rater-cat-loading-text: var(--rater-color-orange-700);
+
+  --rater-cat-output-soft: var(--rater-color-red-50);
+  --rater-cat-output-border: var(--rater-color-red-300);
+  --rater-cat-output-text: var(--rater-color-red-700);
+
+  /* ---- §9.a aliases re-resolved for light mode ---- */
+
+  --rater-surface-sunken: var(--rater-color-zinc-100);
+  --rater-surface-emphasis: var(--rater-color-zinc-200);
+
+  --rater-text-faint: var(--rater-color-zinc-400);
+
+  --rater-hairline-subtle: var(--rater-border-subtle);
+  --rater-hairline-soft: var(--rater-border-subtle);
+  --rater-hairline-base: var(--rater-border-default);
+  --rater-hairline-strong: var(--rater-border-strong);
+
+  --rater-brand-accent-soft: var(--rater-color-azure-50);
+
+  --rater-feedback-success: var(--rater-color-emerald-700);
+  --rater-feedback-success-bg: var(--rater-color-emerald-50);
+  --rater-feedback-warn: var(--rater-color-amber-700);
+  --rater-feedback-warn-bg: var(--rater-color-amber-50);
+  --rater-feedback-error: var(--rater-color-red-700);
+  --rater-feedback-error-bg: var(--rater-color-red-50);
+  --rater-feedback-info: var(--rater-color-azure-700);
+  /* -soft variants reuse the dark-mode color-mix definitions; the
+   * 12% wash works on either canvas. */
+
+  /* Row interaction tokens — light-mode re-resolve. Surface-1 is light
+   * here, so the 18% accent mix stays readable. Hover uses surface-2
+   * (alias already re-resolved earlier in this block). */
+  --rater-row-selected-bg:
+    color-mix(in oklab, var(--rater-accent-primary) 12%, var(--rater-surface-1));
+}
+
+/* ============================================================
+ * 11. REDUCED MOTION — duration override.
+ *
+ * When the OS reports `prefers-reduced-motion: reduce`, every
+ * duration token collapses to 1ms. The change is "visible" to
+ * React state but visually invisible. Easings switch to linear
+ * so any remaining animations don't bounce.
+ *
+ * No manual override token (`data-motion="reduced"` on <html>)
+ * — the OS preference is sufficient for V1. Reconsider only if
+ * the cold-test actuary needs to demonstrate reduced motion
+ * without OS settings.
+ * ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --rater-d-80: 1ms;
+    --rater-d-120: 1ms;
+    --rater-d-140: 1ms;
+    --rater-d-240: 1ms;
+    --rater-d-380: 1ms;
+    --rater-d-600: 1ms;
+    --rater-ease-snap: linear;
+    --rater-ease-soft: linear;
+    --rater-ease-float: linear;
+    --rater-ease-drift: linear;
+  }
+}
+
+/* ============================================================
+ * FORM-CONTROL RESET (Polish PR 4)
+ *
+ * `<button>`, `<input>`, `<textarea>`, `<select>` don't inherit
+ * font from their ancestor by default — they use the browser's
+ * default form-control face (Helvetica on macOS, etc.) and a
+ * UA-supplied size (≈13.33px for buttons). Components have been
+ * patching this with per-rule `font-family: inherit` (10+ sites)
+ * + per-rule `font-size: …` which is noisy and easy to miss
+ * (audit D5 + D7 — `.rater-calc-inventory__head` renders at
+ * 13.33px because of the missing patch).
+ *
+ * This reset uses `:where(...)` so the selector has 0 specificity
+ * and components can still override locally if they need a
+ * specific font/size.
+ * ============================================================ */
+
+:where(button, input, textarea, select) {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  color: inherit;
+  letter-spacing: inherit;
+}

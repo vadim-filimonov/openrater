@@ -1,0 +1,1604 @@
+{
+ "plan_id": "meridian-shopfront-bop-ne-2026",
+ "model_id": null,
+ "tables": {
+  "rating_plans": {
+   "columns": [
+    "rating_plan_id",
+    "display_name",
+    "line_of_business",
+    "jurisdiction",
+    "effective_date",
+    "description",
+    "parent_plan_id",
+    "status",
+    "source_filing_id",
+    "created_at",
+    "preview_inputs_json",
+    "draft_session_id",
+    "template_id",
+    "coverages",
+    "section_layout",
+    "last_edited_at",
+    "content_hash",
+    "product"
+   ],
+   "rows": [
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "display_name": "Meridian Shopfront BOP — Nebraska",
+     "line_of_business": "bop",
+     "jurisdiction": "NE",
+     "effective_date": "2026-09-01",
+     "description": "Built from workbook (spec 1.0): meridian-shopfront-bop-ne-2026 | Carrier: Meridian Mutual (fictional) | Synthetic all-constructs program for the ingestion golden path. Fictional carrier; invented factors.",
+     "parent_plan_id": null,
+     "status": "draft",
+     "source_filing_id": null,
+     "created_at": "2026-07-19T12:45:54.826264+00:00",
+     "preview_inputs_json": null,
+     "draft_session_id": "81c09dd0-a840-49de-a91f-ea1709d04e1b",
+     "template_id": null,
+     "coverages": "[\"building\", \"bpp\", \"liability\"]",
+     "section_layout": null,
+     "last_edited_at": "2026-07-19T12:45:54.832009+00:00",
+     "content_hash": "57b4b34450476695",
+     "product": "bop"
+    }
+   ]
+  },
+  "rating_plan_stages": {
+   "columns": [
+    "rating_plan_id",
+    "stage_id",
+    "sequence",
+    "stage_kind",
+    "display_name",
+    "config_json",
+    "citation_rule",
+    "citation_page",
+    "source_filing_id",
+    "x_position",
+    "y_position"
+   ],
+   "rows": [
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "stage_id": "input_class_code",
+     "sequence": 1,
+     "stage_kind": "input_node",
+     "display_name": "Class code",
+     "config_json": "{\"citation\": \"meridian_shopfront_bop_filing.pdf Rule E.1\", \"data_type\": \"string\", \"name\": \"class_code\", \"output_field\": \"value\", \"required\": true, \"source\": \"form\", \"source_path\": \"class_code\"}",
+     "citation_rule": null,
+     "citation_page": null,
+     "source_filing_id": null,
+     "x_position": null,
+     "y_position": null
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "stage_id": "input_building_limit",
+     "sequence": 2,
+     "stage_kind": "input_node",
+     "display_name": "Building limit",
+     "config_json": "{\"citation\": \"meridian_shopfront_bop_filing.pdf Rule C.3\", \"data_type\": \"money\", \"name\": \"building_limit\", \"output_field\": \"value\", \"required\": true, \"source\": \"form\", \"source_path\": \"building_limit\", \"unit\": \"USD\"}",
+     "citation_rule": null,
+     "citation_page": null,
+     "source_filing_id": null,
+     "x_position": null,
+     "y_position": null
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "stage_id": "input_bpp_limit",
+     "sequence": 3,
+     "stage_kind": "input_node",
+     "display_name": "BPP limit",
+     "config_json": "{\"citation\": \"meridian_shopfront_bop_filing.pdf Rule A.3\", \"data_type\": \"money\", \"name\": \"bpp_limit\", \"output_field\": \"value\", \"required\": true, \"source\": \"form\", \"source_path\": \"bpp_limit\", \"unit\": \"USD\"}",
+     "citation_rule": null,
+     "citation_page": null,
+     "source_filing_id": null,
+     "x_position": null,
+     "y_position": null
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "stage_id": "input_annual_gross_sales",
+     "sequence": 4,
+     "stage_kind": "input_node",
+     "display_name": "Annual gross sales",
+     "config_json": "{\"citation\": \"meridian_shopfront_bop_filing.pdf Rule C.4\", \"data_type\": \"money\", \"name\": \"annual_gross_sales\", \"output_field\": \"value\", \"required\": true, \"source\": \"form\", \"source_path\": \"annual_gross_sales\", \"unit\": \"USD\"}",
+     "citation_rule": null,
+     "citation_page": null,
+     "source_filing_id": null,
+     "x_position": null,
+     "y_position": null
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "stage_id": "input_construction_class",
+     "sequence": 5,
+     "stage_kind": "input_node",
+     "display_name": "Construction",
+     "config_json": "{\"citation\": \"meridian_shopfront_bop_filing.pdf Rule C.2\", \"data_type\": \"string\", \"name\": \"construction_class\", \"output_field\": \"value\", \"required\": true, \"source\": \"form\", \"source_path\": \"construction_class\", \"validation\": {\"enum\": [\"frame\", \"jm\", \"masonry\", \"fr\"]}}",
+     "citation_rule": null,
+     "citation_page": null,
+     "source_filing_id": null,
+     "x_position": null,
+     "y_position": null
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "stage_id": "input_protection_class",
+     "sequence": 6,
+     "stage_kind": "input_node",
+     "display_name": "Protection class",
+     "config_json": "{\"citation\": \"meridian_shopfront_bop_filing.pdf Rule C.2\", \"data_type\": \"string\", \"name\": \"protection_class\", \"output_field\": \"value\", \"required\": true, \"source\": \"form\", \"source_path\": \"protection_class\", \"validation\": {\"enum\": [\"p1_4\", \"p5_8\", \"p9_10\"]}}",
+     "citation_rule": null,
+     "citation_page": null,
+     "source_filing_id": null,
+     "x_position": null,
+     "y_position": null
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "stage_id": "input_zip",
+     "sequence": 7,
+     "stage_kind": "input_node",
+     "display_name": "Location ZIP",
+     "config_json": "{\"citation\": \"meridian_shopfront_bop_filing.pdf Rule D.1\", \"data_type\": \"string\", \"name\": \"zip\", \"output_field\": \"value\", \"required\": true, \"source\": \"form\", \"source_path\": \"zip\"}",
+     "citation_rule": null,
+     "citation_page": null,
+     "source_filing_id": null,
+     "x_position": null,
+     "y_position": null
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "stage_id": "input_sprinklered",
+     "sequence": 8,
+     "stage_kind": "input_node",
+     "display_name": "Sprinklered",
+     "config_json": "{\"citation\": \"meridian_shopfront_bop_filing.pdf Rule A.4\", \"data_type\": \"bool\", \"default_value\": \"false\", \"description\": \"Absent -> not sprinklered (manual default).\", \"name\": \"sprinklered\", \"output_field\": \"value\", \"required\": false, \"source\": \"form\", \"source_path\": \"sprinklered\"}",
+     "citation_rule": null,
+     "citation_page": null,
+     "source_filing_id": null,
+     "x_position": null,
+     "y_position": null
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "stage_id": "input_years_in_business",
+     "sequence": 9,
+     "stage_kind": "input_node",
+     "display_name": "Years in business",
+     "config_json": "{\"citation\": \"meridian_shopfront_bop_filing.pdf Rule A.4\", \"data_type\": \"float\", \"default_value\": 5, \"description\": \"Absent -> 5 (manual default).\", \"name\": \"years_in_business\", \"output_field\": \"value\", \"required\": false, \"source\": \"form\", \"source_path\": \"years_in_business\", \"unit\": \"years\"}",
+     "citation_rule": null,
+     "citation_page": null,
+     "source_filing_id": null,
+     "x_position": null,
+     "y_position": null
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "stage_id": "rating_chains",
+     "sequence": 10,
+     "stage_kind": "multiplicative_chain",
+     "display_name": "Rating chains",
+     "config_json": "{\"chains\": [{\"apply_exposure\": true, \"base_input\": \"literal.base_value\", \"base_value\": 0.18, \"coverage_value\": \"building\", \"exposure_input\": \"form_input.building_limit\", \"exposure_unit_divisor\": 100.0, \"factor_lookups\": [{\"citation_page\": \"4\", \"citation_rule\": \"meridian_shopfront_bop_filing.pdf Rule B.1\", \"description_template\": \"class_rate_prop: x{value}\", \"dimensions\": {\"class_code\": {\"path\": \"class_code\", \"source\": \"form_input\"}}, \"factor_kind\": \"class_rate_prop\", \"lookup_method\": \"direct\", \"name\": \"class_rate_prop\"}, {\"citation_page\": \"4\", \"citation_rule\": \"meridian_shopfront_bop_filing.pdf Rule B.1\", \"description_template\": \"constr_x_prot: x{value}\", \"dimensions\": {\"construction_class\": {\"path\": \"construction_class\", \"source\": \"form_input\"}, \"protection_class\": {\"path\": \"protection_class\", \"source\": \"form_input\"}}, \"factor_kind\": \"constr_x_prot\", \"lookup_method\": \"direct\", \"name\": \"constr_x_prot\"}, {\"citation_page\": \"4\", \"citation_rule\": \"meridian_shopfront_bop_filing.pdf Rule B.1\", \"description_template\": \"building_ilf: x{value}\", \"dimensions\": {\"building_limit_band\": {\"path\": \"building_limit\", \"source\": \"form_input\"}}, \"factor_kind\": \"building_ilf\", \"lookup_method\": \"binned\", \"name\": \"building_ilf\"}, {\"citation_page\": \"4\", \"citation_rule\": \"meridian_shopfront_bop_filing.pdf Rule B.1\", \"description_template\": \"sprinkler_prop: x{value}\", \"dimensions\": {\"sprinklered_level\": {\"path\": \"sprinklered\", \"source\": \"form_input\"}}, \"factor_kind\": \"sprinkler_prop\", \"lookup_method\": \"direct\", \"name\": \"sprinkler_prop\"}, {\"citation_page\": \"4\", \"citation_rule\": \"meridian_shopfront_bop_filing.pdf Rule B.1\", \"description_template\": \"territory_prop: x{value}\", \"dimensions\": {\"territory\": {\"path\": \"zip\", \"source\": \"form_input\"}}, \"factor_kind\": \"territory_prop\", \"lookup_method\": \"direct\", \"name\": \"territory_prop\"}], \"lcm\": {\"citation_page\": \"5\", \"citation_rule\": \"meridian_shopfront_bop_filing.pdf Rule C.1\", \"input_path\": null, \"value\": 1.42}, \"name\": \"building premium\", \"output_field\": \"building_premium\"}, {\"apply_exposure\": true, \"base_input\": \"literal.base_value\", \"base_value\": 0.32, \"coverage_value\": \"bpp\", \"exposure_input\": \"form_input.bpp_limit\", \"exposure_unit_divisor\": 100.0, \"factor_lookups\": [{\"citation_page\": \"4\", \"citation_rule\": \"meridian_shopfront_bop_filing.pdf Rule B.1\", \"description_template\": \"class_rate_prop: x{value}\", \"dimensions\": {\"class_code\": {\"path\": \"class_code\", \"source\": \"form_input\"}}, \"factor_kind\": \"class_rate_prop\", \"lookup_method\": \"direct\", \"name\": \"class_rate_prop\"}, {\"citation_page\": \"4\", \"citation_rule\": \"meridian_shopfront_bop_filing.pdf Rule B.1\", \"description_template\": \"constr_x_prot: x{value}\", \"dimensions\": {\"construction_class\": {\"path\": \"construction_class\", \"source\": \"form_input\"}, \"protection_class\": {\"path\": \"protection_class\", \"source\": \"form_input\"}}, \"factor_kind\": \"constr_x_prot\", \"lookup_method\": \"direct\", \"name\": \"constr_x_prot\"}, {\"citation_page\": \"4\", \"citation_rule\": \"meridian_shopfront_bop_filing.pdf Rule B.1\", \"description_template\": \"sprinkler_prop: x{value}\", \"dimensions\": {\"sprinklered_level\": {\"path\": \"sprinklered\", \"source\": \"form_input\"}}, \"factor_kind\": \"sprinkler_prop\", \"lookup_method\": \"direct\", \"name\": \"sprinkler_prop\"}, {\"citation_page\": \"4\", \"citation_rule\": \"meridian_shopfront_bop_filing.pdf Rule B.1\", \"description_template\": \"territory_prop: x{value}\", \"dimensions\": {\"territory\": {\"path\": \"zip\", \"source\": \"form_input\"}}, \"factor_kind\": \"territory_prop\", \"lookup_method\": \"direct\", \"name\": \"territory_prop\"}], \"lcm\": {\"citation_page\": \"5\", \"citation_rule\": \"meridian_shopfront_bop_filing.pdf Rule C.1\", \"input_path\": null, \"value\": 1.42}, \"name\": \"bpp premium\", \"output_field\": \"bpp_premium\"}, {\"apply_exposure\": true, \"base_input\": \"literal.base_value\", \"base_value\": 1.15, \"coverage_value\": \"liability\", \"exposure_input\": \"form_input.annual_gross_sales\", \"exposure_unit_divisor\": 1000.0, \"factor_lookups\": [{\"citation_page\": \"4\", \"citation_rule\": \"meridian_shopfront_bop_filing.pdf Rule B.1\", \"description_template\": \"class_rate_liab: x{value}\", \"dimensions\": {\"class_code\": {\"path\": \"class_code\", \"source\": \"form_input\"}}, \"factor_kind\": \"class_rate_liab\", \"lookup_method\": \"direct\", \"name\": \"class_rate_liab\"}, {\"citation_page\": \"4\", \"citation_rule\": \"meridian_shopfront_bop_filing.pdf Rule B.1\", \"description_template\": \"liab_ilf: x{value}\", \"dimensions\": {\"sales_band\": {\"path\": \"annual_gross_sales\", \"source\": \"form_input\"}}, \"factor_kind\": \"liab_ilf\", \"lookup_method\": \"binned\", \"name\": \"liab_ilf\"}, {\"citation_page\": \"4\", \"citation_rule\": \"meridian_shopfront_bop_filing.pdf Rule B.1\", \"description_template\": \"territory_liab: x{value}\", \"dimensions\": {\"territory\": {\"path\": \"zip\", \"source\": \"form_input\"}}, \"factor_kind\": \"territory_liab\", \"lookup_method\": \"direct\", \"name\": \"territory_liab\"}], \"lcm\": {\"citation_page\": \"5\", \"citation_rule\": \"meridian_shopfront_bop_filing.pdf Rule C.1\", \"input_path\": null, \"value\": 1.42}, \"name\": \"liability premium\", \"output_field\": \"liability_premium\"}], \"output_total_field\": \"all_coverages_subtotal\", \"rating_dimension\": null}",
+     "citation_rule": null,
+     "citation_page": null,
+     "source_filing_id": null,
+     "x_position": null,
+     "y_position": null
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "stage_id": "eligibility_gate",
+     "sequence": 11,
+     "stage_kind": "eligibility.gate",
+     "display_name": "Eligibility",
+     "config_json": "{\"default_citation\": \"meridian_shopfront_bop_filing.pdf Rule A.2\", \"default_reasoning\": \"Standard appetite.\", \"default_tier\": \"standard\", \"rules\": [{\"citation\": \"meridian_shopfront_bop_filing.pdf Rule A.2\", \"conditions\": [{\"op\": \"gt\", \"value\": 5000000, \"variable\": \"annual_gross_sales\"}, {\"op\": \"lt\", \"value\": 3, \"variable\": \"years_in_business\"}], \"reasoning\": \"Large + young \\u2014 outside appetite.\", \"rule_id\": \"decline_big_young\", \"tier\": \"decline\"}, {\"citation\": \"meridian_shopfront_bop_filing.pdf Rule A.2\", \"op\": \"in\", \"reasoning\": \"Heavier classes route to an underwriter.\", \"rule_id\": \"submit_heavy_classes\", \"tier\": \"submit\", \"value\": [\"c111\", \"c112\"], \"variable\": \"class_code\"}, {\"citation\": \"meridian_shopfront_bop_filing.pdf Rule A.2\", \"conditions\": [{\"op\": \"eq\", \"value\": true, \"variable\": \"sprinklered\"}, {\"op\": \"in\", \"value\": [\"p1_4\"], \"variable\": \"protection_class\"}], \"reasoning\": \"Sprinklered + best protection.\", \"rule_id\": \"preferred_protected\", \"tier\": \"preferred\"}], \"scope\": \"row\"}",
+     "citation_rule": null,
+     "citation_page": null,
+     "source_filing_id": null,
+     "x_position": null,
+     "y_position": null
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "stage_id": "schedule_shopfront_irpm",
+     "sequence": 12,
+     "stage_kind": "modifier.schedule",
+     "display_name": "Shopfront IRPM",
+     "config_json": "{\"schedule\": {\"categories\": [{\"category_id\": \"management\", \"name\": \"Management experience\", \"range_pct\": 10.0}, {\"category_id\": \"premises\", \"name\": \"Premises condition\", \"range_pct\": 15.0}], \"display_name\": \"Shopfront IRPM\", \"schedule_id\": \"shopfront_irpm\", \"scope\": \"package\", \"total_cap_pct\": 25.0}}",
+     "citation_rule": null,
+     "citation_page": null,
+     "source_filing_id": null,
+     "x_position": null,
+     "y_position": null
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "stage_id": "endorsement_equip_breakdown",
+     "sequence": 13,
+     "stage_kind": "endorsement.factor",
+     "display_name": "Equipment breakdown",
+     "config_json": "{\"citation\": \"meridian_shopfront_bop_filing.pdf Rule F.1\", \"display_name\": \"Equipment breakdown\", \"factor\": 1.08, \"form_number\": \"MS 10 01\", \"trigger\": {\"op\": \"eq\", \"value\": false, \"variable\": \"sprinklered\"}}",
+     "citation_rule": null,
+     "citation_page": null,
+     "source_filing_id": null,
+     "x_position": null,
+     "y_position": null
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "stage_id": "endorsement_new_venture_surcharge",
+     "sequence": 14,
+     "stage_kind": "endorsement.factor",
+     "display_name": "New-venture surcharge",
+     "config_json": "{\"citation\": \"meridian_shopfront_bop_filing.pdf Rule F.2\", \"display_name\": \"New-venture surcharge\", \"factor\": 1.15, \"form_number\": \"MS 20 07\", \"trigger\": {\"op\": \"lt\", \"value\": 1, \"variable\": \"years_in_business\"}}",
+     "citation_rule": null,
+     "citation_page": null,
+     "source_filing_id": null,
+     "x_position": null,
+     "y_position": null
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "stage_id": "loading_expense_load",
+     "sequence": 15,
+     "stage_kind": "flat_factor",
+     "display_name": "Expense loading",
+     "config_json": "{\"citation_page\": \"5\", \"citation_rule\": \"meridian_shopfront_bop_filing.pdf Rule C.1\", \"description_template\": \"Expense loading: x{value}\", \"factor\": 1.06, \"factor_kind\": \"expense\", \"input_paths\": [\"chain.building_premium\", \"chain.bpp_premium\", \"chain.liability_premium\"]}",
+     "citation_rule": null,
+     "citation_page": null,
+     "source_filing_id": null,
+     "x_position": null,
+     "y_position": null
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "stage_id": "liab_min",
+     "sequence": 16,
+     "stage_kind": "clamp",
+     "display_name": "liab_min",
+     "config_json": "{\"input_path\": \"chain.liability_premium\", \"min_value\": 100.0, \"output_field\": \"value\"}",
+     "citation_rule": null,
+     "citation_page": null,
+     "source_filing_id": null,
+     "x_position": null,
+     "y_position": null
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "stage_id": "round_total",
+     "sequence": 17,
+     "stage_kind": "round",
+     "display_name": "round_total",
+     "config_json": "{\"increment_input\": \"literal:1.0\", \"input_path\": \"chain.total\", \"min_value_input\": \"literal:500.0\", \"output_field\": \"total_premium\"}",
+     "citation_rule": "meridian_shopfront_bop_filing.pdf Rule B.2",
+     "citation_page": null,
+     "source_filing_id": null,
+     "x_position": null,
+     "y_position": null
+    }
+   ]
+  },
+  "rating_plan_stage_outputs": {
+   "columns": [
+    "rating_plan_id",
+    "stage_id",
+    "output_name",
+    "data_type",
+    "description"
+   ],
+   "rows": [
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "stage_id": "input_annual_gross_sales",
+     "output_name": "value",
+     "data_type": "number",
+     "description": null
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "stage_id": "input_bpp_limit",
+     "output_name": "value",
+     "data_type": "number",
+     "description": null
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "stage_id": "input_building_limit",
+     "output_name": "value",
+     "data_type": "number",
+     "description": null
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "stage_id": "input_class_code",
+     "output_name": "value",
+     "data_type": "string",
+     "description": null
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "stage_id": "input_construction_class",
+     "output_name": "value",
+     "data_type": "string",
+     "description": null
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "stage_id": "input_protection_class",
+     "output_name": "value",
+     "data_type": "string",
+     "description": null
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "stage_id": "input_sprinklered",
+     "output_name": "value",
+     "data_type": "string",
+     "description": null
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "stage_id": "input_years_in_business",
+     "output_name": "value",
+     "data_type": "number",
+     "description": null
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "stage_id": "input_zip",
+     "output_name": "value",
+     "data_type": "string",
+     "description": null
+    }
+   ]
+  },
+  "plan_dimensions": {
+   "columns": [
+    "rating_plan_id",
+    "dim_id",
+    "display_name",
+    "slug",
+    "data_type",
+    "role",
+    "dimension_type",
+    "shape",
+    "description",
+    "levels_json",
+    "axes_json",
+    "source_field",
+    "geo_granularity",
+    "geo_scope_json",
+    "geo_territories_json",
+    "created_at",
+    "updated_at",
+    "content_hash",
+    "class_library_id",
+    "derived_from_json",
+    "classification_mapping_json",
+    "options_json",
+    "monotonicity_expected_json"
+   ],
+   "rows": [
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "dim_id": "building_limit_band",
+     "display_name": "Building limit band",
+     "slug": "building_limit_band",
+     "data_type": "number",
+     "role": "rating-input",
+     "dimension_type": "standard",
+     "shape": "banded",
+     "description": null,
+     "levels_json": "[{\"kind\":\"banded\",\"id\":\"bl_0_100k\",\"label\":\"$0\\u2013$100K\",\"lo\":0.0,\"hi\":100000.0},{\"kind\":\"banded\",\"id\":\"bl_100_250k\",\"label\":\"$100K\\u2013$250K\",\"lo\":100000.0,\"hi\":250000.0},{\"kind\":\"banded\",\"id\":\"bl_250_500k\",\"label\":\"$250K\\u2013$500K\",\"lo\":250000.0,\"hi\":500000.0},{\"kind\":\"banded\",\"id\":\"bl_500k_1m\",\"label\":\"$500K\\u2013$1M\",\"lo\":500000.0,\"hi\":1000000.0},{\"kind\":\"banded\",\"id\":\"bl_1m_plus\",\"label\":\"$1M+\",\"lo\":1000000.0,\"hi\":Infinity}]",
+     "axes_json": null,
+     "source_field": null,
+     "geo_granularity": null,
+     "geo_scope_json": null,
+     "geo_territories_json": null,
+     "created_at": "2026-07-19T12:45:54.826704+00:00",
+     "updated_at": "2026-07-19T12:45:54.826704+00:00",
+     "content_hash": "460991c234d64508",
+     "class_library_id": null,
+     "derived_from_json": null,
+     "classification_mapping_json": null,
+     "options_json": null,
+     "monotonicity_expected_json": null
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "dim_id": "class_code",
+     "display_name": "Class code",
+     "slug": "class_code",
+     "data_type": "string",
+     "role": "rating-input",
+     "dimension_type": "standard",
+     "shape": "categorical",
+     "description": null,
+     "levels_json": "[{\"kind\":\"categorical\",\"id\":\"c101\",\"label\":\"Retail \\u2014 general merchandise\",\"aliases\":[\"101\"]},{\"kind\":\"categorical\",\"id\":\"c102\",\"label\":\"Retail \\u2014 apparel\",\"aliases\":[\"102\"]},{\"kind\":\"categorical\",\"id\":\"c103\",\"label\":\"Office \\u2014 professional\",\"aliases\":[\"103\"]},{\"kind\":\"categorical\",\"id\":\"c104\",\"label\":\"Restaurant \\u2014 limited cooking\",\"aliases\":[\"104\"]},{\"kind\":\"categorical\",\"id\":\"c105\",\"label\":\"Bakery\",\"aliases\":[\"105\"]},{\"kind\":\"categorical\",\"id\":\"c106\",\"label\":\"Barber / beauty shop\",\"aliases\":[\"106\"]},{\"kind\":\"categorical\",\"id\":\"c107\",\"label\":\"Florist\",\"aliases\":[\"107\"]},{\"kind\":\"categorical\",\"id\":\"c108\",\"label\":\"Hardware store\",\"aliases\":[\"108\"]},{\"kind\":\"categorical\",\"id\":\"c109\",\"label\":\"Pharmacy\",\"aliases\":[\"109\"]},{\"kind\":\"categorical\",\"id\":\"c110\",\"label\":\"Print shop\",\"aliases\":[\"110\"]},{\"kind\":\"categorical\",\"id\":\"c111\",\"label\":\"Woodworking \\u2014 light\",\"aliases\":[\"111\"]},{\"kind\":\"categorical\",\"id\":\"c112\",\"label\":\"Welding supply\",\"aliases\":[\"112\"]},{\"kind\":\"categorical\",\"id\":\"c113\",\"label\":\"Grocery \\u2014 neighborhood\",\"aliases\":[\"113\"]},{\"kind\":\"categorical\",\"id\":\"c114\",\"label\":\"Delicatessen\",\"aliases\":[\"114\"]},{\"kind\":\"categorical\",\"id\":\"c115\",\"label\":\"Coffee shop \\u2014 no frying\",\"aliases\":[\"115\"]},{\"kind\":\"categorical\",\"id\":\"c116\",\"label\":\"Ice cream shop\",\"aliases\":[\"116\"]},{\"kind\":\"categorical\",\"id\":\"c117\",\"label\":\"Bookstore\",\"aliases\":[\"117\"]},{\"kind\":\"categorical\",\"id\":\"c118\",\"label\":\"Gift shop\",\"aliases\":[\"118\"]},{\"kind\":\"categorical\",\"id\":\"c119\",\"label\":\"Jewelry store\",\"aliases\":[\"119\"]},{\"kind\":\"categorical\",\"id\":\"c120\",\"label\":\"Shoe store\",\"aliases\":[\"120\"]},{\"kind\":\"categorical\",\"id\":\"c121\",\"label\":\"Sporting goods\",\"aliases\":[\"121\"]},{\"kind\":\"categorical\",\"id\":\"c122\",\"label\":\"Toy store\",\"aliases\":[\"122\"]},{\"kind\":\"categorical\",\"id\":\"c123\",\"label\":\"Pet shop\",\"aliases\":[\"123\"]},{\"kind\":\"categorical\",\"id\":\"c124\",\"label\":\"Bicycle shop \\u2014 sales & repair\",\"aliases\":[\"124\"]},{\"kind\":\"categorical\",\"id\":\"c125\",\"label\":\"Camera / electronics repair\",\"aliases\":[\"125\"]},{\"kind\":\"categorical\",\"id\":\"c126\",\"label\":\"Tailor / dressmaker\",\"aliases\":[\"126\"]},{\"kind\":\"categorical\",\"id\":\"c127\",\"label\":\"Dry cleaner \\u2014 drop store only\",\"aliases\":[\"127\"]},{\"kind\":\"categorical\",\"id\":\"c128\",\"label\":\"Laundromat \\u2014 self service\",\"aliases\":[\"128\"]},{\"kind\":\"categorical\",\"id\":\"c129\",\"label\":\"Picture framing\",\"aliases\":[\"129\"]},{\"kind\":\"categorical\",\"id\":\"c130\",\"label\":\"Music store \\u2014 instruments\",\"aliases\":[\"130\"]},{\"kind\":\"categorical\",\"id\":\"c131\",\"label\":\"Art gallery\",\"aliases\":[\"131\"]},{\"kind\":\"categorical\",\"id\":\"c132\",\"label\":\"Antique store\",\"aliases\":[\"132\"]},{\"kind\":\"categorical\",\"id\":\"c133\",\"label\":\"Office \\u2014 real estate\",\"aliases\":[\"133\"]},{\"kind\":\"categorical\",\"id\":\"c134\",\"label\":\"Office \\u2014 insurance agency\",\"aliases\":[\"134\"]},{\"kind\":\"categorical\",\"id\":\"c135\",\"label\":\"Office \\u2014 accounting\",\"aliases\":[\"135\"]},{\"kind\":\"categorical\",\"id\":\"c136\",\"label\":\"Medical office \\u2014 no surgery\",\"aliases\":[\"136\"]},{\"kind\":\"categorical\",\"id\":\"c137\",\"label\":\"Dental office\",\"aliases\":[\"137\"]},{\"kind\":\"categorical\",\"id\":\"c138\",\"label\":\"Veterinary office \\u2014 small animal\",\"aliases\":[\"138\"]},{\"kind\":\"categorical\",\"id\":\"c139\",\"label\":\"Photography studio\",\"aliases\":[\"139\"]},{\"kind\":\"categorical\",\"id\":\"c140\",\"label\":\"Mailbox / shipping store\",\"aliases\":[\"140\"]}]",
+     "axes_json": null,
+     "source_field": null,
+     "geo_granularity": null,
+     "geo_scope_json": null,
+     "geo_territories_json": null,
+     "created_at": "2026-07-19T12:45:54.826704+00:00",
+     "updated_at": "2026-07-19T12:45:54.826704+00:00",
+     "content_hash": "796a37930b2c750c",
+     "class_library_id": null,
+     "derived_from_json": null,
+     "classification_mapping_json": null,
+     "options_json": null,
+     "monotonicity_expected_json": null
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "dim_id": "construction_class",
+     "display_name": "Construction",
+     "slug": "construction_class",
+     "data_type": "string",
+     "role": "rating-input",
+     "dimension_type": "standard",
+     "shape": "categorical",
+     "description": null,
+     "levels_json": "[{\"kind\":\"categorical\",\"id\":\"frame\",\"label\":\"Frame\"},{\"kind\":\"categorical\",\"id\":\"jm\",\"label\":\"Joisted masonry\",\"aliases\":[\"joisted masonry\"]},{\"kind\":\"categorical\",\"id\":\"masonry\",\"label\":\"Masonry\"},{\"kind\":\"categorical\",\"id\":\"fr\",\"label\":\"Fire-resistive\"}]",
+     "axes_json": null,
+     "source_field": null,
+     "geo_granularity": null,
+     "geo_scope_json": null,
+     "geo_territories_json": null,
+     "created_at": "2026-07-19T12:45:54.826704+00:00",
+     "updated_at": "2026-07-19T12:45:54.826704+00:00",
+     "content_hash": "f6318b10c0091d64",
+     "class_library_id": null,
+     "derived_from_json": null,
+     "classification_mapping_json": null,
+     "options_json": null,
+     "monotonicity_expected_json": null
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "dim_id": "protection_class",
+     "display_name": "Protection class",
+     "slug": "protection_class",
+     "data_type": "string",
+     "role": "rating-input",
+     "dimension_type": "standard",
+     "shape": "categorical",
+     "description": null,
+     "levels_json": "[{\"kind\":\"categorical\",\"id\":\"p1_4\",\"label\":\"Protection 1\\u20134\"},{\"kind\":\"categorical\",\"id\":\"p5_8\",\"label\":\"Protection 5\\u20138\"},{\"kind\":\"categorical\",\"id\":\"p9_10\",\"label\":\"Protection 9\\u201310\"}]",
+     "axes_json": null,
+     "source_field": null,
+     "geo_granularity": null,
+     "geo_scope_json": null,
+     "geo_territories_json": null,
+     "created_at": "2026-07-19T12:45:54.826704+00:00",
+     "updated_at": "2026-07-19T12:45:54.826704+00:00",
+     "content_hash": "95f908878aa5e21d",
+     "class_library_id": null,
+     "derived_from_json": null,
+     "classification_mapping_json": null,
+     "options_json": null,
+     "monotonicity_expected_json": null
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "dim_id": "sales_band",
+     "display_name": "Sales band",
+     "slug": "sales_band",
+     "data_type": "number",
+     "role": "rating-input",
+     "dimension_type": "standard",
+     "shape": "banded",
+     "description": null,
+     "levels_json": "[{\"kind\":\"banded\",\"id\":\"sb_0_250k\",\"label\":\"$0\\u2013$250K\",\"lo\":0.0,\"hi\":250000.0},{\"kind\":\"banded\",\"id\":\"sb_250k_1m\",\"label\":\"$250K\\u2013$1M\",\"lo\":250000.0,\"hi\":1000000.0},{\"kind\":\"banded\",\"id\":\"sb_1m_3m\",\"label\":\"$1M\\u2013$3M\",\"lo\":1000000.0,\"hi\":3000000.0},{\"kind\":\"banded\",\"id\":\"sb_3m_plus\",\"label\":\"$3M+\",\"lo\":3000000.0,\"hi\":Infinity}]",
+     "axes_json": null,
+     "source_field": null,
+     "geo_granularity": null,
+     "geo_scope_json": null,
+     "geo_territories_json": null,
+     "created_at": "2026-07-19T12:45:54.826704+00:00",
+     "updated_at": "2026-07-19T12:45:54.826704+00:00",
+     "content_hash": "4d3a775c188788a5",
+     "class_library_id": null,
+     "derived_from_json": null,
+     "classification_mapping_json": null,
+     "options_json": null,
+     "monotonicity_expected_json": null
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "dim_id": "sprinklered_level",
+     "display_name": "Sprinklered",
+     "slug": "sprinklered_level",
+     "data_type": "string",
+     "role": "rating-input",
+     "dimension_type": "standard",
+     "shape": "categorical",
+     "description": null,
+     "levels_json": "[{\"kind\":\"categorical\",\"id\":\"true\",\"label\":\"Sprinklered\",\"aliases\":[\"Y\",\"yes\"]},{\"kind\":\"categorical\",\"id\":\"false\",\"label\":\"Not sprinklered\",\"aliases\":[\"N\",\"no\"]}]",
+     "axes_json": null,
+     "source_field": null,
+     "geo_granularity": null,
+     "geo_scope_json": null,
+     "geo_territories_json": null,
+     "created_at": "2026-07-19T12:45:54.826704+00:00",
+     "updated_at": "2026-07-19T12:45:54.826704+00:00",
+     "content_hash": "ecc4bb9c9bd8c341",
+     "class_library_id": null,
+     "derived_from_json": null,
+     "classification_mapping_json": null,
+     "options_json": null,
+     "monotonicity_expected_json": null
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "dim_id": "territory",
+     "display_name": "Territory",
+     "slug": "territory",
+     "data_type": "string",
+     "role": "rating-input",
+     "dimension_type": "geographic",
+     "shape": "geographic",
+     "description": null,
+     "levels_json": "[{\"kind\":\"categorical\",\"id\":\"68001\",\"label\":\"68001\"},{\"kind\":\"categorical\",\"id\":\"68002\",\"label\":\"68002\"},{\"kind\":\"categorical\",\"id\":\"68003\",\"label\":\"68003\"},{\"kind\":\"categorical\",\"id\":\"68015\",\"label\":\"68015\"},{\"kind\":\"categorical\",\"id\":\"68018\",\"label\":\"68018\"},{\"kind\":\"categorical\",\"id\":\"68064\",\"label\":\"68064\"},{\"kind\":\"categorical\",\"id\":\"68102\",\"label\":\"68102\"},{\"kind\":\"categorical\",\"id\":\"68104\",\"label\":\"68104\"},{\"kind\":\"categorical\",\"id\":\"68105\",\"label\":\"68105\"},{\"kind\":\"categorical\",\"id\":\"68106\",\"label\":\"68106\"},{\"kind\":\"categorical\",\"id\":\"68107\",\"label\":\"68107\"},{\"kind\":\"categorical\",\"id\":\"68110\",\"label\":\"68110\"},{\"kind\":\"categorical\",\"id\":\"68502\",\"label\":\"68502\"},{\"kind\":\"categorical\",\"id\":\"68503\",\"label\":\"68503\"},{\"kind\":\"categorical\",\"id\":\"68504\",\"label\":\"68504\"},{\"kind\":\"categorical\",\"id\":\"68505\",\"label\":\"68505\"},{\"kind\":\"categorical\",\"id\":\"68506\",\"label\":\"68506\"},{\"kind\":\"categorical\",\"id\":\"68510\",\"label\":\"68510\"},{\"kind\":\"categorical\",\"id\":\"68005\",\"label\":\"68005\"},{\"kind\":\"categorical\",\"id\":\"68046\",\"label\":\"68046\"},{\"kind\":\"categorical\",\"id\":\"68123\",\"label\":\"68123\"},{\"kind\":\"categorical\",\"id\":\"68128\",\"label\":\"68128\"},{\"kind\":\"categorical\",\"id\":\"68147\",\"label\":\"68147\"},{\"kind\":\"categorical\",\"id\":\"68157\",\"label\":\"68157\"},{\"kind\":\"categorical\",\"id\":\"68801\",\"label\":\"68801\"},{\"kind\":\"categorical\",\"id\":\"68803\",\"label\":\"68803\"},{\"kind\":\"categorical\",\"id\":\"68845\",\"label\":\"68845\"},{\"kind\":\"categorical\",\"id\":\"68847\",\"label\":\"68847\"},{\"kind\":\"categorical\",\"id\":\"68901\",\"label\":\"68901\"},{\"kind\":\"categorical\",\"id\":\"68902\",\"label\":\"68902\"},{\"kind\":\"categorical\",\"id\":\"68025\",\"label\":\"68025\"},{\"kind\":\"categorical\",\"id\":\"68601\",\"label\":\"68601\"},{\"kind\":\"categorical\",\"id\":\"68701\",\"label\":\"68701\"},{\"kind\":\"categorical\",\"id\":\"68702\",\"label\":\"68702\"},{\"kind\":\"categorical\",\"id\":\"68776\",\"label\":\"68776\"},{\"kind\":\"categorical\",\"id\":\"68787\",\"label\":\"68787\"}]",
+     "axes_json": null,
+     "source_field": null,
+     "geo_granularity": "zip",
+     "geo_scope_json": "{\"kind\":\"subset\",\"states\":[\"NE\"]}",
+     "geo_territories_json": "[{\"id\":\"t1\",\"label\":\"Territory 1\",\"members\":[\"68001\",\"68002\",\"68003\",\"68015\",\"68018\",\"68064\"]},{\"id\":\"t2\",\"label\":\"Territory 2\",\"members\":[\"68102\",\"68104\",\"68105\",\"68106\",\"68107\",\"68110\"]},{\"id\":\"t3\",\"label\":\"Territory 3\",\"members\":[\"68502\",\"68503\",\"68504\",\"68505\",\"68506\",\"68510\"]},{\"id\":\"t4\",\"label\":\"Territory 4\",\"members\":[\"68005\",\"68046\",\"68123\",\"68128\",\"68147\",\"68157\"]},{\"id\":\"t5\",\"label\":\"Territory 5\",\"members\":[\"68801\",\"68803\",\"68845\",\"68847\",\"68901\",\"68902\"]},{\"id\":\"t6\",\"label\":\"Territory 6\",\"members\":[\"68025\",\"68601\",\"68701\",\"68702\",\"68776\",\"68787\"]}]",
+     "created_at": "2026-07-19T12:45:54.826704+00:00",
+     "updated_at": "2026-07-19T12:45:54.826704+00:00",
+     "content_hash": "9238e73b64c6607c",
+     "class_library_id": null,
+     "derived_from_json": null,
+     "classification_mapping_json": null,
+     "options_json": null,
+     "monotonicity_expected_json": null
+    }
+   ]
+  },
+  "plan_factor_tables": {
+   "columns": [
+    "rating_plan_id",
+    "table_id",
+    "display_name",
+    "slug",
+    "description",
+    "key_dimensions_json",
+    "draft_status",
+    "source_pdf_url",
+    "source_page",
+    "created_at",
+    "updated_at",
+    "content_hash",
+    "interpolation_json"
+   ],
+   "rows": [
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "class_rate_prop",
+     "display_name": "Class factor (property)",
+     "slug": "class_rate_prop",
+     "description": null,
+     "key_dimensions_json": "[\"class_code\"]",
+     "draft_status": null,
+     "source_pdf_url": "meridian_shopfront_bop_filing.pdf Rule E.1",
+     "source_page": 7,
+     "created_at": "2026-07-19T12:45:54.827486+00:00",
+     "updated_at": "2026-07-19T12:45:54.827486+00:00",
+     "content_hash": "d663b1ddefba8556",
+     "interpolation_json": null
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "class_rate_liab",
+     "display_name": "Class factor (liability)",
+     "slug": "class_rate_liab",
+     "description": null,
+     "key_dimensions_json": "[\"class_code\"]",
+     "draft_status": null,
+     "source_pdf_url": "meridian_shopfront_bop_filing.pdf Rule E.1",
+     "source_page": 7,
+     "created_at": "2026-07-19T12:45:54.827486+00:00",
+     "updated_at": "2026-07-19T12:45:54.827486+00:00",
+     "content_hash": "ec020dba9a898a10",
+     "interpolation_json": null
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "constr_x_prot",
+     "display_name": "Construction × Protection",
+     "slug": "constr_x_prot",
+     "description": null,
+     "key_dimensions_json": "[\"construction_class\",\"protection_class\"]",
+     "draft_status": null,
+     "source_pdf_url": "meridian_shopfront_bop_filing.pdf Rule C.2",
+     "source_page": 5,
+     "created_at": "2026-07-19T12:45:54.827486+00:00",
+     "updated_at": "2026-07-19T12:45:54.827486+00:00",
+     "content_hash": "bf48cfa2dada07ce",
+     "interpolation_json": null
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "building_ilf",
+     "display_name": "Building limit ILF",
+     "slug": "building_ilf",
+     "description": null,
+     "key_dimensions_json": "[\"building_limit_band\"]",
+     "draft_status": null,
+     "source_pdf_url": "meridian_shopfront_bop_filing.pdf Rule C.3",
+     "source_page": 5,
+     "created_at": "2026-07-19T12:45:54.827486+00:00",
+     "updated_at": "2026-07-19T12:45:54.827486+00:00",
+     "content_hash": "6bfdfbdf3b42af4e",
+     "interpolation_json": "{\"mode\":\"linear\",\"axis\":\"building_limit_band\"}"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "liab_ilf",
+     "display_name": "Liability sales ILF",
+     "slug": "liab_ilf",
+     "description": null,
+     "key_dimensions_json": "[\"sales_band\"]",
+     "draft_status": null,
+     "source_pdf_url": "meridian_shopfront_bop_filing.pdf Rule C.4",
+     "source_page": 5,
+     "created_at": "2026-07-19T12:45:54.827486+00:00",
+     "updated_at": "2026-07-19T12:45:54.827486+00:00",
+     "content_hash": "3b51d97b39b0d25a",
+     "interpolation_json": null
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "sprinkler_prop",
+     "display_name": "Sprinkler credit (property)",
+     "slug": "sprinkler_prop",
+     "description": null,
+     "key_dimensions_json": "[\"sprinklered_level\"]",
+     "draft_status": null,
+     "source_pdf_url": "meridian_shopfront_bop_filing.pdf Rule C.5",
+     "source_page": 6,
+     "created_at": "2026-07-19T12:45:54.827486+00:00",
+     "updated_at": "2026-07-19T12:45:54.827486+00:00",
+     "content_hash": "ad3d18a77b6de994",
+     "interpolation_json": null
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "territory_prop",
+     "display_name": "Territory factor (property)",
+     "slug": "territory_prop",
+     "description": null,
+     "key_dimensions_json": "[\"territory\"]",
+     "draft_status": null,
+     "source_pdf_url": "meridian_shopfront_bop_filing.pdf Rule C.6",
+     "source_page": 6,
+     "created_at": "2026-07-19T12:45:54.827486+00:00",
+     "updated_at": "2026-07-19T12:45:54.827486+00:00",
+     "content_hash": "a9fe349929339763",
+     "interpolation_json": null
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "territory_liab",
+     "display_name": "Territory factor (liability)",
+     "slug": "territory_liab",
+     "description": null,
+     "key_dimensions_json": "[\"territory\"]",
+     "draft_status": null,
+     "source_pdf_url": "meridian_shopfront_bop_filing.pdf Rule C.6",
+     "source_page": 6,
+     "created_at": "2026-07-19T12:45:54.827486+00:00",
+     "updated_at": "2026-07-19T12:45:54.827486+00:00",
+     "content_hash": "97af27507582c186",
+     "interpolation_json": null
+    }
+   ]
+  },
+  "plan_factor_table_cells": {
+   "columns": [
+    "rating_plan_id",
+    "table_id",
+    "cell_key",
+    "value",
+    "updated_at"
+   ],
+   "rows": [
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "building_ilf",
+     "cell_key": "bl_0_100k",
+     "value": 1.0,
+     "updated_at": "2026-07-19T12:45:54.827827+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "building_ilf",
+     "cell_key": "bl_100_250k",
+     "value": 0.93,
+     "updated_at": "2026-07-19T12:45:54.827827+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "building_ilf",
+     "cell_key": "bl_250_500k",
+     "value": 0.87,
+     "updated_at": "2026-07-19T12:45:54.827827+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "building_ilf",
+     "cell_key": "bl_500k_1m",
+     "value": 0.82,
+     "updated_at": "2026-07-19T12:45:54.827827+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "building_ilf",
+     "cell_key": "bl_1m_plus",
+     "value": 0.78,
+     "updated_at": "2026-07-19T12:45:54.827827+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "class_rate_liab",
+     "cell_key": "c101",
+     "value": 1.0,
+     "updated_at": "2026-07-19T12:45:54.827700+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "class_rate_liab",
+     "cell_key": "c102",
+     "value": 0.95,
+     "updated_at": "2026-07-19T12:45:54.827700+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "class_rate_liab",
+     "cell_key": "c103",
+     "value": 0.85,
+     "updated_at": "2026-07-19T12:45:54.827700+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "class_rate_liab",
+     "cell_key": "c104",
+     "value": 1.3,
+     "updated_at": "2026-07-19T12:45:54.827700+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "class_rate_liab",
+     "cell_key": "c105",
+     "value": 1.18,
+     "updated_at": "2026-07-19T12:45:54.827700+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "class_rate_liab",
+     "cell_key": "c106",
+     "value": 1.05,
+     "updated_at": "2026-07-19T12:45:54.827700+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "class_rate_liab",
+     "cell_key": "c107",
+     "value": 0.9,
+     "updated_at": "2026-07-19T12:45:54.827700+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "class_rate_liab",
+     "cell_key": "c108",
+     "value": 1.08,
+     "updated_at": "2026-07-19T12:45:54.827700+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "class_rate_liab",
+     "cell_key": "c109",
+     "value": 1.02,
+     "updated_at": "2026-07-19T12:45:54.827700+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "class_rate_liab",
+     "cell_key": "c110",
+     "value": 1.06,
+     "updated_at": "2026-07-19T12:45:54.827700+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "class_rate_liab",
+     "cell_key": "c111",
+     "value": 1.55,
+     "updated_at": "2026-07-19T12:45:54.827700+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "class_rate_liab",
+     "cell_key": "c112",
+     "value": 1.72,
+     "updated_at": "2026-07-19T12:45:54.827700+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "class_rate_liab",
+     "cell_key": "c113",
+     "value": 1.04,
+     "updated_at": "2026-07-19T12:45:54.827700+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "class_rate_liab",
+     "cell_key": "c114",
+     "value": 1.12,
+     "updated_at": "2026-07-19T12:45:54.827700+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "class_rate_liab",
+     "cell_key": "c115",
+     "value": 1.1,
+     "updated_at": "2026-07-19T12:45:54.827700+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "class_rate_liab",
+     "cell_key": "c116",
+     "value": 0.98,
+     "updated_at": "2026-07-19T12:45:54.827700+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "class_rate_liab",
+     "cell_key": "c117",
+     "value": 0.85,
+     "updated_at": "2026-07-19T12:45:54.827700+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "class_rate_liab",
+     "cell_key": "c118",
+     "value": 0.88,
+     "updated_at": "2026-07-19T12:45:54.827700+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "class_rate_liab",
+     "cell_key": "c119",
+     "value": 0.92,
+     "updated_at": "2026-07-19T12:45:54.827700+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "class_rate_liab",
+     "cell_key": "c120",
+     "value": 0.9,
+     "updated_at": "2026-07-19T12:45:54.827700+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "class_rate_liab",
+     "cell_key": "c121",
+     "value": 1.06,
+     "updated_at": "2026-07-19T12:45:54.827700+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "class_rate_liab",
+     "cell_key": "c122",
+     "value": 0.95,
+     "updated_at": "2026-07-19T12:45:54.827700+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "class_rate_liab",
+     "cell_key": "c123",
+     "value": 1.08,
+     "updated_at": "2026-07-19T12:45:54.827700+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "class_rate_liab",
+     "cell_key": "c124",
+     "value": 1.09,
+     "updated_at": "2026-07-19T12:45:54.827700+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "class_rate_liab",
+     "cell_key": "c125",
+     "value": 1.0,
+     "updated_at": "2026-07-19T12:45:54.827700+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "class_rate_liab",
+     "cell_key": "c126",
+     "value": 0.82,
+     "updated_at": "2026-07-19T12:45:54.827700+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "class_rate_liab",
+     "cell_key": "c127",
+     "value": 0.96,
+     "updated_at": "2026-07-19T12:45:54.827700+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "class_rate_liab",
+     "cell_key": "c128",
+     "value": 1.15,
+     "updated_at": "2026-07-19T12:45:54.827700+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "class_rate_liab",
+     "cell_key": "c129",
+     "value": 0.88,
+     "updated_at": "2026-07-19T12:45:54.827700+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "class_rate_liab",
+     "cell_key": "c130",
+     "value": 0.87,
+     "updated_at": "2026-07-19T12:45:54.827700+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "class_rate_liab",
+     "cell_key": "c131",
+     "value": 0.84,
+     "updated_at": "2026-07-19T12:45:54.827700+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "class_rate_liab",
+     "cell_key": "c132",
+     "value": 0.93,
+     "updated_at": "2026-07-19T12:45:54.827700+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "class_rate_liab",
+     "cell_key": "c133",
+     "value": 0.86,
+     "updated_at": "2026-07-19T12:45:54.827700+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "class_rate_liab",
+     "cell_key": "c134",
+     "value": 0.84,
+     "updated_at": "2026-07-19T12:45:54.827700+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "class_rate_liab",
+     "cell_key": "c135",
+     "value": 0.83,
+     "updated_at": "2026-07-19T12:45:54.827700+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "class_rate_liab",
+     "cell_key": "c136",
+     "value": 1.14,
+     "updated_at": "2026-07-19T12:45:54.827700+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "class_rate_liab",
+     "cell_key": "c137",
+     "value": 1.12,
+     "updated_at": "2026-07-19T12:45:54.827700+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "class_rate_liab",
+     "cell_key": "c138",
+     "value": 1.2,
+     "updated_at": "2026-07-19T12:45:54.827700+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "class_rate_liab",
+     "cell_key": "c139",
+     "value": 0.9,
+     "updated_at": "2026-07-19T12:45:54.827700+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "class_rate_liab",
+     "cell_key": "c140",
+     "value": 0.94,
+     "updated_at": "2026-07-19T12:45:54.827700+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "class_rate_prop",
+     "cell_key": "c101",
+     "value": 1.0,
+     "updated_at": "2026-07-19T12:45:54.827587+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "class_rate_prop",
+     "cell_key": "c102",
+     "value": 0.92,
+     "updated_at": "2026-07-19T12:45:54.827587+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "class_rate_prop",
+     "cell_key": "c103",
+     "value": 0.78,
+     "updated_at": "2026-07-19T12:45:54.827587+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "class_rate_prop",
+     "cell_key": "c104",
+     "value": 1.45,
+     "updated_at": "2026-07-19T12:45:54.827587+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "class_rate_prop",
+     "cell_key": "c105",
+     "value": 1.32,
+     "updated_at": "2026-07-19T12:45:54.827587+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "class_rate_prop",
+     "cell_key": "c106",
+     "value": 0.88,
+     "updated_at": "2026-07-19T12:45:54.827587+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "class_rate_prop",
+     "cell_key": "c107",
+     "value": 0.95,
+     "updated_at": "2026-07-19T12:45:54.827587+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "class_rate_prop",
+     "cell_key": "c108",
+     "value": 1.12,
+     "updated_at": "2026-07-19T12:45:54.827587+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "class_rate_prop",
+     "cell_key": "c109",
+     "value": 0.85,
+     "updated_at": "2026-07-19T12:45:54.827587+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "class_rate_prop",
+     "cell_key": "c110",
+     "value": 1.18,
+     "updated_at": "2026-07-19T12:45:54.827587+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "class_rate_prop",
+     "cell_key": "c111",
+     "value": 1.85,
+     "updated_at": "2026-07-19T12:45:54.827587+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "class_rate_prop",
+     "cell_key": "c112",
+     "value": 2.1,
+     "updated_at": "2026-07-19T12:45:54.827587+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "class_rate_prop",
+     "cell_key": "c113",
+     "value": 1.08,
+     "updated_at": "2026-07-19T12:45:54.827587+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "class_rate_prop",
+     "cell_key": "c114",
+     "value": 1.22,
+     "updated_at": "2026-07-19T12:45:54.827587+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "class_rate_prop",
+     "cell_key": "c115",
+     "value": 1.15,
+     "updated_at": "2026-07-19T12:45:54.827587+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "class_rate_prop",
+     "cell_key": "c116",
+     "value": 1.05,
+     "updated_at": "2026-07-19T12:45:54.827587+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "class_rate_prop",
+     "cell_key": "c117",
+     "value": 0.82,
+     "updated_at": "2026-07-19T12:45:54.827587+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "class_rate_prop",
+     "cell_key": "c118",
+     "value": 0.9,
+     "updated_at": "2026-07-19T12:45:54.827587+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "class_rate_prop",
+     "cell_key": "c119",
+     "value": 1.02,
+     "updated_at": "2026-07-19T12:45:54.827587+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "class_rate_prop",
+     "cell_key": "c120",
+     "value": 0.89,
+     "updated_at": "2026-07-19T12:45:54.827587+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "class_rate_prop",
+     "cell_key": "c121",
+     "value": 1.04,
+     "updated_at": "2026-07-19T12:45:54.827587+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "class_rate_prop",
+     "cell_key": "c122",
+     "value": 0.93,
+     "updated_at": "2026-07-19T12:45:54.827587+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "class_rate_prop",
+     "cell_key": "c123",
+     "value": 1.06,
+     "updated_at": "2026-07-19T12:45:54.827587+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "class_rate_prop",
+     "cell_key": "c124",
+     "value": 1.1,
+     "updated_at": "2026-07-19T12:45:54.827587+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "class_rate_prop",
+     "cell_key": "c125",
+     "value": 1.08,
+     "updated_at": "2026-07-19T12:45:54.827587+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "class_rate_prop",
+     "cell_key": "c126",
+     "value": 0.84,
+     "updated_at": "2026-07-19T12:45:54.827587+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "class_rate_prop",
+     "cell_key": "c127",
+     "value": 0.98,
+     "updated_at": "2026-07-19T12:45:54.827587+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "class_rate_prop",
+     "cell_key": "c128",
+     "value": 1.24,
+     "updated_at": "2026-07-19T12:45:54.827587+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "class_rate_prop",
+     "cell_key": "c129",
+     "value": 0.94,
+     "updated_at": "2026-07-19T12:45:54.827587+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "class_rate_prop",
+     "cell_key": "c130",
+     "value": 0.91,
+     "updated_at": "2026-07-19T12:45:54.827587+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "class_rate_prop",
+     "cell_key": "c131",
+     "value": 0.86,
+     "updated_at": "2026-07-19T12:45:54.827587+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "class_rate_prop",
+     "cell_key": "c132",
+     "value": 1.0,
+     "updated_at": "2026-07-19T12:45:54.827587+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "class_rate_prop",
+     "cell_key": "c133",
+     "value": 0.76,
+     "updated_at": "2026-07-19T12:45:54.827587+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "class_rate_prop",
+     "cell_key": "c134",
+     "value": 0.75,
+     "updated_at": "2026-07-19T12:45:54.827587+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "class_rate_prop",
+     "cell_key": "c135",
+     "value": 0.74,
+     "updated_at": "2026-07-19T12:45:54.827587+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "class_rate_prop",
+     "cell_key": "c136",
+     "value": 0.96,
+     "updated_at": "2026-07-19T12:45:54.827587+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "class_rate_prop",
+     "cell_key": "c137",
+     "value": 0.98,
+     "updated_at": "2026-07-19T12:45:54.827587+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "class_rate_prop",
+     "cell_key": "c138",
+     "value": 1.14,
+     "updated_at": "2026-07-19T12:45:54.827587+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "class_rate_prop",
+     "cell_key": "c139",
+     "value": 0.88,
+     "updated_at": "2026-07-19T12:45:54.827587+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "class_rate_prop",
+     "cell_key": "c140",
+     "value": 0.92,
+     "updated_at": "2026-07-19T12:45:54.827587+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "constr_x_prot",
+     "cell_key": "fr::p1_4",
+     "value": 0.72,
+     "updated_at": "2026-07-19T12:45:54.827786+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "constr_x_prot",
+     "cell_key": "fr::p5_8",
+     "value": 0.81,
+     "updated_at": "2026-07-19T12:45:54.827786+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "constr_x_prot",
+     "cell_key": "fr::p9_10",
+     "value": 0.94,
+     "updated_at": "2026-07-19T12:45:54.827786+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "constr_x_prot",
+     "cell_key": "frame::p1_4",
+     "value": 1.05,
+     "updated_at": "2026-07-19T12:45:54.827786+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "constr_x_prot",
+     "cell_key": "frame::p5_8",
+     "value": 1.18,
+     "updated_at": "2026-07-19T12:45:54.827786+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "constr_x_prot",
+     "cell_key": "frame::p9_10",
+     "value": 1.42,
+     "updated_at": "2026-07-19T12:45:54.827786+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "constr_x_prot",
+     "cell_key": "jm::p1_4",
+     "value": 0.96,
+     "updated_at": "2026-07-19T12:45:54.827786+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "constr_x_prot",
+     "cell_key": "jm::p5_8",
+     "value": 1.07,
+     "updated_at": "2026-07-19T12:45:54.827786+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "constr_x_prot",
+     "cell_key": "jm::p9_10",
+     "value": 1.28,
+     "updated_at": "2026-07-19T12:45:54.827786+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "constr_x_prot",
+     "cell_key": "masonry::p1_4",
+     "value": 0.88,
+     "updated_at": "2026-07-19T12:45:54.827786+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "constr_x_prot",
+     "cell_key": "masonry::p5_8",
+     "value": 0.97,
+     "updated_at": "2026-07-19T12:45:54.827786+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "constr_x_prot",
+     "cell_key": "masonry::p9_10",
+     "value": 1.15,
+     "updated_at": "2026-07-19T12:45:54.827786+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "liab_ilf",
+     "cell_key": "sb_0_250k",
+     "value": 0.9,
+     "updated_at": "2026-07-19T12:45:54.827848+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "liab_ilf",
+     "cell_key": "sb_250k_1m",
+     "value": 1.0,
+     "updated_at": "2026-07-19T12:45:54.827848+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "liab_ilf",
+     "cell_key": "sb_1m_3m",
+     "value": 1.12,
+     "updated_at": "2026-07-19T12:45:54.827848+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "liab_ilf",
+     "cell_key": "sb_3m_plus",
+     "value": 1.27,
+     "updated_at": "2026-07-19T12:45:54.827848+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "sprinkler_prop",
+     "cell_key": "true",
+     "value": 0.92,
+     "updated_at": "2026-07-19T12:45:54.827867+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "sprinkler_prop",
+     "cell_key": "false",
+     "value": 1.0,
+     "updated_at": "2026-07-19T12:45:54.827867+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "territory_liab",
+     "cell_key": "t1",
+     "value": 1.02,
+     "updated_at": "2026-07-19T12:45:54.827904+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "territory_liab",
+     "cell_key": "t2",
+     "value": 1.0,
+     "updated_at": "2026-07-19T12:45:54.827904+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "territory_liab",
+     "cell_key": "t3",
+     "value": 0.95,
+     "updated_at": "2026-07-19T12:45:54.827904+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "territory_liab",
+     "cell_key": "t4",
+     "value": 1.01,
+     "updated_at": "2026-07-19T12:45:54.827904+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "territory_liab",
+     "cell_key": "t5",
+     "value": 0.93,
+     "updated_at": "2026-07-19T12:45:54.827904+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "territory_liab",
+     "cell_key": "t6",
+     "value": 0.97,
+     "updated_at": "2026-07-19T12:45:54.827904+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "territory_prop",
+     "cell_key": "t1",
+     "value": 0.94,
+     "updated_at": "2026-07-19T12:45:54.827883+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "territory_prop",
+     "cell_key": "t2",
+     "value": 1.0,
+     "updated_at": "2026-07-19T12:45:54.827883+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "territory_prop",
+     "cell_key": "t3",
+     "value": 1.12,
+     "updated_at": "2026-07-19T12:45:54.827883+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "territory_prop",
+     "cell_key": "t4",
+     "value": 0.97,
+     "updated_at": "2026-07-19T12:45:54.827883+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "territory_prop",
+     "cell_key": "t5",
+     "value": 0.91,
+     "updated_at": "2026-07-19T12:45:54.827883+00:00"
+    },
+    {
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "table_id": "territory_prop",
+     "cell_key": "t6",
+     "value": 0.89,
+     "updated_at": "2026-07-19T12:45:54.827883+00:00"
+    }
+   ]
+  },
+  "plan_class_codes": {
+   "columns": [
+    "rating_plan_id",
+    "class_code",
+    "display_name",
+    "family",
+    "description",
+    "naics_code",
+    "sic_code",
+    "eligible_for_json",
+    "exposure_bases_json",
+    "attributes_json",
+    "source",
+    "note",
+    "citation_rule",
+    "citation_page",
+    "created_at",
+    "updated_at",
+    "content_hash"
+   ],
+   "rows": []
+  },
+  "plan_input_mappings": {
+   "columns": [
+    "rating_plan_id",
+    "mapping_json",
+    "created_at",
+    "updated_at",
+    "content_hash"
+   ],
+   "rows": []
+  },
+  "plan_policy_tail": {
+   "columns": [
+    "rating_plan_id",
+    "tail_json",
+    "created_at",
+    "updated_at",
+    "content_hash"
+   ],
+   "rows": []
+  },
+  "plan_build_reports": {
+   "columns": [
+    "report_id",
+    "rating_plan_id",
+    "workbook_hash",
+    "filename",
+    "spec_version",
+    "workbook_plan_id",
+    "manifest_json",
+    "issues_json",
+    "vectors_json",
+    "gaps_json",
+    "created_at",
+    "workbook_blob",
+    "workbook_version",
+    "diff_json",
+    "drift_json"
+   ],
+   "rows": [
+    {
+     "report_id": "br_1a0ad5fd5c96",
+     "rating_plan_id": "meridian-shopfront-bop-ne-2026",
+     "workbook_hash": "5cad4a97fdf666981016a6476c634d3330802e17bff3ee85a6fb338848ed17d1",
+     "filename": "meridian_shopfront_bop.workbook.xlsx",
+     "spec_version": "1.0",
+     "workbook_plan_id": "meridian-shopfront-bop-ne-2026",
+     "manifest_json": "{\"provenance\":{\"carrier\":\"Meridian Mutual (fictional)\",\"product\":\"bop\",\"state\":\"NE\",\"effective_date\":\"2026-09-01\",\"serff_tracking_number\":null,\"display_name\":\"Meridian Shopfront BOP — Nebraska\",\"rating_plan_id\":\"meridian-shopfront-bop-ne-2026\",\"version\":\"1.0.0\"},\"counts\":{\"dimensions\":7,\"dimension_levels\":64,\"factor_tables\":8,\"factor_cells\":115,\"factor_cells_cited\":115,\"chains\":3,\"chain_stages\":21,\"gates\":4,\"modifier_categories\":2,\"endorsements\":2,\"loadings\":1,\"final_adjustments\":2,\"outputs\":4,\"inputs\":9,\"inputs_with_defaults\":2,\"test_cases\":8,\"geo_rows\":36,\"declared_gaps\":2},\"gap_kinds\":{\"assumption\":2},\"plan_content_hash_at_build\":\"57b4b34450476695\"}",
+     "issues_json": "[{\"rule\": \"R-203\", \"severity\": \"notice\", \"sheet\": \"README\", \"cell\": null, \"message\": \"Sheet 'README' is not a data sheet \\u2014 ignored (README-style prose sheets are fine).\"}, {\"rule\": \"R-111\", \"severity\": \"notice\", \"sheet\": \"ft.building_ilf\", \"cell\": \"B6\", \"message\": \"Table 'building_ilf' interpolates linearly between band lower bounds; the ends clamp. Tables without the flag step.\"}, {\"rule\": \"R-083\", \"severity\": \"notice\", \"sheet\": \"geo.territory\", \"cell\": null, \"message\": \"'geo.territory' maps 34 of 586 ZCTAs in the declared scope (subset:NE); 552 unmapped \\u2014 an unmapped ZCTA refuses at rating time. Unmapped: 68004, 68007, 68008, 68010, 68014\\u2026\"}, {\"rule\": \"R-085\", \"severity\": \"notice\", \"sheet\": \"geo.territory\", \"cell\": null, \"message\": \"2 key(s) in 'geo.territory' aren't in the Census ZCTA universe: 68702, 68902. PO-box ZIPs have no ZCTA; typos look like this too.\"}]",
+     "vectors_json": "{\"status\":\"ran\",\"detail\":null,\"total_cases\":8,\"checks\":[{\"case_id\":\"mv_01\",\"name\":\"Retail t2, sprinklered, preferred\",\"field\":\"building_premium\",\"expected\":519.4,\"actual\":519.4,\"delta\":0.0,\"status\":\"match\",\"detail\":null},{\"case_id\":\"mv_01\",\"name\":\"Retail t2, sprinklered, preferred\",\"field\":\"bpp_premium\",\"expected\":340.26,\"actual\":340.26,\"delta\":0.0,\"status\":\"match\",\"detail\":null},{\"case_id\":\"mv_01\",\"name\":\"Retail t2, sprinklered, preferred\",\"field\":\"liability_premium\",\"expected\":1038.8,\"actual\":1038.8,\"delta\":0.0,\"status\":\"match\",\"detail\":null},{\"case_id\":\"mv_01\",\"name\":\"Retail t2, sprinklered, preferred\",\"field\":\"total_premium\",\"expected\":1898.0,\"actual\":1898.0,\"delta\":0.0,\"status\":\"match\",\"detail\":null},{\"case_id\":\"mv_01\",\"name\":\"Retail t2, sprinklered, preferred\",\"field\":\"tier\",\"expected\":\"preferred\",\"actual\":\"preferred\",\"delta\":null,\"status\":\"match\",\"detail\":null},{\"case_id\":\"mv_02\",\"name\":\"Restaurant t3, unsprinklered (endorsement fires)\",\"field\":\"building_premium\",\"expected\":1885.4856,\"actual\":1885.49,\"delta\":0.0,\"status\":\"match\",\"detail\":null},{\"case_id\":\"mv_02\",\"name\":\"Restaurant t3, unsprinklered (endorsement fires)\",\"field\":\"bpp_premium\",\"expected\":1495.1088,\"actual\":1495.11,\"delta\":0.0,\"status\":\"match\",\"detail\":null},{\"case_id\":\"mv_02\",\"name\":\"Restaurant t3, unsprinklered (endorsement fires)\",\"field\":\"liability_premium\",\"expected\":3103.5528,\"actual\":3103.55,\"delta\":0.0,\"status\":\"match\",\"detail\":null},{\"case_id\":\"mv_02\",\"name\":\"Restaurant t3, unsprinklered (endorsement fires)\",\"field\":\"total_premium\",\"expected\":6484.0,\"actual\":6484.0,\"delta\":0.0,\"status\":\"match\",\"detail\":null},{\"case_id\":\"mv_02\",\"name\":\"Restaurant t3, unsprinklered (endorsement fires)\",\"field\":\"tier\",\"expected\":\"standard\",\"actual\":\"standard\",\"delta\":null,\"status\":\"match\",\"detail\":null},{\"case_id\":\"mv_03\",\"name\":\"Office t1, tiny liability (clamp fires)\",\"field\":\"building_premium\",\"expected\":248.4216,\"actual\":248.42,\"delta\":0.0,\"status\":\"match\",\"detail\":null},{\"case_id\":\"mv_03\",\"name\":\"Office t1, tiny liability (clamp fires)\",\"field\":\"bpp_premium\",\"expected\":109.9008,\"actual\":109.9,\"delta\":0.0,\"status\":\"match\",\"detail\":null},{\"case_id\":\"mv_03\",\"name\":\"Office t1, tiny liability (clamp fires)\",\"field\":\"liability_premium\",\"expected\":100.0,\"actual\":100.0,\"delta\":0.0,\"status\":\"match\",\"detail\":null},{\"case_id\":\"mv_03\",\"name\":\"Office t1, tiny liability (clamp fires)\",\"field\":\"total_premium\",\"expected\":500.0,\"actual\":500.0,\"delta\":0.0,\"status\":\"match\",\"detail\":null},{\"case_id\":\"mv_03\",\"name\":\"Office t1, tiny liability (clamp fires)\",\"field\":\"tier\",\"expected\":\"standard\",\"actual\":\"standard\",\"delta\":null,\"status\":\"match\",\"detail\":null},{\"case_id\":\"mv_04\",\"name\":\"Micro florist (package floor fires)\",\"field\":\"building_premium\",\"expected\":83.74,\"actual\":83.74,\"delta\":0.0,\"status\":\"match\",\"detail\":null},{\"case_id\":\"mv_04\",\"name\":\"Micro florist (package floor fires)\",\"field\":\"bpp_premium\",\"expected\":38.16,\"actual\":38.16,\"delta\":0.0,\"status\":\"match\",\"detail\":null},{\"case_id\":\"mv_04\",\"name\":\"Micro florist (package floor fires)\",\"field\":\"liability_premium\",\"expected\":100.0,\"actual\":100.0,\"delta\":0.0,\"status\":\"match\",\"detail\":null},{\"case_id\":\"mv_04\",\"name\":\"Micro florist (package floor fires)\",\"field\":\"total_premium\",\"expected\":500.0,\"actual\":500.0,\"delta\":0.0,\"status\":\"match\",\"detail\":null},{\"case_id\":\"mv_04\",\"name\":\"Micro florist (package floor fires)\",\"field\":\"tier\",\"expected\":\"standard\",\"actual\":\"standard\",\"delta\":null,\"status\":\"match\",\"detail\":null},{\"case_id\":\"mv_05\",\"name\":\"Woodworking (submit tier)\",\"field\":\"building_premium\",\"expected\":1754.3,\"actual\":1754.3,\"delta\":0.0,\"status\":\"match\",\"detail\":null},{\"case_id\":\"mv_05\",\"name\":\"Woodworking (submit tier)\",\"field\":\"bpp_premium\",\"expected\":1259.28,\"actual\":1259.28,\"delta\":0.0,\"status\":\"match\",\"detail\":null},{\"case_id\":\"mv_05\",\"name\":\"Woodworking (submit tier)\",\"field\":\"liability_premium\",\"expected\":2415.74,\"actual\":2415.74,\"delta\":0.0,\"status\":\"match\",\"detail\":null},{\"case_id\":\"mv_05\",\"name\":\"Woodworking (submit tier)\",\"field\":\"total_premium\",\"expected\":5429.0,\"actual\":5429.0,\"delta\":0.0,\"status\":\"match\",\"detail\":null},{\"case_id\":\"mv_05\",\"name\":\"Woodworking (submit tier)\",\"field\":\"tier\",\"expected\":\"submit\",\"actual\":\"submit\",\"delta\":null,\"status\":\"match\",\"detail\":null},{\"case_id\":\"mv_06\",\"name\":\"Big young welding supply (decline tier)\",\"field\":\"building_premium\",\"expected\":4740.6168,\"actual\":4740.62,\"delta\":0.0,\"status\":\"match\",\"detail\":null},{\"case_id\":\"mv_06\",\"name\":\"Big young welding supply (decline tier)\",\"field\":\"bpp_premium\",\"expected\":3560.328,\"actual\":3560.33,\"delta\":0.0,\"status\":\"match\",\"detail\":null},{\"case_id\":\"mv_06\",\"name\":\"Big young welding supply (decline tier)\",\"field\":\"liability_premium\",\"expected\":23272.6392,\"actual\":23272.64,\"delta\":0.0,\"status\":\"match\",\"detail\":null},{\"case_id\":\"mv_06\",\"name\":\"Big young welding supply (decline tier)\",\"field\":\"total_premium\",\"expected\":31574.0,\"actual\":31574.0,\"delta\":0.0,\"status\":\"match\",\"detail\":null},{\"case_id\":\"mv_06\",\"name\":\"Big young welding supply (decline tier)\",\"field\":\"tier\",\"expected\":\"decline\",\"actual\":\"decline\",\"delta\":null,\"status\":\"match\",\"detail\":null},{\"case_id\":\"mv_07\",\"name\":\"Pharmacy at a band edge ($250K exactly)\",\"field\":\"building_premium\",\"expected\":405.98,\"actual\":405.98,\"delta\":0.0,\"status\":\"match\",\"detail\":null},{\"case_id\":\"mv_07\",\"name\":\"Pharmacy at a band edge ($250K exactly)\",\"field\":\"bpp_premium\",\"expected\":832.1,\"actual\":832.1,\"delta\":0.0,\"status\":\"match\",\"detail\":null},{\"case_id\":\"mv_07\",\"name\":\"Pharmacy at a band edge ($250K exactly)\",\"field\":\"liability_premium\",\"expected\":450.5,\"actual\":450.5,\"delta\":0.0,\"status\":\"match\",\"detail\":null},{\"case_id\":\"mv_07\",\"name\":\"Pharmacy at a band edge ($250K exactly)\",\"field\":\"total_premium\",\"expected\":1689.0,\"actual\":1689.0,\"delta\":0.0,\"status\":\"match\",\"detail\":null},{\"case_id\":\"mv_07\",\"name\":\"Pharmacy at a band edge ($250K exactly)\",\"field\":\"tier\",\"expected\":\"standard\",\"actual\":\"standard\",\"delta\":null,\"status\":\"match\",\"detail\":null},{\"case_id\":\"mv_08\",\"name\":\"Hardware t3, defaults exercised implicitly\",\"field\":\"building_premium\",\"expected\":5080.6224,\"actual\":5080.62,\"delta\":0.0,\"status\":\"match\",\"detail\":null},{\"case_id\":\"mv_08\",\"name\":\"Hardware t3, defaults exercised implicitly\",\"field\":\"bpp_premium\",\"expected\":3706.8624,\"actual\":3706.86,\"delta\":0.0,\"status\":\"match\",\"detail\":null},{\"case_id\":\"mv_08\",\"name\":\"Hardware t3, defaults exercised implicitly\",\"field\":\"liability_premium\",\"expected\":5153.8896,\"actual\":5153.89,\"delta\":0.0,\"status\":\"match\",\"detail\":null},{\"case_id\":\"mv_08\",\"name\":\"Hardware t3, defaults exercised implicitly\",\"field\":\"total_premium\",\"expected\":13941.0,\"actual\":13941.0,\"delta\":0.0,\"status\":\"match\",\"detail\":null},{\"case_id\":\"mv_08\",\"name\":\"Hardware t3, defaults exercised implicitly\",\"field\":\"tier\",\"expected\":\"standard\",\"actual\":\"standard\",\"delta\":null,\"status\":\"match\",\"detail\":null}],\"cases\":[{\"case_id\":\"mv_01\",\"name\":\"Retail t2, sprinklered, preferred\",\"inputs\":{\"class_code\":\"c101\",\"building_limit\":250000,\"bpp_limit\":80000,\"annual_gross_sales\":600000,\"construction_class\":\"jm\",\"protection_class\":\"p1_4\",\"zip\":\"68102\",\"sprinklered\":true,\"years_in_business\":8}},{\"case_id\":\"mv_02\",\"name\":\"Restaurant t3, unsprinklered (endorsement fires)\",\"inputs\":{\"class_code\":\"c104\",\"building_limit\":400000,\"bpp_limit\":150000,\"annual_gross_sales\":1200000,\"construction_class\":\"frame\",\"protection_class\":\"p5_8\",\"zip\":\"68502\",\"sprinklered\":false,\"years_in_business\":12}},{\"case_id\":\"mv_03\",\"name\":\"Office t1, tiny liability (clamp fires)\",\"inputs\":{\"class_code\":\"c103\",\"building_limit\":180000,\"bpp_limit\":40000,\"annual_gross_sales\":30000,\"construction_class\":\"fr\",\"protection_class\":\"p1_4\",\"zip\":\"68001\",\"sprinklered\":false,\"years_in_business\":20}},{\"case_id\":\"mv_04\",\"name\":\"Micro florist (package floor fires)\",\"inputs\":{\"class_code\":\"c107\",\"building_limit\":40000,\"bpp_limit\":10000,\"annual_gross_sales\":25000,\"construction_class\":\"masonry\",\"protection_class\":\"p5_8\",\"zip\":\"68002\",\"sprinklered\":true,\"years_in_business\":6}},{\"case_id\":\"mv_05\",\"name\":\"Woodworking (submit tier)\",\"inputs\":{\"class_code\":\"c111\",\"building_limit\":350000,\"bpp_limit\":120000,\"annual_gross_sales\":900000,\"construction_class\":\"jm\",\"protection_class\":\"p9_10\",\"zip\":\"68104\",\"sprinklered\":true,\"years_in_business\":15}},{\"case_id\":\"mv_06\",\"name\":\"Big young welding supply (decline tier)\",\"inputs\":{\"class_code\":\"c112\",\"building_limit\":900000,\"bpp_limit\":300000,\"annual_gross_sales\":6000000,\"construction_class\":\"masonry\",\"protection_class\":\"p5_8\",\"zip\":\"68505\",\"sprinklered\":false,\"years_in_business\":2}},{\"case_id\":\"mv_07\",\"name\":\"Pharmacy at a band edge ($250K exactly)\",\"inputs\":{\"class_code\":\"c109\",\"building_limit\":250000,\"bpp_limit\":250000,\"annual_gross_sales\":250000,\"construction_class\":\"fr\",\"protection_class\":\"p9_10\",\"zip\":\"68015\",\"sprinklered\":true,\"years_in_business\":9}},{\"case_id\":\"mv_08\",\"name\":\"Hardware t3, defaults exercised implicitly\",\"inputs\":{\"class_code\":\"c108\",\"building_limit\":1250000,\"bpp_limit\":400000,\"annual_gross_sales\":2400000,\"construction_class\":\"frame\",\"protection_class\":\"p9_10\",\"zip\":\"68510\",\"sprinklered\":false,\"years_in_business\":30}}],\"matched\":40,\"near\":0,\"mismatched\":0}",
+     "gaps_json": "[{\"kind\": \"assumption\", \"description\": \"The manual's sprinkler question defaults to 'not sprinklered' when unanswered; transcribed as inputs.sprinklered default_value=false.\", \"citation_rule\": \"meridian_shopfront_bop_filing.pdf Rule A.4\", \"citation_page\": \"3\", \"impact\": \"Risks without the answer rate unsprinklered (and the equipment-breakdown endorsement attaches).\", \"related\": \"inputs!sprinklered\"}, {\"kind\": \"assumption\", \"description\": \"Years-in-business defaults to 5 when absent (manual convention).\", \"citation_rule\": \"meridian_shopfront_bop_filing.pdf Rule A.4\", \"citation_page\": \"3\", \"impact\": \"Absent tenure neither declines (needs <3 AND >$5M sales) nor attaches the new-venture surcharge (<1).\", \"related\": \"inputs!years_in_business\"}]",
+     "created_at": "2026-07-19T12:45:54.906380+00:00",
+     "workbook_blob": {
+      "$b64": "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"
+     },
+     "workbook_version": "1.0.0",
+     "diff_json": null,
+     "drift_json": null
+    }
+   ]
+  }
+ },
+ "model": null
+}

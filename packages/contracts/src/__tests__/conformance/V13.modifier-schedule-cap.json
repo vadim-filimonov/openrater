@@ -1,0 +1,61 @@
+{
+  "name": "V13.modifier-schedule-cap",
+  "description": "modifier.schedule sums per-category mods within the filed cap. Two categories applied (−5%, +3%) under a 25% cap → factor 0.98 (Brief 15).",
+  "plan": {
+    "id": "v13.modifier_cap",
+    "version": "1.0.0",
+    "name": "Schedule modifier (cap)",
+    "lines": ["property"],
+    "effective": "2026-01-01",
+    "nodes": [
+      {
+        "id": "app",
+        "kind": "input",
+        "params": { "fieldName": "schedule_application", "fieldType": "money" },
+        "position": { "x": 0, "y": 0 }
+      },
+      {
+        "id": "mod",
+        "kind": "modifier.schedule",
+        "params": {
+          "schedule": {
+            "schedule_id": "property_schedule",
+            "display_name": "Property schedule mod",
+            "scope": "per_coverage",
+            "total_cap_pct": 25,
+            "categories": [
+              { "category_id": "mgmt_exp", "name": "Management experience", "range_pct": 5, "reasoning_required": true },
+              { "category_id": "premises_maint", "name": "Premises maintenance", "range_pct": 5, "reasoning_required": true },
+              { "category_id": "safety_devices", "name": "Safety devices", "range_pct": 10, "reasoning_required": true }
+            ],
+            "citation": "Meridian Rule MS-R4.2"
+          }
+        },
+        "position": { "x": 200, "y": 0 }
+      },
+      { "id": "out_factor", "kind": "output", "params": { "fieldName": "factor", "fieldType": "factor" }, "position": { "x": 400, "y": 0 } },
+      { "id": "out_pct", "kind": "output", "params": { "fieldName": "applied_pct", "fieldType": "pct" }, "position": { "x": 400, "y": 100 } },
+      { "id": "out_cap", "kind": "output", "params": { "fieldName": "cap_hit", "fieldType": "bool" }, "position": { "x": 400, "y": 200 } }
+    ],
+    "edges": [
+      { "from": { "node": "app", "port": "value" }, "to": { "node": "mod", "port": "application" } },
+      { "from": { "node": "mod", "port": "factor" }, "to": { "node": "out_factor", "port": "value" } },
+      { "from": { "node": "mod", "port": "applied_pct" }, "to": { "node": "out_pct", "port": "value" } },
+      { "from": { "node": "mod", "port": "cap_hit" }, "to": { "node": "out_cap", "port": "value" } }
+    ]
+  },
+  "externalInputs": {
+    "schedule_application": {
+      "schedule_id": "property_schedule",
+      "values": {
+        "mgmt_exp": { "value_pct": -5, "reasoning": "Strong mgmt; 15+ yrs.", "source": "underwriter" },
+        "premises_maint": { "value_pct": 3, "reasoning": "Deferred maintenance.", "source": "underwriter" }
+      }
+    }
+  },
+  "expectedOutputs": {
+    "factor": 0.98,
+    "applied_pct": -2,
+    "cap_hit": false
+  }
+}

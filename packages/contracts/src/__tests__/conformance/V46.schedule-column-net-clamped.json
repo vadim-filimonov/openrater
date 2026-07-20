@@ -1,0 +1,49 @@
+{
+  "name": "V46.schedule-column-net-clamped",
+  "description": "The cap binds on a COLUMN-sourced value (Brief 62.2 — the resolver reads the raw net, the composer's schedule_rating step clamps it; one cap implementation). Subtotal 1000; irpm_total_pct = -40 → clamped to the filed ±25% → factor 0.75 → $750. The clamp is evident from input(-40) vs applied(-25%).",
+  "policy": {
+    "policy_id": "V46",
+    "lines": [
+      { "plan_ref": { "plan_id": "bop-plan", "content_hash": "h-bop", "product": "bop" }, "premium_output": "bop_premium" }
+    ]
+  },
+  "policy_tail": [
+    { "kind": "schedule_rating", "id": "irpm", "display_name": "Schedule rating (IRPM)", "cap_pct": 25, "source": { "from": "column", "column": "irpm_total_pct" } }
+  ],
+  "adjustmentInputs": { "irpm_total_pct": -40 },
+  "plans": {
+    "bop-plan": {
+      "externalInputs": { "base": 1000 },
+      "plan": {
+        "id": "v46.bop",
+        "version": "1.0.0",
+        "name": "BOP",
+        "nodes": [
+          { "id": "in_base", "kind": "input", "params": { "fieldName": "base", "fieldType": "money" } },
+          { "id": "k", "kind": "constant", "params": { "value": 1.0, "type": "factor" } },
+          { "id": "mul", "kind": "chain.mult", "params": { "stopOnZero": false } },
+          { "id": "out", "kind": "output", "params": { "fieldName": "bop_premium", "fieldType": "money" } }
+        ],
+        "edges": [
+          { "from": { "node": "in_base", "port": "value" }, "to": { "node": "mul", "port": "base" } },
+          { "from": { "node": "k", "port": "value" }, "to": { "node": "mul", "port": "factors" } },
+          { "from": { "node": "mul", "port": "result" }, "to": { "node": "out", "port": "value" } }
+        ]
+      }
+    }
+  },
+  "expected": {
+    "subtotal": 1000,
+    "package_credit": 1,
+    "after_credit": 1000,
+    "minimum_premium": 0,
+    "minimum_applied": false,
+    "total": 750,
+    "lines": [
+      { "product": "bop", "plan_id": "bop-plan", "premium": 1000 }
+    ],
+    "adjustments": [
+      { "id": "irpm", "kind": "schedule_rating", "applied": true, "before": 1000, "after": 750, "detail": "-25.0% (cap ±25%)", "provenance": { "source": "column" } }
+    ]
+  }
+}

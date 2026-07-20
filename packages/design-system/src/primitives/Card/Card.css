@@ -1,0 +1,19 @@
+.rater-card {
+  background: var(--rater-surface-1);
+  border: 1px solid var(--rater-border-subtle);
+  border-radius: var(--rater-r-6);
+  color: var(--rater-text-default);
+}
+
+.rater-card--default {
+  /* base */
+}
+
+.rater-card--padded {
+  padding: var(--rater-card-pad-y) var(--rater-card-pad-x);
+}
+
+.rater-card--lifted {
+  padding: var(--rater-card-pad-y-lg) var(--rater-card-pad-x-lg);
+  box-shadow: var(--rater-shadow-resting);
+}

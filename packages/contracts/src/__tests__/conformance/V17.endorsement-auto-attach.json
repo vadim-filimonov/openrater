@@ -1,0 +1,97 @@
+{
+  "name": "V17.endorsement-auto-attach",
+  "description": "Fictional Meridian factor, additive, and sublimit endorsements compose through one chain. Triggers fire selectively from external inputs, while the sublimit also surfaces as metadata.",
+  "plan": {
+    "id": "v17.endorsement_auto_attach",
+    "version": "1.0.0",
+    "name": "Meridian endorsement auto-attach",
+    "lines": ["property"],
+    "effective": "2026-01-01",
+    "nodes": [
+      {
+        "id": "base",
+        "kind": "constant",
+        "params": { "value": 10000 },
+        "position": { "x": 0, "y": 0 }
+      },
+      {
+        "id": "end_factor",
+        "kind": "endorsement.factor",
+        "params": {
+          "form_number": "MS 10 03",
+          "display_name": "Liquor liability",
+          "trigger": { "variable": "class_code", "op": "eq", "value": "c101" },
+          "factor": 1.15
+        },
+        "position": { "x": 200, "y": 0 }
+      },
+      {
+        "id": "end_additive",
+        "kind": "endorsement.additive",
+        "params": {
+          "form_number": "MS 10 05",
+          "display_name": "Wind / hail deductible",
+          "trigger": { "variable": "state", "op": "in", "value": ["CA", "TX", "FL"] },
+          "amount": 250
+        },
+        "position": { "x": 400, "y": 0 }
+      },
+      {
+        "id": "end_sublimit",
+        "kind": "endorsement.sublimit",
+        "params": {
+          "form_number": "MS 10 02",
+          "display_name": "Peak-limit endorsement",
+          "trigger": { "variable": "tiv", "op": "gt", "value": 1000000 },
+          "coverage": "peak_items",
+          "sublimit": 100000
+        },
+        "position": { "x": 600, "y": 0 }
+      },
+      {
+        "id": "out_premium",
+        "kind": "output",
+        "params": { "fieldName": "final_premium", "fieldType": "number" },
+        "position": { "x": 800, "y": 0 }
+      },
+      {
+        "id": "out_attached_factor",
+        "kind": "output",
+        "params": { "fieldName": "factor_attached", "fieldType": "boolean" },
+        "position": { "x": 800, "y": 100 }
+      },
+      {
+        "id": "out_attached_additive",
+        "kind": "output",
+        "params": { "fieldName": "additive_attached", "fieldType": "boolean" },
+        "position": { "x": 800, "y": 200 }
+      },
+      {
+        "id": "out_sublimit",
+        "kind": "output",
+        "params": { "fieldName": "peak_sublimit", "fieldType": "string" },
+        "position": { "x": 800, "y": 300 }
+      }
+    ],
+    "edges": [
+      { "from": { "node": "base", "port": "value" }, "to": { "node": "end_factor", "port": "premium" } },
+      { "from": { "node": "end_factor", "port": "premium_out" }, "to": { "node": "end_additive", "port": "premium" } },
+      { "from": { "node": "end_additive", "port": "premium_out" }, "to": { "node": "end_sublimit", "port": "premium" } },
+      { "from": { "node": "end_sublimit", "port": "premium_out" }, "to": { "node": "out_premium", "port": "value" } },
+      { "from": { "node": "end_factor", "port": "attached" }, "to": { "node": "out_attached_factor", "port": "value" } },
+      { "from": { "node": "end_additive", "port": "attached" }, "to": { "node": "out_attached_additive", "port": "value" } },
+      { "from": { "node": "end_sublimit", "port": "sublimit_out" }, "to": { "node": "out_sublimit", "port": "value" } }
+    ]
+  },
+  "externalInputs": {
+    "class_code": "c101",
+    "state": "CA",
+    "tiv": 4200000
+  },
+  "expectedOutputs": {
+    "final_premium": 11750,
+    "factor_attached": true,
+    "additive_attached": true,
+    "peak_sublimit": { "coverage": "peak_items", "value": 100000 }
+  }
+}

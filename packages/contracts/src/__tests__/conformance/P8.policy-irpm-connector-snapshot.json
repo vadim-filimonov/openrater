@@ -1,0 +1,53 @@
+{
+  "name": "P8.policy-irpm-connector-snapshot",
+  "description": "Connector-sourced IRPM (Brief 62.6): a live API Lab connector net (-10%) re-derived from its FROZEN snapshot (no network) — capped ±25% (not binding); applied to a 1000 subtotal -> 900; $500 floor not binding. The engine stays SOURCE-BLIND — the connector net flows through the identical schedule_rating path as a literal/column/model net, carrying connector provenance (source/connector/version/snapshot_id/cost_usd) into the trace. Re-running reads the snapshot, never the live API — replay determinism.",
+  "policy": {
+    "policy_id": "P8",
+    "lines": [
+      { "plan_ref": { "plan_id": "connector-plan", "content_hash": "h-cp", "product": "bop" }, "premium_output": "bop_premium" }
+    ],
+    "adjustments": [
+      { "kind": "schedule_rating", "id": "irpm", "display_name": "Schedule rating (connector)", "cap_pct": 25, "source": { "from": "connector", "connector_id": "loss_geo", "version": "v3" }, "citation": "API Lab · loss_geo v3 · snapshot es_fixture8" },
+      { "kind": "minimum_premium", "id": "min", "floor": 500 }
+    ]
+  },
+  "connectors": {
+    "loss_geo": { "version": "v3", "net": -10, "snapshot_id": "es_fixture8", "cost_usd": 0.012 }
+  },
+  "plans": {
+    "connector-plan": {
+      "externalInputs": { "base": 1000 },
+      "plan": {
+        "id": "p8.connector",
+        "version": "1.0.0",
+        "name": "Connector IRPM plan",
+        "nodes": [
+          { "id": "in_base", "kind": "input", "params": { "fieldName": "base", "fieldType": "money" } },
+          { "id": "k", "kind": "constant", "params": { "value": 1.0, "type": "factor" } },
+          { "id": "mul", "kind": "chain.mult", "params": { "stopOnZero": false } },
+          { "id": "out", "kind": "output", "params": { "fieldName": "bop_premium", "fieldType": "money" } }
+        ],
+        "edges": [
+          { "from": { "node": "in_base", "port": "value" }, "to": { "node": "mul", "port": "base" } },
+          { "from": { "node": "k", "port": "value" }, "to": { "node": "mul", "port": "factors" } },
+          { "from": { "node": "mul", "port": "result" }, "to": { "node": "out", "port": "value" } }
+        ]
+      }
+    }
+  },
+  "expected": {
+    "subtotal": 1000,
+    "package_credit": 1,
+    "after_credit": 1000,
+    "minimum_premium": 500,
+    "minimum_applied": false,
+    "total": 900,
+    "lines": [
+      { "product": "bop", "plan_id": "connector-plan", "premium": 1000 }
+    ],
+    "adjustments": [
+      { "id": "irpm", "kind": "schedule_rating", "applied": true, "before": 1000, "after": 900, "detail": "-10.0% (cap ±25%)", "provenance": { "source": "connector", "connector": "loss_geo", "version": "v3", "snapshot_id": "es_fixture8", "cost_usd": 0.012 }, "citation": "API Lab · loss_geo v3 · snapshot es_fixture8" },
+      { "id": "min", "kind": "minimum_premium", "applied": false, "before": 900, "after": 900, "detail": "floor $500 not binding" }
+    ]
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "name": "V1.trivial-constant",
+  "description": "Constant -> output. No external input.",
+  "plan": {
+    "id": "v1.trivial",
+    "version": "1.0.0",
+    "name": "Trivial constant",
+    "line": "bop",
+    "effective": "2026-01-01",
+    "nodes": [
+      { "id": "k", "kind": "constant", "params": { "value": 1.25, "type": "factor" }, "position": { "x": 0, "y": 0 } },
+      { "id": "out", "kind": "output", "params": { "fieldName": "factor", "fieldType": "float" }, "position": { "x": 200, "y": 0 } }
+    ],
+    "edges": [
+      { "from": { "node": "k", "port": "value" }, "to": { "node": "out", "port": "value" } }
+    ]
+  },
+  "externalInputs": {},
+  "expectedOutputs": { "factor": 1.25 }
+}

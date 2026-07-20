@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <!--
+    OpenRater app icon — the nav's own brand mark, scaled for tile duty.
+    Three bars, each narrower than the last: the filing distilled to a
+    rate. Geometry is the AppNavV2 mark ×21⅓ (24-grid → 512), centered.
+    Tile: brand azure (design-system azure-500 → azure-700, vertical),
+    a breath of top light, on a transparent canvas. icon.png is rendered
+    from this file by render-icon.mjs; edit HERE, then re-render.
+  -->
+  <defs>
+    <linearGradient id="tile" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3b82f6"/>
+      <stop offset="0.55" stop-color="#2563eb"/>
+      <stop offset="1" stop-color="#1d4ed8"/>
+    </linearGradient>
+    <linearGradient id="sheen" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.16"/>
+      <stop offset="0.45" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="0" y="0" width="512" height="512" rx="116" fill="url(#tile)"/>
+  <rect x="0" y="0" width="512" height="512" rx="116" fill="url(#sheen)"/>
+  <!-- hairline inner edge so the tile stays crisp on dark surfaces -->
+  <rect x="1.5" y="1.5" width="509" height="509" rx="114.5" fill="none"
+        stroke="#ffffff" stroke-opacity="0.10" stroke-width="3"/>
+
+  <!-- the mark: 24-grid bars ×21.333 — widths 256 / 187.7 / 119.5,
+       all centered on x=256; fully rounded ends -->
+  <g fill="#ffffff">
+    <rect x="128"   y="138.7" width="256"   height="55.5" rx="27.75"/>
+    <rect x="162.1" y="228.3" width="187.7" height="55.5" rx="27.75"/>
+    <rect x="196.3" y="317.9" width="119.5" height="55.5" rx="27.75"/>
+  </g>
+</svg>

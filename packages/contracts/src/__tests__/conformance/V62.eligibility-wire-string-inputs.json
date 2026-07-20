@@ -1,0 +1,91 @@
+{
+  "name": "V62.eligibility-wire-string-inputs",
+  "description": "Phase F (2026-07-17) — external inputs are coerced onto their declared input ports ONCE at the run seam, so readers of ctx.externalInputs (the eligibility gate, tail guards) see the SAME typed value the rating path rates. Found live: a quote sending the wire-string form '\"sprinklered\": \"true\"' (what CSVs produce) priced identically to the boolean form but silently missed the appetite rule's `eq true` and dropped from preferred to standard — the same risk, two verdicts, no issue emitted (a Law 2 violation, engine-contract.md §5.4). Here EVERY input arrives as a wire string: the boolean port must resolve '\"true\"' → true (gate matches → preferred; branch takes the sprinkler credit), and the number port must resolve '\"8\"' → 8 (the compound rule's `ge 5` and the numeric output). A typed-input caller is byte-identical.",
+  "plan": {
+    "id": "v62.eligibility_wire_string_inputs",
+    "version": "1.0.0",
+    "name": "Wire-string inputs through the appetite gate",
+    "lines": ["property"],
+    "effective": "2026-01-01",
+    "nodes": [
+      {
+        "id": "in_flag",
+        "kind": "input",
+        "params": { "fieldName": "sprinklered", "fieldType": "boolean" },
+        "position": { "x": 0, "y": 0 }
+      },
+      {
+        "id": "in_years",
+        "kind": "input",
+        "params": { "fieldName": "years_in_business", "fieldType": "number" },
+        "position": { "x": 0, "y": 120 }
+      },
+      {
+        "id": "gate",
+        "kind": "eligibility.gate",
+        "params": {
+          "rules": [
+            {
+              "rule_id": "wire_string_protected",
+              "conditions": [
+                { "variable": "sprinklered", "op": "eq", "value": true },
+                { "variable": "years_in_business", "op": "ge", "value": 5 }
+              ],
+              "tier": "preferred",
+              "reasoning": "Sprinklered and established — preferred appetite."
+            }
+          ],
+          "default_tier": "standard",
+          "default_reasoning": "Standard appetite."
+        },
+        "position": { "x": 200, "y": 240 }
+      },
+      {
+        "id": "c_credit",
+        "kind": "constant",
+        "params": { "value": 0.9, "type": "number" },
+        "position": { "x": 200, "y": 0 }
+      },
+      {
+        "id": "c_base",
+        "kind": "constant",
+        "params": { "value": 1.0, "type": "number" },
+        "position": { "x": 200, "y": 60 }
+      },
+      {
+        "id": "br",
+        "kind": "branch",
+        "params": {},
+        "position": { "x": 400, "y": 0 }
+      },
+      {
+        "id": "out_factor",
+        "kind": "output",
+        "params": { "fieldName": "factor", "fieldType": "factor" },
+        "position": { "x": 600, "y": 0 }
+      },
+      {
+        "id": "out_years",
+        "kind": "output",
+        "params": { "fieldName": "years_rated", "fieldType": "number" },
+        "position": { "x": 600, "y": 120 }
+      },
+      {
+        "id": "out_tier",
+        "kind": "output",
+        "params": { "fieldName": "tier", "fieldType": "string" },
+        "position": { "x": 600, "y": 240 }
+      }
+    ],
+    "edges": [
+      { "from": { "node": "in_flag", "port": "value" }, "to": { "node": "br", "port": "predicate" } },
+      { "from": { "node": "c_credit", "port": "value" }, "to": { "node": "br", "port": "then" } },
+      { "from": { "node": "c_base", "port": "value" }, "to": { "node": "br", "port": "else" } },
+      { "from": { "node": "br", "port": "result" }, "to": { "node": "out_factor", "port": "value" } },
+      { "from": { "node": "in_years", "port": "value" }, "to": { "node": "out_years", "port": "value" } },
+      { "from": { "node": "gate", "port": "tier" }, "to": { "node": "out_tier", "port": "value" } }
+    ]
+  },
+  "externalInputs": { "sprinklered": "true", "years_in_business": "8" },
+  "expectedOutputs": { "factor": 0.9, "years_rated": 8, "tier": "preferred" }
+}

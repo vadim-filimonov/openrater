@@ -1,0 +1,64 @@
+{
+  "name": "V45.schedule-column-percategory",
+  "description": "IRPM sourced from a PER-CATEGORY column map (Brief 62.2). Subtotal 3000; three category columns (-3, -2, -2) sum to -7% (within the ±25% cap) → factor 0.93 → $2,790, with the sub-sections retained in the trace (D2). source:\"column\".",
+  "policy": {
+    "policy_id": "V45",
+    "lines": [
+      { "plan_ref": { "plan_id": "bop-plan", "content_hash": "h-bop", "product": "bop" }, "premium_output": "bop_premium" }
+    ]
+  },
+  "policy_tail": [
+    {
+      "kind": "schedule_rating",
+      "id": "irpm",
+      "display_name": "Schedule rating (IRPM)",
+      "cap_pct": 25,
+      "source": { "from": "column", "columns": { "management": "irpm_mgmt_pct", "location": "irpm_loc_pct", "protection": "irpm_prot_pct" } }
+    }
+  ],
+  "adjustmentInputs": { "irpm_mgmt_pct": -3, "irpm_loc_pct": -2, "irpm_prot_pct": -2 },
+  "plans": {
+    "bop-plan": {
+      "externalInputs": { "base": 3000 },
+      "plan": {
+        "id": "v45.bop",
+        "version": "1.0.0",
+        "name": "BOP",
+        "nodes": [
+          { "id": "in_base", "kind": "input", "params": { "fieldName": "base", "fieldType": "money" } },
+          { "id": "k", "kind": "constant", "params": { "value": 1.0, "type": "factor" } },
+          { "id": "mul", "kind": "chain.mult", "params": { "stopOnZero": false } },
+          { "id": "out", "kind": "output", "params": { "fieldName": "bop_premium", "fieldType": "money" } }
+        ],
+        "edges": [
+          { "from": { "node": "in_base", "port": "value" }, "to": { "node": "mul", "port": "base" } },
+          { "from": { "node": "k", "port": "value" }, "to": { "node": "mul", "port": "factors" } },
+          { "from": { "node": "mul", "port": "result" }, "to": { "node": "out", "port": "value" } }
+        ]
+      }
+    }
+  },
+  "expected": {
+    "subtotal": 3000,
+    "package_credit": 1,
+    "after_credit": 3000,
+    "minimum_premium": 0,
+    "minimum_applied": false,
+    "total": 2790,
+    "lines": [
+      { "product": "bop", "plan_id": "bop-plan", "premium": 3000 }
+    ],
+    "adjustments": [
+      {
+        "id": "irpm",
+        "kind": "schedule_rating",
+        "applied": true,
+        "before": 3000,
+        "after": 2790,
+        "detail": "-7.0% (Σ 3 sections, cap ±25%)",
+        "sections": { "management": -3, "location": -2, "protection": -2 },
+        "provenance": { "source": "column" }
+      }
+    ]
+  }
+}

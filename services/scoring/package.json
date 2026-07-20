@@ -1,0 +1,32 @@
+{
+  "name": "@openrater/scoring",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Headless scoring service built on OpenRater's deterministic TypeScript engine, with pluggable queue, result-store, and plan-source adapters.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/main.ts",
+    "start": "node dist/server.mjs",
+    "build": "node esbuild.config.mjs",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "bench": "tsx src/bench/benchmark.ts"
+  },
+  "dependencies": {
+    "@openrater/contracts": "workspace:*",
+    "@openrater/ui": "workspace:*",
+    "fastify": "^5.1.0",
+    "ioredis": "^5.4.1",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@fastify/aws-lambda": "^5.1.0",
+    "@types/node": "^22.9.0",
+    "esbuild": "^0.24.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.4"
+  }
+}

@@ -1,0 +1,62 @@
+/**
+ * Rate Lab — global base styles.
+ *
+ * Imports the design-system tokens, then applies a minimal global
+ * reset + body chrome. Per-component CSS lives next to its component
+ * and reads from the tokens — never from hard-coded values.
+ *
+ * Per the tokens-rebuild-rationale brief: tokens are the only place
+ * colors / type / spacing / radius / motion / shadow / icon-size /
+ * z-index are declared. If you're tempted to add a hex code or a
+ * px value here, it belongs in tokens.css instead.
+ */
+
+@import "@openrater/design-system/tokens.css";
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+}
+
+body {
+  font-family: var(--rater-font-display);
+  font-size: var(--rater-t-13);
+  line-height: var(--rater-leading-snug);
+  color: var(--rater-text-default);
+  background: var(--rater-surface-canvas);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+code,
+kbd,
+samp,
+.rater-mono {
+  font-family: var(--rater-font-mono);
+  font-feature-settings: var(--rater-num-tabular);
+  letter-spacing: var(--rater-tracking-mono);
+}
+
+/* No global underline-on-hover: composite anchors (plan rows, door
+ * cards) underline EVERY descendant, which reads as a rendering glitch.
+ * Hover affordance is each surface's own job — container shade for
+ * rows/cards, color shift or an explicit underline opt-in for inline
+ * text links. */
+a {
+  color: var(--rater-accent-primary);
+  text-decoration: none;
+  transition: color var(--rater-d-80) var(--rater-ease-soft);
+}
+
+a:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: 2px;
+  border-radius: var(--rater-r-2);
+}

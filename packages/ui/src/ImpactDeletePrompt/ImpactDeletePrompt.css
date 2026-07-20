@@ -1,0 +1,46 @@
+/* ============================================================================
+ * <ImpactDeletePrompt> — the one armed delete (Brief 70 Phase 1).
+ * The FactorTableDeletePrompt recipe, generalized.
+ * ============================================================================ */
+
+.rater-impactdel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-12);
+}
+.rater-impactdel__intro {
+  margin: 0;
+  font-size: var(--rater-t-13);
+  color: var(--rater-text-default);
+}
+.rater-impactdel__warning {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-6);
+  margin: 0;
+  font-size: var(--rater-t-12);
+  color: var(--rater-feedback-warn);
+}
+.rater-impactdel__refs {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-4);
+}
+.rater-impactdel__ref {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-8);
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-muted);
+}
+.rater-impactdel__ref-label {
+  color: var(--rater-text-default);
+}
+.rater-impactdel__ref-context {
+  color: var(--rater-text-subtle);
+}
+/* Actions now live in <Modal.Footer> (padded slot + flex-end + divider) —
+   no bespoke actions row, and the dialog gets proper edge margins. */

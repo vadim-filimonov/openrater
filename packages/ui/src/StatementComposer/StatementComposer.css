@@ -1,0 +1,162 @@
+/* ============================================================================
+ * <StatementComposer> — the mad-libs sentence grammar (Brief 70 Phase 1).
+ * Words read as prose; slots read as quiet bordered seats; the active
+ * picker is a small command menu.
+ * ============================================================================ */
+
+.rater-composer {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-8);
+  flex-wrap: wrap;
+  font-size: var(--rater-t-13);
+  color: var(--rater-text-default);
+}
+
+.rater-composer__word {
+  color: var(--rater-text-muted);
+}
+
+.rater-composer__slotwrap {
+  position: relative;
+  display: inline-flex;
+}
+
+.rater-composer__slot {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-6);
+  border: 1px solid var(--rater-hairline-base);
+  background: var(--rater-surface-1);
+  border-radius: var(--rater-r-8);
+  padding: var(--rater-s-4) var(--rater-s-10);
+  font-size: var(--rater-t-13);
+  font-family: inherit;
+  color: var(--rater-text-strong);
+  cursor: pointer;
+  transition: border-color var(--rater-d-80) var(--rater-ease-snap);
+}
+.rater-composer__slot:hover:not(disabled) {
+  border-color: var(--rater-hairline-strong);
+}
+.rater-composer__slot:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: 1px;
+}
+.rater-composer__slot.is-empty {
+  color: var(--rater-text-subtle);
+  border-style: dashed;
+}
+.rater-composer__slot.is-open {
+  border-color: var(--rater-focus-ring);
+}
+.rater-composer__slot:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.rater-composer__slot--value {
+  border: 1px solid var(--rater-hairline-base);
+  background: var(--rater-surface-1);
+  border-radius: var(--rater-r-8);
+  padding: 0;
+}
+.rater-composer__input {
+  border: 0;
+  background: none;
+  outline: none;
+  padding: var(--rater-s-4) var(--rater-s-10);
+  font-size: var(--rater-t-13);
+  font-family: var(--rater-fonts-mono, var(--rater-fonts-sans));
+  color: var(--rater-text-strong);
+  width: 120px;
+}
+.rater-composer__slot--value:focus-within {
+  border-color: var(--rater-focus-ring);
+  box-shadow: 0 0 0 2px var(--rater-focus-halo);
+}
+.rater-composer__input::placeholder {
+  color: var(--rater-text-subtle);
+  font-family: var(--rater-fonts-sans);
+}
+
+/* ── the picker popover ── */
+.rater-composer__picker {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 60;
+  width: 320px;
+  background: var(--rater-surface-1);
+  border: 1px solid var(--rater-hairline-base);
+  border-radius: var(--rater-r-12);
+  box-shadow: var(--rater-shadow-overlay, 0 16px 48px rgb(0 0 0 / 0.5));
+  padding: var(--rater-s-8);
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-6);
+}
+
+.rater-composer__options {
+  display: flex;
+  flex-direction: column;
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.rater-composer__opt {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-10);
+  width: 100%;
+  text-align: left;
+  padding: var(--rater-s-6) var(--rater-s-8);
+  border: 0;
+  background: none;
+  border-radius: var(--rater-r-8);
+  font-size: var(--rater-t-13);
+  color: var(--rater-text-default);
+  cursor: pointer;
+}
+.rater-composer__opt.is-highlighted {
+  background: var(--rater-row-hover-bg);
+}
+.rater-composer__opt:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.rater-composer__opt-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+.rater-composer__opt-label {
+  color: var(--rater-text-strong);
+  font-weight: var(--rater-fw-medium);
+}
+.rater-composer__opt-hint {
+  font-size: var(--rater-t-11);
+  color: var(--rater-text-subtle);
+  font-family: var(--rater-fonts-mono, var(--rater-fonts-sans));
+}
+.rater-composer__empty {
+  padding: var(--rater-s-12);
+  text-align: center;
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-faint);
+}
+
+/* The value seat's no-match escape row (Brief 89.3 follow-up): the
+ * verbatim-text commit is a visible choice — its caption carries the
+ * warn voice so an off-vocabulary value never reads as routine. */
+.rater-composer__opt--freetext .rater-composer__opt-hint {
+  color: var(--rater-feedback-warn);
+  font-family: var(--rater-fonts-sans);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rater-composer__slot {
+    transition: none;
+  }
+}

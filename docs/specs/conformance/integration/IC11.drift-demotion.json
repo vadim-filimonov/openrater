@@ -1,0 +1,175 @@
+{
+  "id": "IC11",
+  "name": "drift-demotion",
+  "spec": "§4.4 (republish drift)",
+  "asserts": "Republishing a new snapshot to a live plan whose mapping was never re-tested DEMOTES it: no member, a named live_version_untested issue, descriptor status paused; siblings keep rating; a re-test on the new version restores serving.",
+  "contract_version": "1.0",
+  "world": {
+    "integration": { "name": "Example Integrator — fixture", "paired": true },
+    "plans": ["plan-alpha", "plan-beta"],
+    "note": "both published + tested + live on v1; the fixture republishes plan-alpha only, so plan-beta is the untouched sibling proving isolation"
+  },
+  "steps": [
+    {
+      "note": "baseline — both live carriers rate",
+      "actor": "integrator",
+      "call": {
+        "method": "POST",
+        "path": "/api/v1/integrations/{{integration_id}}/quote-set",
+        "headers": { "X-OpenRater-Integration-Key": "{{integrator_key}}" },
+        "body": {
+          "risk_ref": "r-fixture-0011",
+          "request_hash": "sha256:ic11-baseline",
+          "effective_date": "2026-08-01",
+          "trace": "none",
+          "facts": {
+            "rest.gross_receipts": 1250000,
+            "property.construction": "JM",
+            "property.tiv": 1500000
+          }
+        }
+      },
+      "expect": {
+        "status": 200,
+        "body": {
+          "quotes": [
+            { "carrier": "acme-mutual", "row_status": "ok", "premium": { "$type": "number" } },
+            { "carrier": "birch-specialty", "row_status": "ok", "premium": { "$type": "number" } }
+          ],
+          "issues": []
+        }
+      }
+    },
+    {
+      "note": "operator freezes a NEW version of plan-alpha (no re-test yet)",
+      "actor": "operator",
+      "call": {
+        "method": "POST",
+        "path": "/api/v1/plans/{{plan_alpha_id}}/snapshots",
+        "body": { "display_name": "v2", "notes": "republish, untested mapping" }
+      },
+      "expect": { "status": 201, "body": { "snapshot_id": { "$type": "string" } } },
+      "capture": { "alpha_v2": "$.snapshot_id" }
+    },
+    {
+      "note": "operator publishes v2 — the live version now differs from the tested one",
+      "actor": "operator",
+      "call": {
+        "method": "PATCH",
+        "path": "/api/v1/plans/{{plan_alpha_id}}/snapshots/{{alpha_v2}}/publish"
+      },
+      "expect": { "status": 200, "body": { "snapshot_id": { "$same": "alpha_v2" } } }
+    },
+    {
+      "note": "quote-set now DEMOTES plan-alpha (no member, named issue); the untouched sibling still rates",
+      "actor": "integrator",
+      "call": {
+        "method": "POST",
+        "path": "/api/v1/integrations/{{integration_id}}/quote-set",
+        "headers": { "X-OpenRater-Integration-Key": "{{integrator_key}}" },
+        "body": {
+          "risk_ref": "r-fixture-0011",
+          "request_hash": "sha256:ic11-drift",
+          "effective_date": "2026-08-01",
+          "trace": "none",
+          "facts": {
+            "rest.gross_receipts": 1250000,
+            "property.construction": "JM",
+            "property.tiv": 1500000
+          }
+        }
+      },
+      "expect": {
+        "status": 200,
+        "body": {
+          "quotes": [
+            { "carrier": "birch-specialty", "row_status": "ok", "premium": { "$type": "number" } }
+          ],
+          "issues": {
+            "$contains": [{ "code": "live_version_untested", "carrier": "acme-mutual" }]
+          }
+        }
+      }
+    },
+    {
+      "note": "the descriptor advertises the drifted plan as paused (§4.4), the sibling as live",
+      "actor": "integrator",
+      "call": {
+        "method": "GET",
+        "path": "/api/v1/integrations/{{integration_id}}/descriptor",
+        "headers": { "X-OpenRater-Integration-Key": "{{integrator_key}}" }
+      },
+      "expect": {
+        "status": 200,
+        "body": {
+          "plans": [
+            { "carrier": "acme-mutual", "status": "paused" },
+            { "carrier": "birch-specialty", "status": "live" }
+          ]
+        }
+      }
+    },
+    {
+      "note": "operator reads the exposed plans (label-ascending) to target plan-alpha's re-test",
+      "actor": "operator",
+      "call": {
+        "method": "GET",
+        "path": "/api/v1/integrations/{{integration_id}}/plans"
+      },
+      "expect": {
+        "status": 200,
+        "body": [
+          { "carrier_label": "acme-mutual", "live": true, "live_version_untested": true },
+          { "carrier_label": "birch-specialty", "live": true, "live_version_untested": false }
+        ]
+      },
+      "capture": { "alpha_exposed_id": "$[0].exposed_id" }
+    },
+    {
+      "note": "operator re-runs the Test step against v2 — a green test re-stamps the receipt",
+      "actor": "operator",
+      "call": {
+        "method": "POST",
+        "path": "/api/v1/integrations/{{integration_id}}/plans/{{alpha_exposed_id}}/test-quote",
+        "body": {
+          "facts": {
+            "rest.gross_receipts": 1250000,
+            "property.construction": "JM",
+            "property.tiv": 1500000
+          }
+        }
+      },
+      "expect": { "status": 200, "body": { "row_status": "ok", "premium": { "$type": "number" } } }
+    },
+    {
+      "note": "serving is restored — both carriers rate again, no drift issue",
+      "actor": "integrator",
+      "call": {
+        "method": "POST",
+        "path": "/api/v1/integrations/{{integration_id}}/quote-set",
+        "headers": { "X-OpenRater-Integration-Key": "{{integrator_key}}" },
+        "body": {
+          "risk_ref": "r-fixture-0011",
+          "request_hash": "sha256:ic11-restored",
+          "effective_date": "2026-08-01",
+          "trace": "none",
+          "facts": {
+            "rest.gross_receipts": 1250000,
+            "property.construction": "JM",
+            "property.tiv": 1500000
+          }
+        }
+      },
+      "expect": {
+        "status": 200,
+        "body": {
+          "quotes": [
+            { "carrier": "acme-mutual", "row_status": "ok", "premium": { "$type": "number" } },
+            { "carrier": "birch-specialty", "row_status": "ok", "premium": { "$type": "number" } }
+          ],
+          "issues": []
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,57 @@
+{
+  "id": "IC5",
+  "name": "honest-refusal",
+  "spec": "§4.2 rules 2–3",
+  "asserts": "A plan that refuses answers with a null premium and a named reason; sibling members compute unaffected.",
+  "contract_version": "1.0",
+  "world": {
+    "integration": { "name": "Example Integrator — fixture", "paired": true },
+    "plans": ["plan-alpha", "plan-beta"],
+    "note": "plan-beta refuses tiv > 2,000,000; the request sends 2,500,000"
+  },
+  "steps": [
+    {
+      "note": "fan out to both carriers; beta refuses, alpha computes",
+      "actor": "integrator",
+      "call": {
+        "method": "POST",
+        "path": "/api/v1/integrations/{{integration_id}}/quote-set",
+        "headers": { "X-OpenRater-Integration-Key": "{{integrator_key}}" },
+        "body": {
+          "risk_ref": "r-fixture-0003",
+          "request_hash": "sha256:ic5-fixture",
+          "effective_date": "2026-08-01",
+          "trace": "none",
+          "facts": {
+            "rest.gross_receipts": 1250000,
+            "property.construction": "JM",
+            "property.tiv": 2500000
+          }
+        }
+      },
+      "expect": {
+        "status": 200,
+        "body": {
+          "quotes": [
+            {
+              "carrier": "acme-mutual",
+              "row_status": "ok",
+              "premium": { "$type": "number" },
+              "outputs": { "$empty": false }
+            },
+            {
+              "carrier": "birch-specialty",
+              "row_status": "error",
+              "premium": { "$type": "null" },
+              "outputs": { "$empty": true },
+              "row_issues": {
+                "$contains": [{ "code": { "$present": true }, "detail": { "$present": true } }]
+              }
+            }
+          ],
+          "issues": []
+        }
+      }
+    }
+  ]
+}

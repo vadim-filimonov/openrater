@@ -1,0 +1,47 @@
+{
+  "name": "V61.interpolate-linear",
+  "description": "A fictional Meridian relativity is interpolated between breakpoints. A building limit of 315000 lies between (250000, 1.30) and (500000, 1.45), producing 1.339; a banded table would instead use one factor for the entire band.",
+  "plan": {
+    "id": "v47.interpolate",
+    "version": "1.0.0",
+    "name": "Linear interpolation between breakpoints",
+    "line": "bop",
+    "effective": "2026-01-01",
+    "nodes": [
+      {
+        "id": "x_in",
+        "kind": "input",
+        "params": { "fieldName": "building_limit", "fieldType": "float" },
+        "position": { "x": 0, "y": 0 }
+      },
+      {
+        "id": "interp",
+        "kind": "interpolate",
+        "params": {
+          "mode": "linear",
+          "clamp": true,
+          "axisLabel": "building_limit",
+          "points": [
+            { "x": 100000, "y": 1.0 },
+            { "x": 250000, "y": 1.3 },
+            { "x": 500000, "y": 1.45 },
+            { "x": 1000000, "y": 1.6 }
+          ]
+        },
+        "position": { "x": 200, "y": 0 }
+      },
+      {
+        "id": "out",
+        "kind": "output",
+        "params": { "fieldName": "factor", "fieldType": "float" },
+        "position": { "x": 400, "y": 0 }
+      }
+    ],
+    "edges": [
+      { "from": { "node": "x_in", "port": "value" }, "to": { "node": "interp", "port": "x" } },
+      { "from": { "node": "interp", "port": "y" }, "to": { "node": "out", "port": "value" } }
+    ]
+  },
+  "externalInputs": { "building_limit": 315000 },
+  "expectedOutputs": { "factor": 1.339 }
+}

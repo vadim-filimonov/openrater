@@ -1,0 +1,75 @@
+{
+  "name": "V19.modifier-model-fallback",
+  "description": "modifier.model fallback semantics. Per Brief 41 §−1 Q4-Q7 + Brief 42 §−1 Q6: when ANY declared_input is missing from externalInputs, runtime falls back to fallback_factor (case 2 of 3). The clamp is NOT evaluated when fallback fires. This fixture exercises that exact path: declared_inputs = [credit_score]; externalInputs omits credit_score; expected outcome = factor=fallback_factor (0.95) → premium *= 0.95. The 3-line trace is verified at the renderer level (V19 covers the runtime, the editor PR H.6 covers the renderer). STATUS: ✓ implemented in Phase H.7 — ModifierModelKind is registered as a builtin; this fixture executes as part of the conformance suite.",
+  "plan": {
+    "id": "v19.modifier_model_fallback",
+    "version": "1.0.0",
+    "name": "modifier.model fallback when input missing",
+    "lines": ["property"],
+    "effective": "2026-01-01",
+    "nodes": [
+      {
+        "id": "base",
+        "kind": "constant",
+        "params": { "value": 1000 },
+        "position": { "x": 0, "y": 0 }
+      },
+      {
+        "id": "mod_model",
+        "kind": "modifier.model",
+        "params": {
+          "model_id": "test_pricing_v1",
+          "version": "2026.05",
+          "declared_inputs": [
+            { "variable": "credit_score", "source": "input" }
+          ],
+          "clamp": {
+            "min_factor": 0.85,
+            "max_factor": 1.25
+          },
+          "rationale": "Filed cap per OSS test fixture for credit-score-based pricing model.",
+          "fallback_factor": 0.95
+        },
+        "position": { "x": 200, "y": 0 }
+      },
+      {
+        "id": "out_premium",
+        "kind": "output",
+        "params": { "fieldName": "final_premium", "fieldType": "number" },
+        "position": { "x": 400, "y": 0 }
+      },
+      {
+        "id": "out_factor",
+        "kind": "output",
+        "params": { "fieldName": "model_factor_used", "fieldType": "number" },
+        "position": { "x": 400, "y": 100 }
+      },
+      {
+        "id": "out_fallback",
+        "kind": "output",
+        "params": { "fieldName": "fallback_fired", "fieldType": "boolean" },
+        "position": { "x": 400, "y": 200 }
+      },
+      {
+        "id": "out_fallback_reason",
+        "kind": "output",
+        "params": { "fieldName": "fallback_reason", "fieldType": "string" },
+        "position": { "x": 400, "y": 300 }
+      }
+    ],
+    "edges": [
+      { "from": { "node": "base", "port": "value" }, "to": { "node": "mod_model", "port": "premium" } },
+      { "from": { "node": "mod_model", "port": "premium_out" }, "to": { "node": "out_premium", "port": "value" } },
+      { "from": { "node": "mod_model", "port": "factor_used" }, "to": { "node": "out_factor", "port": "value" } },
+      { "from": { "node": "mod_model", "port": "fallback_fired" }, "to": { "node": "out_fallback", "port": "value" } },
+      { "from": { "node": "mod_model", "port": "fallback_reason" }, "to": { "node": "out_fallback_reason", "port": "value" } }
+    ]
+  },
+  "externalInputs": {},
+  "expectedOutputs": {
+    "final_premium": 950,
+    "model_factor_used": 0.95,
+    "fallback_fired": true,
+    "fallback_reason": "missing_input:credit_score"
+  }
+}

@@ -1,0 +1,29 @@
+/* <ChoroplethScaleLegend> — value-break legend (maps next-gen). */
+.rater-choro-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 160px;
+}
+.rater-choro-legend__label {
+  font-size: 10px;
+  letter-spacing: var(--rater-tracking-label);
+  text-transform: uppercase;
+  color: var(--rater-text-subtle);
+  font-weight: var(--rater-fw-semibold);
+}
+.rater-choro-legend__bar {
+  height: 8px;
+  border-radius: var(--rater-r-full);
+  border: 1px solid var(--rater-hairline-soft);
+}
+.rater-choro-legend__ticks {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10.5px;
+  color: var(--rater-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+.rater-choro-legend__tick.is-mid {
+  color: var(--rater-text-subtle);
+}

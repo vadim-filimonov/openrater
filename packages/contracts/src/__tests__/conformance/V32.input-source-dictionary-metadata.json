@@ -1,0 +1,65 @@
+{
+  "name": "V32.input-source-dictionary-metadata",
+  "description": "Brief 52: an input.source node carrying dictionary metadata (required / allowedValues / unit / category, and sourceType=derived with derivedFrom) substitutes externalInputs[fieldName] UNCHANGED. The metadata is runtime-inert (forward-compat); `derived` is NOT auto-computed in this contract version.",
+  "plan": {
+    "id": "v32.input-source-dictionary-metadata",
+    "version": "1.0.0",
+    "name": "Input source dictionary metadata",
+    "line": "bop",
+    "effective": "2026-01-01",
+    "nodes": [
+      {
+        "id": "in_floor",
+        "kind": "input.source",
+        "params": {
+          "fieldName": "total_floor_area_sqft",
+          "fieldType": "int",
+          "sourceType": "form",
+          "required": true,
+          "unit": "sqft",
+          "category": "G. Eligibility & policy facts",
+          "description": "Eligibility: <= 35,000 sq ft per location (Rule 22.A)."
+        },
+        "position": { "x": 0, "y": 0 }
+      },
+      {
+        "id": "in_terr",
+        "kind": "input.source",
+        "params": {
+          "fieldName": "territory",
+          "fieldType": "string",
+          "sourceType": "derived",
+          "derivedFrom": "zip",
+          "derivedRule": "ZIP -> KS rating territory (701/702)",
+          "required": true,
+          "allowedValues": ["701", "702"]
+        },
+        "position": { "x": 0, "y": 120 }
+      },
+      {
+        "id": "out_floor",
+        "kind": "output",
+        "params": { "fieldName": "total_floor_area_sqft", "fieldType": "int" },
+        "position": { "x": 240, "y": 0 }
+      },
+      {
+        "id": "out_terr",
+        "kind": "output",
+        "params": { "fieldName": "territory", "fieldType": "string" },
+        "position": { "x": 240, "y": 120 }
+      }
+    ],
+    "edges": [
+      {
+        "from": { "node": "in_floor", "port": "value" },
+        "to": { "node": "out_floor", "port": "value" }
+      },
+      {
+        "from": { "node": "in_terr", "port": "value" },
+        "to": { "node": "out_terr", "port": "value" }
+      }
+    ]
+  },
+  "externalInputs": { "total_floor_area_sqft": 42000, "territory": "701" },
+  "expectedOutputs": { "total_floor_area_sqft": 42000, "territory": "701" }
+}

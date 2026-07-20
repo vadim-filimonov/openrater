@@ -1,0 +1,214 @@
+/* ============================================================================
+ * <FreezeVersionDialog> — name + freeze the current draft state.
+ *
+ * Composes on top of <Modal> from @openrater/design-system. The form is the
+ * direct child of the modal panel, so it needs flex-column layout to
+ * propagate the panel's overflow + footer-pin behavior down to the
+ * native .rater-modal__body / .rater-modal__footer that live inside it.
+ *
+ * BEM names mirror the TSX:
+ *   .rater-freeze-version-dialog                  (form root)
+ *   .rater-freeze-version-dialog__context        (plan-summary strip)
+ *   .rater-freeze-version-dialog__context-{icon,name,sep,meta}
+ *   .rater-freeze-version-dialog__context-meta--mono
+ *   .rater-freeze-version-dialog__error          (inline 409 banner)
+ *   .rater-freeze-version-dialog__error-icon
+ *   .rater-freeze-version-dialog__field          (label wrapper)
+ *   .rater-freeze-version-dialog__field-label
+ *   .rater-freeze-version-dialog__field-required (red asterisk)
+ *   .rater-freeze-version-dialog__field-optional (muted "optional" tag)
+ *   .rater-freeze-version-dialog__field-hint     ([data-tone=muted|error])
+ *   .rater-freeze-version-dialog__input
+ *   .rater-freeze-version-dialog__textarea
+ * ============================================================================ */
+
+.rater-freeze-version-dialog {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.rater-freeze-version-dialog .rater-modal__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-16);
+}
+
+/* ── Context strip ─────────────────────────────────────────────── */
+
+.rater-freeze-version-dialog__context {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--rater-s-8);
+  padding: var(--rater-s-10) var(--rater-s-12);
+  border: 1px solid var(--rater-border-subtle);
+  border-radius: var(--rater-r-6);
+  background: var(--rater-surface-canvas);
+  color: var(--rater-text-muted);
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-12);
+  line-height: var(--rater-lh-snug);
+}
+
+.rater-freeze-version-dialog__context-icon {
+  display: inline-flex;
+  align-items: center;
+  color: var(--rater-text-muted);
+  flex-shrink: 0;
+}
+
+.rater-freeze-version-dialog__context-name {
+  color: var(--rater-text-strong);
+  font-weight: var(--rater-fw-medium);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 20ch;
+}
+
+.rater-freeze-version-dialog__context-sep {
+  color: var(--rater-text-muted);
+  opacity: 0.5;
+}
+
+.rater-freeze-version-dialog__context-meta {
+  color: var(--rater-text-muted);
+}
+
+.rater-freeze-version-dialog__context-meta--mono {
+  font-family: var(--rater-fonts-mono);
+  letter-spacing: var(--rater-tracking-mono);
+  font-size: var(--rater-t-11);
+}
+
+/* ── Inline error banner ───────────────────────────────────────── */
+
+.rater-freeze-version-dialog__error {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--rater-s-8);
+  padding: var(--rater-s-10) var(--rater-s-12);
+  border: 1px solid var(--rater-accent-danger);
+  border-radius: var(--rater-r-6);
+  background: var(--rater-feedback-error-bg);
+  color: var(--rater-feedback-error);
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-13);
+  line-height: var(--rater-lh-normal);
+}
+
+.rater-freeze-version-dialog__error-icon {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  padding-top: 2px;
+}
+
+/* ── Form fields ───────────────────────────────────────────────── */
+
+.rater-freeze-version-dialog__field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-6);
+}
+
+.rater-freeze-version-dialog__field-label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-6);
+  color: var(--rater-text-strong);
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-13);
+  font-weight: var(--rater-fw-medium);
+  line-height: var(--rater-lh-snug);
+}
+
+.rater-freeze-version-dialog__field-required {
+  color: var(--rater-accent-danger);
+  font-weight: var(--rater-fw-regular);
+  line-height: 1;
+}
+
+.rater-freeze-version-dialog__field-optional {
+  margin-left: var(--rater-s-2);
+  padding: 0 var(--rater-s-6);
+  border-radius: var(--rater-r-full);
+  background: var(--rater-surface-2);
+  color: var(--rater-text-muted);
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-11);
+  font-weight: var(--rater-fw-regular);
+  letter-spacing: 0.02em;
+  text-transform: lowercase;
+}
+
+.rater-freeze-version-dialog__field-hint {
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-12);
+  line-height: var(--rater-lh-snug);
+  color: var(--rater-text-muted);
+}
+
+.rater-freeze-version-dialog__field-hint[data-tone="error"] {
+  color: var(--rater-feedback-error);
+}
+
+.rater-freeze-version-dialog__input,
+.rater-freeze-version-dialog__textarea {
+  width: 100%;
+  box-sizing: border-box;
+  background: var(--rater-surface-canvas);
+  color: var(--rater-text-strong);
+  border: 1px solid var(--rater-border-default);
+  border-radius: var(--rater-r-6);
+  padding: var(--rater-s-8) var(--rater-s-10);
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-14);
+  line-height: var(--rater-lh-normal);
+  transition:
+    border-color var(--rater-d-80) var(--rater-ease-soft),
+    box-shadow var(--rater-d-80) var(--rater-ease-soft);
+}
+
+.rater-freeze-version-dialog__input {
+  font-family: var(--rater-fonts-mono);
+  letter-spacing: var(--rater-tracking-mono);
+}
+
+.rater-freeze-version-dialog__textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.rater-freeze-version-dialog__input:hover:not(disabled),
+.rater-freeze-version-dialog__textarea:hover:not(disabled) {
+  border-color: var(--rater-border-strong);
+}
+
+.rater-freeze-version-dialog__input:focus-visible,
+.rater-freeze-version-dialog__textarea:focus-visible {
+  outline: none;
+  border-color: var(--rater-focus-ring);
+  box-shadow: 0 0 0 3px
+    color-mix(in oklab, var(--rater-focus-ring) 24%, transparent);
+}
+
+.rater-freeze-version-dialog__input[aria-invalid="true"],
+.rater-freeze-version-dialog__textarea[aria-invalid="true"] {
+  border-color: var(--rater-accent-danger);
+}
+
+.rater-freeze-version-dialog__input:disabled,
+.rater-freeze-version-dialog__textarea:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.rater-freeze-version-dialog__input::placeholder,
+.rater-freeze-version-dialog__textarea::placeholder {
+  color: var(--rater-text-muted);
+  opacity: 0.6;
+}

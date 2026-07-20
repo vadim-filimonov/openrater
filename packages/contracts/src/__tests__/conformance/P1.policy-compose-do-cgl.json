@@ -1,0 +1,65 @@
+{
+  "name": "P1.policy-compose-do-cgl",
+  "description": "Policy composes a do Plan + a cgl Plan; sum x package_credit floored at minimum (the canonical ADR-0034 shape).",
+  "policy": {
+    "policy_id": "P1",
+    "lines": [
+      { "plan_ref": { "plan_id": "do-plan", "content_hash": "h-do", "product": "do" }, "premium_output": "do_premium" },
+      { "plan_ref": { "plan_id": "cgl-plan", "content_hash": "h-cgl", "product": "cgl" }, "premium_output": "gl_premium" }
+    ],
+    "package_credit": 0.5,
+    "minimum_premium": 700
+  },
+  "plans": {
+    "do-plan": {
+      "externalInputs": { "base": 600 },
+      "plan": {
+        "id": "p1.do",
+        "version": "1.0.0",
+        "name": "D&O",
+        "nodes": [
+          { "id": "in_base", "kind": "input", "params": { "fieldName": "base", "fieldType": "money" } },
+          { "id": "k", "kind": "constant", "params": { "value": 1.5, "type": "factor" } },
+          { "id": "mul", "kind": "chain.mult", "params": { "stopOnZero": false } },
+          { "id": "out", "kind": "output", "params": { "fieldName": "do_premium", "fieldType": "money" } }
+        ],
+        "edges": [
+          { "from": { "node": "in_base", "port": "value" }, "to": { "node": "mul", "port": "base" } },
+          { "from": { "node": "k", "port": "value" }, "to": { "node": "mul", "port": "factors" } },
+          { "from": { "node": "mul", "port": "result" }, "to": { "node": "out", "port": "value" } }
+        ]
+      }
+    },
+    "cgl-plan": {
+      "externalInputs": { "base": 400 },
+      "plan": {
+        "id": "p1.cgl",
+        "version": "1.0.0",
+        "name": "GL",
+        "nodes": [
+          { "id": "in_base", "kind": "input", "params": { "fieldName": "base", "fieldType": "money" } },
+          { "id": "k", "kind": "constant", "params": { "value": 0.75, "type": "factor" } },
+          { "id": "mul", "kind": "chain.mult", "params": { "stopOnZero": false } },
+          { "id": "out", "kind": "output", "params": { "fieldName": "gl_premium", "fieldType": "money" } }
+        ],
+        "edges": [
+          { "from": { "node": "in_base", "port": "value" }, "to": { "node": "mul", "port": "base" } },
+          { "from": { "node": "k", "port": "value" }, "to": { "node": "mul", "port": "factors" } },
+          { "from": { "node": "mul", "port": "result" }, "to": { "node": "out", "port": "value" } }
+        ]
+      }
+    }
+  },
+  "expected": {
+    "subtotal": 1200,
+    "package_credit": 0.5,
+    "after_credit": 600,
+    "minimum_premium": 700,
+    "minimum_applied": true,
+    "total": 700,
+    "lines": [
+      { "product": "do", "plan_id": "do-plan", "premium": 900 },
+      { "product": "cgl", "plan_id": "cgl-plan", "premium": 300 }
+    ]
+  }
+}

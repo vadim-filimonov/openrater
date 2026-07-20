@@ -1,0 +1,66 @@
+{
+  "name": "V40.derive-territory-ungrouped-tail",
+  "description": "Most fictional Meridian location keys roll into t1 or t2, while z999 self-maps and rates on itself at 1.05. This proves an ungrouped tail remains rateable without using real geography.",
+  "plan": {
+    "id": "v40.derive_territory_ungrouped_tail",
+    "version": "1.0.0",
+    "name": "Meridian ungrouped tail (z999 → z999 → 1.05)",
+    "line": "bop",
+    "effective": "2026-01-01",
+    "nodes": [
+      {
+        "id": "in_zip",
+        "kind": "input",
+        "params": { "fieldName": "zip", "fieldType": "string" },
+        "position": { "x": 0, "y": 0 }
+      },
+      {
+        "id": "terr_zip",
+        "kind": "derive.territory",
+        "params": {
+          "dimSlug": "territory",
+          "territoryMap": {
+            "z101": "t1", "z102": "t1",
+            "z201": "t2", "z202": "t2",
+            "z999": "z999"
+          },
+          "territoryLabels": {
+            "t1": "Meridian demo core",
+            "t2": "Meridian demo remainder"
+          }
+        },
+        "position": { "x": 200, "y": 0 }
+      },
+      {
+        "id": "lkp_territory",
+        "kind": "lookup.direct",
+        "params": {
+          "table": { "t1": 1.2, "t2": 0.9, "z999": 1.05 },
+          "defaultValue": 1.0,
+          "tableName": "Meridian synthetic territory factor"
+        },
+        "position": { "x": 400, "y": 0 }
+      },
+      {
+        "id": "out_factor",
+        "kind": "output",
+        "params": { "fieldName": "factor", "fieldType": "float" },
+        "position": { "x": 600, "y": 0 }
+      },
+      {
+        "id": "out_unmapped",
+        "kind": "output",
+        "params": { "fieldName": "unmapped", "fieldType": "bool" },
+        "position": { "x": 600, "y": 120 }
+      }
+    ],
+    "edges": [
+      { "from": { "node": "in_zip",        "port": "value" },        "to": { "node": "terr_zip",      "port": "value"    } },
+      { "from": { "node": "terr_zip",      "port": "territory_id" }, "to": { "node": "lkp_territory", "port": "key"      } },
+      { "from": { "node": "terr_zip",      "port": "unmapped" },     "to": { "node": "out_unmapped",  "port": "value"    } },
+      { "from": { "node": "lkp_territory", "port": "value" },        "to": { "node": "out_factor",    "port": "value"    } }
+    ]
+  },
+  "externalInputs": { "zip": "z999" },
+  "expectedOutputs": { "factor": 1.05, "unmapped": false }
+}

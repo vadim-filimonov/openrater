@@ -1,0 +1,154 @@
+/* ──────────────────────────────────────────────────────────────
+   FactorTableCmdK — Brief 33 PR 33.7
+
+   ⌘K command palette for jumping to a cell in the active factor
+   table. Strict token-discipline; matches the polished mockup at
+   `/mockup/33-parametrize-as-canvas.html` Frame 13.
+   ────────────────────────────────────────────────────────────── */
+
+.rater-ft-cmdk-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: color-mix(in srgb, var(--rater-surface-1) 32%, transparent);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 12vh;
+  animation: rater-ft-cmdk-fade-in 80ms ease-out;
+}
+@keyframes rater-ft-cmdk-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.rater-ft-cmdk {
+  background: var(--rater-surface-1);
+  border: 1px solid var(--rater-hairline-strong);
+  /* Polish PR 2 — command palette is modal-class chrome, not a
+   * canvas node. */
+  border-radius: var(--rater-r-8);
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.5);
+  width: 560px;
+  max-width: calc(100vw - var(--rater-s-32, 32px));
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.rater-ft-cmdk-input {
+  width: 100%;
+  padding: var(--rater-s-12) var(--rater-s-20);
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--rater-text-strong);
+  font-size: 16px;
+  font-family: inherit;
+  border-bottom: 1px solid var(--rater-hairline-soft);
+}
+.rater-ft-cmdk-input::placeholder {
+  color: var(--rater-text-subtle);
+}
+
+.rater-ft-cmdk-section {
+  padding: var(--rater-s-6) 0;
+  display: flex;
+  flex-direction: column;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+.rater-ft-cmdk-section-label {
+  padding: var(--rater-s-4) var(--rater-s-20);
+  font-size: 10px;
+  letter-spacing: var(--rater-tracking-label);
+  text-transform: uppercase;
+  color: var(--rater-text-subtle);
+  font-weight: var(--rater-fw-semibold);
+}
+
+.rater-ft-cmdk-empty {
+  padding: var(--rater-s-12) var(--rater-s-20);
+  font-size: 12px;
+  color: var(--rater-text-subtle);
+  font-style: italic;
+}
+
+.rater-ft-cmdk-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.rater-ft-cmdk-row {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-12);
+  padding: var(--rater-s-8) var(--rater-s-20);
+  cursor: pointer;
+  transition: background 60ms ease;
+}
+.rater-ft-cmdk-row:hover,
+.rater-ft-cmdk-row.is-focused {
+  background: var(--rater-surface-2);
+}
+.rater-ft-cmdk-row-icon {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  border-radius: var(--rater-r-4);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: var(--rater-fw-semibold);
+  background: var(--rater-cat-input-soft);
+  color: var(--rater-cat-input-text);
+}
+.rater-ft-cmdk-row-label {
+  flex: 1;
+  font-size: 13px;
+  color: var(--rater-text-default);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rater-ft-cmdk-row-coord {
+  font-family: var(--rater-fonts-mono);
+  font-size: 11px;
+  color: var(--rater-text-muted);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.rater-ft-cmdk-foot {
+  padding: var(--rater-s-8) var(--rater-s-20);
+  background: var(--rater-surface-canvas);
+  border-top: 1px solid var(--rater-hairline-soft);
+  font-size: 11px;
+  color: var(--rater-text-subtle);
+  display: flex;
+  gap: var(--rater-s-16);
+  flex-wrap: wrap;
+}
+.rater-ft-cmdk-foot kbd {
+  font-family: var(--rater-fonts-mono);
+  font-size: 10px;
+  padding: 1px var(--rater-s-4);
+  background: var(--rater-surface-2);
+  border: 1px solid var(--rater-hairline-base);
+  border-radius: var(--rater-r-4);
+  color: var(--rater-text-muted);
+  margin-right: var(--rater-s-4);
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .rater-ft-cmdk-overlay {
+    animation: none;
+  }
+  .rater-ft-cmdk-row {
+    transition: none;
+  }
+}

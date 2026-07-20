@@ -1,0 +1,82 @@
+/**
+ * <PlanDeleteDialog> styles — K1.4.
+ *
+ * Tokens via @openrater/design-system. BEM block: .rater-plan-delete-dialog.
+ * The Modal primitive owns the shell (overlay, header, body padding,
+ * footer). This stylesheet styles only the stacked body content —
+ * intro copy + optional impact callout + optional error row. The
+ * Cancel / Confirm actions live in <Modal.Footer> and inherit its
+ * bordered, right-aligned layout, so there is no actions rule here.
+ */
+
+.rater-plan-delete-dialog {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-12);
+}
+
+.rater-plan-delete-dialog__intro {
+  margin: 0;
+  font-size: var(--rater-t-13);
+  line-height: 1.55;
+  color: var(--rater-text-default);
+}
+
+/* ─── Impact callout ─── */
+/* Amber warn surface for the optional impact summary (what disappears
+ * when the user confirms). The danger framing on the Confirm button
+ * carries the irreversible-action signal; this callout only enumerates
+ * the casualties. */
+
+.rater-plan-delete-dialog__impact {
+  display: flex;
+  gap: var(--rater-s-8);
+  padding: var(--rater-s-10) var(--rater-s-12);
+  border: 1px solid var(--rater-cat-loading-border);
+  border-radius: var(--rater-r-6);
+  background: var(--rater-cat-loading-soft);
+}
+
+.rater-plan-delete-dialog__impact-icon {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--rater-cat-loading-text);
+}
+
+.rater-plan-delete-dialog__impact-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--rater-t-12);
+  line-height: 1.5;
+  color: var(--rater-text-default);
+}
+
+.rater-plan-delete-dialog__impact-list li + li {
+  margin-top: 2px;
+}
+
+/* ─── Error row ─── */
+/* Surfaces a failed mutation inline so a destructive action never
+ * fails silently. Uses the semantic feedback-error token pair (red),
+ * visually distinct from the amber impact callout. The dialog stays
+ * open while this shows, so the user can read it and retry. */
+
+.rater-plan-delete-dialog__error {
+  display: flex;
+  gap: var(--rater-s-8);
+  align-items: flex-start;
+  padding: var(--rater-s-10) var(--rater-s-12);
+  border: 1px solid var(--rater-feedback-error);
+  border-radius: var(--rater-r-6);
+  background: var(--rater-feedback-error-bg);
+  color: var(--rater-feedback-error);
+  font-size: var(--rater-t-12);
+  line-height: 1.5;
+}
+
+.rater-plan-delete-dialog__error-icon {
+  flex-shrink: 0;
+  margin-top: 1px;
+  color: var(--rater-feedback-error);
+}

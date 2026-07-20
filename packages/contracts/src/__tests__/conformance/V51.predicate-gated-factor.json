@@ -1,0 +1,32 @@
+{
+  "name": "V51.predicate-gated-factor",
+  "description": "ADR-0044 PR4: predicate-gated factor (sprinkler). branch(sprinklered ? sprinkler_rel : 1.0) feeds the chain. sprinklered=true -> 100 × 0.8 = 80; the off case (1.0) is exercised by the projector unit test.",
+  "plan": {
+    "id": "v51.predicate-gate",
+    "version": "1.0.0",
+    "name": "Predicate-gated factor (sprinkler)",
+    "line": "bop",
+    "effective": "2026-01-01",
+    "nodes": [
+      { "id": "in_rateno", "kind": "input", "params": { "fieldName": "prop_rate_number", "fieldType": "string" }, "position": { "x": 0, "y": 0 } },
+      { "id": "in_spr", "kind": "input", "params": { "fieldName": "sprinklered", "fieldType": "boolean" }, "position": { "x": 0, "y": 60 } },
+      { "id": "spr_rel", "kind": "lookup.direct", "params": { "table": { "01": 0.8, "02": 0.7 }, "defaultValue": 1.0, "tableName": "sprinkler_rel" }, "position": { "x": 200, "y": 0 } },
+      { "id": "one", "kind": "constant", "params": { "value": 1.0, "type": "factor" }, "position": { "x": 200, "y": 80 } },
+      { "id": "gate", "kind": "branch", "params": {}, "position": { "x": 400, "y": 40 } },
+      { "id": "base", "kind": "constant", "params": { "value": 100, "type": "money" }, "position": { "x": 400, "y": 140 } },
+      { "id": "mul", "kind": "chain.mult", "params": { "factorNames": ["sprinkler_rel(gated)"], "stopOnZero": false }, "position": { "x": 600, "y": 80 } },
+      { "id": "out", "kind": "output", "params": { "fieldName": "building_premium", "fieldType": "money" }, "position": { "x": 800, "y": 80 } }
+    ],
+    "edges": [
+      { "from": { "node": "in_rateno", "port": "value" }, "to": { "node": "spr_rel", "port": "key" } },
+      { "from": { "node": "in_spr", "port": "value" }, "to": { "node": "gate", "port": "predicate" } },
+      { "from": { "node": "spr_rel", "port": "value" }, "to": { "node": "gate", "port": "then" } },
+      { "from": { "node": "one", "port": "value" }, "to": { "node": "gate", "port": "else" } },
+      { "from": { "node": "base", "port": "value" }, "to": { "node": "mul", "port": "base" } },
+      { "from": { "node": "gate", "port": "result" }, "to": { "node": "mul", "port": "factors" } },
+      { "from": { "node": "mul", "port": "result" }, "to": { "node": "out", "port": "value" } }
+    ]
+  },
+  "externalInputs": { "prop_rate_number": "01", "sprinklered": true },
+  "expectedOutputs": { "building_premium": 80 }
+}

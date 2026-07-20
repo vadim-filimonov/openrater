@@ -1,0 +1,30 @@
+{
+  "name": "V9.class-exposure-coverage-scope",
+  "description": "input.class_exposure with coverage_scope=property routes fictional Meridian class c201 to area exposure instead of primary payroll.",
+  "plan": {
+    "id": "v9.class_exposure_scoped",
+    "version": "1.0.0",
+    "name": "Meridian class exposure (coverage scope)",
+    "lines": ["liability", "property"],
+    "effective": "2026-01-01",
+    "nodes": [
+      { "id": "cls_exp", "kind": "input.class_exposure", "params": { "coverage_scope": "property", "classCodeFieldName": "class_code" }, "position": { "x": 0, "y": 0 } },
+      { "id": "out", "kind": "output", "params": { "fieldName": "exposure", "fieldType": "money" }, "position": { "x": 200, "y": 0 } }
+    ],
+    "edges": [
+      { "from": { "node": "cls_exp", "port": "value" }, "to": { "node": "out", "port": "value" } }
+    ]
+  },
+  "externalInputs": { "class_code": "c201", "annual_payroll": 850000, "area_sqft": 5000 },
+  "expectedOutputs": { "exposure": 5000 },
+  "classLibraryEntries": [
+    {
+      "class_code": "c201",
+      "display_name": "Meridian Workshop",
+      "exposure_bases": [
+        { "code": "payroll", "is_primary": true, "unit": "USD", "coverage_tags": ["liability", "wc"] },
+        { "code": "area", "is_primary": false, "unit": "sq ft", "coverage_tags": ["property"] }
+      ]
+    }
+  ]
+}

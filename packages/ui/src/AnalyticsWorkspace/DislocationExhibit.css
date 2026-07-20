@@ -1,0 +1,128 @@
+/**
+ * Brief 64 PR 64.4 — <DislocationExhibit> styles.
+ * Diverging histogram (emerald = decrease, orange = increase) + summary
+ * chips. BEM + design tokens only; bar opacity is data-driven inline.
+ */
+
+.rater-dislocation {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-2, 8px);
+  background: var(--rater-surface-1);
+  border: 1px solid var(--rater-hairline-base);
+  border-radius: var(--rater-r-12, 12px);
+  padding: var(--rater-s-4, 18px) var(--rater-s-5, 20px);
+}
+
+.rater-dislocation__head {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.rater-dislocation__title-block {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-2, 8px);
+}
+
+.rater-dislocation__title-icon {
+  display: inline-flex;
+  color: var(--rater-text-muted);
+}
+
+.rater-dislocation__title {
+  margin: 0;
+  font-size: var(--rater-t-20, 16px);
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-strong);
+}
+
+.rater-dislocation__sub {
+  font-size: var(--rater-t-13, 12.5px);
+  color: var(--rater-text-muted);
+}
+
+.rater-dislocation__svg {
+  width: 100%;
+  height: 168px;
+  margin-top: var(--rater-s-1, 4px);
+}
+
+.rater-dislocation__zero {
+  stroke: var(--rater-hairline-strong);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+}
+
+.rater-dislocation__zero-label,
+.rater-dislocation__x-label {
+  fill: var(--rater-text-subtle);
+  font-size: 10px;
+  font-family: var(--rater-fonts-sans);
+}
+
+.rater-dislocation__axis {
+  stroke: var(--rater-hairline-base);
+  stroke-width: 1;
+}
+
+.rater-dislocation__bar {
+  rx: 1.5;
+}
+.rater-dislocation__bar.is-up {
+  fill: var(--rater-viz-delta-up);
+}
+.rater-dislocation__bar.is-down {
+  fill: var(--rater-viz-delta-down);
+}
+.rater-dislocation__bar.is-flat {
+  fill: var(--rater-text-subtle);
+}
+
+/* ── Summary chips ───────────────────────────────────────────────── */
+
+.rater-dislocation__summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--rater-s-5, 22px);
+  padding-top: var(--rater-s-2, 8px);
+  border-top: 1px solid var(--rater-hairline-soft);
+}
+
+.rater-dislocation__chip {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.rater-dislocation__chip-val {
+  font-size: var(--rater-t-20, 18px);
+  font-weight: var(--rater-fw-semibold);
+  font-variant-numeric: tabular-nums;
+  color: var(--rater-text-strong);
+}
+
+.rater-dislocation__chip.is-up .rater-dislocation__chip-val {
+  color: var(--rater-viz-delta-up-text);
+}
+.rater-dislocation__chip.is-down .rater-dislocation__chip-val {
+  color: var(--rater-viz-delta-down-text);
+}
+
+.rater-dislocation__chip-label {
+  font-size: var(--rater-t-caption, 11px);
+  letter-spacing: var(--rater-tracking-label);
+  text-transform: uppercase;
+  color: var(--rater-text-subtle);
+}
+
+.rater-dislocation__note {
+  margin: 0;
+  font-size: var(--rater-t-caption, 11px);
+  color: var(--rater-text-subtle);
+}
+
+.rater-dislocation__empty {
+  padding: var(--rater-s-6, 24px) 0;
+}

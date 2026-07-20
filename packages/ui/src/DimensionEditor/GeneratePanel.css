@@ -1,0 +1,212 @@
+/* ============================================================================
+ * <GeneratePanel> — the banded-level generator, self-styled (Brief 66
+ * §3.5; extracted from the legacy DimensionEditor.css so the panel can
+ * mount in the dims2 detail pane — the 66.1c pattern). Token-only BEM.
+ * ========================================================================== */
+
+.rater-generate-panel {
+  background: var(--rater-surface-canvas);
+  border: 1px solid var(--rater-hairline-soft);
+  border-radius: var(--rater-r-8);
+  padding: var(--rater-s-16) var(--rater-s-20);
+}
+
+.rater-generate-panel__cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--rater-s-16);
+}
+
+.rater-generate-panel__col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-6);
+}
+
+.rater-generate-panel__col-label {
+  font-size: var(--rater-t-10);
+  letter-spacing: var(--rater-tracking-label);
+  text-transform: uppercase;
+  color: var(--rater-text-subtle);
+  font-weight: var(--rater-fw-semibold);
+}
+
+.rater-generate-panel__method {
+  display: flex;
+  gap: var(--rater-s-8);
+  align-items: flex-start;
+  padding: var(--rater-s-8) var(--rater-s-10);
+  background: var(--rater-surface-1);
+  border: 1px solid var(--rater-hairline-soft);
+  border-radius: var(--rater-r-6);
+  cursor: pointer;
+  transition:
+    border-color var(--rater-d-80) var(--rater-ease-snap),
+    background-color var(--rater-d-80) var(--rater-ease-snap);
+}
+
+.rater-generate-panel__method:hover:not(.is-disabled) {
+  border-color: var(--rater-hairline-strong);
+}
+
+.rater-generate-panel__method.is-active {
+  border-color: var(--rater-cat-loading);
+  background: color-mix(in srgb, var(--rater-cat-loading) 8%, var(--rater-surface-1));
+}
+
+.rater-generate-panel__method.is-disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.rater-generate-panel__method input {
+  margin-top: 3px;
+}
+
+.rater-generate-panel__method-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.rater-generate-panel__method-name {
+  font-size: var(--rater-t-12);
+  font-weight: var(--rater-fw-medium);
+  color: var(--rater-text-default);
+}
+
+.rater-generate-panel__method-hint {
+  font-size: var(--rater-t-11);
+  color: var(--rater-text-muted);
+}
+
+.rater-generate-panel__params {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: var(--rater-s-8);
+}
+
+.rater-generate-panel__field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-2);
+}
+
+.rater-generate-panel__field-label {
+  font-size: var(--rater-t-10);
+  letter-spacing: var(--rater-tracking-label);
+  text-transform: uppercase;
+  color: var(--rater-text-subtle);
+}
+
+.rater-generate-panel__input {
+  background: var(--rater-surface-1);
+  border: 1px solid var(--rater-hairline-base);
+  border-radius: var(--rater-r-4);
+  color: var(--rater-text-default);
+  padding: 4px 8px;
+  font-family: var(--rater-font-mono);
+  font-size: var(--rater-t-12);
+  font-variant-numeric: tabular-nums;
+}
+
+.rater-generate-panel__input:focus {
+  outline: none;
+  border-color: var(--rater-focus-ring);
+  box-shadow: 0 0 0 2px var(--rater-focus-halo);
+}
+
+.rater-generate-panel__preview {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-4);
+  margin-top: var(--rater-s-6);
+}
+
+.rater-generate-panel__preview-list {
+  background: var(--rater-surface-1);
+  border: 1px solid var(--rater-hairline-soft);
+  border-radius: var(--rater-r-6);
+  padding: var(--rater-s-6) var(--rater-s-10);
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-2);
+  min-height: 90px;
+}
+
+.rater-generate-panel__preview-row {
+  display: grid;
+  grid-template-columns: 28px 1fr auto;
+  gap: var(--rater-s-6);
+  font-family: var(--rater-font-mono);
+  font-size: var(--rater-t-11);
+  color: var(--rater-text-muted);
+  align-items: center;
+}
+
+.rater-generate-panel__preview-num {
+  color: var(--rater-text-subtle);
+}
+
+.rater-generate-panel__preview-id {
+  color: var(--rater-text-default);
+  font-family: var(--rater-font-mono);
+}
+
+.rater-generate-panel__preview-range {
+  color: var(--rater-text-muted);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.rater-generate-panel__preview-row--more {
+  display: block;
+  color: var(--rater-text-subtle);
+  font-style: italic;
+  padding-top: var(--rater-s-2);
+}
+
+.rater-generate-panel__preview-empty {
+  background: var(--rater-surface-1);
+  border: 1px dashed var(--rater-hairline-soft);
+  border-radius: var(--rater-r-6);
+  padding: var(--rater-s-14);
+  font-size: var(--rater-t-11);
+  color: var(--rater-text-muted);
+  font-style: italic;
+  text-align: center;
+}
+
+.rater-generate-panel__warning {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-10);
+  margin-top: var(--rater-s-14);
+  padding: var(--rater-s-8) var(--rater-s-12);
+  background: color-mix(in srgb, var(--rater-accent-danger) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--rater-accent-danger) 30%, transparent);
+  border-radius: var(--rater-r-6);
+  color: var(--rater-text-default);
+  font-size: var(--rater-t-12);
+}
+
+.rater-generate-panel__warning-icon {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--rater-accent-danger);
+  color: white;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: var(--rater-fw-semibold);
+  flex-shrink: 0;
+}
+
+.rater-generate-panel__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--rater-s-8);
+  margin-top: var(--rater-s-16);
+}

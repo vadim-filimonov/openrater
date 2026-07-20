@@ -1,0 +1,101 @@
+/* ============================================================================
+ * <IssueSeverityChip> — severity icon + count chip.
+ *
+ * Used in the persistent status bar (read-only) AND the drawer filter
+ * (clickable; aria-pressed state). The visual styling is identical
+ * except for the cursor/hover treatment when clickable.
+ *
+ * Color comes from --rater-feedback-* tokens — each severity maps to
+ * its own color family.
+ * ============================================================================ */
+
+.rater-issue-severity-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-4);
+  padding: var(--rater-s-4) var(--rater-s-8);
+  border-radius: var(--rater-r-full);
+  border: 1px solid transparent;
+
+  background: transparent;
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-12);
+  font-weight: var(--rater-fw-medium);
+  line-height: var(--rater-lh-snug);
+  user-select: none;
+
+  /* Reset button defaults when used as <button> */
+  margin: 0;
+  cursor: default;
+}
+
+.rater-issue-severity-chip__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.rater-issue-severity-chip__count {
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--rater-fw-semibold);
+}
+
+.rater-issue-severity-chip__label {
+  color: inherit;
+}
+
+/* ── Severity tones ────────────────────────────────────────────── */
+
+.rater-issue-severity-chip--error {
+  color: var(--rater-feedback-error);
+  background: var(--rater-feedback-error-soft, transparent);
+  border-color: var(--rater-feedback-error-soft, transparent);
+}
+
+.rater-issue-severity-chip--warning {
+  color: var(--rater-feedback-warn, var(--rater-cat-lookup));
+  background: var(--rater-feedback-warn-soft, transparent);
+  border-color: var(--rater-feedback-warn-soft, transparent);
+}
+
+.rater-issue-severity-chip--info {
+  color: var(--rater-feedback-info, var(--rater-accent-primary));
+  background: var(--rater-feedback-info-soft, transparent);
+  border-color: var(--rater-feedback-info-soft, transparent);
+}
+
+.rater-issue-severity-chip--ok {
+  color: var(--rater-feedback-success, var(--rater-cat-math));
+  background: var(--rater-feedback-success-soft, transparent);
+  border-color: var(--rater-feedback-success-soft, transparent);
+}
+
+/* ── Clickable state (filter chip) ──────────────────────────────── */
+
+.rater-issue-severity-chip--clickable {
+  cursor: pointer;
+  appearance: none;
+  transition:
+    background var(--rater-d-80) var(--rater-ease-soft),
+    border-color var(--rater-d-80) var(--rater-ease-soft),
+    transform var(--rater-d-80) var(--rater-ease-soft);
+}
+
+.rater-issue-severity-chip--clickable:hover {
+  border-color: currentColor;
+}
+
+.rater-issue-severity-chip--clickable:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: 2px;
+}
+
+.rater-issue-severity-chip--clickable:active {
+  transform: scale(0.97);
+}
+
+.rater-issue-severity-chip--active {
+  border-color: currentColor;
+  background: color-mix(in srgb, currentColor 12%, transparent);
+}

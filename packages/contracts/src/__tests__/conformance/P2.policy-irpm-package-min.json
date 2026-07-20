@@ -1,0 +1,53 @@
+{
+  "name": "P2.policy-irpm-package-min",
+  "description": "Synthetic Meridian policy tail: subtotal 3205, schedule rating at net 0%, a guarded first-term factor of 0.90, and a $500 floor that does not bind. The exact product is $2,884.50.",
+  "policy": {
+    "policy_id": "P2",
+    "lines": [
+      { "plan_ref": { "plan_id": "bop-plan", "content_hash": "h-bop", "product": "bop" }, "premium_output": "bop_premium" }
+    ],
+    "adjustments": [
+      { "kind": "schedule_rating", "id": "irpm", "display_name": "Schedule rating (IRPM)", "cap_pct": 25, "source": { "from": "literal", "total": 0 }, "citation": "Meridian Rule MS-R6.1" },
+      { "kind": "package_factor", "id": "first_term_credit", "display_name": "Meridian first-term credit", "factor": 0.9, "when": { "field": "is_first_term", "op": "eq", "value": true }, "citation": "Meridian Rule MS-R6.2" },
+      { "kind": "minimum_premium", "id": "min", "floor": 500 }
+    ]
+  },
+  "adjustmentInputs": { "is_first_term": true },
+  "plans": {
+    "bop-plan": {
+      "externalInputs": { "base": 3205 },
+      "plan": {
+        "id": "p2.bop",
+        "version": "1.0.0",
+        "name": "BOP",
+        "nodes": [
+          { "id": "in_base", "kind": "input", "params": { "fieldName": "base", "fieldType": "money" } },
+          { "id": "k", "kind": "constant", "params": { "value": 1.0, "type": "factor" } },
+          { "id": "mul", "kind": "chain.mult", "params": { "stopOnZero": false } },
+          { "id": "out", "kind": "output", "params": { "fieldName": "bop_premium", "fieldType": "money" } }
+        ],
+        "edges": [
+          { "from": { "node": "in_base", "port": "value" }, "to": { "node": "mul", "port": "base" } },
+          { "from": { "node": "k", "port": "value" }, "to": { "node": "mul", "port": "factors" } },
+          { "from": { "node": "mul", "port": "result" }, "to": { "node": "out", "port": "value" } }
+        ]
+      }
+    }
+  },
+  "expected": {
+    "subtotal": 3205,
+    "package_credit": 0.9,
+    "after_credit": 2884.5,
+    "minimum_premium": 500,
+    "minimum_applied": false,
+    "total": 2884.5,
+    "lines": [
+      { "product": "bop", "plan_id": "bop-plan", "premium": 3205 }
+    ],
+    "adjustments": [
+      { "id": "irpm", "kind": "schedule_rating", "applied": true, "before": 3205, "after": 3205, "detail": "0.0% (cap ±25%)", "provenance": { "source": "literal" }, "citation": "Meridian Rule MS-R6.1" },
+      { "id": "first_term_credit", "kind": "package_factor", "applied": true, "before": 3205, "after": 2884.5, "detail": "× 0.9", "citation": "Meridian Rule MS-R6.2" },
+      { "id": "min", "kind": "minimum_premium", "applied": false, "before": 2884.5, "after": 2884.5, "detail": "floor $500 not binding" }
+    ]
+  }
+}

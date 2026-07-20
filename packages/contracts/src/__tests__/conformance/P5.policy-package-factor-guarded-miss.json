@@ -1,0 +1,49 @@
+{
+  "name": "P5.policy-package-factor-guarded-miss",
+  "description": "A guarded package factor that does not apply remains visible in the trace. The synthetic Meridian policy has a $3,205 subtotal and a 0.90 first-term factor, but is_first_term is false, so the premium remains $3,205.",
+  "policy": {
+    "policy_id": "P5",
+    "lines": [
+      { "plan_ref": { "plan_id": "bop-plan", "content_hash": "h-bop", "product": "bop" }, "premium_output": "bop_premium" }
+    ]
+  },
+  "policy_tail": [
+    { "kind": "package_factor", "id": "first_term_credit", "display_name": "Meridian first-term credit", "factor": 0.9, "when": { "field": "is_first_term", "op": "eq", "value": true } }
+  ],
+  "adjustmentInputs": { "is_first_term": false },
+  "plans": {
+    "bop-plan": {
+      "externalInputs": { "base": 3205 },
+      "plan": {
+        "id": "p5.bop",
+        "version": "1.0.0",
+        "name": "BOP",
+        "nodes": [
+          { "id": "in_base", "kind": "input", "params": { "fieldName": "base", "fieldType": "money" } },
+          { "id": "k", "kind": "constant", "params": { "value": 1.0, "type": "factor" } },
+          { "id": "mul", "kind": "chain.mult", "params": { "stopOnZero": false } },
+          { "id": "out", "kind": "output", "params": { "fieldName": "bop_premium", "fieldType": "money" } }
+        ],
+        "edges": [
+          { "from": { "node": "in_base", "port": "value" }, "to": { "node": "mul", "port": "base" } },
+          { "from": { "node": "k", "port": "value" }, "to": { "node": "mul", "port": "factors" } },
+          { "from": { "node": "mul", "port": "result" }, "to": { "node": "out", "port": "value" } }
+        ]
+      }
+    }
+  },
+  "expected": {
+    "subtotal": 3205,
+    "package_credit": 1,
+    "after_credit": 3205,
+    "minimum_premium": 0,
+    "minimum_applied": false,
+    "total": 3205,
+    "lines": [
+      { "product": "bop", "plan_id": "bop-plan", "premium": 3205 }
+    ],
+    "adjustments": [
+      { "id": "first_term_credit", "kind": "package_factor", "applied": false, "before": 3205, "after": 3205, "detail": "not applied — guard is_first_term eq true not met" }
+    ]
+  }
+}

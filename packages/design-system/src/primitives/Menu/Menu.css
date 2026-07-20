@@ -1,0 +1,143 @@
+/* ============================================================================
+ * <Menu> — dropdown menu anchored to a trigger.
+ *
+ * Floating panel rendered via portal at document.body. Positioned by
+ * JS using getBoundingClientRect + scroll offsets. Drops down below
+ * the trigger with a 4px gap; left-aligned.
+ *
+ * Items use a low-key hover (surface-2) + a clean focus ring; danger
+ * items shift to feedback-error tone. Separators are 1px hairlines.
+ * ============================================================================ */
+
+.rater-menu-anchor {
+  display: inline-block;
+}
+
+.rater-menu {
+  position: absolute;
+  z-index: var(--rater-z-popover);
+  min-width: 200px;
+  max-width: 320px;
+  max-height: 60vh;
+  overflow-y: auto;
+
+  background: var(--rater-surface-1);
+  border: 1px solid var(--rater-border-default);
+  border-radius: var(--rater-r-6);
+  box-shadow: var(--rater-shadow-floating);
+
+  padding: var(--rater-s-4);
+
+  /* Origin-aware entrance (Shell v3 polish): the panel grows out of its
+   * trigger corner — scale from the anchored edge + a 4px approach along
+   * the entry axis. The component sets data-flipped / data-aligned when
+   * the collision logic flips/right-aligns, so a menu opening UPWARD
+   * rises from its bottom edge instead of animating away from the
+   * trigger (the origin-blind bug). */
+  --rater-menu-enter-y: -4px;
+  transform-origin: top left;
+  animation: rater-menu-in var(--rater-d-140) var(--rater-ease-snap);
+}
+
+.rater-menu[data-aligned="right"] {
+  transform-origin: top right;
+}
+
+.rater-menu[data-flipped] {
+  --rater-menu-enter-y: 4px;
+  transform-origin: bottom left;
+}
+
+.rater-menu[data-flipped][data-aligned="right"] {
+  transform-origin: bottom right;
+}
+
+/* Exit — faster than the entrance (the standard close ratio); the
+ * component unmounts on animationend. Pointer events off so a closing
+ * panel can't swallow clicks. */
+.rater-menu--closing {
+  animation: rater-menu-out var(--rater-d-80) var(--rater-ease-soft) forwards;
+  pointer-events: none;
+}
+
+.rater-menu__item {
+  /* Reset native button */
+  appearance: none;
+  background: transparent;
+  border: 0;
+  margin: 0;
+  cursor: pointer;
+  text-align: left;
+  user-select: none;
+
+  /* Layout */
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-8);
+  width: 100%;
+  padding: var(--rater-s-8) var(--rater-s-10);
+  border-radius: var(--rater-r-4);
+
+  /* Type */
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-13);
+  font-weight: var(--rater-fw-medium);
+  line-height: var(--rater-lh-snug);
+  color: var(--rater-text-default);
+
+  transition:
+    background var(--rater-d-80) var(--rater-ease-soft),
+    color var(--rater-d-80) var(--rater-ease-soft);
+}
+
+.rater-menu__item:hover {
+  background: var(--rater-surface-2);
+  color: var(--rater-text-strong);
+}
+
+.rater-menu__item:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: -2px;
+  background: var(--rater-surface-2);
+  color: var(--rater-text-strong);
+}
+
+.rater-menu__item--danger {
+  color: var(--rater-feedback-error);
+}
+
+.rater-menu__item--danger:hover {
+  background: var(--rater-feedback-error-soft, var(--rater-surface-2));
+  color: var(--rater-feedback-error);
+}
+
+.rater-menu__item--disabled,
+.rater-menu__item[aria-disabled="true"] {
+  color: var(--rater-text-disabled);
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.rater-menu__separator {
+  height: 1px;
+  background: var(--rater-border-subtle);
+  margin: var(--rater-s-4) 0;
+}
+
+@keyframes rater-menu-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(var(--rater-menu-enter-y, -4px));
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes rater-menu-out {
+  to {
+    opacity: 0;
+    transform: scale(0.98) translateY(calc(var(--rater-menu-enter-y, -4px) / 2));
+  }
+}

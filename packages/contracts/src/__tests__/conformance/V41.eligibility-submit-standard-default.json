@@ -1,0 +1,36 @@
+{
+  "name": "V41.eligibility-submit-standard-default",
+  "description": "The fictional Meridian appetite gate fires SUBMIT when floor area exceeds 40,000 sq ft. First-match ordering makes that referral rule win over a later preferred-protection credit, while the authored default remains standard.",
+  "plan": {
+    "id": "v41.eligibility_submit_standard_default",
+    "version": "1.0.0",
+    "name": "Meridian fictional appetite gate (standard default)",
+    "lines": ["bop"],
+    "effective": "2025-10-01",
+    "nodes": [
+      {
+        "id": "gate",
+        "kind": "eligibility.gate",
+        "params": {
+          "rules": [
+            { "rule_id": "decline_ineligible_class", "variable": "class_code", "op": "in", "value": ["c999"], "tier": "decline", "reasoning": "Synthetic class c999 is outside Meridian demo appetite." },
+            { "rule_id": "floor_area_cap", "variable": "total_floor_area_sqft", "op": "gt", "value": 40000, "tier": "submit", "reasoning": "Floor area exceeds the fictional Meridian 40,000 sq ft referral threshold." },
+            { "rule_id": "gross_sales_cap", "variable": "annual_gross_sales", "op": "gt", "value": 5000000, "tier": "submit", "reasoning": "Annual gross sales exceed the fictional Meridian $5M referral threshold." },
+            { "rule_id": "preferred_protection", "variable": "protection_grade", "op": "eq", "value": "preferred", "tier": "preferred", "reasoning": "The synthetic preferred protection grade qualifies for preferred terms." }
+          ],
+          "default_tier": "standard",
+          "default_reasoning": "Within the fictional Meridian appetite at standard demo rates."
+        },
+        "position": { "x": 0, "y": 0 }
+      },
+      { "id": "out_tier", "kind": "output", "params": { "fieldName": "tier", "fieldType": "string" }, "position": { "x": 200, "y": 0 } },
+      { "id": "out_rule", "kind": "output", "params": { "fieldName": "matched_rule_id", "fieldType": "string" }, "position": { "x": 200, "y": 100 } }
+    ],
+    "edges": [
+      { "from": { "node": "gate", "port": "tier" }, "to": { "node": "out_tier", "port": "value" } },
+      { "from": { "node": "gate", "port": "matched_rule_id" }, "to": { "node": "out_rule", "port": "value" } }
+    ]
+  },
+  "externalInputs": { "class_code": "c201", "total_floor_area_sqft": 45000, "annual_gross_sales": 900000, "protection_grade": "preferred" },
+  "expectedOutputs": { "tier": "submit", "matched_rule_id": "floor_area_cap" }
+}

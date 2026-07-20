@@ -1,0 +1,160 @@
+{
+  "$comment": "Transcription capability registry — the machine-readable capability boundary for filing-transcription-spec.md §6. The workbook check reads this file: 'unsupported' constructs fail with `message` (R-190); 'partial' constructs pass with `message` as a warning (R-191). Statuses move unsupported → partial → supported as the platform grows; the spec text does not change. Versioned independently of the spec.",
+  "registry_version": "r9",
+  "spec_version": "1.0",
+  "updated": "2026-07-17",
+  "constructs": [
+    {
+      "id": "endorsement_additive_multi_coverage",
+      "label": "Additive endorsements on multi-coverage plans",
+      "status": "unsupported",
+      "detected_by": "endorsements: kind=additive (or rate_branch) when plan.coverages has more than one entry",
+      "message": "A filed additive endorsement applies ONCE per policy; with multiple coverage towers the engine has no single tip to attach it to (package-level endorsement layering is pending). The projector refuses rather than applying it N times.",
+      "instead": "Factor endorsements work on any plan (distributive). For a once-per-policy amount on a multi-coverage plan, record it in gaps_and_assumptions until package-level layering ships."
+    },
+    {
+      "id": "chain_flat_factor",
+      "label": "Constant (unkeyed) factors as chain stages",
+      "status": "unsupported",
+      "detected_by": "chains: stage_kind=flat_factor",
+      "message": "The engine cannot key a constant chain factor, so the projector refuses it instead of silently changing premium.",
+      "instead": "Express it as a 1-D factor table over a declared dimension (a two-level yes/no dimension for conditional factors like sprinkler credits), or as a loading when it applies post-tower."
+    },
+    {
+      "id": "predicate_beyond_equality",
+      "label": "Non-equality predicate operators on chain stages and loadings",
+      "status": "unsupported",
+      "detected_by": "chains.predicate / loadings.predicate: op other than ==",
+      "message": "The platform's factor gate (FactorPredicate) tests equality only — a chain or loading predicate using != < <= > >= in not-in cannot be expressed, and the builder refuses rather than mis-gating a factor.",
+      "instead": "Express a threshold or set condition as a 1-D factor table over a banded (or yes/no categorical) dimension of the same input, with factor 1.0 on the levels where it doesn't apply; or record the condition in gaps_and_assumptions. == predicates work everywhere; endorsements.trigger executes the full §4.6.1 grammar."
+    },
+    {
+      "id": "per_coverage_rounding",
+      "label": "Per-coverage rounding in final adjustments (round each tower, then sum)",
+      "status": "unsupported",
+      "detected_by": "final_adjustments: kind=round with non-empty applies_to, or more than one round row",
+      "message": "The engine's round stage is the plan-tail total-rounder: it sums the per-coverage premiums, floors, and rounds ONCE at the package level. Rounding each coverage before summing is not expressible.",
+      "instead": "Author one package-level round row. Filed per-coverage premiums stay in test_cases with tolerance_<field> = 0.5 (they differ from the unrounded tower outputs by cents); record the source's per-coverage rounding in gaps_and_assumptions. Per-coverage CLAMPS (minimum premiums) still work."
+    },
+    {
+      "id": "linear_interpolation",
+      "label": "Linear interpolation between factor-table breakpoints",
+      "status": "supported",
+      "detected_by": "ft.* metadata `interpolation=linear`",
+      "message": "A table flagged `interpolation=linear` interpolates — a 2-D table along its flagged banded axis (lookup.multi interpolateOn), or a 1-D banded curve through the engine's interpolate kind. Breakpoints anchor at band LOWER bounds, ends clamp, and on-anchor values are byte-exact. Unflagged tables step. R-111 is a notice naming each interpolating table.",
+      "instead": null
+    },
+    {
+      "id": "multi_location_policy",
+      "label": "Multi-location policies (one insured, N rated locations)",
+      "status": "partial",
+      "detected_by": "not detectable in the workbook; policy-level concern",
+      "message": "The platform rates one risk unit per row and aggregates locations at the policy scoring seam. Location-level rating transcribes normally; policy-level combination rules beyond summation are not expressible.",
+      "instead": "Transcribe the per-location algorithm; record policy-level combination rules (per-policy minimums across locations, location interdependencies) in gaps_and_assumptions."
+    },
+    {
+      "id": "per_vehicle_driver_rating",
+      "label": "Per-vehicle / per-driver rating with assignment algorithms (auto)",
+      "status": "unsupported",
+      "detected_by": "profile guidance; not machine-detectable",
+      "message": "The platform rates one risk unit per row; driver-to-vehicle assignment algorithms cannot be expressed.",
+      "instead": "Where the book allows, decompose to one row per vehicle and record the assignment rule in gaps_and_assumptions (kind=unsupported)."
+    },
+    {
+      "id": "cross_product_package",
+      "label": "Cross-product packages (multiple products on one policy, package credits across them)",
+      "status": "unsupported",
+      "detected_by": "one workbook = one product (plan.product is scalar)",
+      "message": "One product per workbook/plan. Package interactions across products have no home.",
+      "instead": "One workbook per product; record cross-product credits/interactions in gaps_and_assumptions."
+    },
+    {
+      "id": "arbitrary_dag",
+      "label": "Arbitrary DAG topologies (fan-out, diamond joins, a factor consumed by two stages)",
+      "status": "unsupported",
+      "detected_by": "the chains sheet expresses linear towers only",
+      "message": "The workbook expresses a linear tower per coverage; arbitrary wiring is not expressible.",
+      "instead": "Most filed manuals are linear towers. Anything else: record in gaps_and_assumptions; hand-wire post-ingest if truly needed."
+    },
+    {
+      "id": "case_branching",
+      "label": "N-way conditional branching (case/branch logic)",
+      "status": "unsupported",
+      "detected_by": "no workbook surface",
+      "message": "Simple conditions ride `predicate` columns; true N-way branching has no tabular form.",
+      "instead": "Express two-way conditions as predicated stages/tables; record genuine branching in gaps_and_assumptions."
+    },
+    {
+      "id": "formula_stage",
+      "label": "Free-form formula stages (computed intermediate values)",
+      "status": "unsupported",
+      "detected_by": "no workbook surface",
+      "message": "Derived values (ratios, formula factors) cannot be computed by the workbook; inputs arrive as data.",
+      "instead": "Declare the derived quantity as an input (the dataset supplies it pre-computed) and record the derivation in gaps_and_assumptions; or express a filed formula as a banded table at the filing's breakpoints."
+    },
+    {
+      "id": "subplan_stacking",
+      "label": "Sub-plan composition / stacked per-state amendments",
+      "status": "unsupported",
+      "detected_by": "no workbook surface",
+      "message": "Base-plus-overlay layering is not expressible; workbooks are self-contained.",
+      "instead": "Flatten: transcribe the effective algorithm with citations pointing at both the base and the amendment (spec §7.3)."
+    },
+    {
+      "id": "model_backed_factors",
+      "label": "Model-backed factors (GLM/ML scores evaluated in-plan)",
+      "status": "unsupported",
+      "detected_by": "no workbook surface",
+      "message": "Filed tables only; models are not transcription artifacts.",
+      "instead": "If the filing references a scoring model's OUTPUT, declare it as an input; record the model itself in gaps_and_assumptions."
+    },
+    {
+      "id": "class_conditional_exposure",
+      "label": "Class-conditional exposure bases (different divisor per class)",
+      "status": "unsupported",
+      "detected_by": "chains carry one exposure_divisor per stage",
+      "message": "One exposure divisor per chain exposure stage.",
+      "instead": "Split coverages/towers where the filing genuinely rates different exposure bases; otherwise record the exception in gaps_and_assumptions. A future derived_from div(…) grammar can provide a direct representation."
+    },
+    {
+      "id": "external_index_input",
+      "label": "Externally computed indices (WC experience mod, credit tiers) consumed as inputs",
+      "status": "supported",
+      "detected_by": "inputs sheet",
+      "message": "Declare an inputs row; the plan consumes the value.",
+      "instead": null
+    },
+    {
+      "id": "prior_premium_capping",
+      "label": "Premium capping vs prior term",
+      "status": "supported",
+      "detected_by": "inputs + final_adjustments/chains",
+      "message": "Supported when prior premium is declared as an input.",
+      "instead": null
+    },
+    {
+      "id": "workbook_pinned_plan_id",
+      "label": "The workbook's rating_plan_id becomes the built plan's id",
+      "status": "supported",
+      "detected_by": "plan sheet: rating_plan_id (required since v1.0)",
+      "message": "The same workbook produces the same plan id on any machine. Building against a taken id refuses: identical bytes = ingest_already_built (409); different bytes = ingest_plan_id_taken (409) pointing at the re-ingest door — never a silent duplicate.",
+      "instead": null
+    },
+    {
+      "id": "derived_input",
+      "label": "Platform-computed inputs (inputs.derived_from)",
+      "status": "supported",
+      "detected_by": "inputs: derived_from column (spec §4.2)",
+      "message": "derived_from = sum(<input>,<input>,…) over ≥2 declared numeric non-derived inputs makes the input platform-computed: never row-supplied (required=false, no default — R-046), usable as a lookup axis only (R-047; the value exists inside the rating graph, not on the row). div(…) is recognized and named-deferred to class_conditional_exposure.",
+      "instead": null
+    },
+    {
+      "id": "coverage_election",
+      "label": "Coverage election (optional coverages skip, not withhold)",
+      "status": "supported",
+      "detected_by": "plan: coverages entries with a trailing `?` (spec §4.1)",
+      "message": "A coverage marked electable (`building?`) elects OUT on an EXPLICIT 0 exposure: its tower's nodes skip and it contributes $0 with a 'not elected' trace line. Absence still withholds — you can't tell 'didn't buy' from 'didn't fill in'. An explicit 0 on a REQUIRED coverage prices the arithmetic ($0 tower) and warns. R-048: at least one coverage stays required; an electable coverage needs an exposure stage.",
+      "instead": null
+    }
+  ]
+}

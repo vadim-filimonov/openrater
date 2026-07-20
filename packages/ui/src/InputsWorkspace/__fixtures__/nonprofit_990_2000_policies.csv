@@ -1,0 +1,2001 @@
+acct_id,name,ntee_major,revenue,state,subsection_type,employee_count,total_expenses,occupancy_expense
+NP-0001,Riverside Youth Foundation,youth_development,98265,CA,501c3,0,96031,2901
+NP-0002,Faith Learning Center,education,437700,NY,501c3,19,367598,46237
+NP-0003,Foundation Social Services,human_services,16294238,IL,501c3,92,12535862,2145940
+NP-0004,Phoenix Neighborhood Coalition,community_improvement,17701506,CO,501c3,80,17550516,3074821
+NP-0005,Phoenix Community Services,human_services,55229,CA,501c3,4,57328,4661
+NP-0006,Cedar Wellness Network,mental_health,3718057,FL,501c3,17,3563969,436853
+NP-0007,Riverside Research Society,diseases,429467,AK,501c3,12,462793,24688
+NP-0008,Capital Awareness Campaign,diseases,438196,CA,501c4,12,372399,59665
+NP-0009,Pinewood Scholarship Fund,education,445825,TX,501c3,20,386399,54568
+NP-0010,New Transitional Housing,housing_shelter,30242,MN,501c3,1,23065,6486
+NP-0011,Bayside Wellness Foundation,health_care,560058,WA,501c6,19,553578,66106
+NP-0012,Saint Scholarship Fund,education,762451,CA,501c3,7,588064,133474
+NP-0013,Heritage Scouts Council,youth_development,454112,TX,501c3,18,481310,40249
+NP-0014,International Tech Initiative,science_tech,23591,OR,501c3,2,19986,903
+NP-0015,Willow Tutoring Initiative,education,89753,MI,501c3,1,76995,17590
+NP-0016,Golden Community Clinic,health_care,235679,WY,501c3,2,179777,12775
+NP-0017,Central Trail Conservancy,recreation,7208,CA,501c3,2,7259,1235
+NP-0018,First Green Initiative,environment,373907,TX,501c6,9,370308,19760
+NP-0019,Willow Mental Health Initiative,mental_health,8224,GA,501c3,0,8142,44
+NP-0020,Bright Habitat,housing_shelter,119761,TX,501c3,1,126351,13793
+NP-0021,Faith Religious Society,religion,40913,KS,501c3,0,44605,6112
+NP-0022,Hope Hospital Volunteers,health_care,245691,AL,501c3,3,193599,22981
+NP-0023,Community Community Services,human_services,20623,CA,501c3,1,20947,2996
+NP-0024,Lighthouse Scholarship Fund,education,249336,CA,501c3,1,244590,33372
+NP-0025,Valley Habitat,housing_shelter,625140,NM,501c3,10,552835,118776
+NP-0026,Southside Theater Company,arts_culture,22617,TN,501c3,0,21184,8238
+NP-0027,First Community Clinic,health_care,92858,NC,501c3,2,90790,21947
+NP-0028,Eastview Hospital Volunteers,health_care,34232,AR,501c3,1,32868,6053
+NP-0029,Eastview Pantry,food_agriculture,18879,NV,501c3,2,15418,862
+NP-0030,Phoenix Helpline,human_services,7465,WA,501c3,2,7147,256
+NP-0031,Children Safety Coalition,public_safety,110458,GA,501c3,4,88356,4676
+NP-0032,National Temple,religion,60649,MN,501c6,5,65994,6515
+NP-0033,Riverside Justice Fund,civil_rights,630111,GA,501c3,10,560959,47828
+NP-0034,Sunrise Wildlife Sanctuary,animal,64915,KY,501c3,1,62962,4117
+NP-0035,Eastview Counseling Center,mental_health,2388943,NJ,501c3,11,2255353,122858
+NP-0036,Riverside Tutoring Initiative,education,89728,NC,501c3,5,83438,7897
+NP-0037,Crescent Justice Initiative,crime_legal,992968,NJ,501c3,8,758622,108937
+NP-0038,Willow Aid Society,human_services,424821,TX,501c4,15,377853,41007
+NP-0039,Liberty Helpline,human_services,43648,OH,501c3,0,32739,626
+NP-0040,Central Youth Foundation,youth_development,768002,PA,501c3,17,766459,90866
+NP-0041,Southside Wellness Foundation,health_care,12696,IN,501c3,1,10027,696
+NP-0042,Mountainview Youth Foundation,youth_development,3414538,SC,501c3,32,3309366,266191
+NP-0043,Golden Policy Institute,social_science,614735,CT,501c4,7,657515,52711
+NP-0044,Greater Civic Engagement Coalition,public_societal,239233,TX,501c3,5,238635,32768
+NP-0045,Saint Innovation Hub,science_tech,141722,GA,501c4,3,113638,8456
+NP-0046,Community Advocacy Network,civil_rights,55077,VA,501c3,3,45007,7554
+NP-0047,Harvest Educational Trust,education,77188,OH,501c3,1,64309,7052
+NP-0048,Pioneer Voter Education Network,public_societal,4211136,MA,501c3,56,3952354,277233
+NP-0049,Central Affordable Housing Initiative,housing_shelter,3047782,CO,501c3,36,2581862,660323
+NP-0050,Community Aid Society,human_services,22922215,OR,501c4,53,24278964,2511357
+NP-0051,Harvest Schools Foundation,education,155485,MI,501c3,2,143967,16427
+NP-0052,Lakeshore Neighborhood Coalition,community_improvement,16467,MI,501c3,0,15502,955
+NP-0053,Phoenix Land Trust,environment,46936,CA,501c3,0,53812,601
+NP-0054,Northern Mentoring Network,youth_development,585860,NH,501c3,11,442403,39507
+NP-0055,Foundation Disease Foundation,diseases,828855,WI,501c3,9,749696,109438
+NP-0056,Harvest Improvement Trust,community_improvement,423413,WA,501c3,13,372395,22242
+NP-0057,Westgate Scholarship Fund,education,3966667,HI,501c3,27,3557144,964275
+NP-0058,Unity Neighborhood Coalition,community_improvement,170358,VA,501c3,1,159612,18021
+NP-0059,Crescent World Mission,international,229579,WA,501c3,4,181923,28867
+NP-0060,Southern STEM Foundation,science_tech,11260,MO,501c3,0,10972,426
+NP-0061,Golden Scouts Council,youth_development,12261,MI,501c3,0,10823,226
+NP-0062,Heritage Crime Victims Fund,crime_legal,642038,MN,501c3,11,497021,34098
+NP-0063,Bayside Land Trust,environment,449283,CO,501c3,18,448845,58368
+NP-0064,International Wellness Network,mental_health,26491,PA,501c3,3,26090,1196
+NP-0065,Sunrise Educational Trust,education,189314,CA,501c3,0,177616,27553
+NP-0066,Harvest Transitional Housing,housing_shelter,43443,MA,501c3,2,34738,11617
+NP-0067,Hope Recreation Association,recreation,216056,AZ,501c3,1,209885,58462
+NP-0068,Unity Ministry,religion,582343,FL,501c3,9,445499,58701
+NP-0069,Family Parks Foundation,recreation,868567,PA,501c3,16,691974,155791
+NP-0070,National Justice Initiative,crime_legal,4467142,VA,501c3,26,3498596,298911
+NP-0071,Liberty Justice Initiative,crime_legal,171367,MI,501c3,2,131282,5960
+NP-0072,Westgate Youth Foundation,youth_development,951158,CA,501c3,20,904586,115823
+NP-0073,Community Cross-Border Initiative,international,172917,FL,501c3,0,169759,4251
+NP-0074,International Counseling Center,mental_health,2383296,IL,501c3,60,2298476,341819
+NP-0075,Willow Employment Coalition,employment,18561864,PA,501c3,40,18137348,1477333
+NP-0076,Southern Wellness Network,mental_health,606723,MN,501c3,10,567610,50099
+NP-0077,Heritage Educational Trust,education,60379,MT,501c3,1,50211,5732
+NP-0078,United Synagogue,religion,2224156,IN,501c3,73,2159153,544361
+NP-0079,Harvest Job Training Center,employment,445636,TX,501c3,6,457946,55615
+NP-0080,Unity Faith Center,religion,69566,NJ,501c3,4,68383,25014
+NP-0081,Children Community Garden,food_agriculture,184352,IL,501c3,4,207189,14002
+NP-0082,Lighthouse Theater Company,arts_culture,2619331,MN,501c3,27,1983891,656633
+NP-0083,Mountainview Charitable Trust,philanthropy,369780,IA,501c3,2,358871,40148
+NP-0084,Pioneer Agricultural Coalition,food_agriculture,840701,ME,501c3,4,912357,111915
+NP-0085,Northside Youth Foundation,youth_development,411863,UT,501c3,4,365273,26559
+NP-0086,Family Legal Aid Society,crime_legal,2860922,TX,501c3,29,2847107,101616
+NP-0087,Greater Community Clinic,health_care,398354,OH,501c3,7,305056,89298
+NP-0088,Bayside Transitional Housing,housing_shelter,370473,MA,501c3,10,368600,88756
+NP-0089,Pioneer Educational Trust,education,417493,NC,501c3,15,406154,46101
+NP-0090,Silver Tutoring Initiative,education,95827,OH,501c3,1,111717,10051
+NP-0091,Northside Advocacy Network,civil_rights,936647,MT,501c4,11,900591,118234
+NP-0092,Hillcrest Mentoring Network,youth_development,469765,MD,501c3,6,467496,50528
+NP-0093,Phoenix Cultural Center,arts_culture,2370359,OH,501c3,61,1840422,620612
+NP-0094,Senior Habitat,housing_shelter,4960210,NY,501c3,69,5602627,1791226
+NP-0095,Phoenix Food Bank,food_agriculture,94323,CA,501c3,3,112878,11936
+NP-0096,Northside Improvement Trust,community_improvement,168724,CA,501c3,2,184588,12092
+NP-0097,Capital Museum,arts_culture,1928481,UT,501c3,16,1876823,598452
+NP-0098,Phoenix Tutoring Initiative,education,8896356,CA,501c3,89,7628708,1136324
+NP-0099,Greater Religious Society,religion,440473,MO,501c3,6,469320,154213
+NP-0100,Bright Ministry,religion,79143,NY,501c3,5,79929,24194
+NP-0101,Hope Therapy Coalition,mental_health,39900,OH,501c3,0,35028,1937
+NP-0102,Mountainview Humane Society,animal,23160,TX,501c3,0,21398,380
+NP-0103,Eagle Community Clinic,health_care,459325,SD,501c_other,7,424089,35074
+NP-0104,Holy Recreation Association,recreation,38794,CA,501c3,1,37778,12934
+NP-0105,United Job Training Center,employment,976447,FL,501c3,18,857972,32943
+NP-0106,Lighthouse Justice Initiative,crime_legal,121178,TX,501c3,1,93941,12713
+NP-0107,Children Patient Support Network,diseases,362774,MA,501c3,5,346710,39384
+NP-0108,Eastview Justice Initiative,crime_legal,2672395,AR,501c3,61,2580537,180394
+NP-0109,Golden Community Church,religion,7797,MO,501c3,0,6999,2678
+NP-0110,Hope Sports League,recreation,36586,WA,501c3,2,41791,13710
+NP-0111,Heritage Scouts Council,youth_development,93039,IL,501c3,2,96296,9001
+NP-0112,Lakeshore Parks Foundation,recreation,23681086,LA,501c3,53,23275939,7294753
+NP-0113,Saint Health Center,health_care,147554,SC,501c6,4,143133,11564
+NP-0114,Community Academy,education,141263,VA,501c3,1,139686,23099
+NP-0115,International Scholarship Fund,education,19519,MN,501c3,1,16364,2042
+NP-0116,Foundation Academy,education,755135,GA,501c3,18,719093,97452
+NP-0117,Pinewood Museum,arts_culture,33372,PA,501c3,0,28348,7648
+NP-0118,New Habitat,housing_shelter,685685,NY,501c3,4,616025,158301
+NP-0119,Senior Giving Foundation,philanthropy,718991,MA,501c3,11,542242,49590
+NP-0120,Hillcrest Civic League,community_improvement,2020543,KS,501c3,63,1972450,260959
+NP-0121,Capital Animal Rescue,animal,389094,SC,501c3,18,352225,28066
+NP-0122,International Pet Adoption Center,animal,449285,TX,501c3,4,406409,40118
+NP-0123,Hillcrest Social Services,human_services,15845068,UT,501c3,201,12100201,1316170
+NP-0124,Community Trail Conservancy,recreation,109858,IL,501c3,0,110700,39469
+NP-0125,Hope Community Garden,food_agriculture,2886319,WA,501c3,32,2439302,138841
+NP-0126,Open Scholarship Fund,education,764528,NV,501c3,7,681595,189753
+NP-0127,Crescent Youth Foundation,youth_development,188700,OH,501c4,3,165334,13238
+NP-0128,Eagle Disaster Relief,public_safety,4801476,OH,501c3,27,4160708,225532
+NP-0129,Pinewood Ministry,religion,495891,MO,501c3,4,409276,167362
+NP-0130,Oakland Social Services,human_services,1391970,WV,501c_other,62,1049052,93350
+NP-0131,National Faith Center,religion,27528,MI,501c3,0,26850,7210
+NP-0132,Cedar Gallery,arts_culture,37344,IL,501c3,0,33182,10733
+NP-0133,Southside Justice Initiative,crime_legal,79111,GA,501c3,2,78255,4594
+NP-0134,Pioneer Faith Center,religion,47226,AL,501c4,2,54128,8714
+NP-0135,First Transitional Housing,housing_shelter,1580485,NH,501c3,40,1337277,334057
+NP-0136,Unity Philanthropic Society,philanthropy,83643,PA,501c3,0,78564,928
+NP-0137,Eastern Ministry,religion,201231,GA,501c3,5,152057,76316
+NP-0138,Community Counseling Center,mental_health,2981619,TX,501c3,25,2902473,309616
+NP-0139,Hope Community Clinic,health_care,776704,OR,501c3,15,627281,85616
+NP-0140,Mountainview Research Foundation,medical_research,41378,AL,501c3,1,35298,2442
+NP-0141,Family Legal Aid Society,crime_legal,122443,AZ,501c3,2,115179,11667
+NP-0142,Central Disease Foundation,diseases,13511090,MI,501c3,48,10315878,796277
+NP-0143,Southern Justice Fund,civil_rights,22891,CO,501c3,0,22696,783
+NP-0144,Riverside Scouts Council,youth_development,739955,LA,501c3,3,561449,39910
+NP-0145,Children Community Church,religion,316404,NJ,501c_other,3,303607,65524
+NP-0146,Sacred Giving Foundation,philanthropy,204863,IL,501c3,3,212783,30083
+NP-0147,Valley Counseling Center,mental_health,18910,AL,501c3,0,18742,515
+NP-0148,Eagle Scholarship Fund,education,361703,IN,501c3,7,349975,21149
+NP-0149,Lakeshore Trust,unknown_unclassified,1314745,NY,501c_other,59,1196706,146632
+NP-0150,Foundation Donor Network,philanthropy,32733,MD,501c3,1,27056,3210
+NP-0151,Southside Family Services,human_services,800900,WV,501c3,6,664432,86454
+NP-0152,Greater Theater Company,arts_culture,1493925,FL,501c3,41,1471817,245558
+NP-0153,Northern Social Services,human_services,27426,DC,501c3,0,28646,120
+NP-0154,Family Social Services,human_services,69657,WI,501c3,4,69403,7420
+NP-0155,Golden Housing Coalition,housing_shelter,41188,TX,501c3,0,39888,14049
+NP-0156,Valley Youth Foundation,youth_development,21061335,CA,501c3,250,20875299,818234
+NP-0157,Hope Workforce Development,employment,4272659,MD,501c3,31,4086591,386007
+NP-0158,Community Homeless Shelter,housing_shelter,1945690,PA,501c3,52,2241220,360369
+NP-0159,Lighthouse Land Trust,environment,411068,ID,501c3,19,360998,41524
+NP-0160,Children Scholarship Fund,education,247749,TN,501c4,0,249761,59387
+NP-0161,Hillcrest Wellness Foundation,health_care,257939,FL,501c3,17,272011,46011
+NP-0162,Mountainview Wildlife Sanctuary,animal,115705,LA,501c3,0,97526,1968
+NP-0163,New Charitable Trust,philanthropy,204521,PA,501c_other,0,176364,3263
+NP-0164,Valley Hospital Volunteers,health_care,75175,NY,501c3,4,70855,17324
+NP-0165,Beacon Helpline,human_services,20663716,FL,501c3,295,21691467,843201
+NP-0166,Bright Workforce Development,employment,14219,NY,501c3,0,15149,334
+NP-0167,Willow Philanthropic Society,philanthropy,900480,GA,501c4,14,747503,88637
+NP-0168,Crescent Disaster Relief,public_safety,646654,CA,501c3,5,497494,48359
+NP-0169,New Global Relief,international,261876,FL,501c3,3,213850,22743
+NP-0170,Crescent Mentoring Network,youth_development,292598,NJ,501c3,14,394382,19284
+NP-0171,Southern Family Services,human_services,128732,PA,501c3,5,127423,15066
+NP-0172,Saint Trail Conservancy,recreation,24410377,NY,501c3,156,23902059,3689716
+NP-0173,Southern Learning Center,education,1460935,MD,501c3,32,1187358,117292
+NP-0174,Central Research Foundation,medical_research,4086325,SC,501c6,15,3987984,397625
+NP-0175,Senior Homeless Shelter,housing_shelter,2435823,PA,501c3,53,2419704,741035
+NP-0176,Sacred Scouts Council,youth_development,308947,FL,501c3,11,304388,34858
+NP-0177,Beacon Agricultural Coalition,food_agriculture,650884,WA,501c6,5,636017,89490
+NP-0178,Oakland Synagogue,religion,96801,LA,501c3,0,103150,31383
+NP-0179,Open Neighborhood Coalition,community_improvement,57158,NY,501c3,2,54993,10515
+NP-0180,Harvest Mentoring Network,youth_development,552714,CA,501c3,6,475373,78204
+NP-0181,Western Food Bank,food_agriculture,115509,FL,501c7,5,99895,10883
+NP-0182,Bayside Public Interest Forum,public_societal,26190,FL,501c4,3,22237,3729
+NP-0183,Pinewood Cultural Center,arts_culture,14548304,WA,501c3,272,16793544,3610506
+NP-0184,Bayside Meal Program,food_agriculture,40037,FL,501c3,1,38063,2820
+NP-0185,Maple Community Services,human_services,356296,FL,501c3,15,273402,39303
+NP-0186,Faith Agricultural Coalition,food_agriculture,217109,NE,501c3,3,245375,25346
+NP-0187,Children Social Services,human_services,35053,MO,501c3,0,34918,1556
+NP-0188,Foundation Social Services,human_services,157894,TN,501c6,1,123257,18904
+NP-0189,Family Medical Research Institute,medical_research,424088,VA,501c3,8,417309,43043
+NP-0190,Bright Housing Coalition,housing_shelter,1470637,VA,501c3,15,1603419,236253
+NP-0191,Hope Educational Trust,education,875871,OK,501c3,20,814365,121830
+NP-0192,National Learning Center,education,426362,GA,501c3,11,413484,90939
+NP-0193,Harvest Parks Foundation,recreation,6974,CA,501c3,2,6532,763
+NP-0194,Pioneer Justice Fund,civil_rights,360195,SC,501c8,13,459787,48393
+NP-0195,Northside Academy,education,36395,NH,501c4,0,46535,2746
+NP-0196,Mountainview World Mission,international,722365,RI,501c3,19,574954,61599
+NP-0197,Sunrise Conservancy,environment,18737,IA,501c3,1,22276,1103
+NP-0198,Children Recreation Association,recreation,2026489,NC,501c3,13,1614843,334736
+NP-0199,Southside Schools Foundation,education,3416381,VT,501c3,48,3377526,730000
+NP-0200,Saint STEM Foundation,science_tech,172129,SD,501c3,0,204484,7845
+NP-0201,Pioneer Search and Rescue,public_safety,349917,CA,501c3,18,291573,16763
+NP-0202,Harvest Global Relief,international,96371,MI,501c3,0,73388,1988
+NP-0203,Westgate Awareness Campaign,diseases,19738,NY,501c3,2,17663,1043
+NP-0204,Crescent Social Services,human_services,49959,AZ,501c4,1,48003,2751
+NP-0205,Beacon Synagogue,religion,8936478,CA,501c6,285,9558122,2780411
+NP-0206,First Safety Coalition,public_safety,344177,SC,501c3,11,293432,30863
+NP-0207,Lighthouse Cross-Border Initiative,international,52996,PA,501c3,2,41293,3248
+NP-0208,International Wellness Foundation,health_care,314416,FL,501c3,17,313527,36947
+NP-0209,Bright Ministry,religion,36540,TN,501c3,0,35605,13705
+NP-0210,Eastern Synagogue,religion,6589,VA,501c3,1,6052,1116
+NP-0211,Harvest Arts Council,arts_culture,424785,NJ,501c3,17,403879,110301
+NP-0212,First Arts Council,arts_culture,82913,WI,501c3,4,82109,30920
+NP-0213,Silver Housing Coalition,housing_shelter,73228,NY,501c3,1,60384,16242
+NP-0214,Hope Foundation,unknown_unclassified,3741966,FL,501c3,12,3090313,360441
+NP-0215,Riverside Community Services,human_services,336840,CA,501c3,20,403326,46273
+NP-0216,Central Conservancy,environment,112205,IA,501c4,5,108167,10677
+NP-0217,Cedar Watershed Alliance,environment,59449,OK,501c3,3,57660,2332
+NP-0218,Western Humane Society,animal,2391375,OR,501c3,57,2288539,355399
+NP-0219,Children Homeless Shelter,housing_shelter,119927,MT,501c3,1,119656,26265
+NP-0220,Pioneer Arts Council,arts_culture,193273,NY,501c_other,2,152134,53297
+NP-0221,Valley Equity Initiative,civil_rights,13780,PA,501c3,0,13527,509
+NP-0222,Holy Educational Trust,education,170717,CA,501c3,0,142752,27553
+NP-0223,Children Academy,education,455635,CA,501c3,12,456197,60491
+NP-0224,Sacred Community Services,human_services,84151,WA,501c_other,0,65449,1267
+NP-0225,Greater Learning Center,education,120164,NC,501c3,1,140843,17923
+NP-0226,Capital Employment Coalition,employment,199585,TX,501c3,4,163050,25518
+NP-0227,Saint Educational Trust,education,70590,PA,501c6,0,57448,13904
+NP-0228,Maple Ministry,religion,75751,AL,501c3,1,84839,30238
+NP-0229,Family Justice Fund,civil_rights,1879329,CA,501c3,64,1863475,71976
+NP-0230,United Helpline,human_services,60101,TX,501c3,3,57318,8948
+NP-0231,Bright Disease Foundation,diseases,785026,NJ,501c6,3,759886,107909
+NP-0232,International Schools Foundation,education,45076,NY,501c3,0,52637,5856
+NP-0233,Phoenix Religious Society,religion,83467,GA,501c3,3,82163,13881
+NP-0234,Western Pantry,food_agriculture,25804,MD,501c3,0,24103,110
+NP-0235,Sunrise Therapy Coalition,mental_health,341304,IL,501c3,17,305261,28769
+NP-0236,Maple Cultural Center,arts_culture,128668,WI,501c3,3,121820,22281
+NP-0237,National Scholarship Fund,education,76545,WA,501c7,2,67471,9883
+NP-0238,First Tech Initiative,science_tech,12038,NC,501c3,0,11922,37
+NP-0239,Beacon Counseling Center,mental_health,756630,FL,501c3,18,856006,57985
+NP-0240,Valley Counseling Center,mental_health,3961129,OK,501c3,46,4194902,438311
+NP-0241,Saint Animal Rescue,animal,37729,TX,501c3,0,31192,350
+NP-0242,Willow Safety Coalition,public_safety,79556,MI,501c3,2,87128,7013
+NP-0243,International Synagogue,religion,717910,NJ,501c3,16,550302,78437
+NP-0244,Silver Health Center,health_care,39985,NY,501c3,1,38976,6084
+NP-0245,Liberty Health Center,health_care,448386,VA,501c_other,3,435861,42017
+NP-0246,Heritage Community Services,human_services,1135184,IN,501c3,65,1047139,45904
+NP-0247,Oakland Conservancy,environment,3559623,CO,501c3,62,2768842,195047
+NP-0248,Northern Recreation Association,recreation,48070,VA,501c3,0,47955,12225
+NP-0249,Eastern Schools Foundation,education,14087,MN,501c3,2,13005,1407
+NP-0250,Children Community Foundation,community_improvement,170442,MN,501c3,2,130405,35608
+NP-0251,Western Medical Research Institute,medical_research,2907131,MN,501c3,70,2181786,357275
+NP-0252,Sacred Social Services,human_services,116601,NC,501c3,3,110027,15039
+NP-0253,Saint Wellness Foundation,health_care,40903,NY,501c3,1,44020,2420
+NP-0254,Cedar Theater Company,arts_culture,212145,NM,501c3,1,202936,62582
+NP-0255,International Learning Center,education,840216,IL,501c3,7,735290,164008
+NP-0256,Southern Justice Initiative,crime_legal,55107,CA,501c3,0,48824,25
+NP-0257,Phoenix Civic League,community_improvement,27320,ND,501c3,0,24893,1929
+NP-0258,Unity Schools Foundation,education,47188,SC,501c3,0,35470,8494
+NP-0259,Lighthouse Aid Society,human_services,215968,TN,501c3,4,166315,25979
+NP-0260,Children Counseling Center,mental_health,92245,GA,501c3,0,90400,2802
+NP-0261,Family Donor Network,philanthropy,383568,IN,501c3,8,370057,14018
+NP-0262,Silver Affordable Housing Initiative,housing_shelter,388487,TX,501c3,2,463617,54230
+NP-0263,Hope Wellness Network,mental_health,7449199,MD,501c3,48,7081876,416329
+NP-0264,Hillcrest Habitat,housing_shelter,205454,TN,501c3,0,179404,37647
+NP-0265,Sunrise Homeless Shelter,housing_shelter,352427,FL,501c3,20,349511,107249
+NP-0266,Central Community Services,human_services,7825,CO,501c3,2,6826,286
+NP-0267,Pinewood Tutoring Initiative,education,36360,WI,501c3,1,35852,3032
+NP-0268,Eastern Civil Rights Coalition,civil_rights,515391,NY,501c4,12,529408,19412
+NP-0269,Northern Habitat,housing_shelter,1699951,NJ,501c3,55,1537887,626058
+NP-0270,Riverside Pet Adoption Center,animal,2025723,NJ,501c3,13,1674454,97255
+NP-0271,Northside Humane Society,animal,55104,NY,501c4,2,48748,2001
+NP-0272,Silver Temple,religion,70361,CA,501c3,1,66870,11271
+NP-0273,Bright Social Services,human_services,11557288,NY,501c3,165,10823163,379879
+NP-0274,Southside Mentoring Network,youth_development,198638,MO,501c3,4,189738,18588
+NP-0275,Southern Homeless Shelter,housing_shelter,548772,CA,501c_other,3,598012,140445
+NP-0276,Pinewood Workforce Development,employment,417042,MN,501c3,14,360142,34279
+NP-0277,Children Hospital Volunteers,health_care,185524,OK,501c6,1,141914,16797
+NP-0278,Eastview Academy,education,57912,TX,501c3,2,64905,6466
+NP-0279,Eastern Learning Center,education,816304,LA,501c3,3,752072,65030
+NP-0280,Southside Community Church,religion,61394,OH,501c3,0,51597,19917
+NP-0281,Capital Food Bank,food_agriculture,12283,LA,501c3,0,12740,387
+NP-0282,Senior Sports League,recreation,7112,NY,501c3,0,7044,907
+NP-0283,Eagle Learning Center,education,2816789,NE,501c3,58,2328205,381203
+NP-0284,Golden Voter Education Network,public_societal,45123,NY,501c3,1,36505,3584
+NP-0285,Pioneer Tutoring Initiative,education,42229,NY,501c3,0,55266,2276
+NP-0286,Northside Counseling Center,mental_health,3107190,VA,501c3,49,2442136,212113
+NP-0287,First Policy Institute,social_science,22764799,SC,501c3,223,22764350,3343638
+NP-0288,Maple Community Services,human_services,1234497,NY,501c3,36,1233426,94575
+NP-0289,Willow Pet Adoption Center,animal,107394,PA,501c3,3,92737,5053
+NP-0290,Willow Search and Rescue,public_safety,24715,FL,501c3,0,18539,1134
+NP-0291,Heritage Therapy Coalition,mental_health,1249795,FL,501c3,10,1113491,58738
+NP-0292,Liberty Ministry,religion,126484,OH,501c6,1,119549,40437
+NP-0293,Western Ministry,religion,16973078,IN,501c3,154,16815613,3624010
+NP-0294,Maple Hospital Volunteers,health_care,800330,FL,501c3,14,862021,130851
+NP-0295,Valley Community Clinic,health_care,277291,LA,501c3,17,249303,27063
+NP-0296,Sunrise Scouts Council,youth_development,882355,NH,501c3,12,708568,52892
+NP-0297,Bright Wellness Foundation,health_care,210009,TX,501c3,5,220364,26407
+NP-0298,Bayside Academy,education,430134,MI,501c3,9,328941,94264
+NP-0299,Crescent Hospital Volunteers,health_care,37303,ID,501c3,0,35003,9161
+NP-0300,Willow Member Cooperative,mutual_membership,143253,AR,501c3,2,108974,9989
+NP-0301,Sacred Community Services,human_services,68449,WI,501c3,1,56715,6568
+NP-0302,Bayside Arts Council,arts_culture,3621821,CA,501c3,69,2735007,547799
+NP-0303,Phoenix Pantry,food_agriculture,169469,TX,501c3,0,133368,7503
+NP-0304,Central Job Training Center,employment,67600,NY,501c3,2,60116,2812
+NP-0305,United Neighborhood Coalition,community_improvement,53996,GA,501c3,4,56256,8482
+NP-0306,Greater Pantry,food_agriculture,763245,CA,501c4,20,824338,84952
+NP-0307,Liberty Learning Center,education,12109853,MN,501c3,138,10107791,2999077
+NP-0308,Valley Society,unknown_unclassified,97651,TN,501c3,5,80817,7585
+NP-0309,Silver Transitional Housing,housing_shelter,808059,MS,501c3,18,772202,117081
+NP-0310,Eastview Trail Conservancy,recreation,28309,NH,501c3,1,30800,10286
+NP-0311,Crescent Community Services,human_services,38204,WA,501c3,0,37618,74
+NP-0312,Southern Gallery,arts_culture,188569,MI,501c3,4,151999,46668
+NP-0313,Willow Educational Trust,education,19868324,IA,501c3,204,16557358,3558634
+NP-0314,Hillcrest Watershed Alliance,environment,954656,KY,501c3,13,1003846,46851
+NP-0315,Riverside Research Foundation,medical_research,295544,AL,501c3,8,301476,10910
+NP-0316,Phoenix Museum,arts_culture,221692,IL,501c3,2,211980,24201
+NP-0317,Southern Recreation Association,recreation,341687,FL,501c4,13,317392,110941
+NP-0318,Harvest Hospital Volunteers,health_care,306182,OH,501c3,9,301247,31786
+NP-0319,Senior Theater Company,arts_culture,9335,AL,501c3,1,8872,1640
+NP-0320,Open Helpline,human_services,4571811,WI,501c3,52,3628380,302916
+NP-0321,Northern Disease Foundation,diseases,942123,TX,501c3,13,922987,60221
+NP-0322,Mountainview Meal Program,food_agriculture,172583,IL,501c3,1,171654,11365
+NP-0323,Capital Justice Fund,civil_rights,3516722,NV,501c3,59,3460587,409887
+NP-0324,Eastern Trust,unknown_unclassified,109258,NY,501c3,2,148940,7776
+NP-0325,Golden Community Services,human_services,2503645,TN,501c3,72,1962851,272681
+NP-0326,Northside Medical Auxiliary,health_care,793093,MI,501c3,7,943748,143460
+NP-0327,Hope Humane Society,animal,2558949,IA,501c3,41,2490338,112936
+NP-0328,Willow Agricultural Coalition,food_agriculture,777787,FL,501c3,11,718807,37406
+NP-0329,Maple Research Foundation,medical_research,182938,WA,501c4,4,140160,12790
+NP-0330,Community Boys & Girls Club,youth_development,588397,CA,501c3,20,573380,71565
+NP-0331,Faith Scouts Council,youth_development,17861964,TN,501c3,42,14108859,1335577
+NP-0332,Holy World Mission,international,13153,VA,501c3,0,13563,67
+NP-0333,Pinewood Schools Foundation,education,97699,KY,501c3,2,81747,18304
+NP-0334,Lakeshore Group,unknown_unclassified,38218,MI,501c3,0,36191,403
+NP-0335,Hope Habitat,housing_shelter,696708,TX,501c3,10,683579,193808
+NP-0336,Northern Family Services,human_services,199681,CA,501c3,0,177790,2051
+NP-0337,Greater Health Center,health_care,89690,IN,501c3,3,83386,13661
+NP-0338,Harvest Medical Auxiliary,health_care,453937,AL,501c3,10,498110,55191
+NP-0339,Heritage Scholarship Fund,education,752006,VA,501c4,12,565922,50986
+NP-0340,Bayside Social Services,human_services,439677,TX,501c3,5,468007,37289
+NP-0341,International Food Bank,food_agriculture,14521,TX,501c3,0,14104,84
+NP-0342,Crescent Music Society,arts_culture,214744,TX,501c3,5,192542,45479
+NP-0343,Heritage Learning Center,education,3893660,OH,501c3,69,3825296,815261
+NP-0344,Greater Aid Society,human_services,38632,CA,501c6,2,33369,3190
+NP-0345,Unity Civil Rights Coalition,civil_rights,4050427,AZ,501c3,24,3433241,552928
+NP-0346,Open Tutoring Initiative,education,3201245,IN,501c3,36,3735803,376658
+NP-0347,Greater Family Services,human_services,72659,CA,501c3,3,69566,9385
+NP-0348,Westgate Arts Council,arts_culture,229980,NM,501c3,4,195098,39618
+NP-0349,Sacred Affordable Housing Initiative,housing_shelter,1330639,WA,501c3,66,1150479,168200
+NP-0350,Foundation Hospital Volunteers,health_care,18219,DE,501c3,0,17308,1242
+NP-0351,New Scouts Council,youth_development,369592,AR,501c3,12,281205,20974
+NP-0352,Crescent Sports League,recreation,437672,AZ,501c3,16,394720,72882
+NP-0353,Eastern Improvement Trust,community_improvement,434050,NH,501c3,5,339787,33894
+NP-0354,First Educational Trust,education,2647927,AZ,501c3,35,2399774,511996
+NP-0355,Faith Cultural Center,arts_culture,39762,TN,501c3,0,38776,15473
+NP-0356,Maple Community Services,human_services,492318,WA,501c3,18,490107,55640
+NP-0357,Beacon Schools Foundation,education,200837,IN,501c3,1,197749,20012
+NP-0358,Golden Ministry,religion,234294,NC,501c3,1,232662,73465
+NP-0359,Holy Wildlife Sanctuary,animal,982969,FL,501c3,6,1145167,142529
+NP-0360,Liberty Family Services,human_services,497116,MN,501c3,15,494477,46762
+NP-0361,Eastview Housing Coalition,housing_shelter,604806,CA,501c3,10,579432,112484
+NP-0362,National Neighborhood Coalition,community_improvement,516937,MO,501c3,13,522234,115590
+NP-0363,Harvest Social Services,human_services,918812,WA,501c3,11,875029,69636
+NP-0364,International Faith Center,religion,79036,CA,501c3,4,84605,23259
+NP-0365,Maple Volunteer Fire,public_safety,14870966,AZ,501c3,269,13183583,779791
+NP-0366,Riverside Patient Support Network,diseases,44136,GA,501c3,2,37218,6289
+NP-0367,Family Ministry,religion,471024,MA,501c3,11,407216,97702
+NP-0368,Oakland Medical Auxiliary,health_care,21552,FL,501c3,0,17902,2583
+NP-0369,Central Medical Auxiliary,health_care,374480,PA,501c7,19,411221,19383
+NP-0370,Eastview Employment Coalition,employment,260453,NV,501c3,12,236814,11357
+NP-0371,Willow Social Services,human_services,769646,CA,501c3,18,583984,106052
+NP-0372,Oakland Affordable Housing Initiative,housing_shelter,23051439,WV,501c3,43,22141807,6658508
+NP-0373,Mountainview Community Foundation,community_improvement,4109552,FL,501c3,63,4097172,819354
+NP-0374,Pioneer Job Training Center,employment,13254,IL,501c3,1,12742,808
+NP-0375,Lighthouse Youth Foundation,youth_development,780407,NC,501c3,2,765514,94207
+NP-0376,Beacon Family Services,human_services,47474,CA,501c6,0,42871,1038
+NP-0377,Family Agricultural Coalition,food_agriculture,243058,VA,501c3,1,234527,33162
+NP-0378,Hillcrest Synagogue,religion,26368,CA,501c4,0,25757,10127
+NP-0379,Heritage Global Relief,international,234362,NV,501c3,0,204686,2961
+NP-0380,Eastview Family Services,human_services,787756,WA,501c3,16,751249,87127
+NP-0381,Unity Wildlife Fund,environment,161481,MA,501c7,0,160674,2565
+NP-0382,Family Boys & Girls Club,youth_development,345549,PA,501c3,12,385931,23354
+NP-0383,Golden Family Services,human_services,186917,TN,501c3,4,153598,12459
+NP-0384,Sunrise Academy,education,1587209,AZ,501c3,33,1471766,103632
+NP-0385,Bright Giving Foundation,philanthropy,451641,TN,501c3,20,342041,27673
+NP-0386,Phoenix Helpline,human_services,3472964,TX,501c3,45,2952799,141927
+NP-0387,Central Music Society,arts_culture,10564786,NY,501c7,111,8302115,4063359
+NP-0388,Open Social Services,human_services,81958,MI,501c3,1,65304,9034
+NP-0389,National Research Society,diseases,15619,KS,501c4,0,18170,213
+NP-0390,Eagle Sports League,recreation,120404,WA,501c3,2,112150,30692
+NP-0391,Oakland Pantry,food_agriculture,286429,MI,501c3,16,219237,30710
+NP-0392,United Land Trust,environment,32547,IL,501c3,0,25148,1098
+NP-0393,Silver Parks Foundation,recreation,58381,IN,501c3,2,51136,6524
+NP-0394,Community Music Society,arts_culture,23911435,NY,501c3,49,25652126,8282705
+NP-0395,Central Employment Coalition,employment,38460,VT,501c3,1,38114,1993
+NP-0396,Holy Wellness Foundation,health_care,118046,CO,501c3,1,91097,10679
+NP-0397,Community Improvement Trust,community_improvement,3515801,AZ,501c3,12,3702641,704835
+NP-0398,Northside Aid Society,human_services,19139,NV,501c3,1,14520,1790
+NP-0399,Northside Community Foundation,community_improvement,899265,OH,501c3,20,698528,130778
+NP-0400,Pioneer Community Clinic,health_care,48237,IA,501c3,1,41218,7426
+NP-0401,Greater Social Services,human_services,46350,PA,501c3,1,39732,4531
+NP-0402,Hillcrest Group,unknown_unclassified,396161,OH,501c3,17,341418,34882
+NP-0403,Cedar Counseling Center,mental_health,3765232,WI,501c3,23,3661047,428925
+NP-0404,Community Land Trust,environment,432729,OH,501c3,3,408026,13256
+NP-0405,Greater Meal Program,food_agriculture,74303,AZ,501c3,0,61438,3657
+NP-0406,Senior Hospital Volunteers,health_care,591892,NH,501c3,17,467796,107355
+NP-0407,Cedar Health Center,health_care,310731,CA,501c3,7,300783,56243
+NP-0408,Bayside Group,unknown_unclassified,152510,SC,501c3,2,145407,6225
+NP-0409,Maple Voter Education Network,public_societal,89738,IL,501c7,5,74553,2742
+NP-0410,Silver Homeless Shelter,housing_shelter,130673,WA,501c3,4,155188,44944
+NP-0411,Lighthouse Family Services,human_services,897134,NH,501c3,12,1028012,76513
+NP-0412,Bright Food Bank,food_agriculture,615543,NY,501c3,9,640929,44547
+NP-0413,Silver Social Services,human_services,189651,NY,501c3,0,217654,3352
+NP-0414,Willow Land Trust,environment,49153,MN,501c6,0,48840,508
+NP-0415,Bright Community Foundation,community_improvement,27571,IL,501c3,1,27038,5592
+NP-0416,Westgate Giving Foundation,philanthropy,4695128,OH,501c3,43,4445717,656946
+NP-0417,Children Animal Rescue,animal,750777,MA,501c3,19,615230,100039
+NP-0418,Greater Job Training Center,employment,50551,TX,501c3,0,43787,822
+NP-0419,International Wildlife Fund,environment,16512406,NY,501c3,227,13784367,1325800
+NP-0420,Golden Wellness Network,mental_health,400966,OH,501c3,9,429868,50718
+NP-0421,Saint Philanthropic Society,philanthropy,747981,FL,501c3,2,635723,111798
+NP-0422,United Community Foundation,community_improvement,354438,PA,501c3,5,337780,75411
+NP-0423,Northern Employment Coalition,employment,494277,IL,501c3,10,411412,35652
+NP-0424,Community Green Initiative,environment,34326,MA,501c3,0,33446,1264
+NP-0425,Sunrise Youth Foundation,youth_development,3686789,MI,501c7,51,3216583,289681
+NP-0426,Phoenix Tutoring Initiative,education,67529,NY,501c3,2,62635,13924
+NP-0427,National Recreation Association,recreation,25756,NH,501c3,0,20613,8323
+NP-0428,Community Conservancy,environment,2984685,OH,501c3,14,2475505,363533
+NP-0429,Pinewood Hospital Volunteers,health_care,2297594,TX,501c3,37,1853779,402759
+NP-0430,Golden Improvement Trust,community_improvement,2363993,CA,501c3,68,2184754,560199
+NP-0431,Eagle Educational Trust,education,369680,WV,501c3,20,324563,57949
+NP-0432,Pinewood Disaster Relief,public_safety,168106,LA,501c3,0,143674,6373
+NP-0433,Family Health Center,health_care,225060,VA,501c3,1,222786,38125
+NP-0434,Eastview Volunteer Fire,public_safety,165508,FL,501c4,0,160457,3131
+NP-0435,Harvest Crime Victims Fund,crime_legal,4387214,NY,501c3,42,3942286,557426
+NP-0436,Lakeshore Donor Network,philanthropy,411934,FL,501c3,16,360257,21640
+NP-0437,Faith Museum,arts_culture,33820,VA,501c3,0,25420,4297
+NP-0438,Mountainview Humane Society,animal,197359,GA,501c3,2,190749,25898
+NP-0439,Southside Wellness Foundation,health_care,33194,OH,501c3,2,33598,6759
+NP-0440,Pioneer Equity Initiative,civil_rights,20100,NC,501c3,1,17752,1105
+NP-0441,Phoenix Community Church,religion,788138,TX,501c3,18,666958,149465
+NP-0442,Family Donor Network,philanthropy,335069,FL,501c3,2,269804,14862
+NP-0443,Greater Theater Company,arts_culture,140630,CA,501c3,1,109907,17919
+NP-0444,Golden Ministry,religion,10043,WY,501c3,1,9604,1705
+NP-0445,Eastern Cross-Border Initiative,international,47585,LA,501c3,0,45802,93
+NP-0446,Foundation Parks Foundation,recreation,392506,VA,501c3,13,331149,141419
+NP-0447,Lakeshore Scholarship Fund,education,74059,TX,501c3,2,72229,14569
+NP-0448,Children Donor Network,philanthropy,845133,SC,501c3,19,861179,94643
+NP-0449,Riverside Boys & Girls Club,youth_development,42144,PA,501c3,1,39512,2167
+NP-0450,Phoenix Learning Center,education,351868,FL,501c3,17,313254,35604
+NP-0451,Phoenix Mentoring Network,youth_development,82204,CA,501c6,5,86051,8768
+NP-0452,Oakland Community Foundation,community_improvement,388679,AL,501c3,3,385461,25492
+NP-0453,Harvest Tutoring Initiative,education,46524,NY,501c3,0,44613,9297
+NP-0454,Crescent Tutoring Initiative,education,211955,TN,501c3,4,166613,27620
+NP-0455,Saint Educational Trust,education,182615,DC,501c3,2,249994,24190
+NP-0456,Unity Improvement Trust,community_improvement,348320,PA,501c3,19,357170,84408
+NP-0457,Valley Arts Council,arts_culture,9426,CA,501c3,3,7635,1570
+NP-0458,Eastview Equity Initiative,civil_rights,3144428,WV,501c3,27,2647840,153236
+NP-0459,Family STEM Foundation,science_tech,87387,NY,501c3,1,93803,10209
+NP-0460,Silver Educational Trust,education,487936,KY,501c3,5,470867,95712
+NP-0461,Capital Scholarship Fund,education,213850,CA,501c3,1,232450,20389
+NP-0462,Northside Synagogue,religion,22182,TN,501c3,0,17300,5561
+NP-0463,Crescent Arts Council,arts_culture,232311,CO,501c3,0,210769,33546
+NP-0464,Golden Pantry,food_agriculture,76117,MN,501c3,2,72807,3515
+NP-0465,Valley Meal Program,food_agriculture,442850,IN,501c3,18,338483,54564
+NP-0466,Eagle Scholarship Fund,education,184079,MD,501c3,1,181959,15435
+NP-0467,Heritage Community Foundation,community_improvement,161207,LA,501c3,0,145335,35554
+NP-0468,United Humane Society,animal,2206638,TN,501c3,9,2009929,146993
+NP-0469,Southern Health Center,health_care,446701,CO,501c3,10,390688,110987
+NP-0470,Capital Disease Foundation,diseases,53939,NV,501c3,1,52908,1961
+NP-0471,Northside Educational Trust,education,2510868,IN,501c3,21,2318741,451660
+NP-0472,Eastern Habitat,housing_shelter,239345,WI,501c4,0,225788,64193
+NP-0473,Holy Theater Company,arts_culture,141157,KS,501c3,0,136607,26918
+NP-0474,Crescent Improvement Trust,community_improvement,4417764,TN,501c4,11,5278837,420202
+NP-0475,Foundation Social Services,human_services,12631216,CA,501c3,253,9859293,1850024
+NP-0476,Open Workforce Development,employment,429319,TX,501c3,8,442584,49206
+NP-0477,Heritage Crime Victims Fund,crime_legal,398070,MS,501c3,7,342924,57255
+NP-0478,Saint Medical Auxiliary,health_care,961442,UT,501c3,15,1086751,191444
+NP-0479,Lakeshore Schools Foundation,education,13744,FL,501c3,1,13466,1321
+NP-0480,Cedar Learning Center,education,2966136,SC,501c3,55,2454453,429405
+NP-0481,Oakland Humane Society,animal,4985419,GA,501c7,60,4408445,270907
+NP-0482,Children Conservancy,environment,430319,ID,501c3,12,468513,34987
+NP-0483,Open Youth Foundation,youth_development,249929,KY,501c3,2,231223,31098
+NP-0484,International Employment Coalition,employment,22404772,KY,501c3,242,24733191,1713690
+NP-0485,Hope Ministry,religion,4245036,FL,501c3,44,3542450,1205336
+NP-0486,Pinewood Affordable Housing Initiative,housing_shelter,231244,TX,501c3,0,230525,71416
+NP-0487,Capital Science Lab,medical_research,436812,NC,501c3,8,440751,30091
+NP-0488,Holy Neighborhood Coalition,community_improvement,39725,WI,501c3,1,35413,7761
+NP-0489,Hope Awareness Campaign,diseases,3371843,OH,501c3,27,2626400,412372
+NP-0490,Eastview Health Center,health_care,61842,CO,501c7,0,48890,10792
+NP-0491,Community Employment Coalition,employment,21169,CT,501c3,0,20614,434
+NP-0492,Riverside Boys & Girls Club,youth_development,396158,NY,501c3,8,308865,42940
+NP-0493,Greater Donor Network,philanthropy,55747,MD,501c3,0,43797,1873
+NP-0494,Golden Community Church,religion,14807,MN,501c3,0,16021,4849
+NP-0495,Silver Hospital Volunteers,health_care,84540,TX,501c3,1,66939,5210
+NP-0496,Silver Fraternal Association,mutual_membership,3964557,MI,501c3,44,3645646,242469
+NP-0497,Eastern Therapy Coalition,mental_health,415637,TX,501c3,17,326682,42864
+NP-0498,Crescent Temple,religion,280913,CA,501c3,8,280898,62984
+NP-0499,Children Recreation Association,recreation,68456,TN,501c3,1,55453,18140
+NP-0500,United Educational Trust,education,257632,IL,501c3,7,236188,60403
+NP-0501,National Community Foundation,community_improvement,483847,IN,501c3,19,506223,102978
+NP-0502,Family Civic League,community_improvement,85119,PA,501c3,0,82274,19852
+NP-0503,Foundation Academy,education,198367,TX,501c3,2,209693,25373
+NP-0504,Hillcrest Donor Network,philanthropy,52072,MN,501c3,1,48187,3884
+NP-0505,Holy Housing Coalition,housing_shelter,11622,FL,501c3,2,8774,2845
+NP-0506,Open Land Trust,environment,453301,KS,501c3,12,419013,58320
+NP-0507,Community Wildlife Fund,environment,1485851,CA,501c3,8,1127472,195797
+NP-0508,Valley Pantry,food_agriculture,331914,CA,501c3,2,320498,45490
+NP-0509,Golden Watershed Alliance,environment,130841,NY,501c3,1,101125,18971
+NP-0510,Crescent Scholarship Fund,education,96160,VA,501c3,4,92175,10796
+NP-0511,Foundation Employment Coalition,employment,555536,TX,501c3,14,464035,28597
+NP-0512,International Mentoring Network,youth_development,187118,MO,501c3,4,184038,17592
+NP-0513,United Parks Foundation,recreation,550993,CA,501c3,16,484258,181799
+NP-0514,Valley Religious Society,religion,73819,TX,501c4,1,72583,24849
+NP-0515,Beacon Food Bank,food_agriculture,144774,CA,501c3,1,125220,13167
+NP-0516,United Wellness Foundation,health_care,355071,IN,501c3,20,310394,56665
+NP-0517,Central Academy,education,214125,FL,501c3,2,190320,18118
+NP-0518,Beacon Family Services,human_services,44532,WI,501c3,0,44135,392
+NP-0519,Pinewood Youth Foundation,youth_development,2373249,MO,501c3,71,2261882,133171
+NP-0520,Silver World Mission,international,90342,IN,501c3,2,80070,6142
+NP-0521,Bayside Public Interest Forum,public_societal,1374498,NE,501c3,9,1340851,181043
+NP-0522,Liberty Wellness Network,mental_health,930311,VA,501c3,13,750241,31390
+NP-0523,Phoenix Mentoring Network,youth_development,155369,WI,501c3,3,122375,11831
+NP-0524,Pinewood Academy,education,27350,DC,501c3,1,25352,4966
+NP-0525,Unity Educational Trust,education,3916679,LA,501c3,62,3809830,528065
+NP-0526,Silver Therapy Coalition,mental_health,471984,FL,501c3,9,454738,66638
+NP-0527,International Theater Company,arts_culture,226230,CA,501c3,5,202710,58349
+NP-0528,Bright Meal Program,food_agriculture,20481,CA,501c4,1,20141,2295
+NP-0529,Harvest Medical Auxiliary,health_care,745822,CA,501c3,16,629359,146750
+NP-0530,United Faith Center,religion,24583,LA,501c3,1,24046,2911
+NP-0531,Family Schools Foundation,education,3618575,CA,501c_other,11,2773645,546836
+NP-0532,Unity Medical Auxiliary,health_care,98590,AZ,501c3,0,85611,7909
+NP-0533,Mountainview Improvement Trust,community_improvement,238251,NY,501c3,4,182709,18825
+NP-0534,Capital World Mission,international,880632,GA,501c3,7,789814,62885
+NP-0535,Northern Cross-Border Initiative,international,179001,TX,501c3,2,213413,10389
+NP-0536,First Meal Program,food_agriculture,19706,TX,501c4,0,16869,941
+NP-0537,Capital Mentoring Network,youth_development,4600204,ID,501c3,42,3695884,192257
+NP-0538,Valley Meal Program,food_agriculture,903962,MD,501c3,8,800497,134858
+NP-0539,Willow Arts Council,arts_culture,237694,CA,501c3,0,188701,43970
+NP-0540,Heritage Arts Council,arts_culture,469010,CA,501c6,8,545837,146529
+NP-0541,New Charitable Trust,philanthropy,3374264,TX,501c3,31,3608995,203806
+NP-0542,Pioneer Scouts Council,youth_development,184778,KS,501c3,1,178100,6926
+NP-0543,Sacred Foundation,unknown_unclassified,27274,NY,501c3,0,28938,243
+NP-0544,Silver Tutoring Initiative,education,489235,SC,501c3,16,467299,31596
+NP-0545,Crescent Wellness Foundation,health_care,45982,NC,501c4,0,38077,3693
+NP-0546,Northside Recreation Association,recreation,214309,NJ,501c6,1,212297,25937
+NP-0547,Saint Disease Foundation,diseases,42540,MO,501c3,2,37706,3321
+NP-0548,Pioneer Mental Health Initiative,mental_health,4189571,OK,501c3,45,4017090,145460
+NP-0549,Riverside Community Clinic,health_care,755067,OH,501c3,4,788137,66365
+NP-0550,Lakeshore Arts Council,arts_culture,241702,WY,501c3,2,227922,83032
+NP-0551,Bright Mental Health Initiative,mental_health,155490,IL,501c3,4,151279,17316
+NP-0552,Southern Community Services,human_services,756321,NY,501c3,2,706104,26846
+NP-0553,First Arts Council,arts_culture,1408073,TN,501c4,66,1396481,167824
+NP-0554,Valley Habitat,housing_shelter,2787660,LA,501c3,51,3061461,846108
+NP-0555,Heritage Temple,religion,4326509,MA,501c3,35,4238482,868118
+NP-0556,Saint Scholarship Fund,education,364992,GA,501c3,9,366477,25547
+NP-0557,Harvest Awareness Campaign,diseases,5236,TX,501c4,0,4609,232
+NP-0558,Maple Aid Society,human_services,358011,FL,501c3,9,415670,12356
+NP-0559,First Scouts Council,youth_development,77445,CA,501c3,0,59903,2053
+NP-0560,United Giving Foundation,philanthropy,154554,ND,501c3,1,140539,17345
+NP-0561,International Educational Trust,education,324727,MD,501c3,8,265256,68527
+NP-0562,Lighthouse Cultural Center,arts_culture,25952,CO,501c6,0,24109,8211
+NP-0563,Pioneer Community Clinic,health_care,128870,FL,501c3,1,115667,28863
+NP-0564,Western Learning Center,education,156666,MA,501c3,5,129635,12107
+NP-0565,Harvest Boys & Girls Club,youth_development,47682,RI,501c3,1,36821,4094
+NP-0566,Northside International Aid,international,45905,FL,501c3,3,48558,4422
+NP-0567,Southside Medical Research Institute,medical_research,81030,VA,501c3,4,72603,9589
+NP-0568,United Hospital Volunteers,health_care,289051,MA,501c4,20,301126,17009
+NP-0569,Faith Gallery,arts_culture,930593,VA,501c3,5,742708,248976
+NP-0570,New Helpline,human_services,92443,ID,501c3,5,81701,4568
+NP-0571,Eastern International Aid,international,958332,CA,501c3,14,885796,100833
+NP-0572,Silver Donor Network,philanthropy,108575,CA,501c4,1,106935,11237
+NP-0573,Heritage Improvement Trust,community_improvement,528737,CA,501c4,18,617282,120338
+NP-0574,Crescent Mental Health Initiative,mental_health,43310,AZ,501c3,1,42819,2018
+NP-0575,Westgate Safety Coalition,public_safety,956723,IN,501c3,8,945284,65493
+NP-0576,Bayside Wellness Foundation,health_care,238066,CA,501c3,4,203875,51202
+NP-0577,Beacon Boys & Girls Club,youth_development,4946319,LA,501c6,16,4584227,200212
+NP-0578,Lakeshore Medical Auxiliary,health_care,95683,ID,501c3,0,75671,23004
+NP-0579,Senior Medical Research Institute,medical_research,210134,MD,501c6,1,202690,7891
+NP-0580,Golden Improvement Trust,community_improvement,421903,NJ,501c3,12,372612,65830
+NP-0581,Mountainview Job Training Center,employment,67039,WA,501c4,1,54142,8813
+NP-0582,Central Community Clinic,health_care,42541,ID,501c3,0,50365,8022
+NP-0583,Central Schools Foundation,education,365576,TX,501c_other,10,289181,69981
+NP-0584,Children Synagogue,religion,22906086,TX,501c3,194,17293752,8688751
+NP-0585,Bayside Faith Center,religion,23325604,NM,501c3,299,20785218,5648836
+NP-0586,Golden Family Services,human_services,2420545,LA,501c3,22,2408463,113113
+NP-0587,Family Medical Auxiliary,health_care,124243,OH,501c3,1,119243,19293
+NP-0588,Holy Conservancy,environment,545810,CA,501c3,18,462897,55880
+NP-0589,Unity Civic Engagement Coalition,public_societal,2550340,IL,501c3,57,2057946,184039
+NP-0590,Western Educational Trust,education,19847982,CO,501c3,187,17775855,4555999
+NP-0591,Lighthouse Educational Trust,education,81104,MA,501c3,5,66268,19191
+NP-0592,Pioneer Schools Foundation,education,245703,GA,501c4,2,244657,22076
+NP-0593,Faith Search and Rescue,public_safety,2274709,CA,501c3,71,2213684,75567
+NP-0594,Heritage Medical Auxiliary,health_care,175415,ID,501c3,1,155692,17357
+NP-0595,Southern Habitat,housing_shelter,225956,ME,501c3,2,240145,54864
+NP-0596,Cedar Disease Foundation,diseases,88119,CO,501c3,0,81568,596
+NP-0597,Saint Community Clinic,health_care,175984,GA,501c4,1,167860,15620
+NP-0598,Southern World Mission,international,182892,MA,501c3,4,176500,20530
+NP-0599,Cedar Academy,education,21979,MA,501c3,0,21332,5147
+NP-0600,Senior Humane Society,animal,792896,NJ,501c3,18,849393,90605
+NP-0601,Foundation Science Lab,medical_research,25569,MS,501c3,0,21030,1044
+NP-0602,Pinewood Global Relief,international,8886,IL,501c3,0,9012,100
+NP-0603,First Academy,education,540755,CA,501c3,2,534193,31635
+NP-0604,Heritage Neighborhood Coalition,community_improvement,33290,NJ,501c3,0,25035,2307
+NP-0605,Cedar Parks Foundation,recreation,9769,FL,501c3,2,11672,1996
+NP-0606,International Transitional Housing,housing_shelter,777263,CA,501c3,8,775874,117780
+NP-0607,First Music Society,arts_culture,4570597,CO,501c6,68,3966711,1059920
+NP-0608,Open Neighborhood Coalition,community_improvement,356844,DE,501c3,5,344609,51093
+NP-0609,National Homeless Shelter,housing_shelter,543121,IL,501c3,12,449137,128765
+NP-0610,Northern Social Services,human_services,212187,OR,501c3,0,194832,5046
+NP-0611,Southern Watershed Alliance,environment,39354,DC,501c3,1,37620,3045
+NP-0612,Heritage Synagogue,religion,36918,CO,501c4,3,32081,14663
+NP-0613,Beacon Civic League,community_improvement,805092,CO,501c3,20,730941,143923
+NP-0614,Northside Pantry,food_agriculture,173109,AZ,501c3,0,134062,4235
+NP-0615,Greater Cultural Center,arts_culture,107012,CO,501c3,5,94795,15604
+NP-0616,Eastview Scholarship Fund,education,915619,CA,501c3,16,807959,135557
+NP-0617,Pioneer Wellness Network,mental_health,6060270,CT,501c3,260,6132468,509146
+NP-0618,Sacred Workforce Development,employment,2271061,CA,501c3,29,1764381,263185
+NP-0619,Eastview Trail Conservancy,recreation,373160,MI,501c3,17,357418,43555
+NP-0620,Phoenix Sports League,recreation,649127,OH,501c3,12,563502,89877
+NP-0621,Hope Neighborhood Coalition,community_improvement,349765,MA,501c3,5,331713,46303
+NP-0622,Riverside Wellness Foundation,health_care,1274727,IN,501c3,47,999329,201003
+NP-0623,Pioneer Social Services,human_services,105348,GA,501c3,3,105273,7935
+NP-0624,Greater Sports League,recreation,676143,LA,501c3,17,610544,136487
+NP-0625,Hope Therapy Coalition,mental_health,4301544,NC,501c3,17,4532035,277375
+NP-0626,Senior Group,unknown_unclassified,548212,OH,501c3,20,448090,20871
+NP-0627,Willow Community Garden,food_agriculture,329127,FL,501c3,18,343375,31199
+NP-0628,Sacred Medical Research Institute,medical_research,594686,TN,501c3,2,580301,31152
+NP-0629,Silver Family Services,human_services,91807,KY,501c6,2,90747,7532
+NP-0630,Sunrise Housing Coalition,housing_shelter,47456,OH,501c3,1,49402,16991
+NP-0631,Southside Philanthropic Society,philanthropy,47506,NY,501c3,1,36708,2519
+NP-0632,Senior Agricultural Coalition,food_agriculture,259700,WA,501c3,8,201861,15843
+NP-0633,Hillcrest Family Services,human_services,21302151,FL,501c3,50,19796112,1441486
+NP-0634,Heritage Social Science Forum,social_science,273673,GA,501c3,14,320860,12826
+NP-0635,Heritage Social Services,human_services,4983223,NM,501c3,75,4619014,291863
+NP-0636,Westgate Wellness Foundation,health_care,623699,MA,501c3,15,481098,57892
+NP-0637,Westgate Medical Research Institute,medical_research,433400,CT,501c3,5,361783,48509
+NP-0638,Family Mental Health Initiative,mental_health,24851,WI,501c3,0,24601,67
+NP-0639,Faith Wellness Foundation,health_care,973514,OH,501c3,5,776159,134812
+NP-0640,Unity Ministry,religion,4173695,KS,501c3,38,3847659,617991
+NP-0641,Harvest Medical Auxiliary,health_care,643674,LA,501c3,4,704211,92829
+NP-0642,Golden Social Services,human_services,3929646,IA,501c3,41,3223768,401821
+NP-0643,Saint Job Training Center,employment,415191,CA,501c3,16,397256,32417
+NP-0644,Valley Wellness Foundation,health_care,451223,CA,501c3,6,482165,94092
+NP-0645,Maple Community Garden,food_agriculture,933464,CO,501c3,12,896063,74434
+NP-0646,New Tech Initiative,science_tech,51505,WV,501c4,5,50543,7149
+NP-0647,Silver Health Center,health_care,407389,OK,501c3,10,383600,34230
+NP-0648,Family Theater Company,arts_culture,4469769,VA,501c3,71,3990219,702483
+NP-0649,Harvest Community Clinic,health_care,3516929,NJ,501c3,35,4419349,652171
+NP-0650,Community Medical Research Institute,medical_research,90480,TX,501c3,2,78408,9741
+NP-0651,First Meal Program,food_agriculture,155631,IA,501c8,3,153577,9454
+NP-0652,Beacon Gallery,arts_culture,3543318,IL,501c3,13,3015039,759266
+NP-0653,Pinewood Counseling Center,mental_health,318233,ME,501c3,7,297886,43072
+NP-0654,Phoenix Wellness Foundation,health_care,26447,VA,501c3,3,24983,2808
+NP-0655,Sacred Community Clinic,health_care,638285,IA,501c3,18,592669,72195
+NP-0656,Eastern Safety Coalition,public_safety,149524,KS,501c3,0,113215,1945
+NP-0657,Western Crime Victims Fund,crime_legal,16682,WY,501c6,3,16229,725
+NP-0658,Oakland Scholarship Fund,education,30514,CA,501c3,1,32232,5572
+NP-0659,Bayside Foundation,unknown_unclassified,27517,CA,501c3,0,21156,452
+NP-0660,New Research Society,diseases,1644981,MA,501c7,11,1507032,179540
+NP-0661,Senior Parks Foundation,recreation,499271,CA,501c7,16,447501,159914
+NP-0662,Eastview Land Trust,environment,114558,CA,501c3,3,99717,4709
+NP-0663,Capital Animal Rescue,animal,11823,SC,501c3,0,11400,444
+NP-0664,Willow Educational Trust,education,2300659,MI,501c3,24,1769718,284111
+NP-0665,Liberty Workforce Development,employment,273651,OH,501c3,15,290449,22464
+NP-0666,Community Theater Company,arts_culture,94973,IL,501c3,3,109478,27937
+NP-0667,Silver Food Bank,food_agriculture,58374,CA,501c3,3,46683,4747
+NP-0668,Eagle Disaster Relief,public_safety,358270,MS,501c3,5,320315,45693
+NP-0669,Harvest Sports League,recreation,742681,SC,501c3,7,736847,84351
+NP-0670,Community Hospital Volunteers,health_care,169487,CO,501c3,1,183215,15629
+NP-0671,Central Hospital Volunteers,health_care,17941,MD,501c3,0,15167,3379
+NP-0672,Willow Family Services,human_services,431052,PA,501c3,14,434829,19920
+NP-0673,Family Neighborhood Coalition,community_improvement,20765,MO,501c3,1,20179,3638
+NP-0674,United Academy,education,130528,SC,501c3,0,116237,31688
+NP-0675,Eastern Giving Foundation,philanthropy,468585,MA,501c3,14,352176,49505
+NP-0676,Western Faith Center,religion,395307,OK,501c3,11,328079,100410
+NP-0677,Capital Religious Society,religion,53978,NV,501c3,2,43893,6426
+NP-0678,Eagle STEM Foundation,science_tech,367525,TX,501c3,15,296813,19502
+NP-0679,Northern Wildlife Sanctuary,animal,222805,FL,501c4,0,198803,10692
+NP-0680,Foundation Improvement Trust,community_improvement,324044,LA,501c3,4,309933,29130
+NP-0681,Northern Learning Center,education,63725,GA,501c_other,2,81042,6510
+NP-0682,Sacred Schools Foundation,education,2416562,CT,501c3,63,1921983,392440
+NP-0683,Foundation Foundation,unknown_unclassified,792040,AL,501c3,10,859633,106801
+NP-0684,First Helpline,human_services,129079,KS,501c3,5,126559,17168
+NP-0685,Holy Museum,arts_culture,4820951,TX,501c3,54,3897375,1120655
+NP-0686,Faith Community Services,human_services,136116,TX,501c3,0,128483,5235
+NP-0687,Mountainview Improvement Trust,community_improvement,33716,MI,501c3,0,32638,6169
+NP-0688,Lakeshore Improvement Trust,community_improvement,4766758,TX,501c3,66,5489472,888713
+NP-0689,Hope Educational Trust,education,1355585,CA,501c3,51,1282910,112330
+NP-0690,Southern World Mission,international,1242471,IN,501c3,74,1418815,169341
+NP-0691,Capital Community Services,human_services,4775748,PA,501c3,75,4572029,374765
+NP-0692,Hillcrest Science Foundation,science_tech,190505,TN,501c3,4,184832,10225
+NP-0693,Golden Theater Company,arts_culture,566063,IL,501c3,18,711419,72368
+NP-0694,Holy Habitat,housing_shelter,22692,MN,501c3,1,20532,7214
+NP-0695,Silver Family Services,human_services,282456,OR,501c3,3,281627,23683
+NP-0696,Eastern Employment Coalition,employment,23978293,DE,501c3,159,19348254,2977497
+NP-0697,Mountainview Aid Society,human_services,71485,WI,501c3,2,64744,6041
+NP-0698,Lighthouse Improvement Trust,community_improvement,2997550,CA,501c3,35,2469558,465372
+NP-0699,Eastern Giving Foundation,philanthropy,21426272,MA,501c3,253,21735552,969643
+NP-0700,Heritage Scholarship Fund,education,31967,WI,501c3,0,24977,5172
+NP-0701,Sacred Charitable Trust,philanthropy,84260,TX,501c3,0,79895,1277
+NP-0702,Heritage Civic League,community_improvement,14999,TX,501c3,2,13706,2216
+NP-0703,Foundation Learning Center,education,79646,CA,501c3,5,77556,15451
+NP-0704,Greater Cross-Border Initiative,international,217722,NJ,501c3,0,207808,6801
+NP-0705,Silver Research Society,diseases,19519,NV,501c3,1,19388,2242
+NP-0706,International Trail Conservancy,recreation,45273,TX,501c3,1,45176,11613
+NP-0707,Lighthouse Affordable Housing Initiative,housing_shelter,254973,CA,501c3,10,245351,79471
+NP-0708,Open Schools Foundation,education,378836,VA,501c3,2,297803,20764
+NP-0709,Harvest Patient Support Network,diseases,324803,CA,501c8,6,293511,15755
+NP-0710,Eastview Educational Trust,education,656250,HI,501c3,14,510885,150020
+NP-0711,Heritage Temple,religion,89125,NV,501c3,2,80255,19207
+NP-0712,Lighthouse Tutoring Initiative,education,206822,MI,501c3,2,207207,33260
+NP-0713,Mountainview Schools Foundation,education,43620,SC,501c3,0,38261,3955
+NP-0714,Greater Disaster Relief,public_safety,23627818,FL,501c3,271,21561063,3433918
+NP-0715,Saint Community Services,human_services,2146315,FL,501c3,40,2227907,154899
+NP-0716,Pinewood Sports League,recreation,795216,NJ,501c3,4,659282,108859
+NP-0717,Westgate Tech Initiative,science_tech,4707477,FL,501c3,51,4702684,541032
+NP-0718,Foundation Aid Society,human_services,16021196,PA,501c3,48,16235440,2253716
+NP-0719,Capital Gallery,arts_culture,432580,CA,501c3,17,422590,145429
+NP-0720,Eagle Educational Trust,education,852450,CA,501c3,5,777908,183697
+NP-0721,International Wildlife Fund,environment,20161,SC,501c3,0,15158,749
+NP-0722,Phoenix Family Services,human_services,3622432,WI,501c3,46,3702541,534722
+NP-0723,Holy Wellness Foundation,health_care,62850,NV,501c3,5,60056,6628
+NP-0724,Pinewood Schools Foundation,education,816131,FL,501c3,20,708102,162568
+NP-0725,Northern Faith Center,religion,643826,CT,501c4,8,645314,251699
+NP-0726,Liberty Mentoring Network,youth_development,18995,MD,501c4,1,20993,2709
+NP-0727,Unity Medical Auxiliary,health_care,111394,MD,501c3,4,89737,14928
+NP-0728,Southside Music Society,arts_culture,256651,FL,501c3,9,293193,31396
+NP-0729,Eastview Learning Center,education,20727,PA,501c3,0,18850,4912
+NP-0730,Unity Academy,education,15931,NY,501c3,1,12180,2708
+NP-0731,Hope Mentoring Network,youth_development,6092,MA,501c3,0,6514,238
+NP-0732,International Museum,arts_culture,26828,AZ,501c3,1,22167,3454
+NP-0733,Capital Humane Society,animal,17580,AZ,501c3,0,15365,89
+NP-0734,Pinewood Employment Coalition,employment,44502,IL,501c3,1,44147,6164
+NP-0735,Lighthouse Affordable Housing Initiative,housing_shelter,298738,IL,501c3,9,226686,41316
+NP-0736,Phoenix Habitat,housing_shelter,391857,IN,501c3,6,318083,79496
+NP-0737,Willow Habitat,housing_shelter,86664,IN,501c3,4,68384,13875
+NP-0738,New Counseling Center,mental_health,16111396,MD,501c3,211,15643114,797088
+NP-0739,Crescent Affordable Housing Initiative,housing_shelter,744599,KS,501c3,8,667843,287248
+NP-0740,Saint Watershed Alliance,environment,119328,FL,501c_other,1,114211,9886
+NP-0741,Golden Public Interest Forum,public_societal,34309,IL,501c8,0,36775,582
+NP-0742,Oakland Wildlife Fund,environment,1088054,CA,501c3,25,987390,47130
+NP-0743,Sunrise Workforce Development,employment,42266,OH,501c3,3,58172,5723
+NP-0744,Riverside Scholarship Fund,education,37392,KS,501c3,1,31256,6626
+NP-0745,Lighthouse Trail Conservancy,recreation,33099,OK,501c3,0,32888,11765
+NP-0746,Holy Wildlife Fund,environment,534012,CA,501c3,7,480750,57357
+NP-0747,Family Transitional Housing,housing_shelter,226693,MI,501c3,3,182185,49936
+NP-0748,Phoenix Social Services,human_services,161442,FL,501c4,1,149776,15912
+NP-0749,Unity Safety Coalition,public_safety,192163,TX,501c3,1,163809,13521
+NP-0750,Community Justice Initiative,crime_legal,51619,OH,501c3,0,45376,926
+NP-0751,Willow Civic League,community_improvement,985808,NJ,501c3,9,753423,56838
+NP-0752,International Watershed Alliance,environment,3866971,IL,501c3,43,3367384,179983
+NP-0753,Faith Voter Education Network,public_societal,4284677,CA,501c3,59,5065285,518174
+NP-0754,Lighthouse Helpline,human_services,1954533,AK,501c7,37,1877316,113454
+NP-0755,Unity Cross-Border Initiative,international,664141,WI,501c3,8,623220,53212
+NP-0756,Northside Giving Foundation,philanthropy,2281661,CA,501c3,9,2011899,165556
+NP-0757,Pinewood Crime Victims Fund,crime_legal,657096,MN,501c3,12,642888,22252
+NP-0758,Beacon Community Church,religion,979069,VT,501c3,20,1075034,157886
+NP-0759,Riverside Transitional Housing,housing_shelter,368367,FL,501c3,11,283960,97938
+NP-0760,Hope Agricultural Coalition,food_agriculture,14523339,FL,501c3,145,12808335,557660
+NP-0761,Pioneer Housing Coalition,housing_shelter,141165,FL,501c3,5,117686,45588
+NP-0762,Holy Tutoring Initiative,education,748921,FL,501c3,7,746642,125443
+NP-0763,Silver Aid Society,human_services,27096,NY,501c3,2,26075,1882
+NP-0764,Senior Workforce Development,employment,79904,MA,501c3,1,86235,6147
+NP-0765,Riverside Medical Research Institute,medical_research,200837,FL,501c3,5,173467,15509
+NP-0766,Sacred STEM Foundation,science_tech,424760,TX,501c4,4,418864,23816
+NP-0767,Oakland Group,unknown_unclassified,8447,WA,501c_other,1,8197,420
+NP-0768,Riverside Arts Council,arts_culture,742170,CA,501c3,14,615903,117501
+NP-0769,Eastern Wellness Foundation,health_care,743398,WI,501c3,17,569821,134855
+NP-0770,Cedar Academy,education,25591,KY,501c3,1,19828,5074
+NP-0771,Southern Family Services,human_services,146645,CA,501c3,1,129782,8203
+NP-0772,Faith Community Foundation,community_improvement,970291,LA,501c3,5,787551,58686
+NP-0773,Willow Civil Rights Coalition,civil_rights,162531,SC,501c6,0,122806,118
+NP-0774,Valley Animal Rescue,animal,1704151,UT,501c3,29,1452788,217918
+NP-0775,Valley Youth Foundation,youth_development,160924,NM,501c3,1,126280,12593
+NP-0776,Children Awareness Campaign,diseases,3726066,NC,501c3,55,3454406,295594
+NP-0777,Saint Fraternal Association,mutual_membership,24099352,TX,501c3,127,18531170,1660987
+NP-0778,United Disease Foundation,diseases,30745,KS,501c3,1,31722,4064
+NP-0779,International Counseling Center,mental_health,160928,AZ,501c3,2,152988,5237
+NP-0780,Oakland Health Center,health_care,265708,CO,501c3,6,215043,21345
+NP-0781,Family Pet Adoption Center,animal,186164,CO,501c_other,0,168924,368
+NP-0782,Central Community Services,human_services,2389448,PA,501c3,51,2049817,331645
+NP-0783,Sacred Community Foundation,community_improvement,3187211,MO,501c3,49,2791858,200550
+NP-0784,Oakland Synagogue,religion,1526641,CA,501c_other,19,1312559,516874
+NP-0785,Unity Housing Coalition,housing_shelter,31472,GA,501c3,0,25171,5841
+NP-0786,National Wellness Foundation,health_care,18362867,AL,501c3,233,15393136,2773867
+NP-0787,Bright Global Relief,international,17498,KY,501c3,0,16295,262
+NP-0788,United Search and Rescue,public_safety,68561,FL,501c3,1,65379,3181
+NP-0789,National Schools Foundation,education,440144,FL,501c3,13,411595,104779
+NP-0790,International Awareness Campaign,diseases,6272,PA,501c_other,3,5873,310
+NP-0791,Liberty Ministry,religion,228089,SC,501c3,2,173699,49175
+NP-0792,Northern Community Clinic,health_care,107407,MI,501c6,3,103440,15154
+NP-0793,Beacon Hospital Volunteers,health_care,1051746,AZ,501c7,22,1033045,245452
+NP-0794,Central Religious Society,religion,1695514,CA,501c4,62,1374119,661767
+NP-0795,Mountainview Sports League,recreation,4646603,CO,501c3,19,4017092,1576407
+NP-0796,Open Cross-Border Initiative,international,61036,NM,501c3,4,46629,6931
+NP-0797,Oakland Community Services,human_services,135214,CO,501c3,0,127060,3046
+NP-0798,Community Wildlife Fund,environment,38395,MN,501c3,0,38814,1221
+NP-0799,International Academy,education,12693,TX,501c3,0,12122,789
+NP-0800,Sacred Aid Society,human_services,50475,AL,501c3,1,47568,3124
+NP-0801,Pioneer International Aid,international,679871,AZ,501c3,12,743846,74656
+NP-0802,Open Temple,religion,18166,IA,501c3,1,18418,5096
+NP-0803,Valley Community Church,religion,224570,MN,501c3,2,213376,65444
+NP-0804,Family Youth Foundation,youth_development,855430,IA,501c7,16,724469,101543
+NP-0805,Open Counseling Center,mental_health,126333,NE,501c6,3,99678,5960
+NP-0806,Central Scholarship Fund,education,787701,AL,501c3,16,661083,57609
+NP-0807,Valley Pet Adoption Center,animal,273444,FL,501c3,5,244227,13461
+NP-0808,Family Equity Initiative,civil_rights,132269,FL,501c3,3,140648,11776
+NP-0809,Pioneer Giving Foundation,philanthropy,418817,NM,501c3,12,374208,49554
+NP-0810,Silver Civic League,community_improvement,7920,FL,501c3,0,7598,1888
+NP-0811,Liberty Schools Foundation,education,662948,PA,501c3,3,636093,84611
+NP-0812,New Equity Initiative,civil_rights,46749,AL,501c6,1,38757,4422
+NP-0813,Southern Academy,education,219481,NE,501c3,0,197403,48247
+NP-0814,Pioneer Youth Foundation,youth_development,48151,PA,501c_other,1,46262,3128
+NP-0815,Children Mutual Aid Society,mutual_membership,98015,IL,501c3,5,87933,13798
+NP-0816,Northern Giving Foundation,philanthropy,4826783,CO,501c3,28,6321099,340236
+NP-0817,Beacon Foundation,unknown_unclassified,324197,MN,501c3,11,311149,43037
+NP-0818,Southern Educational Trust,education,4564360,MN,501c3,46,3572702,353793
+NP-0819,Family Community Clinic,health_care,885518,TX,501c3,2,815764,62331
+NP-0820,Holy Research Society,diseases,26845,DE,501c3,0,30011,70
+NP-0821,Maple Trail Conservancy,recreation,108911,ME,501c3,0,88276,30369
+NP-0822,Phoenix Civil Rights Coalition,civil_rights,20193,AK,501c3,2,19461,2188
+NP-0823,Westgate Tutoring Initiative,education,767255,CA,501c3,9,663365,126233
+NP-0824,Family Global Relief,international,213680,AL,501c3,1,174158,24712
+NP-0825,Eastern Science Lab,medical_research,4286130,MO,501c3,75,3659413,429327
+NP-0826,Riverside Learning Center,education,1757760,MN,501c7,31,1475545,198379
+NP-0827,Bright Parks Foundation,recreation,99353,IN,501c3,0,114317,20771
+NP-0828,Sacred Justice Initiative,crime_legal,84042,WV,501c3,5,72008,3931
+NP-0829,Mountainview Homeless Shelter,housing_shelter,305008,SD,501c3,5,290439,33862
+NP-0830,Golden Philanthropic Society,philanthropy,405132,FL,501c3,13,362925,32670
+NP-0831,Saint Medical Auxiliary,health_care,166631,IN,501c3,3,185680,15122
+NP-0832,Liberty Organization,unknown_unclassified,234067,MO,501c3,2,182735,34897
+NP-0833,Crescent Theater Company,arts_culture,28604,AZ,501c3,1,23337,3623
+NP-0834,Western Schools Foundation,education,12281,LA,501c3,0,11484,1045
+NP-0835,Cedar Sports League,recreation,249987,LA,501c3,4,245080,92237
+NP-0836,Lighthouse Synagogue,religion,913530,OH,501c3,19,908141,201703
+NP-0837,Saint Medical Auxiliary,health_care,287400,MO,501c3,14,276872,67162
+NP-0838,Westgate Aid Society,human_services,595999,NY,501c3,16,703187,53799
+NP-0839,Community Habitat,housing_shelter,91656,WI,501c6,4,104547,17764
+NP-0840,Liberty Tutoring Initiative,education,272173,NY,501c3,11,265271,61203
+NP-0841,National Habitat,housing_shelter,427412,CO,501c3,19,414706,121763
+NP-0842,Northern Helpline,human_services,98429,MO,501c3,3,108263,14114
+NP-0843,Pinewood Cultural Center,arts_culture,4203233,NC,501c3,75,4276711,883163
+NP-0844,Heritage Therapy Coalition,mental_health,28710,CA,501c3,0,28468,1221
+NP-0845,Capital Hospital Volunteers,health_care,798237,PA,501c3,14,647341,188880
+NP-0846,Eagle Community Foundation,community_improvement,377996,CA,501c3,3,330030,43738
+NP-0847,Harvest Arts Council,arts_culture,126565,AR,501c3,1,108316,46772
+NP-0848,Senior Voter Education Network,public_societal,80847,CA,501c3,1,67561,4192
+NP-0849,Heritage Learning Center,education,36591,NC,501c3,1,33909,7019
+NP-0850,Westgate Health Center,health_care,108285,TX,501c3,0,91593,19821
+NP-0851,Pioneer Medical Research Institute,medical_research,670334,WA,501c3,14,626569,87926
+NP-0852,Liberty Scholarship Fund,education,41384,TX,501c3,0,39422,8937
+NP-0853,Children Family Services,human_services,212447,NC,501c3,1,181057,12733
+NP-0854,Holy Donor Network,philanthropy,1832202,VT,501c3,68,1814791,209122
+NP-0855,Liberty Conservancy,environment,28947,CT,501c3,0,27444,1344
+NP-0856,Hope Mentoring Network,youth_development,180332,CA,501c3,3,202364,14630
+NP-0857,Faith Youth Foundation,youth_development,73004,PA,501c3,3,67822,3782
+NP-0858,Hillcrest Family Services,human_services,89749,PA,501c3,0,84334,1631
+NP-0859,Open Scholarship Fund,education,2389202,CA,501c3,54,2312912,491606
+NP-0860,Capital Mental Health Initiative,mental_health,127883,IN,501c3,0,122258,3750
+NP-0861,Bright Land Trust,environment,3596317,NC,501c3,51,3038311,436300
+NP-0862,Unity Gallery,arts_culture,99765,FL,501c3,4,109493,36760
+NP-0863,Bayside Family Services,human_services,232086,MS,501c3,3,186789,33907
+NP-0864,Unity Faith Center,religion,38025,CA,501c8,0,32423,4657
+NP-0865,Family Awareness Campaign,diseases,62062,SC,501c3,0,60796,27
+NP-0866,Southside Homeless Shelter,housing_shelter,2243039,WI,501c3,42,2150077,254997
+NP-0867,Bright Arts Council,arts_culture,2134285,TX,501c4,14,2054143,740646
+NP-0868,Greater Theater Company,arts_culture,121822,IL,501c3,5,125038,17065
+NP-0869,Children Hospital Volunteers,health_care,1919725,CA,501c3,43,1812836,302313
+NP-0870,Oakland Scholarship Fund,education,478072,MN,501c3,19,400833,54907
+NP-0871,Maple Boys & Girls Club,youth_development,213745,CT,501c3,1,215747,11068
+NP-0872,Foundation Land Trust,environment,255517,MI,501c3,11,200720,19752
+NP-0873,Faith Scholarship Fund,education,2688225,CA,501c3,20,2572267,537883
+NP-0874,Foundation Academy,education,6433,OH,501c3,0,6197,1529
+NP-0875,International Improvement Trust,community_improvement,464500,CA,501c3,12,468446,36159
+NP-0876,First Civic League,community_improvement,85620,PA,501c3,3,81865,18407
+NP-0877,Northside Tutoring Initiative,education,12350,UT,501c3,0,9626,2236
+NP-0878,Sunrise Research Society,diseases,30556,UT,501c3,3,28762,1950
+NP-0879,Northern Educational Trust,education,3535483,KS,501c4,27,3026713,600757
+NP-0880,Eastview Tutoring Initiative,education,2461235,MD,501c3,21,2091680,304756
+NP-0881,United Community Foundation,community_improvement,9918713,AL,501c3,203,8325163,2076682
+NP-0882,Liberty Educational Trust,education,35585,GA,501c3,3,29428,4051
+NP-0883,Bright Community Services,human_services,164463,GA,501c3,1,141068,14655
+NP-0884,Lakeshore Research Society,diseases,431796,MA,501c3,9,415283,13102
+NP-0885,New Search and Rescue,public_safety,16447,HI,501c6,0,17727,114
+NP-0886,Eastern Neighborhood Coalition,community_improvement,155243,WA,501c6,4,120710,37632
+NP-0887,Lakeshore Patient Support Network,diseases,127789,CA,501c7,3,117244,17182
+NP-0888,National Therapy Coalition,mental_health,463309,CA,501c3,15,364385,55238
+NP-0889,Foundation Pantry,food_agriculture,253462,WI,501c3,11,193138,27144
+NP-0890,Holy Homeless Shelter,housing_shelter,959263,CA,501c3,16,951086,360438
+NP-0891,Greater Family Services,human_services,22498671,GA,501c3,233,25030071,1246959
+NP-0892,Capital Pet Adoption Center,animal,470650,FL,501c3,4,492696,31807
+NP-0893,Crescent Community Foundation,community_improvement,301047,TX,501c3,10,230470,51370
+NP-0894,Riverside Animal Rescue,animal,50719,TX,501c3,3,43635,5406
+NP-0895,Faith Medical Auxiliary,health_care,457152,RI,501c3,17,371626,109123
+NP-0896,Harvest International Aid,international,75601,HI,501c3,3,88473,3151
+NP-0897,Northern Affordable Housing Initiative,housing_shelter,750060,SC,501c3,20,752865,111284
+NP-0898,Holy Scholarship Fund,education,64132,TN,501c7,4,63390,5272
+NP-0899,Liberty Foundation,unknown_unclassified,734608,AZ,501c3,6,603894,97492
+NP-0900,First Science Foundation,science_tech,90002,SC,501c3,2,104104,13439
+NP-0901,Cedar Academy,education,7924862,IA,501c3,295,6440881,1876696
+NP-0902,Capital Community Clinic,health_care,40097,IL,501c3,0,32125,9035
+NP-0903,Phoenix Faith Center,religion,175137,MT,501c3,1,191199,24290
+NP-0904,Greater Charitable Trust,philanthropy,765259,ID,501c3,16,707946,85637
+NP-0905,Pioneer Aid Society,human_services,8450,NY,501c3,0,7012,30
+NP-0906,Beacon Aid Society,human_services,464509,IL,501c3,16,365129,19974
+NP-0907,Riverside Watershed Alliance,environment,21317353,IL,501c3,148,20759072,1351626
+NP-0908,Family Educational Trust,education,108211,MI,501c3,5,103138,22908
+NP-0909,Beacon Community Church,religion,18858,FL,501c3,0,17993,2277
+NP-0910,Liberty Medical Auxiliary,health_care,425543,WI,501c4,10,323731,97445
+NP-0911,Liberty Temple,religion,3020082,PA,501c3,68,2738524,1176856
+NP-0912,Valley Civic Engagement Coalition,public_societal,484298,WA,501c3,8,427922,50358
+NP-0913,Valley Mutual Aid Society,mutual_membership,665945,NE,501c3,2,560547,31764
+NP-0914,Riverside Neighborhood Coalition,community_improvement,736222,MD,501c3,6,722930,121973
+NP-0915,Northern International Aid,international,815067,FL,501c3,14,645494,43148
+NP-0916,Eagle Wellness Network,mental_health,58175,OH,501c3,3,56592,4610
+NP-0917,Bayside Affordable Housing Initiative,housing_shelter,39037,SC,501c3,0,37402,9008
+NP-0918,Greater Mentoring Network,youth_development,1416180,MO,501c6,19,1430881,152883
+NP-0919,Harvest Learning Center,education,416074,MN,501c3,16,379115,76367
+NP-0920,Capital Pet Adoption Center,animal,40387,NC,501c3,3,36701,3460
+NP-0921,Southside Arts Council,arts_culture,93167,OH,501c3,1,100575,20908
+NP-0922,Cedar Social Science Forum,social_science,37268,GA,501c3,2,33475,2537
+NP-0923,Saint Organization,unknown_unclassified,46116,NY,501c8,0,43182,989
+NP-0924,Saint Faith Center,religion,364662,FL,501c4,9,331927,91631
+NP-0925,Faith Advocacy Network,civil_rights,86235,OK,501c3,0,66284,110
+NP-0926,Children Theater Company,arts_culture,17530,WI,501c6,0,17515,5089
+NP-0927,Hope Wildlife Fund,environment,33036,IN,501c3,1,34285,2023
+NP-0928,Bayside Schools Foundation,education,8470173,TX,501c3,96,7362095,604900
+NP-0929,Saint Policy Institute,social_science,154518,CA,501c3,1,116567,5999
+NP-0930,Silver Watershed Alliance,environment,368195,GA,501c4,7,276892,18940
+NP-0931,Foundation Charitable Trust,philanthropy,243257,TX,501c3,0,194824,1478
+NP-0932,Western Housing Coalition,housing_shelter,73913,NJ,501c3,0,60276,12264
+NP-0933,Beacon Community Clinic,health_care,244571,MI,501c7,3,223000,33558
+NP-0934,Family Community Clinic,health_care,705953,FL,501c3,5,697709,79290
+NP-0935,Silver Temple,religion,171217,MI,501c4,4,167855,39173
+NP-0936,Capital Research Society,diseases,26106,TN,501c3,3,21719,2674
+NP-0937,Children Research Society,diseases,148736,TX,501c3,1,131094,11101
+NP-0938,Bayside Scholarship Fund,education,221995,PA,501c3,2,176825,14040
+NP-0939,Liberty Wildlife Fund,environment,996118,FL,501c3,4,978500,111421
+NP-0940,Valley Improvement Trust,community_improvement,112266,FL,501c3,5,86985,9455
+NP-0941,Beacon Humane Society,animal,801863,CA,501c3,2,824665,105041
+NP-0942,Westgate Research Coalition,social_science,268206,KS,501c3,17,244202,31323
+NP-0943,Capital International Aid,international,90129,OH,501c3,0,85333,2223
+NP-0944,Northside Neighborhood Coalition,community_improvement,50681,NE,501c3,0,69548,9875
+NP-0945,Family Academy,education,3254683,CO,501c3,8,3862662,331774
+NP-0946,Pinewood Schools Foundation,education,199498,WV,501c3,1,155120,28356
+NP-0947,United Giving Foundation,philanthropy,18867842,MN,501c4,268,18416677,1110614
+NP-0948,Southside Ministry,religion,67289,PA,501c3,3,65112,23595
+NP-0949,Willow Aid Society,human_services,21207,CT,501c3,0,16821,867
+NP-0950,Mountainview Scholarship Fund,education,475039,FL,501c3,12,458693,66887
+NP-0951,Westgate Educational Trust,education,218602,TX,501c4,4,198054,19147
+NP-0952,New Learning Center,education,288611,PA,501c3,16,310113,28316
+NP-0953,Holy Wellness Foundation,health_care,131018,MI,501c3,5,109569,10497
+NP-0954,Foundation Homeless Shelter,housing_shelter,17534,CA,501c3,1,14181,3871
+NP-0955,Riverside Transitional Housing,housing_shelter,838870,NJ,501c3,9,941176,97259
+NP-0956,Southern Medical Auxiliary,health_care,90646,CA,501c3,3,75107,8518
+NP-0957,Southern Transitional Housing,housing_shelter,435035,FL,501c3,11,415333,109181
+NP-0958,Faith Community Garden,food_agriculture,70651,PA,501c4,3,57681,5978
+NP-0959,Sacred Crime Victims Fund,crime_legal,1716073,CA,501c8,9,1713459,171571
+NP-0960,First Food Bank,food_agriculture,652388,CA,501c3,9,511120,31047
+NP-0961,Eagle Medical Auxiliary,health_care,786111,CO,501c3,10,756770,111431
+NP-0962,Lakeshore Community Services,human_services,4783961,AR,501c3,69,4244123,561569
+NP-0963,Oakland Ministry,religion,41312,CT,501c3,0,40683,9469
+NP-0964,Open Learning Center,education,33975,KS,501c3,2,33803,4751
+NP-0965,Southern Medical Auxiliary,health_care,209391,MD,501c4,5,165024,34738
+NP-0966,Northern Neighborhood Coalition,community_improvement,457755,TX,501c3,13,432072,68565
+NP-0967,Faith Community Garden,food_agriculture,424147,TX,501c7,7,342563,53431
+NP-0968,Pinewood Theater Company,arts_culture,15021,NY,501c3,0,13771,1726
+NP-0969,Western Tech Initiative,science_tech,23815618,AL,501c3,119,27895702,1122127
+NP-0970,First Justice Initiative,crime_legal,16620,KS,501c3,0,16109,331
+NP-0971,Harvest Civic Engagement Coalition,public_societal,184536,MA,501c3,4,166734,11072
+NP-0972,Pinewood Watershed Alliance,environment,2934221,PA,501c3,31,2714695,241859
+NP-0973,Lakeshore Employment Coalition,employment,745565,PA,501c6,13,621876,59071
+NP-0974,Silver Theater Company,arts_culture,34908,SC,501c3,1,33813,9993
+NP-0975,Capital Arts Council,arts_culture,742644,OK,501c3,18,565054,86449
+NP-0976,Eastern Counseling Center,mental_health,186850,CA,501c3,4,161984,17059
+NP-0977,Saint Social Services,human_services,9576916,NJ,501c3,154,10189520,465180
+NP-0978,Open Family Services,human_services,302612,NE,501c3,5,236220,41030
+NP-0979,Maple Community Clinic,health_care,352423,TX,501c3,3,362993,51715
+NP-0980,National Neighborhood Coalition,community_improvement,950527,VA,501c3,5,833839,82659
+NP-0981,Westgate Educational Trust,education,176031,CO,501c3,1,152751,21734
+NP-0982,Lighthouse Research Society,diseases,1621455,LA,501c3,11,1255047,124416
+NP-0983,Cedar Theater Company,arts_culture,192989,IN,501c3,5,172650,35330
+NP-0984,Capital Transitional Housing,housing_shelter,3202243,CT,501c3,57,2513438,465672
+NP-0985,United Wellness Network,mental_health,99978,WI,501c3,3,100659,13069
+NP-0986,Lighthouse Temple,religion,765803,AZ,501c3,18,681222,211863
+NP-0987,Valley Parks Foundation,recreation,10215,OR,501c3,0,9959,3103
+NP-0988,Hope Fraternal Association,mutual_membership,61403,LA,501c3,3,58005,8638
+NP-0989,Southern Wellness Foundation,health_care,198126,CA,501c3,2,216423,22632
+NP-0990,Liberty Patient Support Network,diseases,33273,ND,501c3,0,31984,1234
+NP-0991,Bright Academy,education,6089,CA,501c7,2,6307,801
+NP-0992,Holy Therapy Coalition,mental_health,776905,MD,501c7,17,614916,100460
+NP-0993,Pinewood Therapy Coalition,mental_health,2840788,NV,501c3,62,2822887,279244
+NP-0994,Pioneer Tutoring Initiative,education,255909,NJ,501c3,9,263327,55181
+NP-0995,Beacon Counseling Center,mental_health,85023,IA,501c3,2,92945,7652
+NP-0996,International Volunteer Fire,public_safety,2103324,AR,501c3,11,1754763,113708
+NP-0997,Greater Tutoring Initiative,education,3782233,VA,501c3,15,2891828,906221
+NP-0998,Pinewood Civic League,community_improvement,18639,LA,501c3,1,17782,2987
+NP-0999,Lakeshore Family Services,human_services,72954,TX,501c3,1,67115,10693
+NP-1000,Southern Music Society,arts_culture,349454,AL,501c3,2,332892,115216
+NP-1001,Community Legal Aid Society,crime_legal,196392,GA,501c3,1,183354,11504
+NP-1002,Hope Humane Society,animal,797821,MN,501c4,3,959762,92849
+NP-1003,United Gallery,arts_culture,89479,NC,501c3,3,72342,25218
+NP-1004,Hillcrest Schools Foundation,education,379742,CA,501c3,13,412352,52673
+NP-1005,Harvest Justice Fund,civil_rights,320132,PA,501c3,12,312183,11678
+NP-1006,Family Community Clinic,health_care,12735502,FL,501c3,196,12232939,1585289
+NP-1007,Lighthouse Museum,arts_culture,999670,NY,501c3,5,916962,181029
+NP-1008,Northside Community Clinic,health_care,2610345,NH,501c3,71,2157496,362326
+NP-1009,International Research Society,diseases,516413,IN,501c3,19,514792,71888
+NP-1010,Liberty Ministry,religion,448509,NV,501c3,2,410766,103256
+NP-1011,Silver Ministry,religion,499685,MN,501c3,11,546554,119450
+NP-1012,Community Parks Foundation,recreation,162449,NJ,501c3,0,147815,62590
+NP-1013,Foundation Civil Rights Coalition,civil_rights,13987,PA,501c3,0,13834,566
+NP-1014,Eagle Educational Trust,education,61716,WA,501c3,1,46396,3542
+NP-1015,Unity Boys & Girls Club,youth_development,270852,WA,501c3,10,285788,39109
+NP-1016,Heritage Health Center,health_care,159616,AL,501c3,2,139438,9563
+NP-1017,Eastview Conservancy,environment,86268,NJ,501c3,3,77029,5269
+NP-1018,Holy Family Services,human_services,814876,CT,501c3,9,623784,67844
+NP-1019,Valley Wildlife Sanctuary,animal,2744703,IL,501c3,17,2727665,129466
+NP-1020,Lighthouse Counseling Center,mental_health,177086,GA,501c3,2,134394,25081
+NP-1021,Pioneer Scholarship Fund,education,889044,FL,501c3,18,876279,211581
+NP-1022,Silver Gallery,arts_culture,7632176,CO,501c3,79,9152749,2057792
+NP-1023,Valley Disaster Relief,public_safety,3213570,GA,501c3,14,3158810,297063
+NP-1024,Unity Green Initiative,environment,194886,MA,501c4,1,184065,22055
+NP-1025,Silver Mental Health Initiative,mental_health,3740264,IL,501c3,69,3637213,300201
+NP-1026,Heritage Community Church,religion,849124,NY,501c4,6,840456,171923
+NP-1027,Eastview Science Lab,medical_research,151931,NJ,501c3,4,152166,6760
+NP-1028,Holy Helpline,human_services,4497456,MI,501c3,63,3523249,174329
+NP-1029,Crescent Civic Engagement Coalition,public_societal,245998,NV,501c3,1,201069,31725
+NP-1030,Liberty Scouts Council,youth_development,16631,TX,501c3,2,17680,1977
+NP-1031,Phoenix Cross-Border Initiative,international,809098,MO,501c3,18,751748,81902
+NP-1032,Open Awareness Campaign,diseases,497665,NC,501c3,5,422347,17813
+NP-1033,Valley Health Center,health_care,6407085,OH,501c3,147,5161876,1447467
+NP-1034,International Counseling Center,mental_health,158624,TX,501c3,4,148081,23580
+NP-1035,Bright Faith Center,religion,83338,MD,501c3,3,77546,32331
+NP-1036,Pinewood Improvement Trust,community_improvement,11656,CA,501c3,0,13318,1619
+NP-1037,Westgate Health Center,health_care,2863969,TX,501c3,63,2197731,221566
+NP-1038,Holy Ministry,religion,54872,LA,501c3,1,44184,15868
+NP-1039,Golden Civil Rights Coalition,civil_rights,2817717,WI,501c3,20,3323271,191895
+NP-1040,Maple Ministry,religion,478619,TN,501c3,9,461036,69605
+NP-1041,Golden Transitional Housing,housing_shelter,21918,TX,501c3,2,20825,2634
+NP-1042,Maple Wildlife Fund,environment,74922,FL,501c3,2,61416,7016
+NP-1043,International Civic League,community_improvement,202815,IA,501c3,2,164094,19021
+NP-1044,Eastern Medical Research Institute,medical_research,146188,NC,501c3,2,112960,16612
+NP-1045,Family Justice Fund,civil_rights,208004,MI,501c3,3,167148,11609
+NP-1046,Sacred Tutoring Initiative,education,75649,SC,501c3,4,60681,4609
+NP-1047,Greater Wildlife Sanctuary,animal,158015,TN,501c3,2,125027,16597
+NP-1048,Golden Academy,education,17425,VA,501c7,0,17348,3543
+NP-1049,Cedar Social Services,human_services,30144,NJ,501c3,2,26935,1954
+NP-1050,Family Wellness Foundation,health_care,1151309,FL,501c3,10,1124054,173041
+NP-1051,Pioneer Gallery,arts_culture,430373,NY,501c3,9,387328,148004
+NP-1052,Lakeshore Disease Foundation,diseases,1320977,KY,501c4,17,1176591,155765
+NP-1053,Valley Aid Society,human_services,24273,VA,501c4,1,21145,1637
+NP-1054,Northside Affordable Housing Initiative,housing_shelter,67319,CA,501c3,5,65220,15406
+NP-1055,Phoenix Recreation Association,recreation,314124,MI,501c4,14,266819,68508
+NP-1056,Mountainview Employment Coalition,employment,734401,MA,501c3,13,566803,49405
+NP-1057,Open Ministry,religion,3054418,CA,501c3,39,2537118,1073386
+NP-1058,Silver Improvement Trust,community_improvement,207966,MN,501c3,1,162238,23768
+NP-1059,New Giving Foundation,philanthropy,378116,NY,501c3,19,356145,22039
+NP-1060,Open Habitat,housing_shelter,8442,CT,501c_other,0,6546,878
+NP-1061,Golden Educational Trust,education,18899,NC,501c8,0,18449,1473
+NP-1062,Cedar Patient Support Network,diseases,94347,PA,501c3,1,87545,9213
+NP-1063,National Community Clinic,health_care,17457193,MO,501c3,168,13828251,2025652
+NP-1064,Willow Learning Center,education,61745,WI,501c3,0,58373,6938
+NP-1065,Eagle Family Services,human_services,20358,VA,501c3,1,17859,2768
+NP-1066,Golden Faith Center,religion,3451438,NY,501c3,47,3118021,1312555
+NP-1067,Lighthouse Mentoring Network,youth_development,32092,FL,501c3,0,24725,1278
+NP-1068,Family Community Clinic,health_care,98317,SC,501c3,4,95728,8221
+NP-1069,Pinewood Fraternal Association,mutual_membership,30400,CA,501c3,0,23272,1474
+NP-1070,United Civic League,community_improvement,99807,GA,501c3,0,96699,12686
+NP-1071,Eastern Community Clinic,health_care,4532406,VA,501c3,35,5414181,982267
+NP-1072,Lakeshore Civic League,community_improvement,859330,WA,501c3,5,835071,102806
+NP-1073,National Charitable Trust,philanthropy,246746,SC,501c3,4,251458,18482
+NP-1074,Faith Watershed Alliance,environment,336101,IL,501c3,5,366881,30361
+NP-1075,Eastern Wellness Foundation,health_care,166332,IN,501c3,1,143783,9328
+NP-1076,Mountainview Trust,unknown_unclassified,243022,TN,501c3,4,183668,33369
+NP-1077,Bright Philanthropic Society,philanthropy,1235082,TX,501c3,64,1177176,51499
+NP-1078,Phoenix Fraternal Association,mutual_membership,15370,FL,501c3,2,14559,1793
+NP-1079,Westgate Arts Council,arts_culture,532235,MD,501c3,4,480213,76777
+NP-1080,Hillcrest Schools Foundation,education,714565,CA,501c3,7,708924,170222
+NP-1081,Community Parks Foundation,recreation,1361109,TX,501c3,67,1270734,210632
+NP-1082,Southside Medical Auxiliary,health_care,25342,TN,501c3,0,19418,4938
+NP-1083,Westgate Neighborhood Coalition,community_improvement,49767,TN,501c4,1,41100,5345
+NP-1084,Sacred Sports League,recreation,63056,GA,501c3,0,56089,11309
+NP-1085,Oakland Trail Conservancy,recreation,144688,IL,501c3,0,150268,37819
+NP-1086,Holy Mental Health Initiative,mental_health,95852,LA,501c3,5,94620,5969
+NP-1087,Silver Wellness Foundation,health_care,46572,MI,501c3,1,39281,5337
+NP-1088,Capital Family Services,human_services,36759,NV,501c3,2,30667,2579
+NP-1089,Southern Green Initiative,environment,447144,IL,501c3,2,390500,45263
+NP-1090,Northside Helpline,human_services,815066,MI,501c3,12,676692,28376
+NP-1091,Foundation Tutoring Initiative,education,405471,GA,501c3,2,317596,44649
+NP-1092,Family Synagogue,religion,568100,FL,501c8,12,541223,72216
+NP-1093,Oakland Improvement Trust,community_improvement,9832,NC,501c3,0,7978,854
+NP-1094,Northern Educational Trust,education,2569751,NY,501c3,8,2104477,370455
+NP-1095,International Community Services,human_services,3962118,MS,501c3,39,3782995,179960
+NP-1096,Central Disease Foundation,diseases,957537,IL,501c3,15,935231,68582
+NP-1097,Sunrise Animal Rescue,animal,189089,AZ,501c3,2,164476,14707
+NP-1098,Northern Educational Trust,education,189020,FL,501c3,1,147463,21211
+NP-1099,Western Arts Council,arts_culture,47358,HI,501c3,1,43154,9655
+NP-1100,Central Aid Society,human_services,29218,GA,501c3,1,24570,2581
+NP-1101,Bright Justice Initiative,crime_legal,560795,CA,501c3,16,508192,64739
+NP-1102,Lighthouse Schools Foundation,education,956295,FL,501c3,4,781697,226484
+NP-1103,Hope Watershed Alliance,environment,112725,KY,501c3,2,104110,9607
+NP-1104,Valley Social Services,human_services,51542,NY,501c3,2,42335,1654
+NP-1105,Saint Mentoring Network,youth_development,17983,MA,501c3,0,13827,653
+NP-1106,Riverside Crime Victims Fund,crime_legal,627979,NY,501c8,18,597856,43450
+NP-1107,Liberty Mentoring Network,youth_development,41797,CO,501c3,3,39100,5011
+NP-1108,Willow Cultural Center,arts_culture,481453,ID,501c3,4,502320,64961
+NP-1109,Liberty Medical Auxiliary,health_care,2022371,PA,501c3,14,1708061,408809
+NP-1110,Harvest Global Relief,international,816996,SC,501c3,14,872405,51243
+NP-1111,Eastern Theater Company,arts_culture,89261,GA,501c3,3,85231,14946
+NP-1112,United Humane Society,animal,370755,AZ,501c3,20,322203,35212
+NP-1113,Beacon Counseling Center,mental_health,49332,PA,501c3,0,38676,962
+NP-1114,International Social Services,human_services,190518,WA,501c3,0,186036,2896
+NP-1115,International Job Training Center,employment,413647,MI,501c3,13,401555,50379
+NP-1116,Oakland Search and Rescue,public_safety,1552378,MI,501c3,56,1540709,64637
+NP-1117,Foundation Society,unknown_unclassified,49066,WA,501c3,3,47476,2754
+NP-1118,Beacon Wellness Foundation,health_care,3655508,IL,501c3,48,3130948,347345
+NP-1119,Capital Global Relief,international,30820,PA,501c6,0,28230,1175
+NP-1120,Greater Helpline,human_services,209646,TX,501c3,1,205650,9775
+NP-1121,Phoenix Foundation,unknown_unclassified,2363233,AZ,501c3,39,2068062,264974
+NP-1122,Southside Community Services,human_services,476345,UT,501c3,8,484032,35386
+NP-1123,Foundation Community Garden,food_agriculture,27123,WI,501c3,2,22843,1611
+NP-1124,Western Mutual Aid Society,mutual_membership,279139,AL,501c8,12,304509,16576
+NP-1125,Eastern Cultural Center,arts_culture,2972200,CA,501c3,57,2477084,529077
+NP-1126,Beacon Tutoring Initiative,education,256218,SC,501c3,16,229367,27823
+NP-1127,Eastview Civil Rights Coalition,civil_rights,420296,IL,501c3,16,325650,19971
+NP-1128,Sunrise Aid Society,human_services,32964,OH,501c3,1,25363,3528
+NP-1129,Westgate Social Science Forum,social_science,69352,NJ,501c3,3,58260,4227
+NP-1130,Silver Gallery,arts_culture,17152,TX,501c3,1,16557,5398
+NP-1131,Northside Health Center,health_care,47776,WI,501c3,0,47439,4847
+NP-1132,Greater Donor Network,philanthropy,16932,MA,501c3,1,16928,1332
+NP-1133,Open Religious Society,religion,387189,IN,501c3,13,362105,114032
+NP-1134,Children Tutoring Initiative,education,2435991,AR,501c3,36,1936276,257394
+NP-1135,Northside Neighborhood Coalition,community_improvement,103198,IN,501c3,4,111279,15977
+NP-1136,Bright Counseling Center,mental_health,22026072,CA,501c3,74,20755855,2898469
+NP-1137,Northside Ministry,religion,66781,CA,501c3,3,62591,23857
+NP-1138,Pinewood Helpline,human_services,68184,FL,501c8,0,62465,217
+NP-1139,Family Health Center,health_care,750233,FL,501c3,16,694961,45176
+NP-1140,Liberty Conservancy,environment,42772,TX,501c3,1,41274,1332
+NP-1141,Westgate Aid Society,human_services,416443,NC,501c3,16,520699,32840
+NP-1142,Golden Scouts Council,youth_development,92289,IL,501c3,1,94587,5817
+NP-1143,Sunrise Mentoring Network,youth_development,25213,TX,501c3,0,28920,205
+NP-1144,Hillcrest Helpline,human_services,241188,CA,501c3,4,186134,13944
+NP-1145,Children Wellness Foundation,health_care,986304,SC,501c3,8,944612,80164
+NP-1146,Westgate Neighborhood Coalition,community_improvement,41923,OK,501c3,3,41480,8634
+NP-1147,Hillcrest Religious Society,religion,59501,MI,501c3,1,58992,11579
+NP-1148,Children Sports League,recreation,1231976,SC,501c3,60,1122421,483545
+NP-1149,Golden Cultural Center,arts_culture,654558,WI,501c3,13,546882,140547
+NP-1150,Western Helpline,human_services,171817,AL,501c3,0,140047,4120
+NP-1151,Hope Food Bank,food_agriculture,430302,ME,501c3,17,407662,43173
+NP-1152,Children Gallery,arts_culture,174510,IL,501c3,0,157052,34441
+NP-1153,Central Research Foundation,medical_research,63106,TX,501c3,2,51467,6032
+NP-1154,Phoenix Safety Coalition,public_safety,27228,KY,501c3,2,26872,3944
+NP-1155,National International Aid,international,73737,FL,501c3,1,72645,4471
+NP-1156,Phoenix Academy,education,4347461,TN,501c3,14,4373670,1077859
+NP-1157,Sunrise Recreation Association,recreation,2371831,WY,501c7,70,1937194,284934
+NP-1158,Willow Community Church,religion,943704,AL,501c3,4,918622,278441
+NP-1159,Open Justice Fund,civil_rights,139899,GA,501c3,3,123050,9901
+NP-1160,Northside Innovation Hub,science_tech,352222,OH,501c3,2,286876,16927
+NP-1161,Willow Housing Coalition,housing_shelter,4881226,IN,501c3,53,5230187,1332852
+NP-1162,Valley Wildlife Fund,environment,471432,FL,501c3,3,460590,68149
+NP-1163,Unity Community Church,religion,33882,IN,501c3,0,36498,3665
+NP-1164,Oakland Improvement Trust,community_improvement,887927,OH,501c3,8,745292,115284
+NP-1165,Sacred Sports League,recreation,401598,TX,501c7,18,361968,54660
+NP-1166,Lakeshore International Aid,international,22009083,PA,501c3,224,18746171,3155830
+NP-1167,Hillcrest Patient Support Network,diseases,36809,GA,501c7,2,38407,4849
+NP-1168,Riverside Trust,unknown_unclassified,223564,CA,501c3,0,262232,10030
+NP-1169,National Philanthropic Society,philanthropy,286757,FL,501c3,17,273296,36213
+NP-1170,Heritage Mental Health Initiative,mental_health,41993,GA,501c3,3,41594,2174
+NP-1171,United Arts Council,arts_culture,169515,FL,501c3,2,128011,18400
+NP-1172,Northside Family Services,human_services,449885,TX,501c3,18,346421,32319
+NP-1173,Saint Medical Research Institute,medical_research,208809,CA,501c7,4,162219,21380
+NP-1174,Sacred Hospital Volunteers,health_care,46508,MI,501c4,1,54267,3222
+NP-1175,Greater Conservancy,environment,1946032,FL,501c3,18,1918521,124304
+NP-1176,Westgate Community Clinic,health_care,96560,NY,501c3,5,94242,15974
+NP-1177,Family Community Clinic,health_care,946037,OH,501c3,3,936565,166858
+NP-1178,Eagle Synagogue,religion,1997528,CA,501c3,28,1502825,487862
+NP-1179,Capital Scouts Council,youth_development,156318,KY,501c3,2,130990,18663
+NP-1180,Open Therapy Coalition,mental_health,3044115,AR,501c3,66,2993584,216390
+NP-1181,Golden Tutoring Initiative,education,9235514,OH,501c3,88,7771562,667057
+NP-1182,Holy Community Clinic,health_care,121749,IA,501c3,5,136147,26054
+NP-1183,Open Academy,education,49398,MD,501c3,0,47302,10965
+NP-1184,Saint Neighborhood Coalition,community_improvement,3226630,IL,501c3,29,2484594,268220
+NP-1185,Beacon Philanthropic Society,philanthropy,3557122,MN,501c3,62,3656159,516091
+NP-1186,Golden Research Society,diseases,184389,VA,501c3,0,202834,2317
+NP-1187,Southside Green Initiative,environment,18447,CO,501c3,0,14426,896
+NP-1188,Heritage Neighborhood Coalition,community_improvement,36482,IN,501c3,0,41137,8337
+NP-1189,Northside Green Initiative,environment,130747,TX,501c3,2,118238,13311
+NP-1190,Riverside Wellness Foundation,health_care,118455,TX,501c3,4,116796,26657
+NP-1191,Northside Community Foundation,community_improvement,144159,NY,501c3,4,142677,29075
+NP-1192,Saint Academy,education,2012054,CO,501c7,71,2205863,270288
+NP-1193,Eagle Charitable Trust,philanthropy,66493,NY,501c3,2,58739,3999
+NP-1194,Eastern Museum,arts_culture,308035,WI,501c3,20,247398,122964
+NP-1195,Capital Recreation Association,recreation,492546,OR,501c3,14,380028,173111
+NP-1196,Unity Trail Conservancy,recreation,210580,TX,501c3,4,200470,61937
+NP-1197,Lakeshore Sports League,recreation,3634519,VA,501c6,63,3457452,981607
+NP-1198,Southside Schools Foundation,education,945345,KS,501c3,10,838145,113891
+NP-1199,Valley Employment Coalition,employment,13830643,CA,501c3,122,12505138,1323223
+NP-1200,Northside Research Society,diseases,4593035,IL,501c3,19,4011008,545575
+NP-1201,Eastern Improvement Trust,community_improvement,332031,TX,501c3,17,327989,30025
+NP-1202,Holy Therapy Coalition,mental_health,588365,LA,501c4,12,463606,39575
+NP-1203,Beacon World Mission,international,604133,VA,501c3,4,525350,81698
+NP-1204,Bayside Scholarship Fund,education,37623,IL,501c3,0,44449,8558
+NP-1205,Northside Parks Foundation,recreation,110688,CA,501c_other,1,104991,11944
+NP-1206,Unity Wellness Foundation,health_care,50813,FL,501c3,1,60251,7451
+NP-1207,National Disaster Relief,public_safety,41992,DC,501c3,1,41758,6193
+NP-1208,Sunrise Community Services,human_services,74263,DE,501c3,1,76005,7043
+NP-1209,Eastern Wellness Foundation,health_care,803540,OR,501c3,6,750101,198555
+NP-1210,New Homeless Shelter,housing_shelter,72828,TX,501c3,3,71204,28805
+NP-1211,Capital Recreation Association,recreation,214343,CA,501c3,0,258159,50272
+NP-1212,Western Policy Institute,social_science,16613,MI,501c3,0,16255,786
+NP-1213,Hillcrest Social Services,human_services,2661976,MI,501c3,35,2570114,302572
+NP-1214,Hope Wildlife Sanctuary,animal,241456,LA,501c3,5,239798,35374
+NP-1215,International Parks Foundation,recreation,18556,SC,501c3,1,17859,5204
+NP-1216,Northern Improvement Trust,community_improvement,673953,CA,501c6,4,559860,128176
+NP-1217,Eastview Improvement Trust,community_improvement,1767514,OH,501c3,20,1388350,240509
+NP-1218,Foundation Academy,education,121382,NY,501c3,1,118492,6564
+NP-1219,Silver Fraternal Association,mutual_membership,42338,CA,501c3,0,34346,1693
+NP-1220,Northern Patient Support Network,diseases,380600,CA,501c3,7,359725,15846
+NP-1221,Greater Youth Foundation,youth_development,961201,WA,501c4,7,877453,80176
+NP-1222,Cedar Community Church,religion,35212,AR,501c3,2,31219,9754
+NP-1223,Unity Habitat,housing_shelter,4933494,AZ,501c_other,66,5203839,1068859
+NP-1224,United Helpline,human_services,41081,CA,501c3,0,33754,1882
+NP-1225,Capital Learning Center,education,238238,NJ,501c3,2,232540,47977
+NP-1226,First Medical Auxiliary,health_care,91047,TX,501c3,1,69785,4986
+NP-1227,Hillcrest Parks Foundation,recreation,14636629,AZ,501c3,68,11099343,5620962
+NP-1228,Northern Mentoring Network,youth_development,14926,CO,501c3,0,12799,614
+NP-1229,Eastern Social Services,human_services,111723,VA,501c3,5,105018,15315
+NP-1230,Bayside Academy,education,254087,FL,501c3,3,259321,47737
+NP-1231,Riverside Public Interest Forum,public_societal,146414,IN,501c4,5,151857,19112
+NP-1232,Westgate Educational Trust,education,2773522,NY,501c3,47,2567549,547289
+NP-1233,Beacon Family Services,human_services,62418,GA,501c3,4,54305,6565
+NP-1234,Bright Social Services,human_services,91785,NC,501c3,0,83362,305
+NP-1235,Eastview Academy,education,864390,CO,501c7,14,697811,191118
+NP-1236,United Cross-Border Initiative,international,55669,OH,501c4,2,43167,8320
+NP-1237,National Learning Center,education,49986,NY,501c3,1,41847,6207
+NP-1238,Mountainview Job Training Center,employment,299537,SC,501c3,8,285215,9496
+NP-1239,Maple Donor Network,philanthropy,114792,NY,501c3,1,92793,4320
+NP-1240,Valley Counseling Center,mental_health,164428,WI,501c3,2,128618,15728
+NP-1241,Northern Learning Center,education,10567,CA,501c3,1,8006,2433
+NP-1242,Sunrise Arts Council,arts_culture,248623,CA,501c3,0,217708,66902
+NP-1243,Greater Social Services,human_services,324047,MS,501c6,14,291517,36275
+NP-1244,Saint Mental Health Initiative,mental_health,1642306,ND,501c3,66,1350019,77728
+NP-1245,Eastern Faith Center,religion,49248,OH,501c3,0,49957,11720
+NP-1246,Unity Giving Foundation,philanthropy,304552,ND,501c3,14,253857,35941
+NP-1247,Western Meal Program,food_agriculture,42364,IL,501c3,0,33391,412
+NP-1248,Capital Wellness Network,mental_health,696511,MI,501c3,11,542071,29976
+NP-1249,Pioneer Hospital Volunteers,health_care,263339,OR,501c3,8,226560,21421
+NP-1250,Mountainview Restorative Justice Network,crime_legal,87184,WV,501c3,3,78395,8509
+NP-1251,International Recreation Association,recreation,66102,LA,501c3,4,61888,12880
+NP-1252,National Community Services,human_services,6728,AL,501c3,0,6299,119
+NP-1253,Maple Temple,religion,332706,PA,501c3,20,347565,67068
+NP-1254,Golden Hospital Volunteers,health_care,1684748,LA,501c3,61,1570263,222278
+NP-1255,International Youth Foundation,youth_development,2046016,MO,501c3,22,1958717,170614
+NP-1256,Silver Learning Center,education,25653,OH,501c3,1,29147,3544
+NP-1257,Pinewood Employment Coalition,employment,680265,CA,501c3,12,808596,26031
+NP-1258,Eagle Hospital Volunteers,health_care,11614646,OH,501c3,204,10552560,2407895
+NP-1259,Open Mutual Aid Society,mutual_membership,294318,NJ,501c3,13,299969,18727
+NP-1260,International Community Garden,food_agriculture,70095,NV,501c3,1,88845,4397
+NP-1261,United Aid Society,human_services,4886212,IL,501c3,9,4646595,369791
+NP-1262,Crescent Patient Support Network,diseases,196152,MO,501c3,4,211532,15469
+NP-1263,Valley Faith Center,religion,169906,WI,501c3,0,150258,58047
+NP-1264,Southside Policy Institute,social_science,627381,CA,501c3,4,478686,61877
+NP-1265,New Philanthropic Society,philanthropy,4649713,CA,501c3,17,4069546,625674
+NP-1266,Liberty Neighborhood Coalition,community_improvement,604606,TX,501c3,4,540306,41304
+NP-1267,Eastern Land Trust,environment,300499,WI,501c3,17,321781,26875
+NP-1268,Eastview Pantry,food_agriculture,2856048,CO,501c3,31,2187480,419561
+NP-1269,Cedar STEM Foundation,science_tech,49958,MA,501c3,0,40679,2477
+NP-1270,Open Youth Foundation,youth_development,324816,MA,501c3,8,297172,38410
+NP-1271,Greater Aid Society,human_services,533896,ME,501c3,3,437177,62972
+NP-1272,Foundation Tutoring Initiative,education,7891,SC,501c3,0,7857,1496
+NP-1273,Valley Faith Center,religion,73469,WA,501c3,3,62444,24173
+NP-1274,Beacon Organization,unknown_unclassified,16563,FL,501c3,0,17100,659
+NP-1275,Pioneer Donor Network,philanthropy,702146,MI,501c3,15,833683,87481
+NP-1276,Beacon Awareness Campaign,diseases,590586,CA,501c3,6,566487,24439
+NP-1277,Foundation Tutoring Initiative,education,179566,IL,501c3,4,184552,15799
+NP-1278,Foundation Homeless Shelter,housing_shelter,115665,NC,501c3,1,108793,36065
+NP-1279,Northern Scholarship Fund,education,82145,NJ,501c3,0,64214,14465
+NP-1280,United Legal Aid Society,crime_legal,97497,TX,501c3,1,93246,9539
+NP-1281,United Theater Company,arts_culture,3886863,OH,501c3,37,4237673,1127817
+NP-1282,Eastern Search and Rescue,public_safety,29165,MA,501c3,3,28541,4064
+NP-1283,Valley Community Foundation,community_improvement,2314746,NY,501c3,73,2403665,184418
+NP-1284,Children Homeless Shelter,housing_shelter,4052726,MI,501c4,42,3355313,640146
+NP-1285,Mountainview Social Services,human_services,158545,OH,501c3,2,145063,13937
+NP-1286,Western Community Church,religion,1839105,MI,501c3,32,2132918,250318
+NP-1287,Mountainview Social Services,human_services,74642,FL,501c3,1,74723,4576
+NP-1288,Cedar Cultural Center,arts_culture,20235,IN,501c3,1,26089,4342
+NP-1289,Lakeshore Workforce Development,employment,151847,PA,501c6,3,118832,6897
+NP-1290,Maple Theater Company,arts_culture,48609,IL,501c3,0,40678,9584
+NP-1291,Sacred Youth Foundation,youth_development,249036,MN,501c3,0,222776,8886
+NP-1292,Harvest Temple,religion,48391,TX,501c3,0,48324,9748
+NP-1293,Oakland Cross-Border Initiative,international,418248,NJ,501c3,14,408797,17038
+NP-1294,Northside Educational Trust,education,53703,SC,501c3,2,51158,11738
+NP-1295,Lakeshore Cultural Center,arts_culture,29511,FL,501c3,1,26595,8885
+NP-1296,Lighthouse Justice Fund,civil_rights,788374,NJ,501c3,4,684256,43408
+NP-1297,Greater Theater Company,arts_culture,143038,MO,501c3,1,107488,41238
+NP-1298,Heritage Medical Auxiliary,health_care,4163224,OH,501c3,40,3394741,424933
+NP-1299,First Employment Coalition,employment,903710,NC,501c7,14,698150,69128
+NP-1300,Hope Ministry,religion,656557,FL,501c3,8,710254,136748
+NP-1301,Oakland Mentoring Network,youth_development,83495,WA,501c4,0,76474,3591
+NP-1302,Central Synagogue,religion,10545114,OH,501c3,291,9167374,3569531
+NP-1303,Pioneer Tutoring Initiative,education,6639,TX,501c3,2,7920,734
+NP-1304,Capital Recreation Association,recreation,62503,TX,501c3,5,60542,11500
+NP-1305,Saint Health Center,health_care,39972,CA,501c3,2,43171,3634
+NP-1306,Westgate Science Foundation,science_tech,48750,NM,501c3,0,51576,1358
+NP-1307,New Aid Society,human_services,27135,MI,501c3,0,20552,586
+NP-1308,Westgate Academy,education,451728,CA,501c4,10,445378,40899
+NP-1309,Liberty Helpline,human_services,924858,NH,501c3,2,1117991,90252
+NP-1310,United Faith Center,religion,1198367,MI,501c3,44,1042111,283865
+NP-1311,Beacon Schools Foundation,education,288193,IN,501c3,12,278780,24436
+NP-1312,Community Meal Program,food_agriculture,4152687,IL,501c3,71,4029731,603661
+NP-1313,Holy Community Clinic,health_care,368166,TX,501c6,19,374214,21556
+NP-1314,Community Mentoring Network,youth_development,43798,VA,501c3,0,44699,1518
+NP-1315,National Tech Initiative,science_tech,400854,AK,501c3,2,344770,57352
+NP-1316,Silver Social Services,human_services,197864,AL,501c3,2,174393,15262
+NP-1317,Faith International Aid,international,92198,MO,501c_other,2,100451,4849
+NP-1318,Willow Habitat,housing_shelter,99532,MS,501c3,1,104926,12837
+NP-1319,Eagle Gallery,arts_culture,3854146,PA,501c3,17,3239486,522953
+NP-1320,Lighthouse Medical Research Institute,medical_research,154643,MO,501c3,1,154020,16427
+NP-1321,First Aid Society,human_services,167051,RI,501c3,3,173461,15816
+NP-1322,Community Aid Society,human_services,21452021,AZ,501c3,53,20219680,2597538
+NP-1323,United Health Center,health_care,3647859,CA,501c3,20,3282381,358495
+NP-1324,Lakeshore Hospital Volunteers,health_care,207638,WA,501c3,0,203417,38423
+NP-1325,Southern Employment Coalition,employment,703517,NJ,501c3,19,670054,70548
+NP-1326,Sunrise Housing Coalition,housing_shelter,34512,NV,501c3,1,30624,13479
+NP-1327,Crescent Meal Program,food_agriculture,842816,NY,501c3,7,802524,43760
+NP-1328,Foundation Charitable Trust,philanthropy,977969,NY,501c3,5,760704,116224
+NP-1329,Riverside Justice Initiative,crime_legal,22208,OH,501c3,2,19069,1781
+NP-1330,Pinewood Legal Aid Society,crime_legal,16719,MO,501c3,0,13352,775
+NP-1331,Family Gallery,arts_culture,46622,CA,501c3,3,37418,5596
+NP-1332,Holy Conservancy,environment,59659,GA,501c3,1,57841,4451
+NP-1333,Central Educational Trust,education,9491,MD,501c3,0,8030,879
+NP-1334,Holy Pantry,food_agriculture,414372,FL,501c3,19,417310,45601
+NP-1335,Phoenix Donor Network,philanthropy,23997090,CA,501c3,124,21613765,3138159
+NP-1336,Beacon Improvement Trust,community_improvement,15501,GA,501c3,1,13708,3660
+NP-1337,Saint Boys & Girls Club,youth_development,45148,IA,501c3,2,37531,6078
+NP-1338,Mountainview Humane Society,animal,24654,VA,501c3,0,18908,1099
+NP-1339,Hillcrest Wellness Network,mental_health,4846641,OH,501c3,51,4153853,335632
+NP-1340,Silver Housing Coalition,housing_shelter,864511,OH,501c4,19,916831,257885
+NP-1341,Bayside Meal Program,food_agriculture,235527,CA,501c3,2,206280,33468
+NP-1342,Open Affordable Housing Initiative,housing_shelter,3374038,PA,501c4,32,2737254,1173222
+NP-1343,Northern Medical Auxiliary,health_care,45088,MA,501c3,2,40758,4914
+NP-1344,Oakland Helpline,human_services,236344,WA,501c3,0,234880,7546
+NP-1345,Silver Improvement Trust,community_improvement,380273,OR,501c3,13,322041,39604
+NP-1346,Eastview Affordable Housing Initiative,housing_shelter,74678,TX,501c3,4,82170,11700
+NP-1347,Sacred Employment Coalition,employment,87188,AK,501c3,1,82507,9187
+NP-1348,Westgate Academy,education,29027,NC,501c3,0,29185,6369
+NP-1349,Faith Volunteer Fire,public_safety,3880330,NY,501c3,62,3601964,380226
+NP-1350,Eagle Mental Health Initiative,mental_health,160421,TN,501c3,1,158429,22674
+NP-1351,National Scholarship Fund,education,75118,WA,501c3,1,74947,5125
+NP-1352,Northside Temple,religion,18316,NY,501c3,0,14343,2785
+NP-1353,Harvest Tutoring Initiative,education,407212,NY,501c3,14,324318,89365
+NP-1354,Northern Job Training Center,employment,4148639,TX,501c4,56,3746267,226579
+NP-1355,Eastern Legal Aid Society,crime_legal,21631,IA,501c3,1,22943,1617
+NP-1356,Bayside Boys & Girls Club,youth_development,608596,MO,501c3,8,505755,36425
+NP-1357,Lakeshore Awareness Campaign,diseases,795336,UT,501c7,9,758141,91915
+NP-1358,Phoenix Sports League,recreation,216739,IL,501c3,5,173604,36535
+NP-1359,Phoenix Food Bank,food_agriculture,407051,FL,501c3,18,441483,60039
+NP-1360,Bayside Global Relief,international,23114,CA,501c4,0,21643,523
+NP-1361,Silver Donor Network,philanthropy,70420,NY,501c4,0,65093,2186
+NP-1362,First Medical Auxiliary,health_care,25563,MI,501c3,2,22815,1622
+NP-1363,Faith Civic League,community_improvement,196712,FL,501c3,3,184207,19499
+NP-1364,Pinewood Donor Network,philanthropy,21531,SC,501c3,2,16867,1857
+NP-1365,Foundation Charitable Trust,philanthropy,66108,OR,501c3,2,65160,3269
+NP-1366,Open Educational Trust,education,228439,OH,501c3,3,196067,29875
+NP-1367,Holy Religious Society,religion,438312,WV,501c3,14,427868,97438
+NP-1368,Phoenix Academy,education,15014057,CA,501c3,99,14572953,1879592
+NP-1369,Family Medical Auxiliary,health_care,138579,FL,501c3,1,136907,10804
+NP-1370,Oakland Awareness Campaign,diseases,2060823,TX,501c4,70,1839445,153712
+NP-1371,Pioneer Tutoring Initiative,education,45972,HI,501c3,2,34967,6574
+NP-1372,Sunrise Philanthropic Society,philanthropy,3313606,CA,501c3,69,3135570,436272
+NP-1373,Oakland Hospital Volunteers,health_care,8319,PA,501c3,0,8015,457
+NP-1374,Heritage Wellness Network,mental_health,340944,NC,501c3,12,259179,31380
+NP-1375,Pioneer World Mission,international,787304,NC,501c3,20,747725,38105
+NP-1376,Northside Family Services,human_services,59319,NC,501c3,3,51807,3742
+NP-1377,Eastview Music Society,arts_culture,150767,CA,501c3,1,153053,39820
+NP-1378,Northern Museum,arts_culture,81631,CA,501c3,3,76163,12218
+NP-1379,National Schools Foundation,education,197548,MD,501c3,4,222401,31946
+NP-1380,Southside Boys & Girls Club,youth_development,875685,IL,501c3,20,705620,88673
+NP-1381,Lighthouse Civic League,community_improvement,2260677,NC,501c3,71,2710848,136222
+NP-1382,First Civic League,community_improvement,471377,NY,501c3,9,483101,108904
+NP-1383,Valley Medical Research Institute,medical_research,65892,OH,501c3,0,61653,218
+NP-1384,Sacred Restorative Justice Network,crime_legal,108020,KY,501c3,1,87669,9547
+NP-1385,Community Recreation Association,recreation,90014,GA,501c3,4,78275,25026
+NP-1386,Mountainview Academy,education,379144,AL,501c3,4,447146,71838
+NP-1387,Hillcrest Theater Company,arts_culture,17306657,FL,501c3,222,16517058,2588495
+NP-1388,Sacred Academy,education,5006,WY,501c3,2,3924,641
+NP-1389,Children Hospital Volunteers,health_care,14320,PA,501c3,0,13181,1166
+NP-1390,Holy Schools Foundation,education,16097,AZ,501c3,1,15944,1959
+NP-1391,Eastern Community Clinic,health_care,1986186,WI,501c3,47,1907786,282549
+NP-1392,Valley Cultural Center,arts_culture,39710,CA,501c4,0,38285,7934
+NP-1393,Riverside Wildlife Sanctuary,animal,3802924,MI,501c3,46,4262991,330045
+NP-1394,Family Tutoring Initiative,education,13263,FL,501c3,0,13877,3227
+NP-1395,Southern Donor Network,philanthropy,870873,NC,501c3,15,869047,104662
+NP-1396,Holy Cultural Center,arts_culture,227636,AL,501c7,4,172640,32347
+NP-1397,Phoenix Homeless Shelter,housing_shelter,26259,NY,501c3,1,25880,8929
+NP-1398,Holy Theater Company,arts_culture,305328,MI,501c3,6,269217,97999
+NP-1399,New Transitional Housing,housing_shelter,410490,AR,501c_other,8,385845,139601
+NP-1400,Harvest Safety Coalition,public_safety,15898,VA,501c3,0,15870,49
+NP-1401,Northside Civic Engagement Coalition,public_societal,88724,AZ,501c3,1,82362,11734
+NP-1402,Liberty Public Interest Forum,public_societal,260628,NY,501c3,9,298399,20234
+NP-1403,Children Ministry,religion,3292379,LA,501c3,61,3041200,1052985
+NP-1404,Pioneer Civic League,community_improvement,155945,SC,501c3,2,154227,34471
+NP-1405,National Wildlife Fund,environment,186186,IN,501c3,2,205189,8487
+NP-1406,Hillcrest Scholarship Fund,education,38973,PA,501c3,0,29990,9211
+NP-1407,Family Social Services,human_services,28979,TN,501c3,2,23122,3577
+NP-1408,Community Temple,religion,42517,TX,501c3,0,37568,7801
+NP-1409,Children Community Foundation,community_improvement,33201,IL,501c3,1,35260,8097
+NP-1410,Eagle Foundation,unknown_unclassified,430756,TX,501c3,19,408452,52068
+NP-1411,United Counseling Center,mental_health,41790,OH,501c3,1,32742,4368
+NP-1412,Phoenix Synagogue,religion,4274767,MN,501c3,71,4158889,840693
+NP-1413,Valley Research Coalition,social_science,254488,CA,501c3,13,247051,33211
+NP-1414,Western Schools Foundation,education,280538,OK,501c3,20,238140,69917
+NP-1415,First Academy,education,314497,LA,501c3,11,262645,18174
+NP-1416,Sunrise Faith Center,religion,927658,MD,501c_other,14,1165262,329245
+NP-1417,Open Counseling Center,mental_health,106854,NJ,501c3,5,95352,14354
+NP-1418,Westgate Therapy Coalition,mental_health,132434,CA,501c3,0,120524,1533
+NP-1419,Beacon Community Foundation,community_improvement,4404001,WA,501c3,46,4693740,308663
+NP-1420,United Health Center,health_care,113645,UT,501c3,0,106705,5773
+NP-1421,Maple Meal Program,food_agriculture,88722,IL,501c3,5,90918,6218
+NP-1422,Harvest Family Services,human_services,133203,TX,501c3,0,158029,3394
+NP-1423,Greater Aid Society,human_services,941366,IA,501c3,8,750816,76784
+NP-1424,Heritage Green Initiative,environment,207883,VA,501c3,5,166266,27593
+NP-1425,Capital Hospital Volunteers,health_care,44357,AZ,501c3,0,34404,3853
+NP-1426,Oakland Schools Foundation,education,13191,MD,501c3,1,12982,1010
+NP-1427,Mountainview Ministry,religion,935143,WA,501c3,2,765200,218937
+NP-1428,Oakland Aid Society,human_services,17707890,TX,501c3,180,13994718,1880687
+NP-1429,Liberty Wellness Network,mental_health,756855,IA,501c3,17,865649,45603
+NP-1430,Bayside Schools Foundation,education,774874,AL,501c3,11,598267,83254
+NP-1431,Willow Wildlife Fund,environment,534233,SC,501c3,20,433070,30407
+NP-1432,Northside Neighborhood Coalition,community_improvement,214852,NH,501c3,5,171212,31622
+NP-1433,Silver Academy,education,642507,WI,501c3,18,634360,34733
+NP-1434,Maple Pet Adoption Center,animal,850458,NY,501c3,19,899309,119856
+NP-1435,Western Temple,religion,245194,CA,501c7,1,207484,38302
+NP-1436,Eagle Family Services,human_services,63072,GA,501c3,2,62947,6170
+NP-1437,Liberty Disease Foundation,diseases,188119,TN,501c4,1,183721,16776
+NP-1438,Northern Helpline,human_services,52875,TX,501c4,1,50188,2046
+NP-1439,Westgate Employment Coalition,employment,56347,TX,501c3,0,48881,338
+NP-1440,National Parks Foundation,recreation,162051,NC,501c3,2,129651,45292
+NP-1441,Family Museum,arts_culture,432417,MO,501c3,2,453585,171962
+NP-1442,Unity Tech Initiative,science_tech,87727,TX,501c3,1,71917,6388
+NP-1443,Maple Music Society,arts_culture,14019,CA,501c3,0,14347,1592
+NP-1444,Oakland Civic League,community_improvement,19728,FL,501c3,0,15261,4585
+NP-1445,Cedar Scouts Council,youth_development,580703,UT,501c3,4,589940,43767
+NP-1446,Northside Gallery,arts_culture,122236,FL,501c3,3,95435,16200
+NP-1447,Lighthouse Civic League,community_improvement,427508,NY,501c3,18,510104,98239
+NP-1448,Family STEM Foundation,science_tech,398712,TX,501c_other,8,455523,41192
+NP-1449,New Health Center,health_care,904650,NY,501c3,2,731958,185011
+NP-1450,Eastern Tech Initiative,science_tech,1963590,TX,501c3,22,1904152,211986
+NP-1451,Southside Cultural Center,arts_culture,626082,FL,501c4,3,545555,228724
+NP-1452,Oakland Search and Rescue,public_safety,71762,IL,501c3,2,72077,6376
+NP-1453,National Civic League,community_improvement,413798,FL,501c3,16,370011,65936
+NP-1454,Senior Food Bank,food_agriculture,108678,MD,501c_other,3,107457,12270
+NP-1455,Unity Scholarship Fund,education,271250,TX,501c3,4,264208,57254
+NP-1456,Family Helpline,human_services,5867088,CA,501c3,116,6637345,649260
+NP-1457,Children Youth Foundation,youth_development,9847,MN,501c3,1,9589,875
+NP-1458,Lakeshore Academy,education,261130,KY,501c3,12,197956,35758
+NP-1459,Mountainview Mentoring Network,youth_development,72632,CA,501c3,2,64989,4576
+NP-1460,Hillcrest Patient Support Network,diseases,768269,TX,501c3,9,978708,27565
+NP-1461,Greater Improvement Trust,community_improvement,827688,OH,501c3,17,655184,109285
+NP-1462,Hope Youth Foundation,youth_development,416787,AL,501c3,18,317968,25898
+NP-1463,Capital Donor Network,philanthropy,4838773,NY,501c3,75,4660127,570947
+NP-1464,Westgate Search and Rescue,public_safety,62704,MI,501c4,1,61225,2363
+NP-1465,Hillcrest Educational Trust,education,327372,CA,501c3,7,287772,60038
+NP-1466,First Medical Auxiliary,health_care,568425,CA,501c4,13,564020,77406
+NP-1467,International Temple,religion,17785,NY,501c3,0,20256,3670
+NP-1468,Willow International Aid,international,160051,CT,501c3,3,137434,8392
+NP-1469,Lakeshore Community Services,human_services,952504,MI,501c3,11,897253,89194
+NP-1470,Southern Family Services,human_services,296780,OH,501c3,10,280307,25488
+NP-1471,International Social Services,human_services,473599,IL,501c3,11,442008,26082
+NP-1472,Community Conservancy,environment,1512461,VA,501c3,58,1497843,191649
+NP-1473,Saint Community Services,human_services,1519165,NC,501c3,14,1458293,153736
+NP-1474,International Transitional Housing,housing_shelter,6315707,TX,501c3,248,6772560,2443314
+NP-1475,Western International Aid,international,8197998,NJ,501c7,276,9721496,1012203
+NP-1476,Foundation Cultural Center,arts_culture,5986440,FL,501c3,94,4986731,1585940
+NP-1477,Western Religious Society,religion,230377,NY,501c3,1,217890,31310
+NP-1478,Heritage Civic Engagement Coalition,public_societal,190647,UT,501c3,0,154852,675
+NP-1479,International Mentoring Network,youth_development,65161,MA,501c3,1,59792,6541
+NP-1480,Harvest Conservancy,environment,89450,KY,501c3,2,75161,6281
+NP-1481,Phoenix Tutoring Initiative,education,2232908,NM,501c3,24,1856550,445306
+NP-1482,First Arts Council,arts_culture,2797970,AL,501c3,63,3285868,715725
+NP-1483,Phoenix Cross-Border Initiative,international,4958785,GA,501c3,32,4986250,675349
+NP-1484,Oakland Disease Foundation,diseases,702524,AZ,501c3,6,669950,100346
+NP-1485,Sacred Ministry,religion,113645,SC,501c3,4,89402,30867
+NP-1486,Riverside Charitable Trust,philanthropy,3605412,GA,501c3,34,4265704,233804
+NP-1487,Golden Animal Rescue,animal,367291,AR,501c3,8,292909,49048
+NP-1488,Lakeshore Science Lab,medical_research,282541,FL,501c3,3,232845,31908
+NP-1489,Unity Civic League,community_improvement,266997,NJ,501c_other,11,209954,14192
+NP-1490,Children Sports League,recreation,827038,TX,501c3,15,809368,175960
+NP-1491,Family Civic League,community_improvement,854370,TN,501c3,16,730010,67526
+NP-1492,Greater Parks Foundation,recreation,43525,TN,501c3,0,37000,8395
+NP-1493,Beacon Faith Center,religion,4385128,AR,501c3,36,3412762,1713414
+NP-1494,Harvest Recreation Association,recreation,792504,NE,501c3,17,695856,187945
+NP-1495,Foundation Scouts Council,youth_development,439897,FL,501c3,9,349313,48572
+NP-1496,Eagle Aid Society,human_services,397102,NV,501c3,2,436055,51369
+NP-1497,Mountainview STEM Foundation,science_tech,819819,TX,501c3,15,704921,108114
+NP-1498,Saint Recreation Association,recreation,169740,IL,501c3,0,166115,34527
+NP-1499,Crescent Community Church,religion,1412102,FL,501c3,26,1398491,274100
+NP-1500,Saint Health Center,health_care,313072,FL,501c3,20,302282,47526
+NP-1501,Pioneer Charitable Trust,philanthropy,500512,OR,501c3,2,488347,51075
+NP-1502,Lakeshore Foundation,unknown_unclassified,152968,TX,501c8,0,151547,2560
+NP-1503,Hope Religious Society,religion,270998,OH,501c3,11,258439,87076
+NP-1504,Phoenix Medical Research Institute,medical_research,44086,FL,501c3,2,43263,1588
+NP-1505,Western Mentoring Network,youth_development,173793,NY,501c4,1,163119,23679
+NP-1506,United Cross-Border Initiative,international,25637,GA,501c3,1,23701,2999
+NP-1507,Eastview Community Church,religion,1280154,DE,501c3,41,1199907,387105
+NP-1508,Eagle Religious Society,religion,9347,FL,501c3,3,8346,1414
+NP-1509,Northside Educational Trust,education,10382,VA,501c3,1,8125,1307
+NP-1510,Unity Humane Society,animal,41244,NJ,501c3,1,46919,2179
+NP-1511,Beacon Innovation Hub,science_tech,440313,VA,501c3,7,454536,20651
+NP-1512,United Transitional Housing,housing_shelter,53466,MT,501c3,1,42774,6976
+NP-1513,Cedar Tutoring Initiative,education,849844,TX,501c3,18,669107,44874
+NP-1514,Harvest Learning Center,education,297812,NJ,501c3,5,286809,70318
+NP-1515,Bright Parks Foundation,recreation,860070,IL,501c3,16,718333,299218
+NP-1516,National Science Foundation,science_tech,666955,OK,501c3,15,530750,80056
+NP-1517,Sacred Housing Coalition,housing_shelter,355586,MO,501c3,5,316479,78512
+NP-1518,Central Policy Institute,social_science,1064851,NJ,501c3,54,1031633,50298
+NP-1519,Unity Conservancy,environment,37889,TN,501c3,1,36022,2660
+NP-1520,New Helpline,human_services,10708,GA,501c3,0,10347,213
+NP-1521,Lakeshore Synagogue,religion,623322,WA,501c3,15,609043,208815
+NP-1522,Foundation Tutoring Initiative,education,998807,KS,501c3,9,975948,244709
+NP-1523,Capital Family Services,human_services,44844,NJ,501c3,0,43750,1411
+NP-1524,Bright Wellness Foundation,health_care,109384,NC,501c3,3,89846,9386
+NP-1525,Sunrise Employment Coalition,employment,11266660,MI,501c3,53,12902586,852365
+NP-1526,Liberty Scholarship Fund,education,239512,TN,501c8,2,220687,39499
+NP-1527,Bright Homeless Shelter,housing_shelter,41912,OK,501c3,1,37718,14130
+NP-1528,Central Social Services,human_services,915448,CA,501c3,9,813925,124466
+NP-1529,Bright Global Relief,international,219704,OH,501c3,2,170262,13962
+NP-1530,Greater Equity Initiative,civil_rights,84313,IL,501c3,1,80924,6101
+NP-1531,Northside Land Trust,environment,887637,NY,501c7,20,957719,115070
+NP-1532,Bright Disaster Relief,public_safety,38267,NV,501c3,0,33908,627
+NP-1533,Northside Community Services,human_services,2631905,NM,501c3,29,2940326,377751
+NP-1534,Capital Wellness Network,mental_health,41530,AZ,501c3,0,40220,53
+NP-1535,Eastview Housing Coalition,housing_shelter,254097,ID,501c6,12,251213,47310
+NP-1536,United Cultural Center,arts_culture,4749150,PA,501c3,73,4784535,1660868
+NP-1537,Oakland Community Garden,food_agriculture,805123,CA,501c3,9,609911,105171
+NP-1538,Oakland Wellness Foundation,health_care,185921,IL,501c3,1,145892,32327
+NP-1539,Mountainview Food Bank,food_agriculture,77934,OK,501c3,1,58700,8143
+NP-1540,Southern Hospital Volunteers,health_care,592969,SC,501c3,16,507488,147956
+NP-1541,Holy Transitional Housing,housing_shelter,4178295,WA,501c3,69,3435382,712411
+NP-1542,Harvest Volunteer Fire,public_safety,4922403,SC,501c3,50,4900964,605963
+NP-1543,Eastern Temple,religion,217907,CT,501c3,2,201023,30826
+NP-1544,Valley Transitional Housing,housing_shelter,91430,DE,501c4,1,91267,30993
+NP-1545,Pinewood Health Center,health_care,281105,NJ,501c3,4,293139,32737
+NP-1546,Capital Science Foundation,science_tech,160181,CA,501c3,2,161346,9349
+NP-1547,National Neighborhood Coalition,community_improvement,16138,IA,501c3,0,14147,2180
+NP-1548,Mountainview Aid Society,human_services,411718,NY,501c3,14,359838,47762
+NP-1549,Pinewood Temple,religion,215622,MO,501c6,3,179538,69876
+NP-1550,Maple Charitable Trust,philanthropy,2207595,SD,501c3,34,2443717,124094
+NP-1551,Hope Aid Society,human_services,59385,FL,501c3,4,58277,6228
+NP-1552,Cedar Aid Society,human_services,228329,UT,501c3,0,222200,276
+NP-1553,Phoenix Science Lab,medical_research,30920,WI,501c3,2,25174,3698
+NP-1554,Children Mentoring Network,youth_development,4951612,MI,501c3,12,4326333,452138
+NP-1555,United Patient Support Network,diseases,26739,IN,501c3,1,22404,1190
+NP-1556,Lakeshore Schools Foundation,education,881840,MO,501c3,8,939635,214572
+NP-1557,Senior Wildlife Fund,environment,1897994,TX,501c7,60,2079317,223842
+NP-1558,Southside Helpline,human_services,86087,MA,501c3,0,88885,1565
+NP-1559,National Giving Foundation,philanthropy,2118949,VA,501c3,61,1896368,181304
+NP-1560,Children Pet Adoption Center,animal,3395130,LA,501c3,50,2718749,432171
+NP-1561,Crescent Boys & Girls Club,youth_development,215027,CO,501c3,0,209007,1742
+NP-1562,Pinewood Helpline,human_services,4014717,MA,501c3,22,3579456,514285
+NP-1563,Beacon Ministry,religion,25920,WV,501c3,2,24751,8760
+NP-1564,New Improvement Trust,community_improvement,26457,CT,501c3,0,25936,6295
+NP-1565,Hope Counseling Center,mental_health,695136,FL,501c3,18,554273,65480
+NP-1566,Heritage Green Initiative,environment,3707032,NY,501c3,18,4024052,366485
+NP-1567,Capital Scholarship Fund,education,97707,OR,501c3,2,98621,20107
+NP-1568,National Scholarship Fund,education,848131,KS,501c6,2,669826,89424
+NP-1569,Foundation Conservancy,environment,18617,AZ,501c3,3,16519,1675
+NP-1570,Harvest Educational Trust,education,31791,CA,501c3,0,34728,7694
+NP-1571,Maple International Aid,international,853075,TX,501c3,4,705080,36290
+NP-1572,Greater Tutoring Initiative,education,846930,WI,501c3,18,844067,75876
+NP-1573,Central Social Services,human_services,188424,CA,501c3,1,148057,20363
+NP-1574,Open Advocacy Network,civil_rights,56583,TX,501c3,0,48756,1116
+NP-1575,Lighthouse Synagogue,religion,135293,CT,501c3,0,104955,47622
+NP-1576,Oakland Helpline,human_services,940216,OH,501c7,4,1009414,28345
+NP-1577,Willow Trail Conservancy,recreation,104479,TX,501c3,3,87840,14894
+NP-1578,Children Synagogue,religion,134166,VA,501c3,1,125888,49162
+NP-1579,Cedar Cultural Center,arts_culture,194849,AK,501c6,2,167863,35731
+NP-1580,Bayside Youth Foundation,youth_development,18965,NC,501c3,2,15089,856
+NP-1581,Southside Counseling Center,mental_health,3870785,NY,501c3,8,3452997,248716
+NP-1582,Family Schools Foundation,education,230124,AZ,501c4,2,223812,30983
+NP-1583,Eastview Mentoring Network,youth_development,682469,OH,501c3,13,626984,97929
+NP-1584,Holy Community Foundation,community_improvement,100716,TX,501c3,0,99553,21095
+NP-1585,Community Museum,arts_culture,790373,CA,501c4,9,655794,260059
+NP-1586,Western Academy,education,462949,NJ,501c3,13,360927,25969
+NP-1587,Crescent Community Church,religion,26391,WI,501c3,0,20077,8281
+NP-1588,Eastern Synagogue,religion,14245849,KY,501c3,291,12966647,2172409
+NP-1589,Sacred Arts Council,arts_culture,388444,WA,501c3,13,345979,108316
+NP-1590,Eastview Green Initiative,environment,11723154,WA,501c3,246,10691202,1672294
+NP-1591,Riverside Science Foundation,science_tech,116796,NC,501c3,2,124965,10161
+NP-1592,Unity Faith Center,religion,71648,GA,501c3,2,54707,9668
+NP-1593,Eastern Meal Program,food_agriculture,13607,MI,501c4,1,12767,519
+NP-1594,Maple International Aid,international,50198,CT,501c3,1,49464,3413
+NP-1595,Sacred Community Clinic,health_care,419498,AZ,501c3,17,436068,71827
+NP-1596,Harvest Aid Society,human_services,926594,FL,501c3,15,798083,60334
+NP-1597,International Temple,religion,21274617,TX,501c3,285,20474948,7430690
+NP-1598,Unity Legal Aid Society,crime_legal,404920,FL,501c3,11,403137,60527
+NP-1599,Bright Learning Center,education,4557279,KY,501c3,25,3843853,697784
+NP-1600,Bright Academy,education,845644,GA,501c3,2,831286,86169
+NP-1601,Mountainview Humane Society,animal,406099,MO,501c3,18,437776,34043
+NP-1602,Sunrise Scholarship Fund,education,3112459,NC,501c3,45,3270639,663152
+NP-1603,National Synagogue,religion,49832,AR,501c3,0,59217,12786
+NP-1604,Harvest Trail Conservancy,recreation,103023,NC,501c3,2,77796,26994
+NP-1605,Capital Health Center,health_care,31190,MD,501c3,0,27108,2130
+NP-1606,Mountainview Religious Society,religion,2134207,NJ,501c3,29,2072685,792097
+NP-1607,Eagle Community Services,human_services,944560,OH,501c6,17,899694,33225
+NP-1608,Capital Community Services,human_services,722047,NY,501c3,5,547892,99606
+NP-1609,New Watershed Alliance,environment,792651,NY,501c4,9,654315,33958
+NP-1610,Bayside Improvement Trust,community_improvement,176768,LA,501c3,2,193140,33657
+NP-1611,Faith Patient Support Network,diseases,256716,NY,501c3,10,208576,9696
+NP-1612,Pinewood Recreation Association,recreation,16930995,TX,501c3,164,17619461,4449226
+NP-1613,Liberty Housing Coalition,housing_shelter,85036,WA,501c3,1,81753,9551
+NP-1614,Sunrise Mutual Aid Society,mutual_membership,22690208,OH,501c3,267,21633014,740757
+NP-1615,Cedar Community Clinic,health_care,448361,FL,501c3,9,404017,76193
+NP-1616,Eastview Social Services,human_services,968945,TX,501c3,2,916818,34160
+NP-1617,Sacred Search and Rescue,public_safety,1091984,CA,501c3,29,1027807,131100
+NP-1618,Harvest Wellness Foundation,health_care,478862,AZ,501c3,8,461469,99382
+NP-1619,Bright Charitable Trust,philanthropy,4906398,MI,501c3,16,4692179,299501
+NP-1620,Open Volunteer Fire,public_safety,2936615,ID,501c3,26,2249223,183551
+NP-1621,Bright Neighborhood Coalition,community_improvement,3628109,OR,501c3,56,4188983,628728
+NP-1622,Community Social Services,human_services,331688,MA,501c3,18,269486,45475
+NP-1623,Hope Wellness Network,mental_health,279005,NY,501c3,5,275132,31120
+NP-1624,Western Foundation,unknown_unclassified,1186598,NY,501c6,52,1002552,95755
+NP-1625,Capital Animal Rescue,animal,353516,MA,501c3,8,282710,52003
+NP-1626,Silver Schools Foundation,education,349348,MA,501c3,17,263741,63306
+NP-1627,Family Improvement Trust,community_improvement,53077,PA,501c8,1,43788,11838
+NP-1628,Phoenix Restorative Justice Network,crime_legal,142422,GA,501c3,0,137513,3016
+NP-1629,Holy International Aid,international,455132,IL,501c4,11,454330,24155
+NP-1630,Harvest Justice Initiative,crime_legal,76505,NY,501c3,4,75947,3987
+NP-1631,Cedar Community Services,human_services,190970,CA,501c3,1,169764,21203
+NP-1632,Hillcrest Educational Trust,education,736939,TX,501c3,15,845885,133628
+NP-1633,Holy Schools Foundation,education,7590,PA,501c3,0,7248,944
+NP-1634,Eastern Affordable Housing Initiative,housing_shelter,22591,NJ,501c3,0,19275,4943
+NP-1635,Senior Society,unknown_unclassified,44514,TX,501c4,2,41671,6128
+NP-1636,Cedar Workforce Development,employment,60755,VT,501c3,2,47355,2631
+NP-1637,International Watershed Alliance,environment,2435082,NY,501c3,37,2165486,286218
+NP-1638,Central Cultural Center,arts_culture,346598,WA,501c8,10,387317,47960
+NP-1639,Eastview Social Services,human_services,99310,NY,501c3,5,75106,14235
+NP-1640,Willow Community Services,human_services,956062,PA,501c3,8,963395,44737
+NP-1641,Community Religious Society,religion,450631,SD,501c3,17,442086,155323
+NP-1642,Willow Restorative Justice Network,crime_legal,69232,SC,501c3,2,66346,3486
+NP-1643,Pioneer Community Services,human_services,103307,KY,501c4,3,94976,10620
+NP-1644,Holy Neighborhood Coalition,community_improvement,37668,NY,501c3,1,36216,7301
+NP-1645,National Health Center,health_care,70026,AR,501c3,0,76070,14535
+NP-1646,Westgate Homeless Shelter,housing_shelter,175131,WI,501c3,2,146233,69469
+NP-1647,Sunrise Wellness Foundation,health_care,53505,MD,501c3,4,45854,6545
+NP-1648,New Scouts Council,youth_development,254081,FL,501c3,12,220834,12106
+NP-1649,International Science Foundation,science_tech,361564,CO,501c3,20,327317,49236
+NP-1650,Eastview Wellness Foundation,health_care,939096,SD,501c3,17,862042,174864
+NP-1651,Oakland Animal Rescue,animal,23134392,LA,501c3,235,22180132,1061039
+NP-1652,Sacred Recreation Association,recreation,277054,TX,501c3,6,332058,82523
+NP-1653,Golden Patient Support Network,diseases,295194,KY,501c6,18,322474,34066
+NP-1654,New Educational Trust,education,12537,TX,501c3,0,9560,1935
+NP-1655,Bayside Patient Support Network,diseases,3503439,CA,501c3,69,3349585,335380
+NP-1656,Community Disease Foundation,diseases,1986633,AL,501c3,45,2115739,212447
+NP-1657,Lighthouse Civic League,community_improvement,788532,NY,501c3,6,640182,176056
+NP-1658,Westgate Civic League,community_improvement,25553,AL,501c3,0,25445,1295
+NP-1659,Pioneer Religious Society,religion,5640,MA,501c3,2,4718,2081
+NP-1660,Northside Medical Auxiliary,health_care,197247,CA,501c4,1,151497,43028
+NP-1661,Children Cultural Center,arts_culture,170481,NC,501c3,3,145685,17817
+NP-1662,Pioneer Cross-Border Initiative,international,59229,GA,501c3,1,57939,4657
+NP-1663,Capital Improvement Trust,community_improvement,386325,VA,501c3,20,330627,72020
+NP-1664,Pioneer Civil Rights Coalition,civil_rights,2798325,CA,501c3,31,2571041,275136
+NP-1665,Saint Helpline,human_services,19143,NY,501c3,2,18528,2525
+NP-1666,Phoenix Parks Foundation,recreation,7577,OR,501c3,1,7112,2797
+NP-1667,National Synagogue,religion,280874,AL,501c3,16,226990,35688
+NP-1668,Foundation Meal Program,food_agriculture,22754,OH,501c3,1,24008,1448
+NP-1669,Senior Science Lab,medical_research,44764,TX,501c3,2,38833,3756
+NP-1670,Phoenix STEM Foundation,science_tech,639670,MS,501c3,6,550570,71465
+NP-1671,Faith Community Foundation,community_improvement,250756,CA,501c3,20,230422,30951
+NP-1672,Oakland Synagogue,religion,96145,CA,501c3,4,90388,22863
+NP-1673,Westgate Health Center,health_care,491052,CT,501c_other,19,488287,111515
+NP-1674,Community Music Society,arts_culture,3167239,MI,501c3,31,2541277,746794
+NP-1675,Golden Foundation,unknown_unclassified,494116,CA,501c6,13,377100,61446
+NP-1676,Community Schools Foundation,education,471207,WA,501c8,16,476352,100487
+NP-1677,Riverside Green Initiative,environment,619229,CA,501c4,16,534953,33409
+NP-1678,Holy Scholarship Fund,education,20855,GA,501c3,0,20842,1404
+NP-1679,Silver Neighborhood Coalition,community_improvement,92327,WA,501c3,0,89872,15568
+NP-1680,Family Donor Network,philanthropy,80947,GA,501c3,3,72572,11747
+NP-1681,Children Faith Center,religion,305893,FL,501c3,4,249748,44696
+NP-1682,Eastview Helpline,human_services,14724,GA,501c3,0,15888,264
+NP-1683,Liberty International Aid,international,2764446,KY,501c3,75,2549949,407705
+NP-1684,Golden World Mission,international,97038,NC,501c3,5,106071,8772
+NP-1685,Crescent Community Church,religion,4346188,PA,501c3,46,3379508,496464
+NP-1686,Cedar Workforce Development,employment,16799,NC,501c3,0,12868,807
+NP-1687,Hillcrest Recreation Association,recreation,15921,CO,501c3,2,12076,4596
+NP-1688,Foundation Family Services,human_services,7730,AZ,501c4,3,6582,591
+NP-1689,Eastern Scholarship Fund,education,201991,LA,501c3,0,193590,11060
+NP-1690,Central Mental Health Initiative,mental_health,3930277,NY,501c3,18,3929925,539062
+NP-1691,Southern Conservancy,environment,2498811,NV,501c3,15,2303869,302719
+NP-1692,Eastview Educational Trust,education,595993,TX,501c3,13,694610,111616
+NP-1693,Foundation Youth Foundation,youth_development,82264,AZ,501c3,0,64844,531
+NP-1694,Beacon Temple,religion,107353,WI,501c3,5,106436,12285
+NP-1695,Eagle Synagogue,religion,506398,TN,501c7,8,495737,51096
+NP-1696,First Synagogue,religion,433167,UT,501c3,11,371896,124777
+NP-1697,Northern Group,unknown_unclassified,3287755,IL,501c3,53,2959007,457380
+NP-1698,Beacon Wellness Network,mental_health,18354,CA,501c3,3,17966,1969
+NP-1699,Southside Religious Society,religion,17676,MS,501c3,1,13412,5455
+NP-1700,Phoenix Housing Coalition,housing_shelter,1913536,MO,501c3,32,1845507,524913
+NP-1701,Eagle Arts Council,arts_culture,943815,OH,501c3,7,709380,139877
+NP-1702,Hope Tutoring Initiative,education,75635,FL,501c3,0,64853,6561
+NP-1703,Riverside Watershed Alliance,environment,32252,WV,501c3,0,32476,1188
+NP-1704,Harvest Cultural Center,arts_culture,686735,AR,501c3,9,620026,180133
+NP-1705,Bayside Medical Auxiliary,health_care,37583,CA,501c4,0,29210,8850
+NP-1706,Silver Synagogue,religion,794950,KS,501c3,19,776786,156591
+NP-1707,Senior Learning Center,education,143905,MA,501c3,1,132195,19256
+NP-1708,Southern Neighborhood Coalition,community_improvement,236488,UT,501c3,0,223873,53915
+NP-1709,Southern Music Society,arts_culture,142494,NC,501c3,1,135412,22330
+NP-1710,Sacred Tutoring Initiative,education,36553,AL,501c3,2,28324,6015
+NP-1711,Community Gallery,arts_culture,28672,OH,501c3,1,23633,7600
+NP-1712,Riverside Recreation Association,recreation,746648,PA,501c3,7,712832,199208
+NP-1713,Lighthouse Cross-Border Initiative,international,156609,SC,501c4,0,181802,1210
+NP-1714,Western Research Coalition,social_science,15435151,LA,501c3,67,15431623,718849
+NP-1715,Central Learning Center,education,390680,CA,501c3,6,387528,37398
+NP-1716,Sunrise Educational Trust,education,12094162,CA,501c3,107,13134567,2413444
+NP-1717,Pinewood Community Church,religion,867578,ID,501c3,2,856113,278003
+NP-1718,Eagle Boys & Girls Club,youth_development,578259,RI,501c3,9,585810,47803
+NP-1719,Eastview Aid Society,human_services,49880,TX,501c3,0,40756,117
+NP-1720,Lighthouse Conservancy,environment,160505,MD,501c3,5,135132,12478
+NP-1721,Northern Youth Foundation,youth_development,841710,FL,501c3,7,1025145,94201
+NP-1722,Southside Meal Program,food_agriculture,1667403,OH,501c3,75,1565395,55858
+NP-1723,Faith Community Foundation,community_improvement,43595,CA,501c3,0,47688,5839
+NP-1724,Pioneer Mental Health Initiative,mental_health,4529232,WA,501c3,58,4079155,620101
+NP-1725,International Social Services,human_services,353210,NM,501c3,13,286325,22758
+NP-1726,Harvest Medical Auxiliary,health_care,151471,CA,501c7,3,145325,14381
+NP-1727,Community Theater Company,arts_culture,133941,IN,501c3,4,112077,46907
+NP-1728,Northern Synagogue,religion,982153,NY,501c3,12,1134858,192667
+NP-1729,First Tutoring Initiative,education,1164797,NJ,501c3,71,1350479,218339
+NP-1730,Northside Boys & Girls Club,youth_development,975759,GA,501c3,4,954823,73798
+NP-1731,Hope Sports League,recreation,647709,LA,501c4,16,724569,135818
+NP-1732,Central Transitional Housing,housing_shelter,52276,FL,501c3,4,40029,18314
+NP-1733,Sacred Homeless Shelter,housing_shelter,80599,CA,501c_other,3,71569,24384
+NP-1734,Phoenix Improvement Trust,community_improvement,640640,OH,501c3,12,727798,62773
+NP-1735,Westgate Trust,unknown_unclassified,907330,NY,501c3,18,826921,74136
+NP-1736,Hillcrest Scholarship Fund,education,488094,IL,501c3,2,486270,115858
+NP-1737,Maple Academy,education,334697,IL,501c3,13,324607,73247
+NP-1738,Westgate Donor Network,philanthropy,9587188,NY,501c3,162,8565969,1423466
+NP-1739,Heritage Research Society,diseases,13884271,NM,501c3,140,12904765,1984271
+NP-1740,Northern Civil Rights Coalition,civil_rights,2899202,UT,501c3,60,2621064,165604
+NP-1741,Phoenix Gallery,arts_culture,239153,IN,501c3,4,242551,32542
+NP-1742,Maple Safety Coalition,public_safety,60251,CA,501c6,1,64215,7151
+NP-1743,Capital Tech Initiative,science_tech,94582,NJ,501c3,3,90082,8480
+NP-1744,Unity Giving Foundation,philanthropy,715441,NM,501c3,12,774132,40571
+NP-1745,Riverside Employment Coalition,employment,149361,MA,501c3,0,120344,462
+NP-1746,Central Family Services,human_services,1263745,KY,501c3,11,1310186,136344
+NP-1747,Willow Arts Council,arts_culture,882461,KS,501c3,6,694727,210850
+NP-1748,Senior Legal Aid Society,crime_legal,457555,AZ,501c3,5,439655,35579
+NP-1749,Maple Habitat,housing_shelter,37389,TX,501c3,1,29194,12438
+NP-1750,Eagle Boys & Girls Club,youth_development,4288724,FL,501c3,39,3833378,625995
+NP-1751,Foundation Civic Engagement Coalition,public_societal,927127,TX,501c3,16,809557,127233
+NP-1752,Liberty Academy,education,934270,PA,501c3,9,898090,89061
+NP-1753,Sacred Habitat,housing_shelter,6604,MT,501c3,1,5628,1431
+NP-1754,Capital Global Relief,international,26264,LA,501c3,0,20517,131
+NP-1755,Eastern Research Coalition,social_science,8007838,WA,501c3,292,7944501,657996
+NP-1756,Oakland Housing Coalition,housing_shelter,79007,NY,501c3,3,62570,30888
+NP-1757,Central Tutoring Initiative,education,8477,TX,501c3,1,8048,1010
+NP-1758,Pioneer Parks Foundation,recreation,951009,WI,501c3,7,895537,210656
+NP-1759,Western Improvement Trust,community_improvement,92997,AZ,501c_other,0,85243,16468
+NP-1760,Southside Charitable Trust,philanthropy,26816,NY,501c3,0,26134,140
+NP-1761,Central Food Bank,food_agriculture,4238716,PA,501c3,23,4095438,134054
+NP-1762,Phoenix Pet Adoption Center,animal,14398,OH,501c3,1,13183,1250
+NP-1763,Sunrise Schools Foundation,education,15434,CO,501c3,0,12113,2704
+NP-1764,Silver Tutoring Initiative,education,16213,RI,501c3,0,14006,2984
+NP-1765,Pinewood Disease Foundation,diseases,230194,SD,501c3,1,194613,6920
+NP-1766,Willow Hospital Volunteers,health_care,21257,NC,501c3,0,20289,2370
+NP-1767,Open Pet Adoption Center,animal,371309,WI,501c4,19,361170,12758
+NP-1768,Pioneer Conservancy,environment,120946,TX,501c3,3,135282,9983
+NP-1769,Saint Workforce Development,employment,412958,IL,501c3,17,400989,24144
+NP-1770,Crescent Temple,religion,661883,MO,501c4,8,508550,219076
+NP-1771,Heritage Watershed Alliance,environment,833936,ID,501c3,12,646248,29589
+NP-1772,Bayside Educational Trust,education,199126,OK,501c3,1,174835,41798
+NP-1773,Sacred Museum,arts_culture,20578222,CA,501c3,242,17675686,6765184
+NP-1774,Riverside Medical Auxiliary,health_care,55834,NC,501c3,1,51819,7555
+NP-1775,Silver Giving Foundation,philanthropy,157826,CA,501c3,2,141699,23201
+NP-1776,Valley Boys & Girls Club,youth_development,45807,NH,501c3,1,39570,3463
+NP-1777,Oakland Museum,arts_culture,17058,OH,501c3,0,13343,3821
+NP-1778,Crescent Hospital Volunteers,health_care,490167,ND,501c3,18,479373,80379
+NP-1779,Bayside Patient Support Network,diseases,178259,KS,501c3,5,177141,25500
+NP-1780,International Hospital Volunteers,health_care,3566858,NY,501c3,23,3337154,598581
+NP-1781,Lakeshore Animal Rescue,animal,79549,WI,501c3,1,76644,6299
+NP-1782,Capital Scholarship Fund,education,225050,CA,501c3,3,194696,48051
+NP-1783,Maple Recreation Association,recreation,25261,NM,501c3,3,24560,2989
+NP-1784,Crescent Giving Foundation,philanthropy,83985,MN,501c3,1,74910,6679
+NP-1785,Sunrise Neighborhood Coalition,community_improvement,5332,TX,501c3,0,4460,591
+NP-1786,Crescent Aid Society,human_services,16657,FL,501c3,0,15994,719
+NP-1787,Liberty Charitable Trust,philanthropy,44082,VA,501c3,0,42916,5
+NP-1788,Northside Community Church,religion,73625,AZ,501c6,2,65463,16121
+NP-1789,Central Tutoring Initiative,education,11707,NM,501c3,0,10720,954
+NP-1790,Central Educational Trust,education,148001,CT,501c3,1,114191,16317
+NP-1791,Golden Social Services,human_services,844998,GA,501c3,14,825574,28191
+NP-1792,Capital Aid Society,human_services,99365,AR,501c3,2,92133,10776
+NP-1793,Family Justice Initiative,crime_legal,26230,PA,501c3,0,26383,299
+NP-1794,Western Synagogue,religion,323487,TX,501c3,15,254336,105289
+NP-1795,First Land Trust,environment,311282,TX,501c_other,2,241831,24327
+NP-1796,Liberty Green Initiative,environment,38378,CA,501c3,0,34096,1286
+NP-1797,National Counseling Center,mental_health,225406,KY,501c3,2,205742,13500
+NP-1798,Sacred Learning Center,education,10670,TN,501c3,2,10433,1084
+NP-1799,Senior Humane Society,animal,9422809,FL,501c3,63,7624946,359689
+NP-1800,Western Educational Trust,education,569417,WI,501c7,11,469575,78505
+NP-1801,Eastview Voter Education Network,public_societal,126631,NY,501c4,4,111082,11323
+NP-1802,Bright Educational Trust,education,4882496,AL,501c3,41,4013178,773020
+NP-1803,Family Tutoring Initiative,education,116800,MD,501c3,0,88536,28167
+NP-1804,Southside Mental Health Initiative,mental_health,979649,OH,501c3,18,937888,58473
+NP-1805,Holy Workforce Development,employment,29259,SC,501c3,0,32533,669
+NP-1806,Hope Pet Adoption Center,animal,113106,IL,501c3,3,123272,9560
+NP-1807,Eagle Community Clinic,health_care,59899,CA,501c3,1,58759,6011
+NP-1808,Eastview Boys & Girls Club,youth_development,28343,CO,501c4,0,24047,549
+NP-1809,Northern Wildlife Sanctuary,animal,175828,NC,501c3,0,138065,5970
+NP-1810,Bayside Sports League,recreation,31399,IN,501c3,1,26937,4981
+NP-1811,New Health Center,health_care,83984,IA,501c3,2,83658,4396
+NP-1812,Valley Neighborhood Coalition,community_improvement,901581,CA,501c3,18,859719,183217
+NP-1813,Foundation Civic League,community_improvement,595241,NC,501c3,14,524756,48804
+NP-1814,Harvest Medical Research Institute,medical_research,183599,NY,501c3,3,150870,8892
+NP-1815,Mountainview Innovation Hub,science_tech,1561286,IL,501c3,11,1527929,220599
+NP-1816,Central Tutoring Initiative,education,2721815,PA,501c3,35,2363304,308003
+NP-1817,Bayside Parks Foundation,recreation,925912,NY,501c3,6,887595,265483
+NP-1818,Western Arts Council,arts_culture,83709,OH,501c3,0,80945,13256
+NP-1819,Capital Humane Society,animal,23805,VA,501c3,1,25481,1162
+NP-1820,Eastern Wildlife Fund,environment,27499,TX,501c6,0,24269,1214
+NP-1821,Open Homeless Shelter,housing_shelter,355241,IA,501c3,11,358934,97639
+NP-1822,Holy Wellness Foundation,health_care,9481704,VA,501c3,40,7847564,1555032
+NP-1823,Beacon Employment Coalition,employment,71449,VA,501c3,3,83150,4559
+NP-1824,Liberty Community Clinic,health_care,614143,MN,501c3,11,586868,48014
+NP-1825,Heritage Wildlife Fund,environment,523840,FL,501c3,11,419379,29353
+NP-1826,International Aid Society,human_services,475934,NE,501c4,5,439068,39779
+NP-1827,National Recreation Association,recreation,388109,MA,501c3,5,378671,61999
+NP-1828,Cedar Cultural Center,arts_culture,10508,IA,501c3,1,8612,1670
+NP-1829,Open Mental Health Initiative,mental_health,15543,VA,501c3,1,12215,921
+NP-1830,Silver Volunteer Fire,public_safety,984916,CA,501c3,15,1045581,107551
+NP-1831,Golden Learning Center,education,39987,OH,501c3,1,47415,3417
+NP-1832,Community Innovation Hub,science_tech,962822,NJ,501c4,8,815250,132884
+NP-1833,Golden Scouts Council,youth_development,4145906,UT,501c7,59,3486603,247675
+NP-1834,Mountainview Community Church,religion,46752,TX,501c8,1,43480,14730
+NP-1835,Valley Family Services,human_services,62244,OK,501c3,2,61796,5813
+NP-1836,Faith Science Lab,medical_research,6423,AR,501c3,0,6220,186
+NP-1837,Unity Research Coalition,social_science,319835,VA,501c3,9,313776,27522
+NP-1838,Eagle Tutoring Initiative,education,209838,KS,501c3,2,167742,39566
+NP-1839,Beacon Transitional Housing,housing_shelter,883718,CO,501c3,6,856184,272873
+NP-1840,Lighthouse Patient Support Network,diseases,274694,FL,501c3,6,217235,28570
+NP-1841,Foundation Counseling Center,mental_health,102367,FL,501c3,3,101786,10187
+NP-1842,Silver Employment Coalition,employment,360900,TN,501c3,20,407979,43934
+NP-1843,Northern Research Society,diseases,739748,CA,501c3,11,721181,71828
+NP-1844,Bayside Research Foundation,medical_research,4363759,CA,501c3,72,4412870,372862
+NP-1845,Bright Habitat,housing_shelter,781246,TN,501c3,19,645437,260093
+NP-1846,Heritage Health Center,health_care,45971,PA,501c3,1,34569,11169
+NP-1847,Westgate Scholarship Fund,education,175989,TX,501c3,2,176307,27959
+NP-1848,Riverside Civic League,community_improvement,86456,IL,501c3,4,82954,15833
+NP-1849,Golden Agricultural Coalition,food_agriculture,88994,MD,501c3,3,81956,13294
+NP-1850,Northern Research Foundation,medical_research,2875181,CT,501c3,55,2888764,159694
+NP-1851,Eagle Aid Society,human_services,477918,MN,501c3,13,454435,69866
+NP-1852,Unity Hospital Volunteers,health_care,39361,WA,501c3,3,39158,4283
+NP-1853,Senior Arts Council,arts_culture,3741513,MN,501c4,23,2927356,1359875
+NP-1854,Eastview Music Society,arts_culture,132211,TN,501c3,0,106975,50889
+NP-1855,Phoenix Boys & Girls Club,youth_development,72475,NE,501c3,5,72218,9292
+NP-1856,United Community Clinic,health_care,561252,CA,501c3,12,595560,77024
+NP-1857,Saint Medical Auxiliary,health_care,1758330,GA,501c3,23,1699582,163684
+NP-1858,Northside Restorative Justice Network,crime_legal,201920,CA,501c3,1,183160,15080
+NP-1859,Crescent Medical Auxiliary,health_care,64760,CA,501c3,1,49629,5014
+NP-1860,Community Humane Society,animal,1236376,TX,501c3,8,1198937,134776
+NP-1861,Capital Faith Center,religion,575070,SC,501c3,16,480252,104208
+NP-1862,Cedar Social Services,human_services,668416,AZ,501c3,19,525501,73680
+NP-1863,Crescent Academy,education,41461,CT,501c3,0,31792,2624
+NP-1864,Phoenix Housing Coalition,housing_shelter,317718,TN,501c3,16,255397,53724
+NP-1865,Eagle Therapy Coalition,mental_health,444864,TX,501c3,11,403889,37968
+NP-1866,Northside Community Services,human_services,89520,DE,501c3,1,75883,8425
+NP-1867,Maple Educational Trust,education,860909,FL,501c3,8,756620,201184
+NP-1868,Willow Community Church,religion,4406131,NJ,501c3,16,3458009,1158775
+NP-1869,Central Community Clinic,health_care,664343,WA,501c3,7,590137,87506
+NP-1870,Liberty Ministry,religion,3146887,CO,501c3,14,2715464,416062
+NP-1871,Lighthouse Food Bank,food_agriculture,225616,PA,501c3,1,176548,28673
+NP-1872,Crescent Mutual Aid Society,mutual_membership,44811,FL,501c3,1,47630,3656
+NP-1873,Silver Youth Foundation,youth_development,558807,MA,501c3,3,481032,48930
+NP-1874,Open Homeless Shelter,housing_shelter,585839,NY,501c6,5,572373,130571
+NP-1875,Central Civic Engagement Coalition,public_societal,83724,FL,501c3,3,75369,11563
+NP-1876,Eastern Helpline,human_services,479858,MA,501c3,13,522557,33317
+NP-1877,Lighthouse Wellness Network,mental_health,941758,NJ,501c6,20,733339,78102
+NP-1878,Saint Helpline,human_services,4517308,AZ,501c4,17,4652483,428483
+NP-1879,Crescent Public Interest Forum,public_societal,15753,NC,501c3,1,14700,969
+NP-1880,Western Neighborhood Coalition,community_improvement,141910,AL,501c3,2,121286,9451
+NP-1881,Sacred Youth Foundation,youth_development,945079,FL,501c3,19,724292,56224
+NP-1882,Phoenix Medical Auxiliary,health_care,1095059,MS,501c3,29,1143821,181142
+NP-1883,Holy Scholarship Fund,education,307936,CT,501c6,13,282011,34678
+NP-1884,National International Aid,international,903073,MN,501c3,12,798918,29256
+NP-1885,Valley Schools Foundation,education,22453,NY,501c3,0,21862,1726
+NP-1886,Heritage Academy,education,22403,CO,501c3,0,17255,3370
+NP-1887,Family Hospital Volunteers,health_care,80214,CA,501c3,1,65667,15195
+NP-1888,Silver Housing Coalition,housing_shelter,1330787,OH,501c3,35,1298159,372454
+NP-1889,Liberty Conservancy,environment,828535,NY,501c3,12,783036,121950
+NP-1890,Silver Mental Health Initiative,mental_health,92641,ID,501c3,1,76439,9280
+NP-1891,Holy Mental Health Initiative,mental_health,164513,AL,501c3,1,156637,7581
+NP-1892,Southside Agricultural Coalition,food_agriculture,44480,FL,501c3,0,43097,10
+NP-1893,Southern Green Initiative,environment,96189,CA,501c3,3,89326,10081
+NP-1894,Riverside Synagogue,religion,178541,PA,501c4,1,168732,69452
+NP-1895,Holy Family Services,human_services,5277581,VA,501c3,175,4401184,425723
+NP-1896,Silver Wellness Foundation,health_care,49739,NY,501c3,1,49227,11704
+NP-1897,Faith Parks Foundation,recreation,99556,CA,501c3,4,97598,38782
+NP-1898,Eagle Academy,education,3135519,VA,501c3,66,3115321,629862
+NP-1899,Lakeshore Giving Foundation,philanthropy,218928,NY,501c3,0,184053,9723
+NP-1900,Children Community Foundation,community_improvement,897179,HI,501c_other,14,970815,184040
+NP-1901,Capital Wildlife Fund,environment,972459,WV,501c3,4,769321,84008
+NP-1902,Foundation Community Church,religion,224491,FL,501c3,1,226607,70768
+NP-1903,Pinewood Scouts Council,youth_development,45870,TX,501c7,2,51311,2079
+NP-1904,Riverside Medical Auxiliary,health_care,92939,TX,501c3,4,95101,6226
+NP-1905,Westgate Workforce Development,employment,51289,TX,501c3,0,50492,2151
+NP-1906,Greater Sports League,recreation,940500,TX,501c3,19,896272,230249
+NP-1907,Mountainview Tutoring Initiative,education,785205,TN,501c3,16,703573,126892
+NP-1908,Mountainview Patient Support Network,diseases,148059,NY,501c6,0,125731,2210
+NP-1909,Hope Health Center,health_care,306094,NY,501c4,7,236174,66020
+NP-1910,Southern Land Trust,environment,612780,OH,501c3,3,477883,47749
+NP-1911,Pinewood Arts Council,arts_culture,15984,NM,501c3,1,14843,3584
+NP-1912,First Trail Conservancy,recreation,252615,FL,501c7,12,220023,27536
+NP-1913,Children Humane Society,animal,5872309,IL,501c3,276,4946221,309710
+NP-1914,Pioneer Aid Society,human_services,74947,FL,501c3,2,72970,2928
+NP-1915,Heritage Scholarship Fund,education,96526,TX,501c3,3,95523,24108
+NP-1916,Mountainview Learning Center,education,101648,LA,501c7,2,84511,25071
+NP-1917,Crescent Global Relief,international,1770355,PA,501c3,54,1557185,56381
+NP-1918,National Green Initiative,environment,49004,MA,501c3,2,46595,3067
+NP-1919,Northside Neighborhood Coalition,community_improvement,304589,MI,501c3,7,266546,34467
+NP-1920,Eagle Agricultural Coalition,food_agriculture,4020738,CA,501c3,11,4695066,251062
+NP-1921,Community Parks Foundation,recreation,28483,IL,501c3,1,26802,7437
+NP-1922,Family Improvement Trust,community_improvement,649702,VA,501c3,19,666288,104732
+NP-1923,National Learning Center,education,3097990,MI,501c_other,75,2606144,169544
+NP-1924,Community Restorative Justice Network,crime_legal,8675400,IN,501c8,56,7581798,850800
+NP-1925,Willow Medical Auxiliary,health_care,777393,CA,501c3,8,732607,136094
+NP-1926,Open Religious Society,religion,217715,NY,501c3,5,170153,36402
+NP-1927,Northern Community Clinic,health_care,1705366,GA,501c3,16,2114415,333178
+NP-1928,Pioneer Donor Network,philanthropy,4193385,IL,501c3,35,3162333,401832
+NP-1929,Silver Community Foundation,community_improvement,129158,MN,501c_other,2,110329,26299
+NP-1930,Pinewood Tutoring Initiative,education,8025,TX,501c3,0,7875,1717
+NP-1931,Pioneer Habitat,housing_shelter,389442,NM,501c3,20,384379,111120
+NP-1932,Hope Volunteer Fire,public_safety,7758190,CO,501c3,257,6218985,460784
+NP-1933,Southside Voter Education Network,public_societal,429384,KY,501c8,9,332235,17868
+NP-1934,Mountainview Scholarship Fund,education,93394,CA,501c4,2,91966,10828
+NP-1935,International Synagogue,religion,33512,PA,501c8,2,31951,5396
+NP-1936,Unity Community Clinic,health_care,165636,GA,501c3,1,170163,21679
+NP-1937,Community Helpline,human_services,92202,CA,501c3,3,98714,8730
+NP-1938,Open Schools Foundation,education,175755,TX,501c3,5,163124,13734
+NP-1939,Harvest Homeless Shelter,housing_shelter,135636,CA,501c3,2,131285,53071
+NP-1940,Pinewood Scholarship Fund,education,102207,NM,501c3,1,78591,20882
+NP-1941,Lakeshore Social Services,human_services,118204,TX,501c3,2,118053,8453
+NP-1942,Hope Family Services,human_services,20225,AR,501c3,1,16238,1597
+NP-1943,Pinewood Scholarship Fund,education,7940,NY,501c3,1,7612,1958
+NP-1944,Faith Aid Society,human_services,132792,KS,501c3,0,145360,4749
+NP-1945,Capital Community Services,human_services,13675458,NC,501c3,199,10382417,1846710
+NP-1946,Crescent Policy Institute,social_science,91550,RI,501c3,1,91780,9580
+NP-1947,Golden Museum,arts_culture,303728,NJ,501c3,11,236841,51774
+NP-1948,Maple Educational Trust,education,35415,DC,501c3,1,33867,5020
+NP-1949,Pinewood Job Training Center,employment,201561,CA,501c3,5,237502,29090
+NP-1950,Greater Member Cooperative,mutual_membership,207156,ID,501c3,4,190842,12915
+NP-1951,First Meal Program,food_agriculture,417539,OR,501c3,8,316202,61376
+NP-1952,Hope Medical Auxiliary,health_care,9212895,WA,501c_other,160,7410622,846618
+NP-1953,Eastview Helpline,human_services,498374,UT,501c3,5,407298,53058
+NP-1954,Bayside Family Services,human_services,295106,IL,501c3,2,344091,18641
+NP-1955,Central Justice Fund,civil_rights,151266,TX,501c3,2,117889,9059
+NP-1956,Westgate Pet Adoption Center,animal,762376,FL,501c3,18,817573,71196
+NP-1957,Maple Habitat,housing_shelter,1076699,VT,501c3,52,1164617,428406
+NP-1958,Heritage Tutoring Initiative,education,323129,UT,501c3,4,329154,71940
+NP-1959,Holy Awareness Campaign,diseases,251098,PA,501c3,9,193369,29528
+NP-1960,Foundation Arts Council,arts_culture,11766064,CA,501c3,93,11501773,3267059
+NP-1961,Southern Educational Trust,education,14758,LA,501c3,2,11413,1053
+NP-1962,Pioneer Global Relief,international,358774,MA,501c3,3,342718,37901
+NP-1963,Bayside Cross-Border Initiative,international,446937,NE,501c3,3,430363,44613
+NP-1964,Cedar Community Foundation,community_improvement,8947,IL,501c3,0,10146,1051
+NP-1965,New Cultural Center,arts_culture,938892,KS,501c3,16,704819,132647
+NP-1966,Greater Cross-Border Initiative,international,1443688,WI,501c3,62,1282069,62552
+NP-1967,Children Community Church,religion,960909,TX,501c4,20,931322,234785
+NP-1968,Bayside Transitional Housing,housing_shelter,18737,MI,501c3,1,17436,2897
+NP-1969,Bayside Music Society,arts_culture,744067,WI,501c3,18,583306,131750
+NP-1970,Foundation Improvement Trust,community_improvement,10444852,TX,501c4,102,7913127,2597246
+NP-1971,Liberty Volunteer Fire,public_safety,510445,OK,501c3,14,545269,37150
+NP-1972,Hillcrest Community Clinic,health_care,137234,OK,501c4,0,106093,18020
+NP-1973,Eastview Patient Support Network,diseases,73853,CA,501c6,0,87245,1930
+NP-1974,Holy Health Center,health_care,42635,FL,501c3,2,41118,9424
+NP-1975,Mountainview Humane Society,animal,814932,CA,501c4,4,840715,46806
+NP-1976,Northside Therapy Coalition,mental_health,244192,CA,501c3,5,236918,30597
+NP-1977,Mountainview Pet Adoption Center,animal,131061,VA,501c3,4,111366,8014
+NP-1978,International Habitat,housing_shelter,1512877,LA,501c3,48,1301621,296955
+NP-1979,Sacred Scholarship Fund,education,2382089,SC,501c4,20,2068737,483600
+NP-1980,Northside Tutoring Initiative,education,3682223,IL,501c3,13,3647628,524245
+NP-1981,Eagle Disease Foundation,diseases,196943,TX,501c3,3,165927,9248
+NP-1982,United Employment Coalition,employment,2945508,CA,501c3,23,2683657,355121
+NP-1983,Lakeshore Trust,unknown_unclassified,613515,MN,501c3,5,497793,35211
+NP-1984,Maple Innovation Hub,science_tech,71254,PA,501c3,3,69056,3522
+NP-1985,Riverside Wellness Foundation,health_care,138666,MN,501c3,4,118315,15260
+NP-1986,Eastern Medical Research Institute,medical_research,348893,NY,501c3,8,327652,46458
+NP-1987,Open Religious Society,religion,2996018,FL,501c3,61,2899865,412294
+NP-1988,Lighthouse Community Services,human_services,107919,OR,501c3,3,101144,16105
+NP-1989,Foundation Learning Center,education,636161,MO,501c3,2,480352,98582
+NP-1990,Willow Agricultural Coalition,food_agriculture,15984777,MA,501c3,270,12811390,496489
+NP-1991,Sunrise Science Lab,medical_research,371470,CA,501c3,17,359290,18222
+NP-1992,Pinewood Aid Society,human_services,288577,CA,501c3,7,266086,34614
+NP-1993,Phoenix Aid Society,human_services,46085,FL,501c3,0,41583,1926
+NP-1994,Bayside Justice Initiative,crime_legal,114996,TX,501c3,3,106556,8582
+NP-1995,Lighthouse Neighborhood Coalition,community_improvement,10758,GA,501c3,2,11785,554
+NP-1996,Northern Green Initiative,environment,24080355,NV,501c3,47,22776636,1491463
+NP-1997,Oakland Health Center,health_care,477633,OR,501c3,4,442626,96431
+NP-1998,Maple Awareness Campaign,diseases,16220,FL,501c4,1,18314,872
+NP-1999,Family Improvement Trust,community_improvement,158687,FL,501c4,4,165678,25808
+NP-2000,Hope Crime Victims Fund,crime_legal,397540,NY,501c3,3,392694,27434

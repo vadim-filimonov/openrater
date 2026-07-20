@@ -1,0 +1,160 @@
+/**
+ * <GlobalErrorSurface> styles — a fixed bottom-right stack of error
+ * cards (Brief 58, Pillar A). Bottom-right keeps it clear of the app
+ * header (top) and the <Toast> (bottom-center). Anchored at the bottom
+ * so the stack grows upward as failures accumulate.
+ *
+ * Tokens only (no raw palette): feedback-error / feedback-error-bg /
+ * feedback-error-soft for the error skin; surface/border/text/shadow
+ * for the card; s-* spacing; r-* radius; d-* / ease-soft motion.
+ */
+
+.rater-error-surface {
+  position: fixed;
+  bottom: var(--rater-s-24);
+  right: var(--rater-s-24);
+  z-index: var(--rater-z-toast);
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-10);
+
+  width: min(420px, calc(100vw - var(--rater-s-32)));
+  pointer-events: none;
+}
+
+.rater-error-surface__card {
+  pointer-events: auto;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: start;
+  gap: var(--rater-s-10);
+  padding: var(--rater-s-12) var(--rater-s-14);
+
+  background: var(--rater-surface-2);
+  border: 1px solid var(--rater-feedback-error-soft, var(--rater-accent-danger));
+  border-left: 3px solid var(--rater-accent-danger);
+  border-radius: var(--rater-r-8);
+  box-shadow: var(--rater-shadow-floating);
+  color: var(--rater-text-default);
+
+  font-family: var(--rater-font-sans);
+  font-size: var(--rater-t-13);
+  line-height: 1.45;
+  letter-spacing: var(--rater-tracking-tight);
+
+  animation: rater-error-surface-in var(--rater-d-240) var(--rater-ease-soft);
+}
+
+@keyframes rater-error-surface-in {
+  from {
+    opacity: 0;
+    transform: translateY(var(--rater-s-8));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.rater-error-surface__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1px;
+  color: var(--rater-feedback-error);
+}
+
+.rater-error-surface__body {
+  min-width: 0;
+}
+
+.rater-error-surface__title {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-6);
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-default);
+}
+
+.rater-error-surface__count {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 var(--rater-s-6);
+  border-radius: var(--rater-r-full);
+  background: var(--rater-feedback-error-bg);
+  color: var(--rater-feedback-error);
+  font-size: var(--rater-t-11);
+  font-weight: var(--rater-fw-medium);
+  font-variant-numeric: tabular-nums;
+}
+
+.rater-error-surface__message {
+  margin-top: var(--rater-s-4);
+  color: var(--rater-text-muted);
+}
+
+.rater-error-surface__detail-wrap {
+  margin-top: var(--rater-s-8);
+}
+
+.rater-error-surface__detail-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-4);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--rater-text-muted);
+  font: inherit;
+  font-size: var(--rater-t-12);
+  cursor: pointer;
+}
+
+.rater-error-surface__detail-toggle:hover {
+  color: var(--rater-text-default);
+}
+
+.rater-error-surface__detail-toggle:focus-visible {
+  outline: 2px solid var(--rater-focus-ring, var(--rater-accent-primary));
+  outline-offset: 2px;
+  border-radius: var(--rater-r-4);
+}
+
+.rater-error-surface__chev {
+  transition: transform var(--rater-d-80) var(--rater-ease-soft);
+}
+
+.rater-error-surface__chev--open {
+  transform: rotate(180deg);
+}
+
+.rater-error-surface__detail {
+  margin: var(--rater-s-6) 0 0;
+  padding: var(--rater-s-8);
+  max-height: 120px;
+  overflow: auto;
+
+  background: var(--rater-surface-1);
+  border: 1px solid var(--rater-border-default);
+  border-radius: var(--rater-r-4);
+
+  color: var(--rater-text-muted);
+  font-family: var(--rater-font-mono);
+  font-size: var(--rater-t-11);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.rater-error-surface__actions {
+  margin-top: var(--rater-s-10);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rater-error-surface__card {
+    animation: none;
+  }
+  .rater-error-surface__chev {
+    transition: none;
+  }
+}

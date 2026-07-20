@@ -1,0 +1,225 @@
+/* ============================================================================
+ * <MapPanel> — Brief 43 PR 43.5 map exhibit (Brief 44 PR 44.8 upgrade).
+ *
+ * The MapLibre canvas (state polygons) is the hero — anchored at a
+ * fixed 360px so it doesn't reflow when the chart panel resizes. A
+ * compact chip rail of all 51 USPS codes sits beneath it as the
+ * keyboard / AT / test affordance for cross-filter selection.
+ *
+ * Empty state covers the narrow case where the geo dim is mapped +
+ * Score all has run but no rows fell into any state. The blocker
+ * strip in <AnalyticsWorkspace> shuts down the workspace before this
+ * panel would render in the "Score all hasn't run" case.
+ * ============================================================================ */
+
+.rater-analytics-map {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-12);
+  background: var(--rater-surface-1);
+  border: 1px solid var(--rater-border-subtle);
+  border-radius: var(--rater-r-8);
+  padding: var(--rater-s-16);
+  min-height: 460px;
+}
+
+/* ── Header ────────────────────────────────────────────────────── */
+
+.rater-analytics-map__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--rater-s-12);
+  padding-bottom: var(--rater-s-8);
+  border-bottom: 1px solid var(--rater-border-subtle);
+}
+
+.rater-analytics-map__title-block {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-8);
+  min-width: 0;
+}
+
+.rater-analytics-map__title-icon {
+  display: inline-flex;
+  color: var(--rater-text-subtle);
+  flex-shrink: 0;
+}
+
+.rater-analytics-map__title {
+  margin: 0;
+  color: var(--rater-text-strong);
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-14);
+  font-weight: var(--rater-fw-semibold);
+  letter-spacing: -0.005em;
+  line-height: var(--rater-lh-snug);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Body — canvas + chip rail stacked ─────────────────────────── */
+
+.rater-analytics-map__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-12);
+  flex: 1;
+}
+
+/* ── Map canvas wrapper ────────────────────────────────────────── */
+
+.rater-analytics-map__canvas-wrap {
+  position: relative;
+  height: 320px;
+  min-height: 320px;
+  border-radius: var(--rater-r-8);
+  overflow: hidden;
+}
+
+/* <UsChoropleth> fills the canvas-wrap (it owns its own width/height +
+   min-height floor); the wrap supplies the rounded clip. */
+
+/* ── Chip rail (testable cross-filter surface) ─────────────────── */
+
+.rater-analytics-map__chip-rail {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(34px, 1fr));
+  gap: 3px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rater-analytics-map__chip {
+  appearance: none;
+  height: 24px;
+  border-radius: var(--rater-r-4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--rater-fonts-mono);
+  font-size: 9.5px;
+  font-weight: var(--rater-fw-semibold);
+  letter-spacing: var(--rater-tracking-label);
+  cursor: pointer;
+  color: var(--rater-text-strong);
+  background: var(--rater-surface-2);
+  border: 1px solid var(--rater-border-default);
+  padding: 0;
+  transition:
+    transform var(--rater-d-140) var(--rater-ease-snap),
+    opacity var(--rater-d-140) var(--rater-ease-snap),
+    box-shadow var(--rater-d-140) var(--rater-ease-snap);
+  position: relative;
+}
+
+.rater-analytics-map__chip:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px -2px
+    color-mix(in oklab, var(--rater-accent-primary) 35%, transparent);
+  z-index: 2;
+}
+
+.rater-analytics-map__chip:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: 1px;
+  z-index: 3;
+}
+
+.rater-analytics-map__chip[data-has-value="false"] {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* Cross-filter selected chip: glow + lift. */
+.rater-analytics-map__chip[data-selected="true"] {
+  box-shadow:
+    0 0 0 2px
+      var(--rater-accent-primary),
+    0 4px 12px -2px
+      color-mix(in oklab, var(--rater-accent-primary) 55%, transparent);
+  transform: translateY(-1px) scale(1.08);
+  z-index: 3;
+}
+
+.rater-analytics-map__chip[data-dimmed="true"]:not([data-selected="true"]) {
+  opacity: 0.32;
+}
+
+/* ── Choropleth bucket tinting (chips) ─────────────────────────── */
+
+.rater-analytics-map__chip[data-bucket="-3"] {
+  background: var(--rater-cat-choropleth-1);
+  color: var(--rater-text-muted);
+}
+.rater-analytics-map__chip[data-bucket="-2"] {
+  background: var(--rater-cat-choropleth-2);
+  color: var(--rater-text-default);
+}
+.rater-analytics-map__chip[data-bucket="-1"] {
+  background: var(--rater-cat-choropleth-3);
+  color: var(--rater-text-default);
+}
+.rater-analytics-map__chip[data-bucket="0"] {
+  background: var(--rater-cat-choropleth-4);
+  color: var(--rater-text-strong);
+}
+.rater-analytics-map__chip[data-bucket="1"] {
+  background: var(--rater-cat-choropleth-5);
+  color: var(--rater-text-strong);
+}
+.rater-analytics-map__chip[data-bucket="2"] {
+  background: var(--rater-cat-choropleth-6);
+  color: var(--rater-text-strong);
+}
+.rater-analytics-map__chip[data-bucket="3"] {
+  background: var(--rater-cat-choropleth-7);
+  color: var(--rater-text-inverse);
+}
+
+/* ── Diverging bucket tinting (chips) — signed KPIs (rate change /
+   loss ratio): emerald below the book center, neutral at it, orange
+   above. The 2-attribute selector outranks the sequential rule above. */
+.rater-analytics-map__chip[data-diverging="true"][data-bucket="-3"] {
+  background: var(--rater-cat-choropleth-div-1);
+  color: var(--rater-text-inverse);
+}
+.rater-analytics-map__chip[data-diverging="true"][data-bucket="-2"] {
+  background: var(--rater-cat-choropleth-div-2);
+  color: var(--rater-text-inverse);
+}
+.rater-analytics-map__chip[data-diverging="true"][data-bucket="-1"] {
+  background: var(--rater-cat-choropleth-div-3);
+  color: var(--rater-text-strong);
+}
+.rater-analytics-map__chip[data-diverging="true"][data-bucket="0"] {
+  background: var(--rater-cat-choropleth-div-4);
+  color: var(--rater-text-strong);
+}
+.rater-analytics-map__chip[data-diverging="true"][data-bucket="1"] {
+  background: var(--rater-cat-choropleth-div-5);
+  color: var(--rater-text-strong);
+}
+.rater-analytics-map__chip[data-diverging="true"][data-bucket="2"] {
+  background: var(--rater-cat-choropleth-div-6);
+  color: var(--rater-text-inverse);
+}
+.rater-analytics-map__chip[data-diverging="true"][data-bucket="3"] {
+  background: var(--rater-cat-choropleth-div-7);
+  color: var(--rater-text-inverse);
+}
+
+/* The value-break legend lives in <ChoroplethScaleLegend> (its own CSS). */
+
+/* ── Empty state ──────────────────────────────────────────────── */
+
+.rater-analytics-map__empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 320px;
+  padding: var(--rater-s-24);
+}

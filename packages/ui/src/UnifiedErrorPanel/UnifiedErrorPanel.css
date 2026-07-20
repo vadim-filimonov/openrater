@@ -1,0 +1,143 @@
+/* ============================================================================
+ * <UnifiedErrorPanel> — drawer-rendered ranked issue list.
+ *
+ * Composes ErrorFilter (top) + grouped ErrorRows (body) inside a
+ * Drawer. The Drawer primitive owns the chrome; this CSS styles the
+ * panel's body content.
+ * ============================================================================ */
+
+/* ── Readiness header ────────────────────────────────────────── */
+
+.rater-unified-error-panel__readiness {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--rater-s-12);
+  padding: var(--rater-s-12) var(--rater-s-14);
+  border-bottom: 1px solid var(--rater-border-subtle);
+  font-family: var(--rater-fonts-sans);
+}
+
+.rater-unified-error-panel__readiness-label {
+  font-size: var(--rater-t-13);
+  font-weight: var(--rater-fw-semibold);
+}
+
+.rater-unified-error-panel__readiness--filing_ready .rater-unified-error-panel__readiness-label {
+  color: var(--rater-feedback-success, var(--rater-cat-math));
+}
+
+.rater-unified-error-panel__readiness--filing_ready_with_warnings .rater-unified-error-panel__readiness-label {
+  color: var(--rater-feedback-warn, var(--rater-cat-lookup));
+}
+
+.rater-unified-error-panel__readiness--blocked .rater-unified-error-panel__readiness-label {
+  color: var(--rater-feedback-error);
+}
+
+.rater-unified-error-panel__readiness-counts {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-6);
+}
+
+/* ── Empty states ────────────────────────────────────────────── */
+
+.rater-unified-error-panel__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--rater-s-12);
+  padding: var(--rater-s-24) var(--rater-s-14);
+  text-align: center;
+}
+
+.rater-unified-error-panel__empty-text {
+  margin: 0;
+  color: var(--rater-text-muted);
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-13);
+  line-height: var(--rater-lh-normal);
+  max-width: 360px;
+}
+
+.rater-unified-error-panel__empty-filter {
+  padding: var(--rater-s-16) var(--rater-s-14);
+  color: var(--rater-text-muted);
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-13);
+  font-style: italic;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--rater-s-12);
+}
+
+.rater-unified-error-panel__clear-filter {
+  appearance: none;
+  background: transparent;
+  border: 1px solid var(--rater-border-default);
+  border-radius: var(--rater-r-4);
+  padding: var(--rater-s-4) var(--rater-s-10);
+  color: var(--rater-text-default);
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-12);
+  font-weight: var(--rater-fw-medium);
+  font-style: normal;
+  cursor: pointer;
+  transition: background var(--rater-d-80) var(--rater-ease-soft);
+}
+
+.rater-unified-error-panel__clear-filter:hover {
+  background: var(--rater-surface-2);
+}
+
+.rater-unified-error-panel__clear-filter:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: 1px;
+}
+
+/* ── Issue groups ────────────────────────────────────────────── */
+
+.rater-unified-error-panel__groups {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-14);
+  padding: var(--rater-s-14);
+}
+
+.rater-unified-error-panel__group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-6);
+}
+
+.rater-unified-error-panel__group-header {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-8);
+  padding-block: var(--rater-s-2);
+}
+
+.rater-unified-error-panel__group-title {
+  margin: 0;
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-13);
+  font-weight: var(--rater-fw-semibold);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--rater-text-muted);
+}
+
+.rater-unified-error-panel__group-count {
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-12);
+  font-variant-numeric: tabular-nums;
+  color: var(--rater-text-subtle);
+}
+
+.rater-unified-error-panel__group-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-6);
+}

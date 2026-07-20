@@ -1,0 +1,92 @@
+/* ============================================================================
+ * <WorkspaceFrame> — Polish PR 6.
+ *
+ * Canonical workspace shell. Locks the audit's geometry (UI_AUDIT.md §I):
+ *
+ *   rail = 240px       (audit §I2 — was 240 / 240 / 260 / 280)
+ *   inspector = 320px  (audit §I1 — was 340 / 320 / 320 / 280)
+ *   gap = 0            (column-divider hairlines do the work)
+ *   inspector bg = surface-1  (audit §I3)
+ *   no border-radius, no border on the root — it's the body of the route,
+ *     not a card (audit §I4)
+ *
+ * Pure geometry — no padding inside the slots. Each workspace owns its
+ * own slot density (Brief 39 rails are dense; Dimensions tool-pane is
+ * looser). The frame only owns column widths, backgrounds, and hairlines.
+ *
+ * Min-height keeps empty workspaces tall enough to feel like real
+ * surfaces (not a tiny strip at the top of the route).
+ * ========================================================================== */
+
+.rater-workspace-frame {
+  display: grid;
+  min-height: 600px;
+  background: var(--rater-surface-1);
+  font-family: var(--rater-font-sans);
+  color: var(--rater-text-default);
+  overflow: hidden;
+}
+
+.rater-workspace-frame--rail-stage-inspector {
+  grid-template-columns: 240px minmax(0, 1fr) 320px;
+}
+
+.rater-workspace-frame--rail-stage {
+  grid-template-columns: 240px minmax(0, 1fr);
+}
+
+.rater-workspace-frame--stage-inspector {
+  grid-template-columns: minmax(0, 1fr) 320px;
+}
+
+.rater-workspace-frame--stage {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+/* ── Slots ─────────────────────────────────────────────────── */
+
+.rater-workspace-frame__rail {
+  /* surface-2 keeps the rail visually quieter than the stage so the eye
+   * lands on the stage by default. The hairline divider gives the
+   * column edge without a heavy border. */
+  background: var(--rater-surface-2);
+  border-right: 1px solid var(--rater-hairline-soft);
+  overflow-y: auto;
+  min-width: 0;
+}
+
+.rater-workspace-frame__stage {
+  /* Stage owns the workspace identity. Padding is the workspace's
+   * call — the frame stays out of it. */
+  background: var(--rater-surface-1);
+  overflow-y: auto;
+  min-width: 0;
+}
+
+.rater-workspace-frame__inspector {
+  /* surface-1 (audit §I3) — same fill as the stage. The divider
+   * provides the column edge; no contrast fill needed. */
+  background: var(--rater-surface-1);
+  border-left: 1px solid var(--rater-hairline-soft);
+  overflow-y: auto;
+  min-width: 0;
+}
+
+/* ── Narrow viewports — collapse the rail above the stage; keep the
+ * inspector hidden on small screens (the workspace's own routes can
+ * surface inspector content via drawer instead). ──────────────────── */
+
+@media (max-width: 960px) {
+  .rater-workspace-frame--rail-stage-inspector,
+  .rater-workspace-frame--rail-stage {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .rater-workspace-frame--rail-stage-inspector .rater-workspace-frame__inspector,
+  .rater-workspace-frame--stage-inspector .rater-workspace-frame__inspector {
+    display: none;
+  }
+  .rater-workspace-frame__rail {
+    border-right: 0;
+    border-bottom: 1px solid var(--rater-hairline-soft);
+  }
+}

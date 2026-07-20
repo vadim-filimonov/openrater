@@ -1,0 +1,70 @@
+/* ============================================================================
+ * <Checkbox> — custom-drawn selection control (Shell v3 polish; Wave 1).
+ *
+ * The native input is visually hidden but stretched over the drawn box
+ * (opacity 0, absolute inset) so clicks, focus, and AT land on the real
+ * control; :focus-visible re-projects onto the drawn box.
+ * ========================================================================== */
+
+.rater-checkbox {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-8);
+  cursor: pointer;
+  font-family: var(--rater-font-sans);
+}
+
+.rater-checkbox__input {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+  cursor: inherit;
+}
+
+.rater-checkbox__box {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border: 1px solid var(--rater-border-default);
+  border-radius: var(--rater-r-4);
+  background: var(--rater-surface-1);
+  color: var(--rater-on-accent);
+  transition:
+    background var(--rater-d-80) var(--rater-ease-snap),
+    border-color var(--rater-d-80) var(--rater-ease-snap);
+}
+
+.rater-checkbox__box svg {
+  width: 11px;
+  height: 11px;
+}
+
+.rater-checkbox:hover:not(.is-disabled) .rater-checkbox__box {
+  border-color: var(--rater-border-strong);
+}
+
+.rater-checkbox.is-checked .rater-checkbox__box {
+  background: var(--rater-accent-primary);
+  border-color: var(--rater-accent-primary);
+}
+
+.rater-checkbox__input:focus-visible + .rater-checkbox__box {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: 2px;
+}
+
+.rater-checkbox__label {
+  font-size: var(--rater-t-13);
+  color: var(--rater-text-default);
+  user-select: none;
+}
+
+.rater-checkbox.is-disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}

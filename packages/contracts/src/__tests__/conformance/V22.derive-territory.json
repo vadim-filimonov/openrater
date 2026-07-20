@@ -1,0 +1,67 @@
+{
+  "name": "V22.derive-territory",
+  "description": "ADR-0028 (cold-test L13) — geographic territory grouping drives scoring. A risk with state='CA' resolves THROUGH a `derive.territory` node (state code → territory id, map built from the dim's geo_territories) onto territory 'T1', then a territory-keyed `lookup.direct` returns 1.30. Proves the runtime honors the territory layer: a 5-tier table prices CA by its tier, not by the 1.0 default it would hit if 'CA' were fed to the lookup raw. The `unmapped` diagnostic output is also surfaced (false here). The unmapped-value case is V23.",
+  "plan": {
+    "id": "v22.derive_territory",
+    "version": "1.0.0",
+    "name": "Territory grouping runtime (CA → T1 → 1.30)",
+    "line": "property",
+    "effective": "2026-01-01",
+    "nodes": [
+      {
+        "id": "in_state",
+        "kind": "input",
+        "params": { "fieldName": "state", "fieldType": "string" },
+        "position": { "x": 0, "y": 0 }
+      },
+      {
+        "id": "terr_state",
+        "kind": "derive.territory",
+        "params": {
+          "dimSlug": "state",
+          "territoryMap": {
+            "CA": "T1", "FL": "T1", "NY": "T1",
+            "TX": "T2", "IL": "T2",
+            "WI": "T3", "MN": "T3", "OH": "T3"
+          },
+          "territoryLabels": {
+            "T1": "Tier 1 — high-cost coastal",
+            "T2": "Tier 2 — mid",
+            "T3": "Tier 3 — low-cost"
+          }
+        },
+        "position": { "x": 200, "y": 0 }
+      },
+      {
+        "id": "lkp_territory",
+        "kind": "lookup.direct",
+        "params": {
+          "table": { "T1": 1.30, "T2": 1.10, "T3": 0.90 },
+          "defaultValue": 1.0,
+          "tableName": "State tier factor"
+        },
+        "position": { "x": 400, "y": 0 }
+      },
+      {
+        "id": "out_factor",
+        "kind": "output",
+        "params": { "fieldName": "factor", "fieldType": "float" },
+        "position": { "x": 600, "y": 0 }
+      },
+      {
+        "id": "out_unmapped",
+        "kind": "output",
+        "params": { "fieldName": "unmapped", "fieldType": "bool" },
+        "position": { "x": 600, "y": 120 }
+      }
+    ],
+    "edges": [
+      { "from": { "node": "in_state",      "port": "value" },        "to": { "node": "terr_state",    "port": "value"    } },
+      { "from": { "node": "terr_state",    "port": "territory_id" }, "to": { "node": "lkp_territory", "port": "key"      } },
+      { "from": { "node": "terr_state",    "port": "unmapped" },     "to": { "node": "out_unmapped",  "port": "value"    } },
+      { "from": { "node": "lkp_territory", "port": "value" },        "to": { "node": "out_factor",    "port": "value"    } }
+    ]
+  },
+  "externalInputs": { "state": "CA" },
+  "expectedOutputs": { "factor": 1.30, "unmapped": false }
+}

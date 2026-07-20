@@ -1,0 +1,50 @@
+{
+  "name": "P4.policy-minimum-floor-binds",
+  "description": "The minimum-premium floor binds AFTER the package credit (Brief 62.3 P6). Single-line BOP, aggregated subtotal $430; the plan's filed default tail (policy_tail, inherited via effectivePolicyTail) is package_factor 0.90 → minimum_premium 500. 430 × 0.9 = 387 < 500, so the floor binds: total $500, minimum_applied true.",
+  "policy": {
+    "policy_id": "P4",
+    "lines": [
+      { "plan_ref": { "plan_id": "bop-plan", "content_hash": "h-bop", "product": "bop" }, "premium_output": "bop_premium" }
+    ]
+  },
+  "policy_tail": [
+    { "kind": "package_factor", "id": "pkg", "display_name": "Package credit", "factor": 0.9 },
+    { "kind": "minimum_premium", "id": "min", "floor": 500 }
+  ],
+  "plans": {
+    "bop-plan": {
+      "externalInputs": { "base": 430 },
+      "plan": {
+        "id": "p4.bop",
+        "version": "1.0.0",
+        "name": "BOP",
+        "nodes": [
+          { "id": "in_base", "kind": "input", "params": { "fieldName": "base", "fieldType": "money" } },
+          { "id": "k", "kind": "constant", "params": { "value": 1.0, "type": "factor" } },
+          { "id": "mul", "kind": "chain.mult", "params": { "stopOnZero": false } },
+          { "id": "out", "kind": "output", "params": { "fieldName": "bop_premium", "fieldType": "money" } }
+        ],
+        "edges": [
+          { "from": { "node": "in_base", "port": "value" }, "to": { "node": "mul", "port": "base" } },
+          { "from": { "node": "k", "port": "value" }, "to": { "node": "mul", "port": "factors" } },
+          { "from": { "node": "mul", "port": "result" }, "to": { "node": "out", "port": "value" } }
+        ]
+      }
+    }
+  },
+  "expected": {
+    "subtotal": 430,
+    "package_credit": 0.9,
+    "after_credit": 387,
+    "minimum_premium": 500,
+    "minimum_applied": true,
+    "total": 500,
+    "lines": [
+      { "product": "bop", "plan_id": "bop-plan", "premium": 430 }
+    ],
+    "adjustments": [
+      { "id": "pkg", "kind": "package_factor", "applied": true, "before": 430, "after": 387, "detail": "× 0.9" },
+      { "id": "min", "kind": "minimum_premium", "applied": true, "before": 387, "after": 500, "detail": "floored at $500" }
+    ]
+  }
+}

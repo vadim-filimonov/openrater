@@ -1,0 +1,42 @@
+{
+  "name": "V7.bop-like-end-to-end",
+  "description": "A fictional Meridian class lookup, limit band, and LCM compose into a deterministic premium.",
+  "plan": {
+    "id": "v7.bop",
+    "version": "1.0.0",
+    "name": "Meridian synthetic end-to-end rate",
+    "line": "bop",
+    "effective": "2026-01-01",
+    "nodes": [
+      { "id": "in_cls", "kind": "input", "params": { "fieldName": "class_code", "fieldType": "string" }, "position": { "x": 0, "y": 0 } },
+      { "id": "in_tiv", "kind": "input", "params": { "fieldName": "tiv", "fieldType": "money" }, "position": { "x": 0, "y": 80 } },
+      { "id": "cls_lkp", "kind": "lookup.direct",
+        "params": { "table": { "c102": 1.0, "c202": 1.25 }, "defaultValue": 1.0, "tableName": "Meridian synthetic class factor" },
+        "position": { "x": 200, "y": 0 } },
+      { "id": "tiv_lkp", "kind": "lookup.range",
+        "params": {
+          "buckets": [
+            { "lo": 0, "hi": 500000, "factor": 0.95 },
+            { "lo": 500000, "hi": 1e308, "factor": 1.10 }
+          ],
+          "defaultValue": 1.0
+        },
+        "position": { "x": 200, "y": 80 } },
+      { "id": "base", "kind": "constant", "params": { "value": 1000, "type": "money" }, "position": { "x": 200, "y": 160 } },
+      { "id": "lcm",  "kind": "constant", "params": { "value": 1.20, "type": "factor" }, "position": { "x": 200, "y": 220 } },
+      { "id": "mul",  "kind": "chain.mult", "params": { "stopOnZero": false }, "position": { "x": 400, "y": 80 } },
+      { "id": "out_p", "kind": "output", "params": { "fieldName": "premium", "fieldType": "money" }, "position": { "x": 600, "y": 80 } }
+    ],
+    "edges": [
+      { "from": { "node": "in_cls",  "port": "value" }, "to": { "node": "cls_lkp", "port": "key" } },
+      { "from": { "node": "in_tiv",  "port": "value" }, "to": { "node": "tiv_lkp", "port": "value" } },
+      { "from": { "node": "base",    "port": "value" }, "to": { "node": "mul", "port": "base" } },
+      { "from": { "node": "cls_lkp", "port": "value" }, "to": { "node": "mul", "port": "factors" } },
+      { "from": { "node": "tiv_lkp", "port": "value" }, "to": { "node": "mul", "port": "factors" } },
+      { "from": { "node": "lcm",     "port": "value" }, "to": { "node": "mul", "port": "factors" } },
+      { "from": { "node": "mul",     "port": "result" }, "to": { "node": "out_p", "port": "value" } }
+    ]
+  },
+  "externalInputs": { "class_code": "c202", "tiv": 250000 },
+  "expectedOutputs": { "premium": 1425 }
+}

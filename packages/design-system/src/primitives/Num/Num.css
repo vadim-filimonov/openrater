@@ -1,0 +1,37 @@
+.rater-num {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--rater-s-4);
+  font-family: var(--rater-font-mono);
+  font-feature-settings: var(--rater-num-tabular);
+  letter-spacing: var(--rater-tracking-mono);
+  color: var(--rater-text-default);
+  white-space: nowrap;
+}
+
+/* currency uses tabular + slashed-zero per tokens.css */
+.rater-num--currency {
+  font-feature-settings: var(--rater-num-currency);
+}
+
+.rater-num__value {
+  display: inline-block;
+}
+
+.rater-num__delta {
+  display: inline-block;
+  font-size: 0.85em;
+  line-height: 1;
+}
+
+.rater-num--delta-up {
+  color: var(--rater-accent-success);
+}
+
+.rater-num--delta-down {
+  color: var(--rater-accent-danger);
+}
+
+.rater-num--delta-flat {
+  color: var(--rater-text-muted);
+}

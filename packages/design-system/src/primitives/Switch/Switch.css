@@ -1,0 +1,103 @@
+/* ============================================================================
+ * <Switch> — boolean toggle (Shell v3 polish; Wave 1).
+ *
+ * Track cross-fades surface-3 → accent; the thumb travels on transform
+ * (--rater-d-140 --rater-ease-snap — collapses under reduced motion via
+ * the duration token). The checked thumb carries the machined edge so
+ * it reads as a raised physical part.
+ * ========================================================================== */
+
+.rater-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-8);
+  font-family: var(--rater-font-sans);
+}
+
+label.rater-switch {
+  cursor: pointer;
+}
+
+.rater-switch__track {
+  position: relative;
+  flex: none;
+  display: inline-block;
+  padding: 0;
+  border: 1px solid var(--rater-border-default);
+  border-radius: var(--rater-r-full);
+  background: var(--rater-surface-3);
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  transition:
+    background var(--rater-d-140) var(--rater-ease-snap),
+    border-color var(--rater-d-140) var(--rater-ease-snap);
+}
+
+.rater-switch--md .rater-switch__track {
+  width: 36px;
+  height: 20px;
+}
+
+.rater-switch--sm .rater-switch__track {
+  width: 28px;
+  height: 16px;
+}
+
+.rater-switch.is-checked .rater-switch__track {
+  background: var(--rater-accent-primary);
+  border-color: var(--rater-accent-primary);
+}
+
+.rater-switch__thumb {
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  border-radius: var(--rater-r-full);
+  background: var(--rater-on-accent);
+  box-shadow: var(--rater-shadow-resting);
+  transition: transform var(--rater-d-140) var(--rater-ease-snap);
+}
+
+.rater-switch--md .rater-switch__thumb {
+  width: 16px;
+  height: 16px;
+}
+
+.rater-switch--sm .rater-switch__thumb {
+  width: 12px;
+  height: 12px;
+}
+
+/* travel = track width − thumb − 2×inset − 2×border */
+.rater-switch--md.is-checked .rater-switch__thumb {
+  transform: translateX(16px);
+}
+
+.rater-switch--sm.is-checked .rater-switch__thumb {
+  transform: translateX(12px);
+}
+
+.rater-switch__track:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: 2px;
+}
+
+.rater-switch__label {
+  font-size: var(--rater-t-13);
+  color: var(--rater-text-default);
+  user-select: none;
+}
+
+.rater-switch--sm .rater-switch__label {
+  font-size: var(--rater-t-12);
+}
+
+.rater-switch.is-disabled {
+  opacity: 0.45;
+}
+
+.rater-switch.is-disabled .rater-switch__track,
+label.rater-switch.is-disabled {
+  cursor: not-allowed;
+}

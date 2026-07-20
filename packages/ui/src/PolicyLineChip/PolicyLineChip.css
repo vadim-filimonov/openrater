@@ -1,0 +1,137 @@
+/* ============================================================================
+ * <PolicyLineChip> — one product line on a Policy (Brief 46 §5).
+ * The consistent bound-Plan chip: badge · name · version · output · premium.
+ * ============================================================================ */
+
+.rater-policy-line-chip {
+  background: var(--rater-surface-2);
+  border: 1px solid var(--rater-border-default);
+  border-radius: var(--rater-s-12);
+  padding: var(--rater-s-14) var(--rater-s-16);
+}
+
+.rater-policy-line-chip__row {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-12);
+}
+
+/* Product badge — tone derived from a hash of the product code (generic;
+   no per-product map). Four token tones cycle deterministically. */
+.rater-policy-line-chip__badge {
+  flex: none;
+  font-size: 11px;
+  font-weight: var(--rater-fw-bold);
+  letter-spacing: var(--rater-tracking-label);
+  border-radius: var(--rater-s-6);
+  padding: var(--rater-s-4) var(--rater-s-8);
+  font-family: var(--rater-font-mono);
+}
+.rater-policy-line-chip__badge--tone-0 {
+  color: var(--rater-cat-transform-text);
+  background: var(--rater-cat-transform-soft);
+}
+.rater-policy-line-chip__badge--tone-1 {
+  color: var(--rater-cat-math-text);
+  background: var(--rater-cat-math-soft);
+}
+.rater-policy-line-chip__badge--tone-2 {
+  color: var(--rater-cat-input-text);
+  background: var(--rater-cat-input-soft);
+}
+.rater-policy-line-chip__badge--tone-3 {
+  color: var(--rater-cat-lookup-text);
+  background: var(--rater-cat-lookup-soft);
+}
+
+.rater-policy-line-chip__body {
+  min-width: 0;
+}
+
+.rater-policy-line-chip__head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--rater-s-6);
+}
+
+.rater-policy-line-chip__name {
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-default);
+}
+
+.rater-policy-line-chip__ver {
+  font-family: var(--rater-font-mono);
+  font-size: 12px;
+  color: var(--rater-text-faint);
+}
+
+.rater-policy-line-chip__out {
+  font-size: 12.5px;
+  color: var(--rater-text-muted);
+  margin-top: var(--rater-s-2);
+}
+.rater-policy-line-chip__out code {
+  font-family: var(--rater-font-mono);
+  color: var(--rater-text-muted);
+  background: var(--rater-surface-3);
+  padding: 1px var(--rater-s-6);
+  border-radius: var(--rater-s-4);
+}
+
+/* Premium-output picker (D3) — styled like the code chip, selectable. */
+.rater-policy-line-chip__out-select {
+  font-family: var(--rater-font-mono);
+  font-size: 12px;
+  color: var(--rater-text-default);
+  background: var(--rater-surface-3);
+  border: 1px solid var(--rater-border-default);
+  border-radius: var(--rater-s-4);
+  padding: 1px var(--rater-s-6);
+  cursor: pointer;
+}
+.rater-policy-line-chip__out-select:hover {
+  border-color: var(--rater-border-strong);
+}
+
+.rater-policy-line-chip__spacer {
+  flex: 1 1 auto;
+}
+
+.rater-policy-line-chip__prem {
+  font-size: 19px;
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-strong);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.rater-policy-line-chip__prem-none {
+  color: var(--rater-text-faint);
+  cursor: help;
+}
+
+/* Newer-version rebind hint — warn hue, quiet until hovered. */
+.rater-policy-line-chip__rebind {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-6);
+  margin-top: var(--rater-s-10);
+  padding: 0;
+  background: none;
+  border: none;
+  font: inherit;
+  font-size: 11.5px;
+  color: var(--rater-feedback-warn);
+  cursor: pointer;
+  text-align: left;
+}
+.rater-policy-line-chip__rebind-cta {
+  color: var(--rater-cat-input-text);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.rater-policy-line-chip__expand {
+  margin-top: var(--rater-s-14);
+  padding-top: var(--rater-s-14);
+  border-top: 1px dashed var(--rater-border-default);
+}

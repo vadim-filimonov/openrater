@@ -1,0 +1,21 @@
+acct_id,name,ntee_major,revenue,state,subsection_type,employee_count,total_expenses,occupancy_expense,expected_do_premium,expected_gl_premium,expected_total_premium,expected_tier
+NP-001,Faith Community Church,religion,45000,TN,501c3,2,43000,8000,658,396,1054,Standard
+NP-002,Lakeside Youth Camp,youth_development,180000,MI,501c3,9,195000,32000,1166,711,1877,Standard
+NP-003,Riverside Family Services,human_services,425000,WI,501c3,18,410000,22000,1018,525,1543,Standard
+NP-004,Lakeshore Arts Foundation,philanthropy,2400000,MA,501c3,11,1900000,50000,1084,578,1662,Preferred
+NP-005,Mountain Conservation Trust,environment,650000,CO,501c3,7,620000,14000,1094,568,1662,Standard
+NP-006,Westside Free Clinic,health_care,1200000,CA,501c3,35,1350000,75000,3306,1651,4957,Standard
+NP-007,Veterans Support League,human_services,88000,TX,501c4,3,92000,6500,1194,570,1764,Standard
+NP-008,Northridge Animal Rescue,animal,215000,OH,501c3,5,240000,38000,833,615,1448,Standard
+NP-009,Tech Education Alliance,education,880000,WA,501c3,22,760000,45000,1203,699,1902,Standard
+NP-010,Harbor Disaster Relief,public_safety,1750000,FL,501c3,14,1600000,38000,1712,954,2666,Standard
+NP-011,Civic Choir Society,arts_culture,32000,VT,501c3,0,28000,4000,439,321,760,Standard
+NP-012,Urban Housing Coalition,housing_shelter,1900000,NY,501c3,28,2300000,420000,3656,2388,6044,Submit
+NP-013,Statewide Bar Association,crime_legal,540000,IL,501c6,4,500000,18000,1505,727,2232,Standard
+NP-014,Inner-City Food Pantry,food_agriculture,110000,MO,501c3,1,105000,12000,768,590,1358,Standard
+NP-015,International Aid Bridge,international,3200000,DC,501c3,19,3100000,95000,1701,795,2496,Standard
+NP-016,Statewide Recreation League,recreation,740000,NJ,501c7,8,720000,90000,1188,1653,2841,Standard
+NP-017,Heritage Museum,arts_culture,480000,PA,501c3,6,460000,65000,932,689,1621,Standard
+NP-018,Civic Advocacy Now,civil_rights,95000,OR,501c4,2,105000,8000,1083,396,1479,Standard
+NP-019,Endangered Languages Fund,social_science,320000,MA,501c3,4,260000,9000,757,372,1129,Preferred
+NP-020,Faith Youth Mission,religion,28000,MS,501c3,1,36000,4500,883,352,1235,Decline

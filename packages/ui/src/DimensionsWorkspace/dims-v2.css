@@ -1,0 +1,507 @@
+/* <DimensionsWorkspaceV2> — the v2 2-column Dimensions surface (BEM + tokens). */
+
+.rater-dims2 {
+  display: grid;
+  grid-template-columns: 384px minmax(0, 1fr);
+  gap: var(--rater-s-16);
+  align-items: start;
+  padding: var(--rater-s-4) 0 var(--rater-s-24);
+}
+
+/* Brief 66 §3.3 — the structural-axis note + the classification
+   registry row in the detail pane. */
+.rater-dims2__d-structural {
+  margin: 0;
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-muted);
+}
+.rater-dims2__d-registry {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-10);
+  padding: var(--rater-s-8) 0;
+}
+.rater-dims2__d-registry-meta {
+  flex: 1;
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-muted);
+}
+
+/* Brief 66 §3.5 — the bulk authoring drawer (paste levels / bands). */
+.rater-dims2__d-bulk {
+  margin-left: auto;
+  display: inline-flex;
+  gap: var(--rater-s-6);
+}
+.rater-dims2__paste {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-8);
+}
+.rater-dims2__paste-text {
+  width: 100%;
+  padding: var(--rater-s-8) var(--rater-s-10);
+  background: var(--rater-surface-canvas);
+  border: 1px solid var(--rater-border-default);
+  border-radius: var(--rater-r-8);
+  color: var(--rater-text-default);
+  font-family: var(--rater-font-mono);
+  font-size: var(--rater-t-12);
+  resize: vertical;
+}
+.rater-dims2__paste-text:focus-visible {
+  outline: none;
+  border-color: var(--rater-focus-ring);
+  box-shadow: 0 0 0 2px var(--rater-focus-halo);
+}
+.rater-dims2__paste-foot {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-10);
+}
+.rater-dims2__paste-preview {
+  flex: 1;
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-muted);
+}
+.rater-dims2__paste-replace {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-6);
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-muted);
+  cursor: pointer;
+}
+
+/* Brief 66 §3.2 — the sync-blocked banner spans both columns. */
+.rater-dims2__syncbanner {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-10);
+  padding: var(--rater-s-8) var(--rater-s-14);
+  background: color-mix(in srgb, var(--rater-feedback-warn) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--rater-feedback-warn) 30%, transparent);
+  border-radius: var(--rater-r-8);
+  color: var(--rater-feedback-warn);
+  font-size: var(--rater-t-12);
+}
+.rater-dims2__syncbanner-msg {
+  flex: 1;
+  color: var(--rater-text-default);
+}
+
+@media (max-width: 1080px) {
+  .rater-dims2 {
+    grid-template-columns: 320px minmax(0, 1fr);
+  }
+}
+
+.rater-dims2__list,
+.rater-dims2__detail {
+  background: var(--rater-surface-1);
+  border: 1px solid var(--rater-border-subtle);
+  border-radius: var(--rater-r-12);
+}
+
+/* ── LIST ─────────────────────────────────────────────────────── */
+.rater-dims2__list {
+  padding: var(--rater-s-14);
+}
+.rater-dims2__list-head {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-10);
+}
+/* the search box is the design-system <SearchField> now (Wave 1) —
+   this class only sizes its seat in the list head */
+.rater-dims2__search {
+  flex: 1;
+}
+
+.rater-dims2__filter {
+  margin: var(--rater-s-12) 0;
+}
+
+.rater-dims2__rows {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.rater-dims2__empty-list {
+  padding: var(--rater-s-16);
+  color: var(--rater-text-subtle);
+  font-size: var(--rater-t-13);
+  text-align: center;
+}
+
+.rater-dims2__row {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-12);
+  width: 100%;
+  padding: var(--rater-s-8) var(--rater-s-10);
+  border: 0;
+  border-radius: var(--rater-r-8);
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  transition:
+    background var(--rater-d-80) var(--rater-ease-snap),
+    box-shadow var(--rater-d-120) var(--rater-ease-snap);
+}
+.rater-dims2__row:hover {
+  background: var(--rater-row-hover-bg);
+}
+.rater-dims2__row:active {
+  background: var(--rater-surface-2);
+}
+/* Wave 3 — selection is a neutral surface step + a thin accent rail
+   (the old 14% accent wash competed with the one primary button). */
+.rater-dims2__row.is-selected {
+  background: var(--rater-surface-3);
+  box-shadow: inset 2px 0 0 var(--rater-accent-primary);
+}
+.rater-dims2__row:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: 1px;
+}
+
+/* shape icon swatch (list + detail + menu) */
+.rater-dims2__shape,
+.rater-dims2__d-shape,
+.rater-dims2__add-ic {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  border-radius: var(--rater-r-6);
+  background: var(--rater-surface-2);
+  color: var(--rater-text-muted);
+}
+.rater-dims2__shape svg,
+.rater-dims2__add-ic svg {
+  width: 15px;
+  height: 15px;
+}
+
+/* V2_INTERFACE_SPEC §1.1 — the shape tiles are NEUTRAL: the Wave-3
+   cat-* tints collided with the computation-kind palette (categorical
+   read as azure = interactive = input-stage all at once). The lucide
+   glyph is the one shape signal; the base surface-2 + text-muted
+   treatment above already covers all five modifiers. */
+
+.rater-dims2__row-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.rater-dims2__row-name {
+  color: var(--rater-text-strong);
+  font-size: var(--rater-t-13);
+  font-weight: var(--rater-fw-medium);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rater-dims2__row-slug {
+  color: var(--rater-text-subtle);
+  font-size: var(--rater-t-11);
+  font-family: var(--rater-font-mono);
+  letter-spacing: var(--rater-tracking-mono);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rater-dims2__row-count {
+  color: var(--rater-text-muted);
+  font-size: var(--rater-t-12);
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+
+/* add-shape menu items */
+.rater-dims2__add-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+.rater-dims2__add-title {
+  color: var(--rater-text-strong);
+  font-size: var(--rater-t-13);
+  font-weight: var(--rater-fw-medium);
+}
+.rater-dims2__add-hint {
+  color: var(--rater-text-subtle);
+  font-size: var(--rater-t-11);
+}
+
+/* ── DETAIL ───────────────────────────────────────────────────── */
+.rater-dims2__detail {
+  min-height: 360px;
+}
+.rater-dims2__detail-empty {
+  display: grid;
+  place-items: center;
+  min-height: 360px;
+  padding: var(--rater-s-24);
+  animation: rater-dims2-d-in var(--rater-d-140) var(--rater-ease-snap) both;
+}
+.rater-dims2__empty-ic {
+  color: var(--rater-text-subtle);
+}
+
+.rater-dims2__d {
+  padding: var(--rater-s-20);
+  animation: rater-dims2-d-in var(--rater-d-140) var(--rater-ease-snap) both;
+}
+
+@keyframes rater-dims2-d-in {
+  from {
+    opacity: 0;
+    transform: translateY(3px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+/* Wave 3 — the name row: title + the always-mounted save pill + ⋯.
+   (The back-crumb row is gone; the pill's reserved slot means the ⋯
+   button never shifts as save state changes.) */
+.rater-dims2__d-namerow {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-8);
+}
+.rater-dims2__d-namerow .rater-inline-edit--title,
+.rater-dims2__d-namerow .rater-dims2__d-name {
+  flex: 1;
+  min-width: 0;
+}
+.rater-dims2__save {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-4);
+  height: 22px;
+  padding: 0 var(--rater-s-8);
+  border-radius: var(--rater-r-6);
+  border: 1px solid var(--rater-border-subtle);
+  font-size: var(--rater-t-11);
+  white-space: nowrap;
+  flex: none;
+  transition:
+    opacity var(--rater-d-140) var(--rater-ease-soft),
+    color var(--rater-d-120) var(--rater-ease-soft);
+}
+/* steady state is SILENT — "Saved" confirms then fades; the slot stays */
+.rater-dims2__save--hidden {
+  opacity: 0;
+}
+.rater-dims2__save--editing {
+  color: var(--rater-text-subtle);
+}
+.rater-dims2__save--saved {
+  color: var(--rater-feedback-success);
+}
+.rater-dims2__save--saving {
+  color: var(--rater-text-muted);
+}
+.rater-dims2__save--error {
+  color: var(--rater-feedback-error);
+}
+
+.rater-dims2__d-head {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--rater-s-12);
+}
+.rater-dims2__d-shape {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--rater-r-8);
+}
+.rater-dims2__d-shape svg {
+  width: 19px;
+  height: 19px;
+}
+.rater-dims2__d-headcopy {
+  min-width: 0;
+}
+.rater-dims2__d-name {
+  /* a SECTION title — the page's one t-20 lives in the plan header */
+  font-size: var(--rater-t-16);
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-strong);
+  letter-spacing: -0.01em;
+}
+.rater-dims2__d-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--rater-s-4) var(--rater-s-8);
+  margin-top: var(--rater-s-4);
+  color: var(--rater-text-muted);
+  font-size: var(--rater-t-12);
+}
+.rater-dims2__d-dot {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--rater-text-disabled);
+}
+.rater-dims2__mono {
+  font-family: var(--rater-font-mono);
+  letter-spacing: var(--rater-tracking-mono);
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-default);
+}
+
+.rater-dims2__d-divider {
+  height: 1px;
+  background: var(--rater-border-subtle);
+  margin: var(--rater-s-20) 0 var(--rater-s-16);
+}
+.rater-dims2__d-secrow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  /* B5 — the eyebrow ("LEVELS") and its count sit adjacent on the left (the
+     trailing control takes the space-between gap), so they rendered fused
+     ("LEVELS1"). A gap guarantees a minimum separation → "LEVELS 1". */
+  gap: var(--rater-s-6);
+  margin-bottom: var(--rater-s-10);
+}
+.rater-dims2__d-secrow--gap {
+  margin-top: var(--rater-s-24);
+}
+.rater-dims2__eyebrow {
+  font-size: var(--rater-t-11);
+  letter-spacing: var(--rater-tracking-label);
+  text-transform: uppercase;
+  color: var(--rater-text-subtle);
+  font-weight: var(--rater-fw-semibold);
+}
+.rater-dims2__d-count {
+  color: var(--rater-text-muted);
+  font-size: var(--rater-t-12);
+  font-variant-numeric: tabular-nums;
+}
+.rater-dims2__d-note {
+  color: var(--rater-text-subtle);
+  font-size: var(--rater-t-13);
+  padding: var(--rater-s-8) 0;
+}
+
+/* levels table (read-only in P1) */
+.rater-dims2__lv {
+  border: 1px solid var(--rater-border-subtle);
+  border-radius: var(--rater-r-8);
+  overflow: hidden;
+}
+.rater-dims2__lv-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 180px;
+  align-items: center;
+  gap: var(--rater-s-10);
+  padding: var(--rater-s-10) var(--rater-s-12);
+  border-bottom: 1px solid var(--rater-border-subtle);
+}
+.rater-dims2__lv-row:last-child {
+  border-bottom: 0;
+}
+.rater-dims2__lv-row--head {
+  background: var(--rater-surface-canvas);
+}
+.rater-dims2__lv-row--head span {
+  font-size: var(--rater-t-11);
+  letter-spacing: var(--rater-tracking-label);
+  text-transform: uppercase;
+  color: var(--rater-text-subtle);
+  font-weight: var(--rater-fw-semibold);
+}
+.rater-dims2__lv-name {
+  color: var(--rater-text-strong);
+  font-size: var(--rater-t-13);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rater-dims2__lv-id {
+  color: var(--rater-text-muted);
+}
+.rater-dims2__lv-row--more {
+  grid-template-columns: 1fr;
+  color: var(--rater-text-subtle);
+  font-size: var(--rater-t-12);
+}
+
+/* ── EDITABLE meta (P2): name + id inputs, id-collision warning ──── */
+/* the editable name is the design-system <InlineEdit variant="title">
+   (Wave 1); scoped to this detail pane it renders at the t-16 SECTION
+   tier — the page's one t-20 is the plan header's. */
+.rater-dims2__d-namerow .rater-inline-edit--title {
+  font-size: var(--rater-t-16);
+}
+
+.rater-dims2__d-idline {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-4);
+}
+.rater-dims2__slug-input {
+  /* width tracks the value via the `size` attribute so the id never clips */
+  min-width: 6ch;
+  max-width: 100%;
+  padding: 1px var(--rater-s-6);
+  border: 1px solid transparent;
+  border-radius: var(--rater-r-4);
+  background: transparent;
+  font-family: var(--rater-font-mono);
+  letter-spacing: var(--rater-tracking-mono);
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-default);
+  transition:
+    background var(--rater-d-80) var(--rater-ease-snap),
+    border-color var(--rater-d-80) var(--rater-ease-snap);
+}
+.rater-dims2__slug-input:hover {
+  border-color: var(--rater-border-subtle);
+}
+.rater-dims2__slug-input:focus {
+  outline: none;
+  border-color: var(--rater-focus-ring);
+  box-shadow: 0 0 0 2px var(--rater-focus-halo);
+  background: var(--rater-surface-canvas);
+}
+
+.rater-dims2__d-warn {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-6);
+  margin-top: var(--rater-s-8);
+  color: var(--rater-feedback-warn);
+  font-size: var(--rater-t-12);
+}
+
+/* push the ⋯ actions menu to the right when there's no save pill to do it */
+.rater-dims2__d-actions {
+  margin-left: auto;
+}
+
+/* the reused <UsedInPanel> flattens into the v2 grammar: the section
+   eyebrow above replaces its own header strip, and the card chrome
+   drops (one bordered card inside another was box-in-box-in-box). */
+.rater-dims2__d-usedin .rater-dim-used-in {
+  border: 0;
+  background: transparent;
+}
+.rater-dims2__d-usedin .rater-dim-used-in__head {
+  display: none;
+}

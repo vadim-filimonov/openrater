@@ -1,0 +1,161 @@
+/* ============================================================================
+ * <Combobox> — type-to-search single-select picker.
+ *
+ * Input field + portal-rendered listbox. Drops down below the input
+ * (4px gap). Width matches the input minimum; expands to fit content
+ * up to the max-width.
+ *
+ * Highlight + selection states are visually distinct:
+ *   - highlighted (keyboard / hover) → surface-2 background
+ *   - selected (current value)        → accent-color left border
+ *   - both                            → both
+ * ============================================================================ */
+
+.rater-combobox {
+  position: relative;
+  display: inline-flex;
+  align-items: stretch;
+  min-width: 200px;
+}
+
+.rater-combobox__field {
+  /* Reset native input */
+  appearance: none;
+  width: 100%;
+
+  /* Layout */
+  padding: var(--rater-s-8) calc(var(--rater-s-10) + 20px) var(--rater-s-8) var(--rater-s-10);
+
+  /* Surface */
+  background: var(--rater-surface-1);
+  color: var(--rater-text-strong);
+  border: 1px solid var(--rater-border-default);
+  border-radius: var(--rater-r-6);
+
+  /* Type */
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-13);
+  font-weight: var(--rater-fw-regular);
+  line-height: var(--rater-lh-snug);
+
+  /* Motion */
+  transition:
+    border-color var(--rater-d-80) var(--rater-ease-soft),
+    background var(--rater-d-80) var(--rater-ease-soft);
+}
+
+.rater-combobox__field::placeholder {
+  color: var(--rater-text-muted);
+}
+
+.rater-combobox__field:hover:not(:disabled) {
+  border-color: var(--rater-border-strong);
+}
+
+.rater-combobox__field:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: 1px;
+  border-color: var(--rater-border-strong);
+}
+
+.rater-combobox__field--error {
+  border-color: var(--rater-feedback-error);
+}
+
+.rater-combobox__field:disabled {
+  background: var(--rater-surface-canvas);
+  color: var(--rater-text-disabled);
+  cursor: not-allowed;
+}
+
+.rater-combobox__chevron {
+  position: absolute;
+  right: var(--rater-s-10);
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: var(--rater-text-muted);
+  font-size: var(--rater-t-12);
+  user-select: none;
+}
+
+/* ── Listbox panel ────────────────────────────────────────────────── */
+
+.rater-combobox__listbox {
+  position: absolute;
+  z-index: var(--rater-z-popover);
+  max-width: 480px;
+  max-height: 280px;
+  overflow-y: auto;
+
+  background: var(--rater-surface-1);
+  border: 1px solid var(--rater-border-default);
+  border-radius: var(--rater-r-6);
+  box-shadow: var(--rater-shadow-floating);
+
+  padding: var(--rater-s-4);
+
+  animation: rater-combobox-in var(--rater-d-140) var(--rater-ease-soft);
+}
+
+.rater-combobox__option {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--rater-s-6) var(--rater-s-10);
+  border-radius: var(--rater-r-4);
+  cursor: pointer;
+  user-select: none;
+  /* Left border slot — invisible by default; the --selected modifier
+     paints it. Prevents layout shift between selected/unselected. */
+  border-left: 2px solid transparent;
+  transition: background var(--rater-d-80) var(--rater-ease-soft);
+}
+
+.rater-combobox__option--highlighted {
+  background: var(--rater-surface-2);
+}
+
+.rater-combobox__option--selected {
+  border-left-color: var(--rater-focus-ring);
+}
+
+.rater-combobox__option--disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.rater-combobox__option-label {
+  color: var(--rater-text-strong);
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-13);
+  font-weight: var(--rater-fw-medium);
+  line-height: var(--rater-lh-snug);
+}
+
+.rater-combobox__option-hint {
+  color: var(--rater-text-muted);
+  font-family: var(--rater-fonts-mono, var(--rater-fonts-sans));
+  font-size: var(--rater-t-12);
+  font-weight: var(--rater-fw-regular);
+  line-height: var(--rater-lh-snug);
+}
+
+.rater-combobox__empty {
+  padding: var(--rater-s-12) var(--rater-s-10);
+  color: var(--rater-text-muted);
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-13);
+  font-style: italic;
+}
+
+@keyframes rater-combobox-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

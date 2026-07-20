@@ -1,0 +1,55 @@
+{
+  "name": "V49.exposure-rated-tower",
+  "description": "A fictional Meridian exposure-rated tower multiplies a 0.4 base factor by a 1.5 relativity, rounds the rate, applies 200,000/100 units and a 1.4 LCM, then rounds the premium to 1,680.",
+  "plan": {
+    "id": "v49.exposure-tower",
+    "version": "1.0.0",
+    "name": "Meridian synthetic exposure-rated tower",
+    "line": "bop",
+    "effective": "2026-01-01",
+    "nodes": [
+      { "id": "in_terr", "kind": "input", "params": { "fieldName": "territory", "fieldType": "string" }, "position": { "x": 0, "y": 0 } },
+      { "id": "in_rateno", "kind": "input", "params": { "fieldName": "prop_rate_number", "fieldType": "string" }, "position": { "x": 0, "y": 60 } },
+      { "id": "in_limit", "kind": "input", "params": { "fieldName": "building_limit", "fieldType": "money" }, "position": { "x": 0, "y": 120 } },
+
+      { "id": "base", "kind": "constant", "params": { "value": 1.0, "type": "factor" }, "position": { "x": 200, "y": 0 } },
+      { "id": "base_lc", "kind": "lookup.direct", "params": { "table": { "t1": 0.4, "t2": 0.4 }, "defaultValue": 1.0, "tableName": "Meridian synthetic property base factor" }, "position": { "x": 200, "y": 40 } },
+      { "id": "rate_no", "kind": "lookup.direct", "params": { "table": { "r2": 1.5, "r3": 1.3 }, "defaultValue": 1.0, "tableName": "Meridian synthetic building relativity" }, "position": { "x": 200, "y": 80 } },
+
+      { "id": "mul", "kind": "chain.mult", "params": { "factorNames": ["base_lc", "rate_no"], "stopOnZero": false }, "position": { "x": 400, "y": 40 } },
+      { "id": "rate3", "kind": "round", "params": { "decimals": 3 }, "position": { "x": 560, "y": 40 } },
+
+      { "id": "divisor", "kind": "constant", "params": { "value": 100, "type": "number" }, "position": { "x": 400, "y": 140 } },
+      { "id": "expdiv", "kind": "math.op", "params": { "op": "div" }, "position": { "x": 560, "y": 120 } },
+
+      { "id": "mulexp", "kind": "math.op", "params": { "op": "mul" }, "position": { "x": 700, "y": 80 } },
+      { "id": "lcm", "kind": "constant", "params": { "value": 1.4, "type": "factor" }, "position": { "x": 700, "y": 160 } },
+      { "id": "mullcm", "kind": "math.op", "params": { "op": "mul" }, "position": { "x": 840, "y": 100 } },
+      { "id": "prem", "kind": "round", "params": { "decimals": 0 }, "position": { "x": 980, "y": 100 } },
+      { "id": "out", "kind": "output", "params": { "fieldName": "building_premium", "fieldType": "money" }, "position": { "x": 1120, "y": 100 } }
+    ],
+    "edges": [
+      { "from": { "node": "in_terr", "port": "value" }, "to": { "node": "base_lc", "port": "key" } },
+      { "from": { "node": "in_rateno", "port": "value" }, "to": { "node": "rate_no", "port": "key" } },
+
+      { "from": { "node": "base", "port": "value" }, "to": { "node": "mul", "port": "base" } },
+      { "from": { "node": "base_lc", "port": "value" }, "to": { "node": "mul", "port": "factors" } },
+      { "from": { "node": "rate_no", "port": "value" }, "to": { "node": "mul", "port": "factors" } },
+      { "from": { "node": "mul", "port": "result" }, "to": { "node": "rate3", "port": "value" } },
+
+      { "from": { "node": "in_limit", "port": "value" }, "to": { "node": "expdiv", "port": "x" } },
+      { "from": { "node": "divisor", "port": "value" }, "to": { "node": "expdiv", "port": "y" } },
+
+      { "from": { "node": "rate3", "port": "value" }, "to": { "node": "mulexp", "port": "x" } },
+      { "from": { "node": "expdiv", "port": "result" }, "to": { "node": "mulexp", "port": "y" } },
+
+      { "from": { "node": "mulexp", "port": "result" }, "to": { "node": "mullcm", "port": "x" } },
+      { "from": { "node": "lcm", "port": "value" }, "to": { "node": "mullcm", "port": "y" } },
+
+      { "from": { "node": "mullcm", "port": "result" }, "to": { "node": "prem", "port": "value" } },
+      { "from": { "node": "prem", "port": "value" }, "to": { "node": "out", "port": "value" } }
+    ]
+  },
+  "externalInputs": { "territory": "t2", "prop_rate_number": "r2", "building_limit": 200000 },
+  "expectedOutputs": { "building_premium": 1680 }
+}

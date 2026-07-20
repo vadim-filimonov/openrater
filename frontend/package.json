@@ -1,0 +1,42 @@
+{
+  "name": "@openrater/app",
+  "version": "0.0.0",
+  "private": true,
+  "description": "OpenRater's rating-plan authoring, review, analytics, and execution app.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview --port 5174",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@hookform/resolvers": "^3.9.0",
+    "@openrater/api-client": "workspace:*",
+    "@openrater/contracts": "workspace:*",
+    "@openrater/design-system": "workspace:*",
+    "@openrater/hooks": "workspace:*",
+    "@openrater/ui": "workspace:*",
+    "@tanstack/react-query": "^5.59.0",
+    "d3-geo": "^3.1.1",
+    "lucide-react": "^0.453.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-hook-form": "^7.53.0",
+    "react-router-dom": "^6.27.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/d3-geo": "^3.1.0",
+    "@types/geojson": "^7946.0.16",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.3",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.10",
+    "vitest": "^2.1.4"
+  }
+}

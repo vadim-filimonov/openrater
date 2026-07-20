@@ -1,0 +1,118 @@
+/* ============================================================================
+ * <Segmented> — Polish PR 8.
+ *
+ * Single visual surface (border + radius + inset padding) with 2-N
+ * segment buttons inside. The active segment gets a surface-3 fill +
+ * text-strong color; inactive segments are transparent + text-muted.
+ *
+ * Audit §G2 reference: this primitive replaces the bespoke
+ * `.rater-pc-pill-group` (Parametrize Canvas/Saved) and `.rater-dsp-toggle`
+ * (Inputs CSV/Webhook) — both ~22-24px tall pills with surface-3
+ * active fill. The primitive locks the height + padding so the two
+ * surfaces stop pixel-disagreeing.
+ * ========================================================================== */
+
+.rater-segmented {
+  position: relative; /* the thumb's offsetParent + paint root */
+  display: inline-flex;
+  padding: 2px;
+  background: var(--rater-surface-1);
+  border: 1px solid var(--rater-hairline-soft);
+  border-radius: var(--rater-r-8);
+  font-family: var(--rater-font-sans);
+}
+
+/* ── The sliding thumb (Shell v3 polish) ──────────────────────────
+ * One shared fill that physically travels between segments instead of
+ * each item repainting its own background. Position + width arrive as
+ * custom properties measured by the component; width defaults to 0 so
+ * the thumb is invisible until the first measurement (and in
+ * non-measuring environments like jsdom). Reduced-motion collapses
+ * the slide via the duration token. */
+.rater-segmented__thumb {
+  position: absolute;
+  top: 2px;
+  bottom: 2px;
+  left: 0;
+  width: var(--rater-segmented-thumb-w, 0px);
+  transform: translateX(var(--rater-segmented-thumb-x, 0px));
+  background: var(--rater-surface-3);
+  border-radius: var(--rater-r-6);
+  box-shadow: var(--rater-shadow-resting);
+  pointer-events: none;
+  transition:
+    transform var(--rater-d-140) var(--rater-ease-snap),
+    width var(--rater-d-140) var(--rater-ease-snap);
+}
+
+/* Per-size: height + padding + font-size. */
+
+.rater-segmented--sm .rater-segmented__item {
+  height: 22px;
+  padding: 0 var(--rater-s-10);
+  font-size: var(--rater-t-12);
+}
+
+.rater-segmented--md .rater-segmented__item {
+  height: 26px;
+  padding: 0 var(--rater-s-12);
+  font-size: var(--rater-t-13);
+}
+
+.rater-segmented__item {
+  position: relative; /* paint above the absolutely-positioned thumb */
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-6);
+  border: 0;
+  background: transparent;
+  border-radius: var(--rater-r-6);
+  color: var(--rater-text-muted);
+  font-family: inherit;
+  font-weight: var(--rater-fw-medium);
+  cursor: pointer;
+  transition: color var(--rater-d-80) var(--rater-ease-snap);
+}
+
+.rater-segmented__item:hover:not(.is-active):not(:disabled) {
+  color: var(--rater-text-default);
+}
+
+.rater-segmented__item:active:not(.is-active):not(:disabled) {
+  color: var(--rater-text-strong);
+}
+
+/* the active item carries no fill of its own — the thumb IS the fill */
+.rater-segmented__item.is-active {
+  color: var(--rater-text-strong);
+}
+
+.rater-segmented__item:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: -2px;
+}
+
+.rater-segmented__item:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.rater-segmented__count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 16px;
+  padding: 0 var(--rater-s-4);
+  border-radius: var(--rater-r-full);
+  background: var(--rater-surface-2);
+  color: var(--rater-text-subtle);
+  font-family: var(--rater-font-mono);
+  font-size: var(--rater-t-10);
+  font-weight: var(--rater-fw-semibold);
+}
+
+.rater-segmented__item.is-active .rater-segmented__count {
+  background: var(--rater-surface-1);
+  color: var(--rater-text-default);
+}

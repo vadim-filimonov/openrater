@@ -1,0 +1,459 @@
+/* ──────────────────────────────────────────────────────────────────
+   <PlanReport> — Brief 93: the document idiom. One readable column,
+   section heads + hairlines (no panels-in-panels), typography does
+   the hierarchy. Prints clean: the actions row hides, the column is
+   the artifact. All values are tokens — no raw hex.
+   ────────────────────────────────────────────────────────────────── */
+
+.rater-report {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: var(--rater-s-8) 0 var(--rater-s-48);
+}
+
+.rater-report__head {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-8);
+  margin-bottom: var(--rater-s-6);
+}
+
+.rater-report__title {
+  margin: 0;
+  font-family: var(--rater-font-display);
+  font-size: var(--rater-t-20);
+  font-weight: var(--rater-fw-semibold);
+  letter-spacing: var(--rater-tracking-tight);
+  color: var(--rater-text-strong);
+}
+
+.rater-report__spacer {
+  flex: 1;
+}
+
+.rater-report__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--rater-s-8);
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-subtle);
+  margin-bottom: var(--rater-s-20);
+}
+
+/* Dot separators between meta pieces — grammar, not markup. */
+.rater-report__meta > *:not(last-child)::after {
+  content: "·";
+  margin-left: var(--rater-s-8);
+  color: var(--rater-text-faint);
+}
+
+.rater-report__meta-chip {
+  display: inline-flex;
+  align-items: center;
+}
+
+.rater-report__lede {
+  margin: 0 0 var(--rater-s-28);
+  font-size: var(--rater-t-14);
+  line-height: var(--rater-leading-relaxed);
+  color: var(--rater-text-default);
+}
+
+.rater-report__lede b {
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-strong);
+}
+
+.rater-report__prov {
+  color: var(--rater-text-muted);
+}
+
+/* ── Section anatomy ─────────────────────────────────────────────── */
+.rater-report__sec {
+  margin-bottom: var(--rater-s-32);
+}
+
+.rater-report__sec-head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--rater-s-10);
+  padding-bottom: var(--rater-s-8);
+  border-bottom: 1px solid var(--rater-border-subtle);
+  margin-bottom: var(--rater-s-12);
+}
+
+.rater-report__sec-title {
+  margin: 0;
+  font-size: var(--rater-t-13);
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-strong);
+}
+
+.rater-report__sec-src {
+  font-size: var(--rater-t-11);
+  color: var(--rater-text-subtle);
+}
+
+.rater-report__none {
+  margin: 0;
+  font-size: var(--rater-t-13);
+  color: var(--rater-text-muted);
+}
+
+.rater-report__refusal {
+  margin: 0;
+  font-size: var(--rater-t-13);
+  color: var(--rater-feedback-warn);
+}
+
+/* ── §3 What a policy costs — the big number + the walk ─────────── */
+.rater-report__cost {
+  display: flex;
+  gap: var(--rater-s-28);
+  align-items: flex-start;
+}
+
+.rater-report__big {
+  font-family: var(--rater-font-display);
+  font-size: var(--rater-t-28);
+  font-weight: var(--rater-fw-semibold);
+  letter-spacing: var(--rater-tracking-tight);
+  color: var(--rater-text-strong);
+  font-variant-numeric: tabular-nums;
+  line-height: var(--rater-leading-tight);
+}
+
+.rater-report__withheld {
+  font-size: var(--rater-t-18);
+  color: var(--rater-text-muted);
+}
+
+.rater-report__pins {
+  display: block;
+  max-width: 210px;
+  margin-top: var(--rater-s-6);
+  font-family: var(--rater-font-sans);
+  font-size: var(--rater-t-11);
+  font-weight: var(--rater-fw-regular);
+  letter-spacing: normal;
+  line-height: var(--rater-leading-snug);
+  color: var(--rater-text-subtle);
+}
+
+.rater-report__walk {
+  flex: 1;
+  min-width: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.rater-report__walk-row {
+  display: grid;
+  grid-template-columns: 1fr 84px 108px;
+  gap: var(--rater-s-10);
+  padding: var(--rater-s-4) var(--rater-s-2);
+  border-bottom: 1px solid var(--rater-border-subtle);
+  font-size: var(--rater-t-12);
+}
+
+.rater-report__walk-n {
+  color: var(--rater-text-muted);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rater-report__walk-f,
+.rater-report__walk-r {
+  text-align: right;
+  font-family: var(--rater-font-mono);
+  font-size: var(--rater-t-11);
+}
+
+.rater-report__walk-f {
+  color: var(--rater-text-subtle);
+}
+
+.rater-report__walk-r {
+  color: var(--rater-text-default);
+}
+
+.rater-report__walk-row.is-base .rater-report__walk-n,
+.rater-report__walk-row.is-base .rater-report__walk-r {
+  color: var(--rater-text-default);
+  font-weight: var(--rater-fw-medium);
+}
+
+/* 93.4 — one coverage tower's closing line on a total-less ledger.
+   Heavier than a factor row (it's a real coverage premium), lighter
+   than the grand total (which ADDS these). */
+.rater-report__walk-row.is-subtotal {
+  border-bottom: 1px solid var(--rater-border-default);
+}
+
+.rater-report__walk-row.is-subtotal .rater-report__walk-n,
+.rater-report__walk-row.is-subtotal .rater-report__walk-r {
+  color: var(--rater-text-default);
+  font-weight: var(--rater-fw-medium);
+}
+
+/* Air between stacked towers, so the ledger reads as N build-ups
+   rather than one long chain whose running total keeps resetting. */
+.rater-report__walk-row.is-subtotal + .rater-report__walk-row.is-base {
+  margin-top: var(--rater-s-10);
+}
+
+.rater-report__walk-row.is-total {
+  border-top: 1px solid var(--rater-border-default);
+  border-bottom: 0;
+}
+
+.rater-report__walk-row.is-total .rater-report__walk-n,
+.rater-report__walk-row.is-total .rater-report__walk-r {
+  color: var(--rater-text-strong);
+  font-weight: var(--rater-fw-semibold);
+  font-size: var(--rater-t-12);
+}
+
+/* ── §6 gates — the rules, stated (93.2) ─────────────────────────── */
+.rater-report__gates {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.rater-report__gate {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--rater-s-12);
+  padding: var(--rater-s-8) var(--rater-s-2);
+  border-bottom: 1px solid var(--rater-border-subtle);
+  font-size: var(--rater-t-13);
+}
+
+.rater-report__gate:last-child {
+  border-bottom: 0;
+}
+
+.rater-report__gate-rule {
+  color: var(--rater-text-default);
+  min-width: 0;
+}
+
+.rater-report__gate-out {
+  flex: none;
+}
+
+.rater-report__gates-default {
+  margin: var(--rater-s-10) 0 0;
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-subtle);
+}
+
+.rater-report__gates-default b {
+  font-weight: var(--rater-fw-medium);
+  color: var(--rater-text-muted);
+}
+
+/* ── §4 drivers — the closing sentence under the ranked list ────── */
+.rater-report__drv-sentence {
+  margin: var(--rater-s-10) 0 0;
+  font-size: var(--rater-t-13);
+  color: var(--rater-text-muted);
+}
+
+.rater-report__drv-sentence b {
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-strong);
+}
+
+/* ── §7 worked examples — the verified filing table (93.3) ───────── */
+.rater-report__verdict {
+  display: inline-flex;
+  align-items: center;
+  margin: 0 0 var(--rater-s-10);
+  padding: var(--rater-s-2) var(--rater-s-10);
+  border-radius: var(--rater-r-full);
+  font-size: var(--rater-t-12);
+  font-weight: var(--rater-fw-semibold);
+}
+
+.rater-report__verdict.is-success {
+  color: var(--rater-feedback-success);
+  background: var(--rater-feedback-success-soft);
+  border: 1px solid var(--rater-feedback-success);
+}
+
+.rater-report__verdict.is-warn {
+  color: var(--rater-feedback-warn);
+  background: var(--rater-feedback-warn-soft);
+  border: 1px solid var(--rater-feedback-warn);
+}
+
+.rater-report__verdict.is-error {
+  color: var(--rater-feedback-error);
+  background: var(--rater-feedback-error-soft);
+  border: 1px solid var(--rater-feedback-error);
+}
+
+.rater-report__ex {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+
+.rater-report__ex th,
+.rater-report__ex td {
+  padding: var(--rater-s-6) var(--rater-s-10);
+  border-bottom: 1px solid var(--rater-border-subtle);
+  text-align: right;
+  font-size: var(--rater-t-12);
+}
+
+.rater-report__ex th {
+  font-size: var(--rater-t-11);
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-subtle);
+}
+
+.rater-report__ex th:first-child,
+.rater-report__ex td:first-child {
+  text-align: left;
+}
+
+.rater-report__ex td {
+  font-family: var(--rater-font-mono);
+  font-size: var(--rater-t-11);
+  color: var(--rater-text-default);
+}
+
+.rater-report__ex td:first-child {
+  font-family: var(--rater-font-sans);
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-muted);
+}
+
+.rater-report__ex tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.rater-report__ex td.is-match {
+  color: var(--rater-feedback-success);
+}
+
+.rater-report__ex td.is-near {
+  color: var(--rater-feedback-warn);
+}
+
+.rater-report__ex td.is-mismatch,
+.rater-report__ex td.is-error {
+  color: var(--rater-feedback-error);
+}
+
+.rater-report__ex td.is-not_run {
+  color: var(--rater-text-subtle);
+}
+
+.rater-report__ex-cap {
+  margin: var(--rater-s-8) 0 0;
+  font-size: var(--rater-t-11);
+  color: var(--rater-text-faint);
+}
+
+/* ── §8 the boundary — one quiet closing line (R4) ──────────────── */
+.rater-report__boundary {
+  display: flex;
+  gap: var(--rater-s-10);
+  align-items: flex-start;
+  margin: 0;
+  padding-top: var(--rater-s-14);
+  border-top: 1px solid var(--rater-border-subtle);
+  font-size: var(--rater-t-12);
+  line-height: var(--rater-leading-snug);
+  color: var(--rater-text-subtle);
+}
+
+.rater-report__boundary svg {
+  width: var(--rater-icon-14);
+  height: var(--rater-icon-14);
+  flex: none;
+  margin-top: 1px;
+  color: var(--rater-text-faint);
+}
+
+.rater-report__boundary-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: var(--rater-accent-primary);
+  cursor: pointer;
+}
+
+.rater-report__boundary-link:hover {
+  color: var(--rater-accent-primary-hover);
+}
+
+.rater-report__boundary-link:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: 2px;
+  border-radius: var(--rater-r-2);
+}
+
+/* ── Print — the column IS the export (CT-5, 93.3) ────────────────
+ * The classic print-region recipe: on any page carrying the report,
+ * everything goes invisible, then the report subtree comes back and
+ * lifts out of flow to the top-left. App chrome (nav, plan header,
+ * tabs) never prints; pages WITHOUT a report print untouched. */
+@media print {
+  body:has(.rater-report) {
+    visibility: hidden;
+  }
+  body:has(.rater-report) .rater-report {
+    visibility: visible;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    max-width: none;
+    padding: 0;
+  }
+  /* The head's buttons (Print / Book) are chrome, not report. */
+  .rater-report__head button {
+    display: none;
+  }
+  /*  — INTERACTIVE chrome never prints: the rate card's axis
+   * pickers, Export CSV, and every button inside the report were
+   * printing as ghost chrome. Selects/buttons on paper are dead
+   * controls, not content. */
+  .rater-report select,
+  .rater-report button,
+  .rater-report .rater-probe__card-toolbar {
+    display: none !important;
+  }
+  /* Muted grays sit fine on a screen and vanish on paper — darken the
+   * secondary text tiers to print-safe values. */
+  .rater-report {
+    --rater-text-muted: #333;
+    --rater-text-subtle: #444;
+    --rater-text-faint: #555;
+  }
+  /* The section head's bottom border + the first row's top border
+   * printed as a doubled rule — the row yields. */
+  .rater-report table tr:first-child td,
+  .rater-report table tr:first-child th {
+    border-top: none;
+  }
+}
+
+@media (max-width: 720px) {
+  .rater-report__cost {
+    flex-direction: column;
+    gap: var(--rater-s-16);
+  }
+  .rater-report__pins {
+    max-width: none;
+  }
+}

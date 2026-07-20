@@ -1,0 +1,185 @@
+/* ============================================================================
+ * <CommandPalette> — Cmd+K launcher.
+ *
+ * Centered modal over a dimming backdrop. Top-of-viewport offset
+ * (positioned ~120px down from the top edge) for the Linear/Vercel-
+ * style "command bar floating near the top" feel — not vertically
+ * centered like a confirmation modal.
+ * ============================================================================ */
+
+.rater-command-palette__backdrop {
+  position: fixed;
+  inset: 0;
+  background: var(--rater-surface-overlay);
+  z-index: var(--rater-z-overlay);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: clamp(80px, 12vh, 160px);
+  padding-inline: var(--rater-s-16);
+  animation: rater-command-palette-backdrop-in var(--rater-d-140) var(--rater-ease-soft);
+}
+
+.rater-command-palette {
+  position: relative;
+  z-index: var(--rater-z-modal);
+  width: 600px;
+  max-width: 100%;
+  max-height: 60vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--rater-surface-1);
+  border: 1px solid var(--rater-border-default);
+  border-radius: var(--rater-r-8);
+  box-shadow: var(--rater-shadow-floating);
+  overflow: hidden;
+
+  animation: rater-command-palette-in var(--rater-d-240) var(--rater-ease-soft);
+}
+
+.rater-command-palette__field {
+  /* Reset */
+  appearance: none;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  margin: 0;
+
+  /* Layout */
+  padding: var(--rater-s-14) var(--rater-s-16);
+  border-bottom: 1px solid var(--rater-border-subtle);
+
+  /* Type */
+  color: var(--rater-text-strong);
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-14);
+  font-weight: var(--rater-fw-regular);
+  line-height: var(--rater-lh-snug);
+}
+
+.rater-command-palette__field:focus-visible {
+  outline: none; /* The whole palette has the focus ring via the dialog */
+}
+
+.rater-command-palette__field::placeholder {
+  color: var(--rater-text-muted);
+}
+
+/* ── List ────────────────────────────────────────────────────── */
+
+.rater-command-palette__list {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: var(--rater-s-6);
+}
+
+.rater-command-palette__group + .rater-command-palette__group {
+  margin-top: var(--rater-s-8);
+}
+
+.rater-command-palette__group-title {
+  margin: 0;
+  padding: var(--rater-s-4) var(--rater-s-8);
+  color: var(--rater-text-muted);
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-11, var(--rater-t-12));
+  font-weight: var(--rater-fw-semibold);
+  letter-spacing: var(--rater-tracking-label);
+  text-transform: uppercase;
+}
+
+.rater-command-palette__item {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-10);
+  padding: var(--rater-s-8) var(--rater-s-10);
+  border-radius: var(--rater-r-4);
+  cursor: pointer;
+  user-select: none;
+  color: var(--rater-text-default);
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-13);
+  line-height: var(--rater-lh-snug);
+  transition: background var(--rater-d-80) var(--rater-ease-soft);
+}
+
+.rater-command-palette__item--highlighted {
+  background: var(--rater-surface-2);
+  color: var(--rater-text-strong);
+}
+
+.rater-command-palette__item--disabled,
+.rater-command-palette__item[aria-disabled="true"] {
+  color: var(--rater-text-disabled);
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.rater-command-palette__item-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  flex-shrink: 0;
+  color: var(--rater-text-muted);
+}
+
+.rater-command-palette__item-label {
+  flex: 1 1 auto;
+  font-weight: var(--rater-fw-medium);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rater-command-palette__item-hint {
+  color: var(--rater-text-muted);
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-12);
+  font-weight: var(--rater-fw-regular);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-shrink: 0;
+}
+
+.rater-command-palette__item-shortcut {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-2);
+  padding: 1px var(--rater-s-4);
+  border-radius: var(--rater-r-2);
+  border: 1px solid var(--rater-border-subtle);
+  background: var(--rater-surface-canvas);
+  color: var(--rater-text-muted);
+  font-family: var(--rater-fonts-mono, var(--rater-fonts-sans));
+  font-size: var(--rater-t-11, var(--rater-t-12));
+  font-weight: var(--rater-fw-medium);
+  letter-spacing: var(--rater-tracking-label);
+  flex-shrink: 0;
+}
+
+.rater-command-palette__empty {
+  padding: var(--rater-s-16) var(--rater-s-14);
+  color: var(--rater-text-muted);
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-13);
+  font-style: italic;
+  text-align: center;
+}
+
+@keyframes rater-command-palette-backdrop-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes rater-command-palette-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "name": "V5.lookup-range-middle-bucket",
+  "description": "TIV $500k -> middle bucket factor 1.00.",
+  "plan": {
+    "id": "v5.range",
+    "version": "1.0.0",
+    "name": "Range lookup",
+    "line": "bop",
+    "effective": "2026-01-01",
+    "nodes": [
+      { "id": "in_tiv", "kind": "input", "params": { "fieldName": "tiv", "fieldType": "money" }, "position": { "x": 0, "y": 0 } },
+      { "id": "lkp", "kind": "lookup.range",
+        "params": {
+          "buckets": [
+            { "lo": 0, "hi": 250000, "factor": 0.95 },
+            { "lo": 250000, "hi": 1000000, "factor": 1.00 },
+            { "lo": 1000000, "hi": 1e308, "factor": 1.10 }
+          ],
+          "defaultValue": 1.0
+        },
+        "position": { "x": 200, "y": 0 } },
+      { "id": "out_f", "kind": "output", "params": { "fieldName": "tiv_factor", "fieldType": "float" }, "position": { "x": 400, "y": 0 } }
+    ],
+    "edges": [
+      { "from": { "node": "in_tiv", "port": "value" }, "to": { "node": "lkp",   "port": "value" } },
+      { "from": { "node": "lkp",    "port": "value" }, "to": { "node": "out_f", "port": "value" } }
+    ]
+  },
+  "externalInputs": { "tiv": 500000 },
+  "expectedOutputs": { "tiv_factor": 1.00 }
+}

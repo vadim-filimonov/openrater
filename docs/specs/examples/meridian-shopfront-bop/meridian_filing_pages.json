@@ -1,0 +1,78 @@
+{
+  "filing": "MMI-NE-2026-BOP-001",
+  "document": "meridian_shopfront_bop_filing.pdf",
+  "sections": {
+    "program": {
+      "rule": "A.1",
+      "page": 3
+    },
+    "eligibility": {
+      "rule": "A.2",
+      "page": 3
+    },
+    "coverages": {
+      "rule": "A.3",
+      "page": 3
+    },
+    "conventions": {
+      "rule": "A.4",
+      "page": 3
+    },
+    "rating_order": {
+      "rule": "B.1",
+      "page": 4
+    },
+    "rounding": {
+      "rule": "B.2",
+      "page": 4
+    },
+    "modifiers": {
+      "rule": "B.3",
+      "page": 4
+    },
+    "base_rates": {
+      "rule": "C.1",
+      "page": 5
+    },
+    "construction": {
+      "rule": "C.2",
+      "page": 5
+    },
+    "building_bands": {
+      "rule": "C.3",
+      "page": 5
+    },
+    "sales_bands": {
+      "rule": "C.4",
+      "page": 5
+    },
+    "sprinkler": {
+      "rule": "C.5",
+      "page": 6
+    },
+    "territory_factors": {
+      "rule": "C.6",
+      "page": 6
+    },
+    "territory_zips": {
+      "rule": "D.1",
+      "page": 6
+    },
+    "classes": {
+      "rule": "E.1",
+      "page": 7
+    },
+    "endorsement_equip": {
+      "rule": "F.1",
+      "page": 9
+    },
+    "endorsement_venture": {
+      "rule": "F.2",
+      "page": 9
+    },
+    "examples": {
+      "rule": "G.1",
+      "page": 10
+    }
+  }
+}

@@ -1,0 +1,123 @@
+{
+  "name": "V20.full-gate-cascade",
+  "description": "Full gate cascade end-to-end per Brief 42 §−1 Q1 fixed-order lock. One row passing through eligibility.gate (tier=preferred) → base premium → modifier.schedule (+5% mgmt category) → endorsement.factor (×1.10) → endorsement.additive (+50) → endorsement.sublimit (metadata, premium unchanged). Math: 1000 × 1.05 × 1.10 + 50 = 1205. Eligibility tier propagates as a parallel output (NOT premium-affecting). The sublimit emits metadata. Tier-propagation + cascade composition is the novel coverage this fixture provides; individual kind math is covered by V11/V13/V17. STATUS: ✓ implemented via Phase H.3.1-H.3.3 + Brief 39 runtime; this fixture executes deterministically as part of the conformance suite.",
+  "plan": {
+    "id": "v20.full_gate_cascade",
+    "version": "1.0.0",
+    "name": "Full gate cascade (preferred tier)",
+    "lines": ["property"],
+    "effective": "2026-01-01",
+    "nodes": [
+      {
+        "id": "gate",
+        "kind": "eligibility.gate",
+        "params": {
+          "rules": [
+            { "rule_id": "core", "variable": "state", "op": "in", "value": ["CA", "NY"], "tier": "preferred", "reasoning": "Core market." }
+          ],
+          "default_tier": "standard",
+          "default_reasoning": "Standard appetite."
+        },
+        "position": { "x": 0, "y": 0 }
+      },
+      {
+        "id": "base",
+        "kind": "constant",
+        "params": { "value": 1000 },
+        "position": { "x": 0, "y": 100 }
+      },
+      {
+        "id": "app",
+        "kind": "input",
+        "params": { "fieldName": "schedule_application", "fieldType": "money" },
+        "position": { "x": 0, "y": 200 }
+      },
+      {
+        "id": "sched",
+        "kind": "modifier.schedule",
+        "params": {
+          "schedule": {
+            "schedule_id": "v20_irpm",
+            "display_name": "v20 IRPM",
+            "scope": "per_coverage",
+            "total_cap_pct": 25,
+            "categories": [
+              { "category_id": "mgmt", "name": "Management", "range_pct": 10, "reasoning_required": true }
+            ]
+          }
+        },
+        "position": { "x": 200, "y": 200 }
+      },
+      {
+        "id": "mult_sched",
+        "kind": "chain.mult",
+        "params": { "factorNames": ["sched_factor"], "stopOnZero": false },
+        "position": { "x": 400, "y": 100 }
+      },
+      {
+        "id": "end_factor",
+        "kind": "endorsement.factor",
+        "params": {
+          "form_number": "V20-A",
+          "display_name": "Test factor endorsement",
+          "trigger": { "variable": "has_liquor", "op": "eq", "value": true },
+          "factor": 1.10
+        },
+        "position": { "x": 600, "y": 100 }
+      },
+      {
+        "id": "end_add",
+        "kind": "endorsement.additive",
+        "params": {
+          "form_number": "V20-B",
+          "display_name": "Test additive endorsement",
+          "trigger": { "variable": "state", "op": "eq", "value": "CA" },
+          "amount": 50
+        },
+        "position": { "x": 800, "y": 100 }
+      },
+      {
+        "id": "end_sub",
+        "kind": "endorsement.sublimit",
+        "params": {
+          "form_number": "V20-C",
+          "display_name": "Test sublimit endorsement",
+          "trigger": { "variable": "tiv", "op": "gt", "value": 500000 },
+          "coverage": "peak_items",
+          "sublimit": 100000
+        },
+        "position": { "x": 1000, "y": 100 }
+      },
+      { "id": "out_premium", "kind": "output", "params": { "fieldName": "final_premium", "fieldType": "number" }, "position": { "x": 1200, "y": 0 } },
+      { "id": "out_tier", "kind": "output", "params": { "fieldName": "eligibility_tier", "fieldType": "string" }, "position": { "x": 1200, "y": 100 } },
+      { "id": "out_sublimit", "kind": "output", "params": { "fieldName": "peak_sublimit", "fieldType": "string" }, "position": { "x": 1200, "y": 200 } }
+    ],
+    "edges": [
+      { "from": { "node": "app", "port": "value" }, "to": { "node": "sched", "port": "application" } },
+      { "from": { "node": "base", "port": "value" }, "to": { "node": "mult_sched", "port": "base" } },
+      { "from": { "node": "sched", "port": "factor" }, "to": { "node": "mult_sched", "port": "factors" } },
+      { "from": { "node": "mult_sched", "port": "result" }, "to": { "node": "end_factor", "port": "premium" } },
+      { "from": { "node": "end_factor", "port": "premium_out" }, "to": { "node": "end_add", "port": "premium" } },
+      { "from": { "node": "end_add", "port": "premium_out" }, "to": { "node": "end_sub", "port": "premium" } },
+      { "from": { "node": "end_sub", "port": "premium_out" }, "to": { "node": "out_premium", "port": "value" } },
+      { "from": { "node": "gate", "port": "tier" }, "to": { "node": "out_tier", "port": "value" } },
+      { "from": { "node": "end_sub", "port": "sublimit_out" }, "to": { "node": "out_sublimit", "port": "value" } }
+    ]
+  },
+  "externalInputs": {
+    "state": "CA",
+    "has_liquor": true,
+    "tiv": 750000,
+    "schedule_application": {
+      "schedule_id": "v20_irpm",
+      "values": {
+        "mgmt": { "value_pct": 5, "reasoning": "Strong management.", "source": "underwriter" }
+      }
+    }
+  },
+  "expectedOutputs": {
+    "final_premium": 1205,
+    "eligibility_tier": "preferred",
+    "peak_sublimit": { "coverage": "peak_items", "value": 100000 }
+  }
+}

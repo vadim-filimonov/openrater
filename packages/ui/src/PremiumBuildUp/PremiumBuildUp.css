@@ -1,0 +1,192 @@
+/* ============================================================================
+ * <PremiumBuildUp> — the premium build-up trace (Brief 62.4, R1).
+ * The ordered post-aggregation tail (62.1 AdjustmentStep[]) as an
+ * explainable waterfall: subtotal → steps → filed premium. Tabular, calm,
+ * every step's effect + provenance + before→after legible at a glance.
+ * ============================================================================ */
+
+.rater-premium-buildup {
+  display: flex;
+  flex-direction: column;
+  font-variant-numeric: tabular-nums;
+}
+
+.rater-premium-buildup--empty {
+  padding: var(--rater-s-16) 0;
+}
+
+/* Subtotal — the line the tail builds from. */
+.rater-premium-buildup__row--subtotal {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--rater-s-8);
+  padding: var(--rater-s-6) var(--rater-s-2);
+}
+
+.rater-premium-buildup__label {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--rater-s-8);
+  font-size: 11px;
+  letter-spacing: var(--rater-tracking-label);
+  text-transform: uppercase;
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-muted);
+}
+
+.rater-premium-buildup__tag {
+  font-size: 11px;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--rater-text-faint);
+}
+
+.rater-premium-buildup__amount {
+  color: var(--rater-text-default);
+  font-weight: var(--rater-fw-semibold);
+  white-space: nowrap;
+}
+
+/* One tail step: [kind chip] [effect detail] [provenance] [before → after]. */
+.rater-premium-buildup__row--step {
+  display: grid;
+  grid-template-columns: minmax(108px, auto) minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: var(--rater-s-8);
+  padding: var(--rater-s-6) var(--rater-s-2);
+  border-top: 1px solid var(--rater-border-subtle);
+  font-size: 12.5px;
+}
+
+/* A guard-skipped (applied:false) step is a visible no-op (P-N9). */
+.rater-premium-buildup__row--skipped {
+  opacity: 0.5;
+}
+
+.rater-premium-buildup__chip {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  padding: var(--rater-s-1) var(--rater-s-8);
+  border-radius: var(--rater-r-full);
+  font-size: 10.5px;
+  font-weight: var(--rater-fw-semibold);
+  white-space: nowrap;
+}
+.rater-premium-buildup__chip--sched {
+  background: var(--rater-cat-transform-soft);
+  color: var(--rater-cat-transform-text);
+}
+.rater-premium-buildup__chip--pkg {
+  background: var(--rater-cat-math-soft);
+  color: var(--rater-cat-math-text);
+}
+.rater-premium-buildup__chip--endo {
+  background: var(--rater-cat-lookup-soft);
+  color: var(--rater-cat-lookup-text);
+}
+.rater-premium-buildup__chip--min {
+  background: var(--rater-cat-input-soft);
+  color: var(--rater-cat-input-text);
+}
+
+.rater-premium-buildup__detail {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--rater-text-default);
+}
+/* The effect tone: credit lowered the running total, debit raised it. */
+.rater-premium-buildup__detail--credit {
+  color: var(--rater-feedback-success);
+}
+.rater-premium-buildup__detail--debit {
+  color: var(--rater-feedback-warn);
+}
+.rater-premium-buildup__detail--neutral {
+  color: var(--rater-text-faint);
+}
+
+.rater-premium-buildup__prov {
+  justify-self: end;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-6);
+  padding: 0 var(--rater-s-6);
+  border: 1px solid var(--rater-border-default);
+  border-radius: var(--rater-r-full);
+  font-size: 9.5px;
+  font-weight: var(--rater-fw-semibold);
+  letter-spacing: 0.02em;
+  color: var(--rater-text-faint);
+}
+
+/* Brief 62.6 — the "view frozen response" affordance on a connector step. */
+.rater-premium-buildup__snapshot {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 0 var(--rater-s-4);
+  background: var(--rater-cat-transform-soft);
+  border: none;
+  border-radius: var(--rater-r-full);
+  color: var(--rater-cat-transform-text);
+  font: inherit;
+  font-size: 9.5px;
+  cursor: pointer;
+}
+
+.rater-premium-buildup__snapshot:hover {
+  filter: brightness(1.1);
+}
+
+.rater-premium-buildup__fallback {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  color: var(--rater-feedback-warn);
+}
+
+.rater-premium-buildup__arrow {
+  justify-self: end;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-1);
+  white-space: nowrap;
+  font-size: 11px;
+  color: var(--rater-text-muted);
+}
+.rater-premium-buildup__arrow-glyph {
+  color: var(--rater-text-faint);
+}
+
+.rater-premium-buildup__divider {
+  height: 1px;
+  background: var(--rater-border-default);
+  margin: var(--rater-s-8) 0;
+}
+
+.rater-premium-buildup__total {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--rater-s-8);
+  padding: var(--rater-s-2);
+}
+
+.rater-premium-buildup__total-label {
+  font-size: 12px;
+  letter-spacing: var(--rater-tracking-label);
+  text-transform: uppercase;
+  color: var(--rater-text-muted);
+}
+
+.rater-premium-buildup__total-amount {
+  font-size: 24px;
+  font-weight: var(--rater-fw-bold);
+  letter-spacing: -0.01em;
+  color: var(--rater-text-strong);
+  font-variant-numeric: tabular-nums;
+}

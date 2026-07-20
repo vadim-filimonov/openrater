@@ -1,0 +1,52 @@
+{
+  "name": "V50.banded-limit-range-tower",
+  "description": "A fictional Meridian BPP tower selects a 0.94 relativity for the [60,000,70,000) band, applies 600 exposure units and a 1.4 LCM, then rounds the premium to 790.",
+  "plan": {
+    "id": "v50.bpp-range-tower",
+    "version": "1.0.0",
+    "name": "Meridian BPP tower (synthetic banded limit)",
+    "line": "bop",
+    "effective": "2026-01-01",
+    "nodes": [
+      { "id": "in_bpp", "kind": "input", "params": { "fieldName": "bpp_limit", "fieldType": "money" }, "position": { "x": 0, "y": 0 } },
+      { "id": "base", "kind": "constant", "params": { "value": 1.0, "type": "factor" }, "position": { "x": 0, "y": 80 } },
+      { "id": "bpp_rel", "kind": "lookup.range",
+        "params": {
+          "buckets": [
+            { "lo": 0, "hi": 50000, "factor": 1.0 },
+            { "lo": 50000, "hi": 60000, "factor": 1.0 },
+            { "lo": 60000, "hi": 70000, "factor": 0.94 },
+            { "lo": 70000, "hi": 1e308, "factor": 0.88 }
+          ],
+          "defaultValue": 1.0,
+          "tableName": "Meridian synthetic BPP limit relativity"
+        },
+        "position": { "x": 200, "y": 0 } },
+      { "id": "mul", "kind": "chain.mult", "params": { "factorNames": ["bpp_limit_rel"], "stopOnZero": false }, "position": { "x": 400, "y": 40 } },
+      { "id": "rate3", "kind": "round", "params": { "decimals": 3 }, "position": { "x": 540, "y": 40 } },
+      { "id": "divisor", "kind": "constant", "params": { "value": 100, "type": "number" }, "position": { "x": 400, "y": 140 } },
+      { "id": "expdiv", "kind": "math.op", "params": { "op": "div" }, "position": { "x": 540, "y": 120 } },
+      { "id": "mulexp", "kind": "math.op", "params": { "op": "mul" }, "position": { "x": 680, "y": 80 } },
+      { "id": "lcm", "kind": "constant", "params": { "value": 1.4, "type": "factor" }, "position": { "x": 680, "y": 160 } },
+      { "id": "mullcm", "kind": "math.op", "params": { "op": "mul" }, "position": { "x": 820, "y": 100 } },
+      { "id": "prem", "kind": "round", "params": { "decimals": 0 }, "position": { "x": 960, "y": 100 } },
+      { "id": "out", "kind": "output", "params": { "fieldName": "bpp_premium", "fieldType": "money" }, "position": { "x": 1100, "y": 100 } }
+    ],
+    "edges": [
+      { "from": { "node": "in_bpp", "port": "value" }, "to": { "node": "bpp_rel", "port": "value" } },
+      { "from": { "node": "base", "port": "value" }, "to": { "node": "mul", "port": "base" } },
+      { "from": { "node": "bpp_rel", "port": "value" }, "to": { "node": "mul", "port": "factors" } },
+      { "from": { "node": "mul", "port": "result" }, "to": { "node": "rate3", "port": "value" } },
+      { "from": { "node": "in_bpp", "port": "value" }, "to": { "node": "expdiv", "port": "x" } },
+      { "from": { "node": "divisor", "port": "value" }, "to": { "node": "expdiv", "port": "y" } },
+      { "from": { "node": "rate3", "port": "value" }, "to": { "node": "mulexp", "port": "x" } },
+      { "from": { "node": "expdiv", "port": "result" }, "to": { "node": "mulexp", "port": "y" } },
+      { "from": { "node": "mulexp", "port": "result" }, "to": { "node": "mullcm", "port": "x" } },
+      { "from": { "node": "lcm", "port": "value" }, "to": { "node": "mullcm", "port": "y" } },
+      { "from": { "node": "mullcm", "port": "result" }, "to": { "node": "prem", "port": "value" } },
+      { "from": { "node": "prem", "port": "value" }, "to": { "node": "out", "port": "value" } }
+    ]
+  },
+  "externalInputs": { "bpp_limit": 60000 },
+  "expectedOutputs": { "bpp_premium": 790 }
+}

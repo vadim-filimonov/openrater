@@ -1,0 +1,142 @@
+/*
+ * <ChipInput> styles — Brief 26 PR 6.
+ *
+ * Linear-grade chip cloud + inline input. Chips wrap; the input
+ * fills the remaining row so the next-token affordance is always
+ * obvious. Same token discipline as the Chip primitive.
+ */
+
+.rater-chip-input {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-4);
+  width: 100%;
+}
+
+.rater-chip-input__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--rater-s-4);
+  padding: var(--rater-s-4) var(--rater-s-6);
+  margin: 0;
+  list-style: none;
+  border: 1px solid var(--rater-hairline-base);
+  border-radius: var(--rater-r-6);
+  background: var(--rater-surface-1);
+  min-height: 32px;
+  align-items: center;
+  transition: border-color var(--rater-d-80) var(--rater-ease-snap);
+}
+
+.rater-chip-input__chips:focus-within {
+  border-color: var(--rater-focus-ring);
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: 1px;
+}
+
+.rater-chip-input--disabled .rater-chip-input__chips {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* Chip — pill-shaped with built-in remove ✕ button. */
+
+.rater-chip-input__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-2);
+  padding: 0 var(--rater-s-2) 0 var(--rater-s-8);
+  background: color-mix(in srgb, var(--rater-cat-input) 14%, var(--rater-surface-1));
+  border: 1px solid color-mix(in srgb, var(--rater-cat-input) 30%, var(--rater-hairline-base));
+  border-radius: var(--rater-r-full);
+  font-size: var(--rater-t-12);
+  line-height: 22px;
+  color: var(--rater-text-strong);
+  max-width: 240px;
+  transition: background-color var(--rater-d-80) var(--rater-ease-snap);
+}
+
+.rater-chip-input__chip:hover {
+  background: color-mix(in srgb, var(--rater-cat-input) 22%, var(--rater-surface-1));
+}
+
+.rater-chip-input__chip-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--rater-font-sans);
+}
+
+.rater-chip-input__chip-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: none;
+  border-radius: var(--rater-r-full);
+  background: transparent;
+  color: var(--rater-text-muted);
+  cursor: pointer;
+  transition:
+    background-color var(--rater-d-80) var(--rater-ease-snap),
+    color var(--rater-d-80) var(--rater-ease-snap);
+}
+
+.rater-chip-input__chip-remove:hover {
+  background: color-mix(in srgb, var(--rater-cat-input) 30%, transparent);
+  color: var(--rater-text-strong);
+}
+
+.rater-chip-input__chip-remove:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: 2px;
+}
+
+.rater-chip-input__chip-remove:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* Inline input — grows to fill the remaining row width. */
+
+.rater-chip-input__input-wrap {
+  flex: 1 1 120px;
+  min-width: 120px;
+  display: flex;
+}
+
+.rater-chip-input__input {
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  padding: 0 var(--rater-s-2);
+  font-family: var(--rater-font-sans);
+  font-size: var(--rater-t-13);
+  color: var(--rater-text-default);
+  line-height: 22px;
+}
+
+.rater-chip-input__input::placeholder {
+  color: var(--rater-text-faint);
+}
+
+.rater-chip-input__input:disabled {
+  cursor: not-allowed;
+}
+
+.rater-chip-input__cap-hint {
+  margin: 0;
+  font-size: var(--rater-t-11);
+  color: var(--rater-text-faint);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rater-chip-input__chips,
+  .rater-chip-input__chip,
+  .rater-chip-input__chip-remove {
+    transition: none;
+  }
+}

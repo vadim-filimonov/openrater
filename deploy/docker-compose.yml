@@ -1,0 +1,179 @@
+# OpenRater — demo deployment (AWS Lightsail + Cloudflare Access).
+#
+# Two services:
+#   app         — the OpenRater image (SPA + API). No published ports:
+#                 only Cloudflare (via the tunnel) can reach it.
+#   cloudflared — Cloudflare Tunnel. Makes an OUTBOUND connection to
+#                 Cloudflare, so the server needs NO open inbound ports.
+#
+# Data lives on the host at /opt/rater/data so it survives restarts and
+# redeploys. Run from the repo root:
+#
+#   docker compose -f deploy/docker-compose.yml --env-file deploy/.env up -d --build
+#
+# All ${VARS} come from deploy/.env (copy deploy/.env.example).
+
+# --- log rotation (applied to every service via the `logging` anchor) ---
+# The box is a 2 GB Lightsail instance; a chatty container's JSON log file
+# would otherwise grow without bound and fill the disk. json-file is the
+# default driver — we make it explicit only to cap size + rotation.
+#
+# NOTE: these files are PER-CONTAINER and are reset when a container is
+# recreated (e.g. `docker compose up --build`). They bound disk growth;
+# they do NOT preserve request/quote traces across a redeploy. Durable,
+# off-box trace retention is a separate operational concern.
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+services:
+  app:
+    build:
+      context: ..                  # repo root (the build needs the whole workspace)
+      dockerfile: deploy/Dockerfile
+      args:
+        VITE_API_BASE: ${PUBLIC_URL}        # baked into the SPA at build time
+    depends_on:
+      - scoring
+    environment:
+      # --- data: SQLite on the persistent host volume below ---
+      RATER_DB_PATH: /data/openrater.db
+      # --- bundled synthetic demo plans (the Meridian reference program,
+      #     docs/fixtures/*.plan.json), seeded on boot by DEFAULT ---
+      #   "1" = seed if absent (in-app edits survive) · "reset" = restore each boot
+      #   · SEED_COLD_TEST=0 to ship empty
+      RATER_SEED_COLD_TEST: ${SEED_COLD_TEST:-1}
+      # --- Rate Lab: every quote and run delegates to the scoring service
+      #     delegates here (server-to-server, internal). ---
+      RATER_SCORING_URL: http://scoring:8080
+      # --- optional: require an API key on POST /plans/{id}/quote.
+      #     Blank (default) = open behind Cloudflare Access; "1" = external
+      #     callers must present X-API-Key (D-D). ---
+      RATER_QUOTE_REQUIRE_KEY: ${QUOTE_REQUIRE_KEY:-}
+      # --- same-origin, but set explicitly; never a wildcard (credentials on) ---
+      RATER_CORS_ORIGINS: ${PUBLIC_URL}
+      RATER_LOG_FORMAT: json
+      RATER_LOG_LEVEL: INFO
+      # --- login: Cloudflare Access ---
+      RATER_AUTH_MODE: cloudflare
+      RATER_CF_ACCESS_TEAM_DOMAIN: ${CF_ACCESS_TEAM_DOMAIN}
+      RATER_CF_ACCESS_AUD: ${CF_ACCESS_AUD}
+      RATER_OPERATOR_ALLOWLIST: ${OPERATOR_ALLOWLIST:-}
+      # --- optional: enrichment connector key (leave blank if unused) ---
+      RATER_GOOGLE_MAPS_API_KEY: ${GOOGLE_MAPS_API_KEY:-}
+    volumes:
+      - /opt/rater/data:/data       # the SQLite DB persists here on the host
+    expose:
+      - "8001"                     # internal only — NOT published to the host
+    restart: unless-stopped
+    logging: *default-logging
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://localhost:8001/health').status==200 else 1)
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 40s
+
+  scoring:
+    # Rate Lab's rating engine as a service. The server delegates every quote
+    # and run here — the SAME engine the
+    # browser previews with, so the API and the UI can't disagree (Law 1).
+    # Internal only — reached via `app`'s RATER_SCORING_URL, never published
+    # to the host or the tunnel. The runtime image is a single esbuild
+    # bundle (node + dist/); the build context is the repo root because the
+    # workspace deps (@openrater/contracts, @openrater/ui) are bundled from source.
+    build:
+      context: ..
+      dockerfile: services/scoring/Dockerfile
+    environment:
+      PORT: "8080"
+      HOST: 0.0.0.0
+      NODE_ENV: production
+      # In-memory queue + filesystem store — book-run results persist on the
+      # host volume so Analytics' run-fed reads survive a restart.
+      # Swapping to SQS+S3 is config, not code.
+      QUEUE_DRIVER: memory
+      STORE_DRIVER: fs
+      STORE_DIR: /data/scoring
+      WORKER_CONCURRENCY: "1"
+      # source:plan_id snapshot resolution calls back to the server.
+      API_LAB_BASE: http://app:8001
+    volumes:
+      - /opt/rater/data:/data
+    expose:
+      - "8080"                     # internal only — NOT published to the host
+    restart: unless-stopped
+    logging: *default-logging
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - require('http').get('http://localhost:8080/health',r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 40s
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    command: tunnel --no-autoupdate run
+    environment:
+      TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN}
+    restart: unless-stopped
+    logging: *default-logging
+    depends_on:
+      - app
+
+  litestream:
+    # Continuous streaming backup of the two SQLite books of record to
+    # S3 (or any S3-compatible store — Cloudflare R2, MinIO). Litestream
+    # ships the WAL frames as the app writes them, giving a recovery point
+    # objective of SECONDS — the disaster-safe complement to the daily
+    # Lightsail snapshot + the nightly `.backup` cron (both ~24h RPO).
+    #
+    # DISABLED BY DEFAULT. It only replicates when LITESTREAM_BUCKET is
+    # set in deploy/.env; left blank, the container starts, logs that it
+    # is disabled, and idles (no crash loop, no restart storm). The
+    # replica config is deploy/litestream.yml; every value there is
+    # env-expanded, so credentials never live in the repo. Enable + restore
+    # recovery steps should be rehearsed before enabling this sidecar.
+    image: litestream/litestream:0.3.13
+    # Override the default `litestream` entrypoint with a tiny guard so an
+    # unconfigured box no-ops cleanly instead of erroring on a missing
+    # bucket.
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        if [ -z "$${LITESTREAM_BUCKET}" ]; then
+          echo "litestream: LITESTREAM_BUCKET is unset — streaming backup DISABLED."
+          echo "litestream: set LITESTREAM_* in deploy/.env to enable (see runbook)."
+          exec tail -f /dev/null
+        fi
+        echo "litestream: replicating /data/openrater.db to bucket '$${LITESTREAM_BUCKET}'."
+        exec litestream replicate -config /etc/litestream.yml
+    environment:
+      # Consumed by deploy/litestream.yml via env expansion. All blank by
+      # default (backup disabled); fill them in deploy/.env to turn it on.
+      LITESTREAM_BUCKET: ${LITESTREAM_BUCKET:-}
+      LITESTREAM_PATH: ${LITESTREAM_PATH:-openrater}
+      LITESTREAM_ENDPOINT: ${LITESTREAM_ENDPOINT:-}
+      LITESTREAM_REGION: ${LITESTREAM_REGION:-us-east-1}
+      LITESTREAM_ACCESS_KEY_ID: ${LITESTREAM_ACCESS_KEY_ID:-}
+      LITESTREAM_SECRET_ACCESS_KEY: ${LITESTREAM_SECRET_ACCESS_KEY:-}
+    volumes:
+      # Read the SAME host bind mount the app writes to, plus the
+      # replica config (read-only).
+      - /opt/rater/data:/data
+      - ./litestream.yml:/etc/litestream.yml:ro
+    restart: unless-stopped
+    logging: *default-logging
+    depends_on:
+      - app

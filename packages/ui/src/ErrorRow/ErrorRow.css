@@ -1,0 +1,108 @@
+/* ============================================================================
+ * <ErrorRow> — single issue row.
+ *
+ * Vertical stack: header (severity + source + location) → message →
+ * citation → actions. Hover surface for affordance. Left border
+ * accent in the severity color for at-a-glance scanning of a long
+ * list.
+ * ============================================================================ */
+
+.rater-error-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-6);
+  padding: var(--rater-s-12) var(--rater-s-14);
+  border-radius: var(--rater-r-6);
+  border-left: 3px solid transparent;
+  background: var(--rater-surface-1);
+  transition: background var(--rater-d-80) var(--rater-ease-soft);
+}
+
+.rater-error-row:hover {
+  background: var(--rater-surface-2);
+}
+
+.rater-error-row--error {
+  border-left-color: var(--rater-feedback-error);
+}
+.rater-error-row--warning {
+  border-left-color: var(--rater-feedback-warn, var(--rater-feedback-error));
+}
+.rater-error-row--info {
+  border-left-color: var(--rater-feedback-info, var(--rater-accent-primary));
+}
+
+/* ── Header (severity + source + breadcrumb) ─────────────────── */
+
+.rater-error-row__header {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-6);
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-muted);
+}
+
+.rater-error-row__severity {
+  /* The IssueSeverityChip already carries its own styling. */
+  display: inline-flex;
+}
+
+.rater-error-row__source {
+  font-weight: var(--rater-fw-medium);
+  text-transform: lowercase;
+  color: var(--rater-text-default);
+}
+
+.rater-error-row__breadcrumb-sep {
+  color: var(--rater-text-subtle);
+  flex-shrink: 0;
+}
+
+.rater-error-row__location {
+  font-family: var(--rater-fonts-sans);
+  color: var(--rater-text-default);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── Message body ────────────────────────────────────────────── */
+
+.rater-error-row__message {
+  margin: 0;
+  color: var(--rater-text-strong);
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-13);
+  font-weight: var(--rater-fw-regular);
+  line-height: var(--rater-lh-normal);
+}
+
+.rater-error-row__citation {
+  margin: 0;
+  color: var(--rater-text-muted);
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-12);
+  font-style: italic;
+  line-height: var(--rater-lh-snug);
+}
+
+/* ── Actions row ─────────────────────────────────────────────── */
+
+.rater-error-row__actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--rater-s-8);
+  margin-top: var(--rater-s-2);
+}
+
+.rater-error-row__fix-hint {
+  /* Pulls left; the deep-link icon hugs the right. */
+  margin-right: auto;
+}
+
+.rater-error-row__deep-link {
+  margin-left: auto;
+  flex-shrink: 0;
+}

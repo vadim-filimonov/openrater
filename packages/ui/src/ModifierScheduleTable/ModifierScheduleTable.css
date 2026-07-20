@@ -1,0 +1,197 @@
+/* ============================================================================
+ * <ModifierScheduleTable> — one IRPM-style modifier schedule.
+ *
+ * Card-shaped (matches RatingChainCard's silhouette) with a header
+ * showing the schedule name + total cap, a flat list of categories,
+ * and a footer with citation + "Add category" CTA.
+ * ============================================================================ */
+
+.rater-modifier-schedule-table {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--rater-hairline-base);
+  border-radius: var(--rater-r-6);
+  background: var(--rater-surface-canvas);
+  font-family: var(--rater-fonts-sans);
+  overflow: hidden;
+}
+
+/* ── Header ─────────────────────────────────────────────────────── */
+
+.rater-modifier-schedule-table__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--rater-s-10) var(--rater-s-12);
+  background: var(--rater-surface-sunken);
+  border-bottom: 1px solid var(--rater-hairline-base);
+}
+
+.rater-modifier-schedule-table__title-block {
+  display: flex;
+  align-items: baseline;
+  gap: var(--rater-s-8);
+}
+
+.rater-modifier-schedule-table__title {
+  margin: 0;
+  font-size: var(--rater-t-14);
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-strong);
+}
+
+.rater-modifier-schedule-table__scope {
+  font-family: var(--rater-fonts-mono, var(--rater-fonts-sans));
+  font-size: var(--rater-t-11);
+  color: var(--rater-text-muted);
+  text-transform: uppercase;
+  letter-spacing: var(--rater-tracking-label);
+}
+
+.rater-modifier-schedule-table__cap {
+  font-family: var(--rater-fonts-mono, var(--rater-fonts-sans));
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-strong);
+  background: var(--rater-surface-canvas);
+  padding: 2px var(--rater-s-6);
+  border-radius: var(--rater-r-4);
+  border: 1px solid var(--rater-hairline-base);
+}
+
+/* ── Category rows ──────────────────────────────────────────────── */
+
+.rater-modifier-schedule-table__categories {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.rater-modifier-schedule-table__category {
+  display: grid;
+  grid-template-columns: 1fr auto auto auto;
+  align-items: center;
+  gap: var(--rater-s-10);
+  padding: var(--rater-s-8) var(--rater-s-12);
+  border-bottom: 1px solid var(--rater-hairline-subtle);
+}
+
+.rater-modifier-schedule-table__category:last-child {
+  border-bottom: 0;
+}
+
+.rater-modifier-schedule-table__category-main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.rater-modifier-schedule-table__category-name {
+  font-size: var(--rater-t-13);
+  color: var(--rater-text-strong);
+  font-weight: var(--rater-fw-medium);
+}
+
+.rater-modifier-schedule-table__category-note {
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-muted);
+  margin-top: 1px;
+}
+
+.rater-modifier-schedule-table__category-range {
+  font-family: var(--rater-fonts-mono, var(--rater-fonts-sans));
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-strong);
+  min-width: 56px;
+  text-align: right;
+}
+
+.rater-modifier-schedule-table__category-reasoning {
+  font-family: var(--rater-fonts-mono, var(--rater-fonts-sans));
+  font-size: var(--rater-t-11);
+  color: var(--rater-text-muted);
+  background: var(--rater-surface-sunken);
+  padding: 2px var(--rater-s-6);
+  border-radius: var(--rater-r-4);
+  white-space: nowrap;
+}
+
+.rater-modifier-schedule-table__category-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-2);
+  justify-content: flex-end;
+}
+
+/* ── Empty state ────────────────────────────────────────────────── */
+
+.rater-modifier-schedule-table__empty {
+  padding: var(--rater-s-14);
+  text-align: center;
+  font-size: var(--rater-t-13);
+  color: var(--rater-text-muted);
+  background: var(--rater-surface-sunken);
+}
+
+/* ── Footer ─────────────────────────────────────────────────────── */
+
+.rater-modifier-schedule-table__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--rater-s-8) var(--rater-s-12);
+  background: var(--rater-surface-sunken);
+  border-top: 1px solid var(--rater-hairline-base);
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-muted);
+}
+
+.rater-modifier-schedule-table__citation {
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-muted);
+}
+
+.rater-modifier-schedule-table__add {
+  border: 0;
+  background: transparent;
+  padding: 2px var(--rater-s-6);
+  border-radius: var(--rater-r-4);
+  color: var(--rater-text-strong);
+  font-size: var(--rater-t-12);
+  cursor: pointer;
+  transition: background-color 100ms ease;
+}
+
+.rater-modifier-schedule-table__add:hover {
+  background: var(--rater-surface-canvas);
+}
+
+/* ── Action buttons ─────────────────────────────────────────────── */
+
+.rater-modifier-schedule-table__action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  border-radius: var(--rater-r-4);
+  color: var(--rater-text-muted);
+  cursor: pointer;
+  transition: background-color 100ms ease, color 100ms ease;
+}
+
+.rater-modifier-schedule-table__action:hover {
+  background: var(--rater-surface-sunken);
+  color: var(--rater-text-strong);
+}
+
+.rater-modifier-schedule-table__action:focus-visible {
+  outline: 2px solid var(--rater-brand-accent, var(--rater-text-strong));
+  outline-offset: 1px;
+}
+
+.rater-modifier-schedule-table__action--danger:hover {
+  color: var(--rater-feedback-error, var(--rater-text-strong));
+}

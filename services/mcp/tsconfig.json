@@ -1,0 +1,29 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": "src",
+    // Use the workspace's Bundler resolution (from the
+    // base config), so the shared @openrater/contracts SOURCE
+    // typechecks here the way it does in services/scoring. Runtime is
+    // unaffected: dev runs tsx and the .mcpb bundles via esbuild,
+    // both of which resolve the same way. The `.js`-suffixed relative
+    // imports remain valid under Bundler resolution.
+    "target": "ES2022",
+    "lib": [
+      "ES2022"
+    ],
+    "types": [
+      "node"
+    ],
+    "declaration": false,
+    "noEmit": false,
+    "declarationMap": false
+  },
+  "include": [
+    "src/**/*.ts"
+  ],
+  "exclude": [
+    "src/**/*.test.ts"
+  ]
+}

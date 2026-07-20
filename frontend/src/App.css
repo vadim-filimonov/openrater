@@ -1,0 +1,81 @@
+/**
+ * App shell — header + nav. Per-route content styles live in the
+ * route's own .css file colocated with the route component.
+ */
+
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app__header {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-24);
+  padding: var(--rater-s-12) var(--rater-s-24);
+  border-bottom: 1px solid var(--rater-border-subtle);
+  background: var(--rater-surface-canvas);
+  position: sticky;
+  top: 0;
+  z-index: var(--rater-z-sticky);
+}
+
+.app__brand {
+  display: flex;
+  align-items: baseline;
+  gap: var(--rater-s-8);
+}
+
+.app__brand-mark {
+  font-family: var(--rater-font-display);
+  font-size: var(--rater-t-16);
+  font-weight: var(--rater-fw-semibold);
+  letter-spacing: var(--rater-tracking-tight);
+  color: var(--rater-text-strong);
+}
+
+.app__nav {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-2);
+  flex: 1;
+  margin-left: var(--rater-s-16);
+}
+
+.app__nav-link {
+  display: inline-flex;
+  align-items: center;
+  height: 28px;
+  padding: 0 var(--rater-s-10);
+  font-family: var(--rater-font-sans);
+  font-size: var(--rater-t-12);
+  font-weight: var(--rater-fw-medium);
+  color: var(--rater-text-muted);
+  background: transparent;
+  border-radius: var(--rater-r-6);
+  text-decoration: none;
+  transition:
+    background var(--rater-d-80) var(--rater-ease-soft),
+    color var(--rater-d-80) var(--rater-ease-soft);
+}
+
+.app__nav-link:hover {
+  background: var(--rater-surface-2);
+  color: var(--rater-text-strong);
+  text-decoration: none;
+}
+
+.app__nav-link:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: 2px;
+}
+
+.app__nav-link--active {
+  color: var(--rater-text-strong);
+  background: var(--rater-surface-2);
+}
+
+.app__body {
+  flex: 1;
+}

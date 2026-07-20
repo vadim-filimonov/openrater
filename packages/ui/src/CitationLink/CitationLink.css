@@ -1,0 +1,49 @@
+/* ============================================================================
+ * <CitationLink> — inline citation reference.
+ *
+ * Renders as muted italic; when URL-bearing, becomes an inline anchor
+ * with an external-link icon. Stays inline so it can flow under an
+ * explanation line in trace steps.
+ * ============================================================================ */
+
+.rater-citation-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-2);
+  color: var(--rater-text-muted);
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-12);
+  font-style: italic;
+  line-height: var(--rater-lh-snug);
+  vertical-align: baseline;
+}
+
+.rater-citation-link__text {
+  color: inherit;
+}
+
+.rater-citation-link__icon {
+  display: inline-flex;
+  align-items: center;
+  color: inherit;
+  flex-shrink: 0;
+}
+
+.rater-citation-link--external {
+  text-decoration: none;
+  border-bottom: 1px dashed var(--rater-text-subtle);
+  transition:
+    color var(--rater-d-80) var(--rater-ease-soft),
+    border-color var(--rater-d-80) var(--rater-ease-soft);
+}
+
+.rater-citation-link--external:hover {
+  color: var(--rater-text-default);
+  border-bottom-color: var(--rater-text-muted);
+}
+
+.rater-citation-link--external:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: 2px;
+  border-radius: var(--rater-r-2);
+}

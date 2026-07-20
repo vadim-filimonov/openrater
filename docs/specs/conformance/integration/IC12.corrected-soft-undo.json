@@ -1,0 +1,176 @@
+{
+ "id": "IC12",
+ "name": "corrected-soft-undo",
+ "spec": "§5 rule 5",
+ "asserts": "corrected events record on the ledger: removed:true marks the prior fact recanted, removed:false restates declared values; both are idempotent on event_id. There is no book row to re-open — the ledger keeps the full trail.",
+ "contract_version": "1.0",
+ "world": {
+  "integration": {
+   "name": "Example Integrator — fixture",
+   "paired": true
+  },
+  "plans": [
+   "plan-alpha"
+  ]
+ },
+ "steps": [
+  {
+   "note": "the market said quoted, then bound — the mis-tap this fixture will undo",
+   "actor": "integrator",
+   "call": {
+    "method": "POST",
+    "path": "/api/v1/integrations/{{integration_id}}/events",
+    "headers": {
+     "X-OpenRater-Integration-Key": "{{integrator_key}}"
+    },
+    "body": {
+     "events": [
+      {
+       "event_id": "pe-fixture-1101",
+       "risk_ref": "r-fixture-0011",
+       "carrier": "acme-mutual",
+       "kind": "quoted",
+       "at": "2026-08-02T17:04:00Z",
+       "premium_cents": 473100,
+       "quote_pins": {
+        "plan_ref": "{{plan_alpha_ref}}",
+        "snapshot_id": "{{plan_alpha_snapshot}}",
+        "request_hash": "sha256:ic11-fixture"
+       }
+      },
+      {
+       "event_id": "pe-fixture-1102",
+       "risk_ref": "r-fixture-0011",
+       "carrier": "acme-mutual",
+       "kind": "bound",
+       "at": "2026-08-04T09:30:00Z",
+       "premium_cents": 481000,
+       "effective_on": "2026-09-01",
+       "term_months": 12
+      }
+     ]
+    }
+   },
+   "expect": {
+    "status": 202,
+    "body": {
+     "acks": [
+      {
+       "event_id": "pe-fixture-1101",
+       "status": "applied"
+      },
+      {
+       "event_id": "pe-fixture-1102",
+       "status": "applied"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "note": "the producer undoes the mis-tap — corrected/soft-undo re-opens the row",
+   "actor": "integrator",
+   "call": {
+    "method": "POST",
+    "path": "/api/v1/integrations/{{integration_id}}/events",
+    "headers": {
+     "X-OpenRater-Integration-Key": "{{integrator_key}}"
+    },
+    "body": {
+     "events": [
+      {
+       "event_id": "pe-fixture-1103",
+       "risk_ref": "r-fixture-0011",
+       "carrier": "acme-mutual",
+       "kind": "corrected",
+       "at": "2026-08-04T09:31:00Z",
+       "reason": "undo bound",
+       "removed": true
+      }
+     ]
+    }
+   },
+   "expect": {
+    "status": 202,
+    "body": {
+     "acks": [
+      {
+       "event_id": "pe-fixture-1103",
+       "status": "applied"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "note": "replaying the undo is safe — idempotent on event_id (§5 rule 1)",
+   "actor": "integrator",
+   "call": {
+    "method": "POST",
+    "path": "/api/v1/integrations/{{integration_id}}/events",
+    "headers": {
+     "X-OpenRater-Integration-Key": "{{integrator_key}}"
+    },
+    "body": {
+     "events": [
+      {
+       "event_id": "pe-fixture-1103",
+       "risk_ref": "r-fixture-0011",
+       "carrier": "acme-mutual",
+       "kind": "corrected",
+       "at": "2026-08-04T09:31:00Z",
+       "reason": "undo bound",
+       "removed": true
+      }
+     ]
+    }
+   },
+   "expect": {
+    "status": 202,
+    "body": {
+     "acks": [
+      {
+       "event_id": "pe-fixture-1103",
+       "status": "duplicate"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "note": "a removed:false restatement is ledger-only — the book keeps its declaration",
+   "actor": "integrator",
+   "call": {
+    "method": "POST",
+    "path": "/api/v1/integrations/{{integration_id}}/events",
+    "headers": {
+     "X-OpenRater-Integration-Key": "{{integrator_key}}"
+    },
+    "body": {
+     "events": [
+      {
+       "event_id": "pe-fixture-1104",
+       "risk_ref": "r-fixture-0011",
+       "carrier": "acme-mutual",
+       "kind": "corrected",
+       "at": "2026-08-05T10:00:00Z",
+       "premium_cents": 490000,
+       "removed": false
+      }
+     ]
+    }
+   },
+   "expect": {
+    "status": 202,
+    "body": {
+     "acks": [
+      {
+       "event_id": "pe-fixture-1104",
+       "status": "applied"
+      }
+     ]
+    }
+   }
+  }
+ ]
+}

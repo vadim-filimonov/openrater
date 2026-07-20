@@ -1,0 +1,155 @@
+/* ──────────────────────────────────────────────────────────────
+   FactorTablePowerTools — Brief 33 PR 33.4
+
+   The bulk-edit toolbar above the materialized grid. Strict token
+   discipline matching the polished mockup Frame 7. Two button
+   variants × one size (ghost + primary).
+   ────────────────────────────────────────────────────────────── */
+
+.rater-ft-pt {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-12);
+  padding: var(--rater-s-8) var(--rater-s-12);
+  background: var(--rater-surface-canvas);
+  border-bottom: 1px solid var(--rater-hairline-soft);
+  flex-wrap: wrap;
+}
+
+.rater-ft-pt-group {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-6);
+}
+
+/* Selection chip — left side */
+.rater-ft-pt-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-4);
+  padding: var(--rater-s-4) var(--rater-s-8);
+  font-size: var(--rater-t-11);
+  font-family: inherit;
+  border-radius: var(--rater-r-full);
+  white-space: nowrap;
+}
+.rater-ft-pt-chip.is-active {
+  background: var(--rater-cat-input-soft);
+  color: var(--rater-cat-input-text);
+  font-weight: var(--rater-fw-medium);
+}
+.rater-ft-pt-chip.is-muted {
+  background: var(--rater-surface-2);
+  color: var(--rater-text-subtle);
+}
+
+/* Buttons — two variants × one size */
+.rater-ft-pt-btn,
+.rater-ft-pt-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-4);
+  padding: var(--rater-s-4) var(--rater-s-12);
+  font-size: var(--rater-t-12);
+  font-family: inherit;
+  border-radius: var(--rater-r-6);
+  cursor: pointer;
+  transition: border-color var(--rater-d-120) var(--rater-ease-snap), color var(--rater-d-120) var(--rater-ease-snap), background var(--rater-d-120) var(--rater-ease-snap);
+}
+.rater-ft-pt-btn {
+  background: transparent;
+  border: 1px solid var(--rater-hairline-soft);
+  color: var(--rater-text-muted);
+}
+.rater-ft-pt-btn:hover:not(disabled) {
+  color: var(--rater-text-default);
+  border-color: var(--rater-hairline-strong);
+}
+.rater-ft-pt-btn.is-active {
+  background: var(--rater-cat-input);
+  border-color: var(--rater-cat-input);
+  color: #fff;
+}
+.rater-ft-pt-btn:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: 2px;
+}
+.rater-ft-pt-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.rater-ft-pt-btn-primary {
+  background: var(--rater-cat-input);
+  border: 1px solid var(--rater-cat-input);
+  color: #fff;
+}
+.rater-ft-pt-btn-primary:hover:not(disabled) {
+  background: var(--rater-cat-input-border);
+  border-color: var(--rater-cat-input-border);
+}
+.rater-ft-pt-btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Popover wrap (so the popover anchors below the button) */
+.rater-ft-pt-pop-wrap {
+  position: relative;
+}
+.rater-ft-pt-pop {
+  position: absolute;
+  top: calc(100% + var(--rater-s-6));
+  left: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-6);
+  padding: var(--rater-s-12);
+  background: var(--rater-surface-1);
+  border: 1px solid var(--rater-hairline-base);
+  border-radius: var(--rater-r-8);
+  box-shadow: 0 8px 24px -6px color-mix(in srgb, var(--rater-surface-1) 30%, transparent);
+  min-width: 220px;
+}
+.rater-ft-pt-pop-label {
+  font-size: var(--rater-t-10);
+  letter-spacing: var(--rater-tracking-label);
+  text-transform: uppercase;
+  color: var(--rater-text-subtle);
+  font-weight: var(--rater-fw-semibold);
+}
+.rater-ft-pt-pop-row {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-6);
+}
+.rater-ft-pt-pop-input {
+  flex: 1;
+  min-width: 0;
+  padding: var(--rater-s-6) var(--rater-s-8);
+  font-size: var(--rater-t-12);
+  font-family: inherit;
+  background: var(--rater-surface-canvas);
+  border: 1px solid var(--rater-hairline-base);
+  border-radius: var(--rater-r-6);
+  color: var(--rater-text-default);
+}
+.rater-ft-pt-pop-input:focus {
+  outline: none;
+  border-color: var(--rater-focus-ring);
+  box-shadow: 0 0 0 2px var(--rater-focus-halo);
+}
+.rater-ft-pt-pop-unit {
+  font-family: var(--rater-fonts-mono);
+  font-size: var(--rater-t-11);
+  color: var(--rater-text-subtle);
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .rater-ft-pt-btn,
+  .rater-ft-pt-btn-primary {
+    transition: none;
+  }
+}

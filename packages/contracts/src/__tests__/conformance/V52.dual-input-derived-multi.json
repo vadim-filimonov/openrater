@@ -1,0 +1,51 @@
+{
+  "name": "V52.dual-input-derived-multi",
+  "description": "A fictional Meridian deductible factor uses a derived total-limit band as its second axis. ded_1500 with a 220,000 total selects synthetic factor 0.92.",
+  "plan": {
+    "id": "v52.dual-input-derived",
+    "version": "1.0.0",
+    "name": "Meridian dual-input deductible (derived total-limit band)",
+    "line": "bop",
+    "effective": "2026-01-01",
+    "nodes": [
+      { "id": "in_ded", "kind": "input", "params": { "fieldName": "property_deductible", "fieldType": "string" }, "position": { "x": 0, "y": 0 } },
+      { "id": "in_bld", "kind": "input", "params": { "fieldName": "building_limit", "fieldType": "money" }, "position": { "x": 0, "y": 60 } },
+      { "id": "in_bpp", "kind": "input", "params": { "fieldName": "bpp_limit", "fieldType": "money" }, "position": { "x": 0, "y": 120 } },
+      { "id": "total", "kind": "chain.add", "params": { "addendNames": ["building_limit", "bpp_limit"] }, "position": { "x": 200, "y": 90 } },
+      { "id": "band", "kind": "derive.band",
+        "params": {
+          "dimSlug": "property_total_band",
+          "clampToNearest": true,
+          "levels": [
+            { "id": "b_0_50", "label": "<=$50K", "kind": "banded", "lo": 0, "hi": 50000 },
+            { "id": "b_50_250", "label": "$50-250K", "kind": "banded", "lo": 50000, "hi": 250000 },
+            { "id": "b_250_500", "label": "$250-500K", "kind": "banded", "lo": 250000, "hi": 500000 }
+          ]
+        },
+        "position": { "x": 360, "y": 90 } },
+      { "id": "ded", "kind": "lookup.multi",
+        "params": {
+          "keyNames": ["property_deductible", "property_total_band"],
+          "rows": [
+            { "keys": ["ded_1500", "b_50_250"], "factor": 0.92 },
+            { "keys": ["ded_1500", "b_250_500"], "factor": 0.95 },
+            { "keys": ["ded_5000", "b_50_250"], "factor": 0.78 }
+          ],
+          "defaultValue": 1.0,
+          "tableName": "Meridian synthetic property deductible"
+        },
+        "position": { "x": 540, "y": 40 } },
+      { "id": "out", "kind": "output", "params": { "fieldName": "deductible_factor", "fieldType": "float" }, "position": { "x": 740, "y": 40 } }
+    ],
+    "edges": [
+      { "from": { "node": "in_bld", "port": "value" }, "to": { "node": "total", "port": "addends" } },
+      { "from": { "node": "in_bpp", "port": "value" }, "to": { "node": "total", "port": "addends" } },
+      { "from": { "node": "total", "port": "result" }, "to": { "node": "band", "port": "value" } },
+      { "from": { "node": "in_ded", "port": "value" }, "to": { "node": "ded", "port": "property_deductible" } },
+      { "from": { "node": "band", "port": "level_id" }, "to": { "node": "ded", "port": "property_total_band" } },
+      { "from": { "node": "ded", "port": "value" }, "to": { "node": "out", "port": "value" } }
+    ]
+  },
+  "externalInputs": { "property_deductible": "ded_1500", "building_limit": 180000, "bpp_limit": 40000 },
+  "expectedOutputs": { "deductible_factor": 0.92 }
+}

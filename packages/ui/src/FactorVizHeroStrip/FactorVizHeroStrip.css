@@ -1,0 +1,186 @@
+/**
+ * Brief 45 PR 45.1 — Hero strip styles.
+ *
+ * Three KPIs in display-1 typography above every chart pane.
+ * Always borders against the chart canvas below (the pane's CSS
+ * supplies the border-bottom).
+ */
+
+.rater-fvhs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+  /* L19 — trim the hero-strip's vertical gutter so the chart body
+     clears the fold on a laptop viewport. Was 14px top / 18px bottom;
+     the KPIs read just as clearly with a tighter 8px/10px gutter. */
+  padding: var(--rater-s-8) 0 var(--rater-s-10);
+  background: transparent;
+}
+
+.rater-fvhs__stat {
+  /* PR 45.9 — `padding-bottom` reserves the gutter that the `::after`
+     accent line lives in. Without this, the line at `bottom: 4px`
+     intersected the `.rater-fvhs__stat-detail` text ("+11% vs identity"
+     in the screenshot bug). The line sits at bottom:4px + 2px tall, so
+     10px of bottom padding still clears the detail text.
+     L19 — tightened 14px → 10px to claw back vertical budget. */
+  padding: 0 var(--rater-s-20) 10px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-1, 4px);
+  position: relative;
+  min-width: 0;
+}
+
+.rater-fvhs__stat + .rater-fvhs__stat {
+  border-left: 1px solid var(--rater-hairline-soft);
+}
+
+.rater-fvhs__stat-val {
+  font-family: var(--rater-fonts-sans);
+  font-feature-settings: "tnum";
+  font-variant-numeric: tabular-nums;
+  font-size: var(--rater-t-28);
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-strong);
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.rater-fvhs__bracket {
+  color: var(--rater-text-muted);
+  font-size: 0.6em;
+  font-weight: var(--rater-fw-regular);
+}
+
+.rater-fvhs__stat-label {
+  font-size: var(--rater-t-10, 10px);
+  font-weight: var(--rater-fw-semibold);
+  letter-spacing: var(--rater-tracking-label);
+  color: var(--rater-text-subtle);
+  text-transform: uppercase;
+}
+
+.rater-fvhs__stat-detail {
+  font-size: var(--rater-t-11);
+  color: var(--rater-text-muted);
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Mean cell flag colors ──────────────────────────────────────── */
+
+/* Within ±2% of identity — soft azure underline. */
+.rater-fvhs__stat--mean.is-near-identity::after {
+  content: "";
+  position: absolute;
+  left: var(--rater-s-20);
+  right: var(--rater-s-20);
+  bottom: 4px;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--rater-cat-input);
+  opacity: 0.55;
+}
+
+/* Skew high (> +10%) — orange underline. */
+.rater-fvhs__stat--mean.is-skew-high::after {
+  content: "";
+  position: absolute;
+  left: var(--rater-s-20);
+  right: var(--rater-s-20);
+  bottom: 4px;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--rater-cat-loading);
+  opacity: 0.55;
+}
+
+/* Skew low (< -10%) — also orange (it's still "off identity"). */
+.rater-fvhs__stat--mean.is-skew-low::after {
+  content: "";
+  position: absolute;
+  left: var(--rater-s-20);
+  right: var(--rater-s-20);
+  bottom: 4px;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--rater-cat-loading);
+  opacity: 0.55;
+}
+
+/* Skew-high gets a warm-tinted detail line for extra clarity. */
+.rater-fvhs__stat--mean.is-skew-high .rater-fvhs__stat-detail,
+.rater-fvhs__stat--mean.is-skew-low .rater-fvhs__stat-detail {
+  color: var(--rater-cat-loading-text);
+}
+
+/* ── Coverage cell flag colors ──────────────────────────────────── */
+
+.rater-fvhs__stat--coverage.is-full .rater-fvhs__stat-detail {
+  color: var(--rater-cat-math-text);
+}
+
+.rater-fvhs__stat--coverage.is-partial::after {
+  content: "";
+  position: absolute;
+  left: var(--rater-s-20);
+  right: var(--rater-s-20);
+  bottom: 4px;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--rater-cat-lookup);
+  opacity: 0.55;
+}
+
+.rater-fvhs__stat--coverage.is-partial .rater-fvhs__stat-detail {
+  color: var(--rater-cat-lookup-text);
+}
+
+/* ── Narrow viewport — stack vertically below ~480px ────────────── */
+
+@media (max-width: 480px) {
+  .rater-fvhs {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  .rater-fvhs__stat {
+    /* Preserve the 14px bottom gutter from PR 45.9 so the accent
+       line clears the detail text on mobile too. */
+    padding: var(--rater-s-12) var(--rater-s-20) 14px;
+  }
+  .rater-fvhs__stat + .rater-fvhs__stat {
+    border-left: none;
+    border-top: 1px solid var(--rater-hairline-soft);
+  }
+}
+
+/* ── Motion polish ──────────────────────────────────────────────── */
+
+.rater-fvhs__stat-val,
+.rater-fvhs__stat-detail {
+  transition: color var(--rater-d-180, 180ms)
+    var(--rater-ease-soft, cubic-bezier(0.32, 0.72, 0, 1));
+}
+
+/* ── Narrow CONTAINER (the co-rendered chart side pane, Brief 67) ──
+   The display-1 KPIs were sized for a full-width pane; in a ~380px
+   container they overflow their grid cells. Compact the type — the
+   numbers stay scannable, nothing overlaps. */
+@container (max-width: 480px) {
+  .rater-fvhs__stat-val {
+    font-size: var(--rater-t-18);
+  }
+  .rater-fvhs__stat {
+    padding: var(--rater-s-8) var(--rater-s-10) 12px;
+  }
+  .rater-fvhs__stat-detail {
+    font-size: var(--rater-t-10);
+  }
+}

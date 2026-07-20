@@ -1,0 +1,28 @@
+{
+  "name": "V38.min-premium-floor",
+  "description": "Brief 54 — a chain premium (100) below the carrier minimum premium (500) is floored to 500 via math.op(max). Pins the runtime clamp-floor the projector emits for a min-premium clamp stage; an above-floor premium would pass through unchanged.",
+  "plan": {
+    "id": "v38.min-premium",
+    "version": "1.0.0",
+    "name": "Minimum-premium floor",
+    "line": "bop",
+    "effective": "2026-01-01",
+    "nodes": [
+      { "id": "base", "kind": "constant", "params": { "value": 100, "type": "money" }, "position": { "x": 0, "y": 0 } },
+      { "id": "f1", "kind": "constant", "params": { "value": 1.0, "type": "factor" }, "position": { "x": 0, "y": 80 } },
+      { "id": "mul", "kind": "chain.mult", "params": { "stopOnZero": false }, "position": { "x": 200, "y": 40 } },
+      { "id": "floor_const", "kind": "constant", "params": { "value": 500, "type": "money" }, "position": { "x": 200, "y": 140 } },
+      { "id": "floor_op", "kind": "math.op", "params": { "op": "max" }, "position": { "x": 400, "y": 80 } },
+      { "id": "out_p", "kind": "output", "params": { "fieldName": "premium", "fieldType": "money" }, "position": { "x": 600, "y": 80 } }
+    ],
+    "edges": [
+      { "from": { "node": "base", "port": "value" }, "to": { "node": "mul", "port": "base" } },
+      { "from": { "node": "f1", "port": "value" }, "to": { "node": "mul", "port": "factors" } },
+      { "from": { "node": "mul", "port": "result" }, "to": { "node": "floor_op", "port": "x" } },
+      { "from": { "node": "floor_const", "port": "value" }, "to": { "node": "floor_op", "port": "y" } },
+      { "from": { "node": "floor_op", "port": "result" }, "to": { "node": "out_p", "port": "value" } }
+    ]
+  },
+  "externalInputs": {},
+  "expectedOutputs": { "premium": 500 }
+}

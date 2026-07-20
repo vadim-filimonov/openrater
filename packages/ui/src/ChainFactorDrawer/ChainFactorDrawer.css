@@ -1,0 +1,34 @@
+/* ============================================================================
+ * <ChainFactorDrawer> — drawer-rendered chain-factor authoring surface.
+ *
+ * The Drawer primitive owns the chrome (header, close, ESC, focus trap,
+ * backdrop, portal); this CSS styles the body content that sits inside
+ * <Drawer.Body>.
+ *
+ * Tokens consumed:
+ *   - --rater-feedback-error, --rater-feedback-error-bg
+ *   - --rater-r-6
+ *   - --rater-s-* (spacing scale)
+ *   - --rater-t-13 (font size)
+ *   - --rater-fonts-sans
+ * ============================================================================ */
+
+.rater-chain-factor-drawer__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-14);
+  padding: var(--rater-s-14) var(--rater-s-14) var(--rater-s-6);
+}
+
+/* ── Inline error banner ────────────────────────────────────── */
+
+.rater-chain-factor-drawer__error {
+  border: 1px solid var(--rater-feedback-error);
+  background: var(--rater-feedback-error-bg, rgba(239, 68, 68, 0.08));
+  color: var(--rater-feedback-error);
+  border-radius: var(--rater-r-6);
+  padding: var(--rater-s-10) var(--rater-s-12);
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-13);
+  line-height: var(--rater-lh-normal);
+}

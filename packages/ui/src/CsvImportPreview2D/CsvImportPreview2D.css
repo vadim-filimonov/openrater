@@ -1,0 +1,242 @@
+/* ──────────────────────────────────────────────────────────────
+   CsvImportPreview2D — Brief 33 PR 33.5
+
+   The pre-import inspection drawer for 2-D factor table CSV.
+   Strict token-discipline; matches the polished mockup at
+   `/mockup/33-parametrize-as-canvas.html` Frame 8.
+   ────────────────────────────────────────────────────────────── */
+
+.rater-csv-import-2d {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-16);
+}
+
+/* ── Empty state (no file picked yet) ──────────────────────────── */
+
+.rater-csv-import-2d-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--rater-s-8);
+  padding: var(--rater-s-48) var(--rater-s-24);
+  text-align: center;
+  background: var(--rater-surface-canvas);
+  border: 1px dashed var(--rater-hairline-base);
+  border-radius: var(--rater-r-8);
+}
+.rater-csv-import-2d-empty-title {
+  margin: 0;
+  font-size: var(--rater-t-14);
+  font-weight: var(--rater-fw-medium);
+  color: var(--rater-text-default);
+}
+.rater-csv-import-2d-empty-sub {
+  margin: 0;
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-muted);
+  line-height: 1.5;
+  max-width: 420px;
+}
+.rater-csv-import-2d-empty-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-6);
+  margin-top: var(--rater-s-8);
+  padding: var(--rater-s-6) var(--rater-s-16);
+  background: var(--rater-cat-input);
+  border: 1px solid var(--rater-cat-input);
+  color: #fff;
+  border-radius: var(--rater-r-6);
+  cursor: pointer;
+  font-size: var(--rater-t-13);
+  font-family: inherit;
+  transition: background var(--rater-d-120) var(--rater-ease-snap);
+}
+.rater-csv-import-2d-empty-btn:hover {
+  background: var(--rater-cat-input-border);
+}
+
+/* ── Stats row (top of drawer) ─────────────────────────────────── */
+
+.rater-csv-import-2d-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0;
+  background: var(--rater-surface-canvas);
+  border: 1px solid var(--rater-hairline-soft);
+  border-radius: var(--rater-r-8);
+}
+.rater-csv-import-2d-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--rater-s-4);
+  padding: var(--rater-s-16) var(--rater-s-12);
+  border-right: 1px solid var(--rater-hairline-soft);
+}
+.rater-csv-import-2d-stat:last-child {
+  border-right: none;
+}
+.rater-csv-import-2d-stat-num {
+  font-family: var(--rater-fonts-mono);
+  font-size: var(--rater-t-20);
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-strong);
+  font-variant-numeric: tabular-nums;
+}
+.rater-csv-import-2d-stat-num.is-muted {
+  color: var(--rater-text-muted);
+}
+.rater-csv-import-2d-stat-num.is-warning {
+  color: var(--rater-cat-loading-text);
+}
+.rater-csv-import-2d-stat-label {
+  font-size: var(--rater-t-11);
+  color: var(--rater-text-subtle);
+  text-align: center;
+  line-height: 1.35;
+}
+
+/* ── Preview table ─────────────────────────────────────────────── */
+
+.rater-csv-import-2d-table {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--rater-hairline-soft);
+  border-radius: var(--rater-r-8);
+  overflow: hidden;
+}
+.rater-csv-import-2d-row {
+  display: grid;
+  grid-template-columns: 160px 1fr 2fr 80px;
+  gap: var(--rater-s-12);
+  padding: var(--rater-s-8) var(--rater-s-12);
+  align-items: center;
+  border-top: 1px solid var(--rater-hairline-soft);
+  font-size: var(--rater-t-12);
+  background: var(--rater-surface-1);
+}
+.rater-csv-import-2d-row:first-child {
+  border-top: none;
+}
+.rater-csv-import-2d-row.is-header {
+  background: var(--rater-surface-canvas);
+  font-size: var(--rater-t-10);
+  letter-spacing: var(--rater-tracking-label);
+  text-transform: uppercase;
+  color: var(--rater-text-subtle);
+  font-weight: var(--rater-fw-semibold);
+}
+.rater-csv-import-2d-row.is-warn {
+  background: color-mix(in srgb, var(--rater-cat-loading) 4%, var(--rater-surface-1));
+}
+.rater-csv-import-2d-row.is-bad {
+  background: color-mix(in srgb, var(--rater-cat-output-text) 4%, var(--rater-surface-1));
+}
+
+.rater-csv-import-2d-row-key {
+  font-family: var(--rater-fonts-mono);
+  color: var(--rater-text-default);
+  font-weight: var(--rater-fw-medium);
+}
+.rater-csv-import-2d-row-match {
+  font-family: var(--rater-fonts-mono);
+  font-size: var(--rater-t-11);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.rater-csv-import-2d-row-match.is-ok {
+  color: var(--rater-cat-math-text, #6ee7b7);
+}
+.rater-csv-import-2d-row-match.is-warn {
+  color: var(--rater-cat-loading-text);
+}
+.rater-csv-import-2d-row-match.is-bad {
+  color: var(--rater-cat-output-text);
+}
+.rater-csv-import-2d-row-preview {
+  font-family: var(--rater-fonts-mono);
+  font-size: var(--rater-t-11);
+  color: var(--rater-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.rater-csv-import-2d-row-preview .is-muted {
+  color: var(--rater-text-subtle);
+  font-style: italic;
+}
+.rater-csv-import-2d-row-count {
+  font-family: var(--rater-fonts-mono);
+  font-size: var(--rater-t-11);
+  color: var(--rater-text-muted);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.rater-csv-import-2d-row-count.is-muted {
+  color: var(--rater-text-subtle);
+}
+
+/* Re-key dropdown */
+.rater-csv-import-2d-rekey {
+  display: inline-block;
+  padding: 2px var(--rater-s-6);
+  font-size: var(--rater-t-11);
+  font-family: inherit;
+  background: var(--rater-surface-canvas);
+  border: 1px solid var(--rater-hairline-base);
+  border-radius: var(--rater-r-4);
+  color: var(--rater-text-default);
+  margin-left: var(--rater-s-6);
+}
+.rater-csv-import-2d-rekey:focus {
+  outline: none;
+  border-color: var(--rater-focus-ring);
+  box-shadow: 0 0 0 2px var(--rater-focus-halo);
+}
+
+/* ── Missing-levels chip strip ─────────────────────────────────── */
+
+.rater-csv-import-2d-missing {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-8);
+  padding: var(--rater-s-8) var(--rater-s-12);
+  background: color-mix(in srgb, var(--rater-cat-loading) 4%, var(--rater-surface-canvas));
+  border: 1px solid var(--rater-hairline-soft);
+  border-radius: var(--rater-r-8);
+  flex-wrap: wrap;
+}
+.rater-csv-import-2d-missing-label {
+  font-size: var(--rater-t-11);
+  color: var(--rater-text-muted);
+  font-weight: var(--rater-fw-medium);
+}
+.rater-csv-import-2d-missing-list {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: var(--rater-s-6);
+}
+.rater-csv-import-2d-missing-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px var(--rater-s-8);
+  background: var(--rater-surface-2);
+  font-size: var(--rater-t-11);
+  border-radius: var(--rater-r-full);
+  color: var(--rater-text-muted);
+  font-family: var(--rater-fonts-mono);
+}
+
+/* Brief 67 walkthrough fix — parse failures render, not vanish. */
+.rater-csv-import-2d__error {
+  margin: 0 0 var(--rater-s-12);
+  padding: var(--rater-s-8) var(--rater-s-12);
+  border: 1px solid var(--rater-feedback-error);
+  border-radius: var(--rater-r-8);
+  font-size: var(--rater-t-12);
+  color: var(--rater-feedback-error);
+}

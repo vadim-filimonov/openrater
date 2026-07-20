@@ -1,0 +1,490 @@
+/* ──────────────────────────────────────────────────────────────────
+   Brief 44 PR 44.3 — <GeoDimEditor> styles.
+
+   BEM + design tokens only. Visual lock: Frame 3 from
+   rate-lab/frontend/public/mockup/44-geographic-rating.html.
+   ────────────────────────────────────────────────────────────────── */
+
+.rater-geo-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  font-family: var(--rater-fonts-sans);
+  color: var(--rater-text-default);
+  padding: 16px 22px;
+}
+
+/* ── Header (crumb + save-pill) ─────────────────────────────────── */
+.rater-geo-editor__head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.rater-geo-editor__crumb {
+  font-size: 12px;
+  color: var(--rater-text-muted);
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  font-family: var(--rater-fonts-sans);
+}
+.rater-geo-editor__crumb:hover {
+  color: var(--rater-text-default);
+}
+/* The save pill is now the shared <SavePill> primitive (status domain,
+   §1.1). Its styles live in SavePill.css. */
+
+/* ── Title row ──────────────────────────────────────────────────── */
+.rater-geo-editor__title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.rater-geo-editor__shape-glyph {
+  width: 22px;
+  height: 22px;
+  border-radius: var(--rater-r-6);
+  background: var(--rater-cat-transform-soft);
+  color: var(--rater-cat-transform-text);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.rater-geo-editor__name {
+  font-size: 17px;
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-strong);
+  background: transparent;
+  border: 1px solid transparent;
+  padding: 2px 6px;
+  border-radius: var(--rater-r-4);
+  font-family: var(--rater-fonts-sans);
+  flex: 1;
+  min-width: 0;
+  max-width: 420px;
+}
+.rater-geo-editor__name:hover {
+  border-color: var(--rater-hairline-soft);
+}
+.rater-geo-editor__name:focus {
+  outline: none;
+  border-color: var(--rater-cat-transform);
+  background: var(--rater-surface-canvas);
+}
+.rater-geo-editor__shape-badge {
+  font-size: 11px;
+  color: var(--rater-text-muted);
+  padding: 2px 8px;
+  border-radius: var(--rater-r-full);
+  background: var(--rater-surface-2);
+}
+
+/* ── Meta row ───────────────────────────────────────────────────── */
+.rater-geo-editor__meta-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  font-size: 12px;
+  color: var(--rater-text-muted);
+  margin-top: -4px;
+  flex-wrap: wrap;
+}
+.rater-geo-editor__meta-row code {
+  color: var(--rater-text-default);
+  background: var(--rater-surface-canvas);
+  padding: 1px 6px;
+  border-radius: var(--rater-r-4);
+  font-size: 11px;
+  font-family: var(--rater-fonts-mono);
+}
+
+/* ── Tab bar ────────────────────────────────────────────────────── */
+.rater-geo-editor__tabbar {
+  display: flex;
+  gap: 2px;
+  border-bottom: 1px solid var(--rater-hairline-soft);
+  margin-bottom: 4px;
+}
+.rater-geo-editor__tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  font-size: 12px;
+  color: var(--rater-text-muted);
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  font-family: var(--rater-fonts-sans);
+  transition: color var(--rater-d-120) var(--rater-ease-soft);
+}
+.rater-geo-editor__tab:hover {
+  color: var(--rater-text-default);
+}
+.rater-geo-editor__tab.is-active {
+  color: var(--rater-text-strong);
+  border-bottom-color: var(--rater-cat-transform);
+  font-weight: var(--rater-fw-medium);
+}
+.rater-geo-editor__tab-count {
+  font-family: var(--rater-fonts-mono);
+  font-size: 10px;
+  color: var(--rater-text-subtle);
+  padding: 1px 6px;
+  border-radius: var(--rater-r-full);
+  background: var(--rater-surface-2);
+}
+.rater-geo-editor__tab.is-active .rater-geo-editor__tab-count {
+  background: color-mix(in srgb, var(--rater-cat-transform) 18%, transparent);
+  color: var(--rater-cat-transform-text);
+}
+
+/* ── Body ───────────────────────────────────────────────────────── */
+.rater-geo-editor__body {
+  background: var(--rater-surface-canvas);
+  border: 1px solid var(--rater-hairline-soft);
+  border-radius: var(--rater-r-8);
+  overflow: hidden;
+}
+
+/* ── Levels list ────────────────────────────────────────────────── */
+.rater-geo-editor__levels {
+  display: flex;
+  flex-direction: column;
+}
+.rater-geo-editor__levels-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--rater-surface-1);
+  border-bottom: 1px solid var(--rater-hairline-soft);
+  font-size: 11px;
+  color: var(--rater-text-subtle);
+  letter-spacing: var(--rater-tracking-label);
+  text-transform: uppercase;
+  font-weight: var(--rater-fw-semibold);
+}
+.rater-geo-editor__levels-count {
+  color: var(--rater-text-default);
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: var(--rater-fw-medium);
+}
+.rater-geo-editor__levels-custom-count {
+  color: var(--rater-cat-loading-text);
+}
+.rater-geo-editor__levels-spacer {
+  flex: 1;
+}
+.rater-geo-editor__action {
+  font-size: 11px;
+  color: var(--rater-text-muted);
+  padding: 4px 10px;
+  border-radius: var(--rater-r-4);
+  background: transparent;
+  border: 1px solid var(--rater-hairline-soft);
+  cursor: pointer;
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: var(--rater-fw-medium);
+  font-family: var(--rater-fonts-sans);
+  transition: background var(--rater-d-120) var(--rater-ease-soft),
+              color var(--rater-d-120) var(--rater-ease-soft);
+}
+.rater-geo-editor__action:hover {
+  background: var(--rater-surface-2);
+  color: var(--rater-text-default);
+}
+.rater-geo-editor__action--danger {
+  color: var(--rater-cat-output-text);
+  border-color: color-mix(in srgb, var(--rater-cat-output) 40%, transparent);
+}
+.rater-geo-editor__action--danger:hover {
+  background: color-mix(in srgb, var(--rater-cat-output) 14%, transparent);
+  color: var(--rater-cat-output-text);
+}
+
+/* Paste-import form (F12 — the keyboard/headless twin of Import CSV) */
+.rater-geo-editor__paste-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 14px;
+  background: var(--rater-surface-1);
+  border-bottom: 1px solid var(--rater-hairline-soft);
+}
+.rater-geo-editor__paste-input {
+  width: 100%;
+  background: var(--rater-surface-canvas);
+  border: 1px solid var(--rater-hairline-base);
+  color: var(--rater-text-default);
+  border-radius: var(--rater-r-6);
+  padding: 8px 10px;
+  font-size: 12px;
+  font-family: var(--rater-fonts-mono);
+  resize: vertical;
+}
+.rater-geo-editor__paste-input:focus-visible {
+  outline: none;
+  border-color: var(--rater-focus-ring);
+  box-shadow: 0 0 0 3px
+    color-mix(in oklab, var(--rater-focus-ring) 24%, transparent);
+}
+.rater-geo-editor__paste-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+/* Add-custom form */
+.rater-geo-editor__add-form {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: var(--rater-surface-1);
+  border-bottom: 1px solid var(--rater-hairline-soft);
+}
+.rater-geo-editor__add-input {
+  background: var(--rater-surface-canvas);
+  border: 1px solid var(--rater-hairline-base);
+  color: var(--rater-text-default);
+  border-radius: var(--rater-r-6);
+  padding: 6px 10px;
+  font-size: 12px;
+  font-family: var(--rater-fonts-mono);
+  min-width: 0;
+  flex: 1;
+}
+.rater-geo-editor__add-input--id {
+  max-width: 200px;
+  text-transform: uppercase;
+}
+.rater-geo-editor__add-input:focus {
+  outline: none;
+  border-color: var(--rater-cat-transform);
+}
+.rater-geo-editor__add-submit {
+  background: var(--rater-cat-transform);
+  color: var(--rater-text-inverse);
+  border: 1px solid var(--rater-cat-transform);
+  border-radius: var(--rater-r-6);
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: var(--rater-fw-semibold);
+  cursor: pointer;
+  font-family: var(--rater-fonts-sans);
+}
+.rater-geo-editor__add-submit:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Reset confirm */
+.rater-geo-editor__reset-confirm {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  background: color-mix(in srgb, var(--rater-cat-loading) 8%, var(--rater-surface-1));
+  border-bottom: 1px solid var(--rater-hairline-soft);
+  font-size: 12px;
+}
+.rater-geo-editor__reset-confirm-text {
+  color: var(--rater-text-default);
+  font-size: 12px;
+}
+.rater-geo-editor__reset-confirm-text strong {
+  color: var(--rater-cat-loading-text);
+  font-weight: var(--rater-fw-semibold);
+}
+
+/* Level rows */
+/* I4 — level-list search */
+.rater-geo-editor__levels-search {
+  width: 100%;
+  margin: var(--rater-s-8) 0;
+  padding: var(--rater-s-8) var(--rater-s-12);
+  background: var(--rater-surface-2);
+  border: 1px solid var(--rater-hairline-base);
+  border-radius: var(--rater-r-8);
+  font-family: var(--rater-font-sans);
+  font-size: var(--rater-t-13);
+  color: var(--rater-text-default);
+}
+.rater-geo-editor__levels-search::placeholder {
+  color: var(--rater-text-subtle);
+}
+.rater-geo-editor__levels-search:focus {
+  outline: none;
+  border-color: var(--rater-hairline-strong);
+  box-shadow: var(--rater-focus-ring);
+}
+
+.rater-geo-editor__levels-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  max-height: 420px;
+  overflow-y: auto;
+}
+.rater-geo-editor__levels-row {
+  display: grid;
+  /* B1 — four tracks for four children (key · label · badge · delete). The
+     label is minmax(0,1fr) so a long name truncates instead of forcing the
+     delete to wrap. */
+  grid-template-columns: 96px minmax(0, 1fr) auto auto;
+  gap: 12px;
+  align-items: center;
+  min-height: 40px;
+  padding: 8px 14px;
+  border-bottom: 1px solid var(--rater-hairline-soft);
+  font-size: 12px;
+}
+.rater-geo-editor__levels-row:last-child {
+  border-bottom: none;
+}
+.rater-geo-editor__levels-row:hover {
+  background: var(--rater-surface-2);
+}
+.rater-geo-editor__levels-key {
+  font-family: var(--rater-fonts-mono);
+  font-size: 11px;
+  color: var(--rater-text-default);
+  padding: 2px 6px;
+  border-radius: var(--rater-r-4);
+  background: var(--rater-surface-1);
+}
+.rater-geo-editor__levels-label {
+  color: var(--rater-text-default);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rater-geo-editor__levels-badge {
+  /* A per-row "custom" mark — quiet neutral metadata, not a loud pill. The
+     count is already summarized in the list header, so across 100+ rows this
+     recedes to a faint tag instead of 100 colored chips. (Also drops the
+     cat-* computation color, which never belonged on a metadata badge.) */
+  font-size: 10px;
+  color: var(--rater-text-faint);
+  letter-spacing: var(--rater-tracking-label);
+  text-transform: uppercase;
+  font-weight: var(--rater-fw-medium);
+}
+.rater-geo-editor__levels-delete {
+  background: transparent;
+  border: 0;
+  color: var(--rater-text-subtle);
+  font-size: 12px;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: var(--rater-r-4);
+  font-family: var(--rater-fonts-sans);
+}
+.rater-geo-editor__levels-delete:hover {
+  color: var(--rater-cat-output-text);
+  background: color-mix(in srgb, var(--rater-cat-output) 14%, transparent);
+}
+.rater-geo-editor__levels-empty {
+  padding: 24px 16px;
+  text-align: center;
+  color: var(--rater-text-subtle);
+  font-size: 12px;
+  font-style: italic;
+}
+
+/* ── Placeholder tabs (Map + Territories) ───────────────────────── */
+.rater-geo-editor__placeholder {
+  padding: 32px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  background:
+    radial-gradient(
+      ellipse at center,
+      color-mix(in srgb, var(--rater-cat-transform) 4%, var(--rater-surface-canvas)),
+      var(--rater-surface-canvas)
+    );
+}
+.rater-geo-editor__placeholder-tag {
+  font-family: var(--rater-fonts-mono);
+  font-size: 10px;
+  color: var(--rater-cat-transform-text);
+  background: var(--rater-cat-transform-soft);
+  padding: 2px 8px;
+  border-radius: var(--rater-r-4);
+  letter-spacing: var(--rater-tracking-label);
+  text-transform: uppercase;
+}
+.rater-geo-editor__placeholder-title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-strong);
+  letter-spacing: -0.01em;
+}
+.rater-geo-editor__placeholder-body {
+  margin: 0;
+  color: var(--rater-text-muted);
+  font-size: 13px;
+  line-height: 1.55;
+  max-width: 540px;
+}
+
+/* Map tab (maps next-gen) — <UsChoropleth> scope preview + county flip. */
+.rater-geo-editor__map {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-8);
+  padding: var(--rater-s-12);
+  min-height: 360px;
+}
+.rater-geo-editor__map-head {
+  display: flex;
+  justify-content: flex-end;
+  flex-shrink: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rater-geo-editor__tab,
+  .rater-geo-editor__action {
+    transition: none;
+  }
+}
+
+/* ADR-0038 / Brief 51 — ZIP→territory CSV import affordance + report. */
+.rater-geo-editor__action {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.rater-geo-editor__file-input {
+  display: none;
+}
+
+.rater-geo-editor__import-msg {
+  margin: 8px 0 0;
+  padding: 8px 12px;
+  border-radius: var(--rater-r-8);
+  background: var(--rater-surface-2);
+  border: 1px solid var(--rater-hairline-soft);
+  font-size: 12px;
+  color: var(--rater-text-default);
+}
+
+.rater-geo-editor__import-msg--error {
+  background: color-mix(in srgb, var(--rater-cat-output) 12%, transparent);
+  border-color: var(--rater-cat-output);
+  color: var(--rater-text-strong);
+}
+
+.rater-geo-editor__import-warn {
+  color: var(--rater-cat-loading-text);
+}

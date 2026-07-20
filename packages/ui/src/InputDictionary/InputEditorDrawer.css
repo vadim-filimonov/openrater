@@ -1,0 +1,94 @@
+/**
+ * <InputEditorDrawer> styles — Brief 61 D4.
+ *
+ * Renders inside the design-system <Drawer> (which owns the panel
+ * chrome, scroll, and pinned footer). This file styles only the form
+ * body + footer contents. Tokens only — no hard-coded colors.
+ */
+
+.rater-ied {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.rater-ied__section {
+  font-size: var(--rater-t-11);
+  font-weight: var(--rater-fw-semibold);
+  text-transform: uppercase;
+  letter-spacing: var(--rater-tracking-label);
+  color: var(--rater-text-faint);
+  margin: 4px 0 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.rater-ied__section::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--rater-hairline-soft);
+}
+
+.rater-ied__field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.rater-ied__label {
+  font-size: var(--rater-t-11);
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-muted);
+}
+
+.rater-ied__hint {
+  font-size: var(--rater-t-10);
+  color: var(--rater-text-faint);
+}
+
+.rater-ied__error {
+  font-size: var(--rater-t-11);
+  color: var(--rater-accent-danger);
+}
+
+.rater-ied__row2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.rater-ied__select {
+  height: 32px;
+  width: 100%;
+  border: 1px solid var(--rater-hairline-base);
+  border-radius: var(--rater-r-6);
+  background: var(--rater-surface-1);
+  color: var(--rater-text-default);
+  font-size: var(--rater-t-12);
+  padding: 0 8px;
+}
+.rater-ied__select:focus-visible {
+  outline: none;
+  box-shadow: var(--rater-focus-ring);
+}
+
+.rater-ied__unit {
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-faint);
+}
+
+.rater-ied__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 8px;
+}
+
+.rater-ied__footer-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}

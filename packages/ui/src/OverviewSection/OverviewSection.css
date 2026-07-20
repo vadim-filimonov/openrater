@@ -1,0 +1,8 @@
+
+/* Drift tracking: the edited-since-build suffix on the
+ * provenance row — a warn-tinted fact, not a lifecycle state. */
+.rater-overview__drift {
+  color: var(--rater-accent-warning);
+  font-size: var(--rater-t-12);
+  white-space: nowrap;
+}

@@ -1,0 +1,4 @@
+# Bundled plan-template recipes (*.json) are seeded into the
+# plan_templates table on app startup by rates/templates/seed.py.
+# None are bundled right now — drop a recipe matching
+# UpsertTemplateRequest here and restart to add one to the gallery.

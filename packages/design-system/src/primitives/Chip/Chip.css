@@ -1,0 +1,152 @@
+.rater-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-4);
+  height: 20px;
+  padding: 0 var(--rater-s-8);
+  border: 1px solid var(--rater-border-default);
+  border-radius: var(--rater-r-full);
+  background: var(--rater-surface-1);
+  color: var(--rater-text-default);
+  font-size: var(--rater-t-11);
+  line-height: 1;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+.rater-chip--mono {
+  font-family: var(--rater-font-mono);
+  font-feature-settings: var(--rater-num-tabular);
+  letter-spacing: var(--rater-tracking-mono);
+}
+
+.rater-chip--sans {
+  font-family: var(--rater-font-sans);
+  font-weight: var(--rater-fw-medium);
+}
+
+/* Tones */
+
+.rater-chip--default {
+  /* base */
+}
+
+.rater-chip--input {
+  background: var(--rater-cat-input-soft);
+  border-color: var(--rater-cat-input-border);
+  color: var(--rater-cat-input-text);
+}
+.rater-chip--input .rater-chip__dot { background: var(--rater-cat-input); }
+
+.rater-chip--transform {
+  background: var(--rater-cat-transform-soft);
+  border-color: var(--rater-cat-transform-border);
+  color: var(--rater-cat-transform-text);
+}
+.rater-chip--transform .rater-chip__dot { background: var(--rater-cat-transform); }
+
+.rater-chip--lookup {
+  background: var(--rater-cat-lookup-soft);
+  border-color: var(--rater-cat-lookup-border);
+  color: var(--rater-cat-lookup-text);
+}
+.rater-chip--lookup .rater-chip__dot { background: var(--rater-cat-lookup); }
+
+.rater-chip--math {
+  background: var(--rater-cat-math-soft);
+  border-color: var(--rater-cat-math-border);
+  color: var(--rater-cat-math-text);
+}
+.rater-chip--math .rater-chip__dot { background: var(--rater-cat-math); }
+
+.rater-chip--loading {
+  background: var(--rater-cat-loading-soft);
+  border-color: var(--rater-cat-loading-border);
+  color: var(--rater-cat-loading-text);
+}
+.rater-chip--loading .rater-chip__dot { background: var(--rater-cat-loading); }
+
+.rater-chip--output {
+  background: var(--rater-cat-output-soft);
+  border-color: var(--rater-cat-output-border);
+  color: var(--rater-cat-output-text);
+}
+.rater-chip--output .rater-chip__dot { background: var(--rater-cat-output); }
+
+/* Semantic tones — STATUS comes from the feedback tokens only
+ * (V2_INTERFACE_SPEC §1.1: the cat-* palette encodes computation kind;
+ * borrowing it for status made red mean both "premium" and "error"
+ * at the token level). */
+.rater-chip--success {
+  background: var(--rater-feedback-success-bg);
+  border-color: var(--rater-feedback-success-soft);
+  color: var(--rater-feedback-success);
+}
+.rater-chip--success .rater-chip__dot { background: var(--rater-accent-success); }
+
+.rater-chip--warning {
+  background: var(--rater-feedback-warn-bg);
+  border-color: var(--rater-feedback-warn-soft);
+  color: var(--rater-feedback-warn);
+}
+.rater-chip--warning .rater-chip__dot { background: var(--rater-accent-warning); }
+
+.rater-chip--danger {
+  background: var(--rater-feedback-error-bg);
+  border-color: var(--rater-feedback-error-soft);
+  color: var(--rater-feedback-error);
+}
+.rater-chip--danger .rater-chip__dot { background: var(--rater-accent-danger); }
+
+/* Dot */
+
+.rater-chip__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--rater-r-full);
+  background: var(--rater-text-muted);
+  flex-shrink: 0;
+}
+
+.rater-chip__label {
+  display: inline-block;
+}
+
+/* Remove button */
+
+.rater-chip--removable {
+  padding-right: var(--rater-s-2);
+}
+
+.rater-chip__remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  margin-left: var(--rater-s-2);
+  padding: 0;
+  border: none;
+  border-radius: var(--rater-r-full);
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  opacity: 0.65;
+  transition: background var(--rater-d-80) var(--rater-ease-soft),
+    opacity var(--rater-d-80) var(--rater-ease-soft);
+}
+
+.rater-chip__remove:hover {
+  background: rgba(255, 255, 255, 0.1);
+  opacity: 1;
+}
+
+:root[data-theme="light"] .rater-chip__remove:hover {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.rater-chip__remove:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: 1px;
+  opacity: 1;
+}

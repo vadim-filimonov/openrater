@@ -1,0 +1,51 @@
+/* ============================================================================
+ * <SectionIssueDot> — per-section count badge for the spine nav.
+ * ============================================================================ */
+
+.rater-section-issue-dot {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-4);
+  vertical-align: baseline;
+  user-select: none;
+  cursor: help;
+}
+
+.rater-section-issue-dot__dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: var(--rater-r-full);
+  flex-shrink: 0;
+}
+
+.rater-section-issue-dot__dot[data-severity="error"] {
+  background: var(--rater-feedback-error);
+}
+
+.rater-section-issue-dot__dot[data-severity="warning"] {
+  background: var(--rater-feedback-warn, var(--rater-cat-lookup));
+}
+
+.rater-section-issue-dot__dot[data-severity="info"] {
+  background: var(--rater-feedback-info, var(--rater-accent-primary));
+}
+
+.rater-section-issue-dot__count {
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-11, var(--rater-t-12));
+  font-weight: var(--rater-fw-semibold);
+  font-variant-numeric: tabular-nums;
+}
+
+.rater-section-issue-dot--error .rater-section-issue-dot__count {
+  color: var(--rater-feedback-error);
+}
+
+.rater-section-issue-dot--warning .rater-section-issue-dot__count {
+  color: var(--rater-feedback-warn, var(--rater-cat-lookup));
+}
+
+.rater-section-issue-dot--info .rater-section-issue-dot__count {
+  color: var(--rater-feedback-info, var(--rater-accent-primary));
+}

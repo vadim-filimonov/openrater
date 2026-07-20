@@ -1,0 +1,172 @@
+/* ──────────────────────────────────────────────────────────────
+   FactorTableViz — Brief 34 PR 34.4
+
+   The orchestrator pane that mounts the right chart for the
+   table's shape. Lives in <FactorTableNode>'s chartPane slot.
+   ────────────────────────────────────────────────────────────── */
+
+.rater-ft-viz {
+  display: flex;
+  flex-direction: column;
+  /* L19 — tighten the vertical rhythm so the chart body clears the
+     fold on a 13" laptop. Was gap/padding 12; the hero strip + head
+     + body stack now breathes on 8px. */
+  gap: var(--rater-s-8);
+  padding: var(--rater-s-8);
+  background: var(--rater-surface-1);
+  border-radius: var(--rater-r-8);
+  border: 1px solid var(--rater-hairline-soft);
+  min-width: 0;
+}
+
+/* ── Head: chart-type picker + auto-reset ─────────────────────── */
+
+.rater-ft-viz-head {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-12);
+  flex-wrap: wrap;
+}
+
+.rater-ft-viz-pill-group {
+  display: inline-flex;
+  padding: 2px;
+  background: var(--rater-surface-canvas);
+  border: 1px solid var(--rater-hairline-soft);
+  border-radius: var(--rater-r-8);
+}
+
+.rater-ft-viz-pill {
+  padding: var(--rater-s-4) var(--rater-s-12);
+  font-size: var(--rater-t-12);
+  background: transparent;
+  border: none;
+  border-radius: var(--rater-r-6);
+  color: var(--rater-text-muted);
+  cursor: pointer;
+  font-family: inherit;
+  transition: background var(--rater-d-80) var(--rater-ease-snap), color var(--rater-d-80) var(--rater-ease-snap);
+}
+.rater-ft-viz-pill:hover:not(disabled) {
+  color: var(--rater-text-default);
+}
+.rater-ft-viz-pill.is-active {
+  background: var(--rater-surface-3);
+  color: var(--rater-text-strong);
+}
+.rater-ft-viz-pill.is-disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.rater-ft-viz-pill:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: 2px;
+}
+
+.rater-ft-viz-auto-reset {
+  background: transparent;
+  border: 1px solid var(--rater-hairline-soft);
+  color: var(--rater-text-muted);
+  padding: var(--rater-s-4) var(--rater-s-8);
+  font-size: var(--rater-t-11);
+  border-radius: var(--rater-r-6);
+  cursor: pointer;
+  font-family: inherit;
+  transition: border-color var(--rater-d-80) var(--rater-ease-snap), color var(--rater-d-80) var(--rater-ease-snap);
+}
+.rater-ft-viz-auto-reset:hover {
+  border-color: var(--rater-hairline-strong);
+  color: var(--rater-text-default);
+}
+
+/* ── Body: the resolved chart ─────────────────────────────────── */
+
+.rater-ft-viz-body {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  /* Brief 45 PR 45.7 — Absorb the section's remaining height so
+     the chart SVG (which scales to its container via height:
+     auto + viewBox preserveAspectRatio) renders at a meaningful
+     size. Without this the body collapses to 0px when the parent
+     flex section is height-constrained (chart pane inside the
+     ParametrizeCanvas FactorTableNode is the canonical case). */
+  flex: 1 1 auto;
+  min-height: 200px;
+  /* L19 — cap the chart so a WIDE canvas (1440px viewport) doesn't
+     balloon the aspect-driven SVG (preserveAspectRatio="none" +
+     height:auto grows the chart with its width, which on a wide
+     screen pushes the x-axis below the fold). The cap is viewport-
+     HEIGHT-relative, not width-relative: the chrome above the chart
+     (plan header + tabs + canvas/node head + hero strip) is a fixed
+     ~600px, so `calc(100vh - 600px)` lets the chart fill exactly the
+     remaining budget down to the fold on any laptop height. The
+     `min-height: 200px` floor keeps it usable on very short windows
+     (short screens accept a small inner-scroll). Same convention as
+     PlanDetailRoute's `calc(100vh - 100px)` rail. */
+  max-height: max(200px, calc(100vh - 600px));
+}
+
+/* L19 — the 1-D chart SVGs (line / bar / line-multiples) use
+   preserveAspectRatio="none" + height:auto, so they stretch to
+   whatever box they're given. Inside the (now height-capped) viz
+   body, fill the available height instead of growing past it. The
+   chart is "flexing to fill the budget" rather than dictating it. */
+.rater-ft-viz-body .rater-line-chart,
+.rater-ft-viz-body .rater-bar-chart,
+.rater-ft-viz-body .rater-line-multiples {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.rater-ft-viz-body .rater-line-chart-svg,
+.rater-ft-viz-body .rater-bar-chart-svg,
+.rater-ft-viz-body .rater-line-multiples-svg {
+  height: 100%;
+  min-height: 0;
+}
+
+/* Unavailable / stub state */
+.rater-ft-viz-unavailable {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--rater-s-48) var(--rater-s-24);
+  background: var(--rater-surface-canvas);
+  border: 1px dashed var(--rater-hairline-base);
+  border-radius: var(--rater-r-8);
+  min-height: 200px;
+}
+.rater-ft-viz-unavailable-text {
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-subtle);
+  text-align: center;
+  max-width: 360px;
+  line-height: 1.5;
+  font-style: italic;
+}
+
+/* Map view (maps next-gen) — <UsChoropleth> + its county flip picker.
+   Flexes to fill the height-capped viz body; the choropleth's own
+   min-height floor keeps it usable on short windows. */
+.rater-ft-viz__map {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-8);
+  flex: 1 1 auto;
+  min-height: 0;
+}
+.rater-ft-viz__map-head {
+  display: flex;
+  justify-content: flex-end;
+  flex-shrink: 0;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .rater-ft-viz-pill,
+  .rater-ft-viz-auto-reset {
+    transition: none;
+  }
+}

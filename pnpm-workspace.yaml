@@ -1,0 +1,17 @@
+# OpenRater — pnpm workspace manifest.
+#
+# Workspace layout:
+#
+#   frontend/          — the app shell (Rate Lab + Portfolio + Integrations).
+#   server/            — the FastAPI backend (Python; not in this manifest).
+#   services/scoring/  — the deterministic scoring engine.
+#   packages/*         — shared packages (contracts, design-system, ui,
+#                        api-client, hooks).
+#
+# Layer rule: apps depend on packages; packages depend on lower-layer
+# packages only; nothing imports upward. Enforced by ESLint.
+
+packages:
+  - "frontend"
+  - "services/*"
+  - "packages/*"

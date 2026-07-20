@@ -1,0 +1,148 @@
+/* ============================================================================
+ * <TestRunner> — Rate Against Sample workbench.
+ *
+ * Vertical stack: inputs section (textarea + actions) → result panel
+ * (TracePanel OR PlanCompareView depending on toggle).
+ * ============================================================================ */
+
+.rater-test-runner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-16);
+  font-family: var(--rater-fonts-sans);
+}
+
+.rater-test-runner__section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-8);
+}
+
+.rater-test-runner__section-title {
+  margin: 0;
+  color: var(--rater-text-muted);
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-12);
+  font-weight: var(--rater-fw-semibold);
+  text-transform: uppercase;
+  letter-spacing: var(--rater-tracking-label);
+}
+
+/* ── Inputs area ───────────────────────────────────────────── */
+
+.rater-test-runner__inputs-area {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-6);
+}
+
+.rater-test-runner__inputs-textarea {
+  /* Reset native */
+  appearance: none;
+  width: 100%;
+  resize: vertical;
+  min-height: 140px;
+  /* Layout */
+  padding: var(--rater-s-10) var(--rater-s-12);
+  /* Surface */
+  background: var(--rater-surface-canvas);
+  color: var(--rater-text-strong);
+  border: 1px solid var(--rater-border-default);
+  border-radius: var(--rater-r-6);
+  /* Type — mono since this is JSON */
+  font-family: var(--rater-fonts-mono, var(--rater-fonts-sans));
+  font-size: var(--rater-t-13);
+  line-height: 1.5;
+  font-feature-settings: "calt" off; /* JSON looks better without ligatures */
+
+  transition:
+    border-color var(--rater-d-80) var(--rater-ease-soft),
+    background var(--rater-d-80) var(--rater-ease-soft);
+}
+
+.rater-test-runner__inputs-textarea:hover:not(disabled):not(focus-visible) {
+  border-color: var(--rater-border-strong);
+}
+
+.rater-test-runner__inputs-textarea:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: 1px;
+  border-color: var(--rater-border-strong);
+  background: var(--rater-surface-1);
+}
+
+.rater-test-runner__inputs-textarea--error {
+  border-color: var(--rater-feedback-error);
+}
+
+.rater-test-runner__inputs-error {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--rater-s-6);
+  padding: var(--rater-s-6) var(--rater-s-10);
+  border-radius: var(--rater-r-4);
+  background: color-mix(in srgb, var(--rater-feedback-error) 10%, transparent);
+  color: var(--rater-feedback-error);
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-12);
+  font-weight: var(--rater-fw-medium);
+  line-height: var(--rater-lh-snug);
+}
+
+.rater-test-runner__inputs-error svg {
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* ── Actions row ───────────────────────────────────────────── */
+
+.rater-test-runner__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-8);
+  margin-top: var(--rater-s-2);
+}
+
+/* ── Result + error ────────────────────────────────────────── */
+
+.rater-test-runner__result {
+  padding-top: var(--rater-s-12);
+  border-top: 1px solid var(--rater-border-subtle);
+}
+
+.rater-test-runner__error {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--rater-s-6);
+  padding: var(--rater-s-8) var(--rater-s-12);
+  border-radius: var(--rater-r-6);
+  border: 1px solid var(--rater-feedback-error);
+  background: color-mix(in srgb, var(--rater-feedback-error) 10%, transparent);
+  color: var(--rater-feedback-error);
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-13);
+  font-weight: var(--rater-fw-medium);
+  line-height: var(--rater-lh-snug);
+}
+
+.rater-test-runner__error svg {
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* ── Empty state ───────────────────────────────────────────── */
+
+.rater-test-runner__empty {
+  padding: var(--rater-s-24) var(--rater-s-16);
+  text-align: center;
+  color: var(--rater-text-muted);
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-13);
+  line-height: var(--rater-lh-normal);
+  border-top: 1px solid var(--rater-border-subtle);
+}
+
+.rater-test-runner__empty strong {
+  color: var(--rater-text-default);
+  font-weight: var(--rater-fw-semibold);
+}

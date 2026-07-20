@@ -1,0 +1,275 @@
+/**
+ * <Button> styles — BEM, tokens-only.
+ *
+ * The three variants × three sizes matrix lives here; the keyboard +
+ * focus + disabled states are universal (defined on the root).
+ *
+ * Variant fills + borders + text colors map to semantic tokens. Light
+ * mode adjustments flow automatically through tokens.css's
+ * [data-theme=light] block — no per-mode rules needed here.
+ */
+
+/* ----------------------------------------------------------------
+ * Root — universal across variants + sizes
+ * ---------------------------------------------------------------- */
+
+.rater-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--rater-s-6);
+  padding: 0 var(--rater-s-12);
+  height: 32px;
+  border: 1px solid transparent;
+  border-radius: var(--rater-r-6);
+  background: transparent;
+  color: inherit;
+
+  font-family: var(--rater-font-sans);
+  font-size: var(--rater-t-13);
+  font-weight: var(--rater-fw-medium);
+  line-height: 1;
+  letter-spacing: var(--rater-tracking-tight);
+  white-space: nowrap;
+
+  cursor: pointer;
+  user-select: none;
+  appearance: none;
+  -webkit-appearance: none;
+
+  transition:
+    background var(--rater-d-80) var(--rater-ease-soft),
+    border-color var(--rater-d-80) var(--rater-ease-soft),
+    color var(--rater-d-80) var(--rater-ease-soft),
+    box-shadow var(--rater-d-80) var(--rater-ease-soft),
+    transform var(--rater-d-80) var(--rater-ease-soft);
+}
+
+.rater-button:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: 2px;
+}
+
+.rater-button:disabled,
+.rater-button[aria-busy="true"] {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.rater-button:not(:disabled):active {
+  transform: translateY(1px);
+}
+
+/* ----------------------------------------------------------------
+ * Sizes
+ * ---------------------------------------------------------------- */
+
+.rater-button--xs {
+  height: 24px;
+  padding: 0 var(--rater-s-10);
+  gap: var(--rater-s-4);
+  font-size: var(--rater-t-12);
+}
+
+.rater-button--sm {
+  height: 28px;
+  padding: 0 var(--rater-s-10);
+  font-size: var(--rater-t-12);
+}
+
+.rater-button--md {
+  /* 32px — defaults match root */
+}
+
+.rater-button--lg {
+  height: 44px;
+  padding: 0 var(--rater-s-16);
+  gap: var(--rater-s-8);
+  font-size: var(--rater-t-14);
+}
+
+/* ----------------------------------------------------------------
+ * Variants
+ * ---------------------------------------------------------------- */
+
+/* primary — accent fill, machined (inner top-edge light + soft drop);
+   pressing darkens one step past hover and flattens the edge */
+.rater-button--primary {
+  background: var(--rater-accent-primary);
+  color: var(--rater-on-accent);
+  border-color: var(--rater-accent-primary);
+  box-shadow: var(--rater-edge-highlight);
+}
+
+.rater-button--primary:hover:not(:disabled) {
+  background: var(--rater-accent-primary-hover);
+  border-color: var(--rater-accent-primary-hover);
+}
+
+.rater-button--primary:active:not(:disabled) {
+  background: color-mix(
+    in oklab,
+    var(--rater-accent-primary-hover) 88%,
+    black
+  );
+  border-color: transparent;
+  box-shadow: none;
+}
+
+/* ghost — transparent until hover (default); press deepens one surface step */
+.rater-button--ghost {
+  background: transparent;
+  color: var(--rater-text-strong);
+  border-color: var(--rater-border-default);
+}
+
+.rater-button--ghost:hover:not(:disabled) {
+  background: var(--rater-surface-2);
+  border-color: var(--rater-border-strong);
+}
+
+.rater-button--ghost:active:not(:disabled) {
+  background: var(--rater-surface-3);
+}
+
+/* plain — borderless quiet text action (crumbs, add-rows, reveal toggles);
+   reads as text at rest, earns a soft wash on hover */
+.rater-button--plain {
+  background: transparent;
+  color: var(--rater-text-muted);
+  border-color: transparent;
+}
+
+.rater-button--plain:hover:not(:disabled) {
+  background: var(--rater-surface-2);
+  color: var(--rater-text-default);
+}
+
+.rater-button--plain:active:not(:disabled) {
+  background: var(--rater-surface-3);
+}
+
+/* danger — red fill, destructive actions; same machined physics as primary */
+.rater-button--danger {
+  background: var(--rater-accent-danger);
+  color: var(--rater-on-accent);
+  border-color: var(--rater-accent-danger);
+  box-shadow: var(--rater-edge-highlight);
+}
+
+.rater-button--danger:hover:not(:disabled) {
+  background: var(--rater-accent-danger-hover);
+  border-color: var(--rater-accent-danger-hover);
+}
+
+.rater-button--danger:active:not(:disabled) {
+  background: color-mix(
+    in oklab,
+    var(--rater-accent-danger-hover) 88%,
+    black
+  );
+  border-color: transparent;
+  box-shadow: none;
+}
+
+/* danger-text — red text only, for dense lists */
+.rater-button--danger-text {
+  background: transparent;
+  color: var(--rater-accent-danger);
+  border-color: transparent;
+}
+
+.rater-button--danger-text:hover:not(:disabled) {
+  background: var(--rater-feedback-error-bg);
+  color: var(--rater-accent-danger-text);
+}
+
+.rater-button--danger-text:active:not(:disabled) {
+  background: color-mix(in oklab, var(--rater-feedback-error-bg) 80%, black);
+}
+
+/* ----------------------------------------------------------------
+ * Full-width variant + slots
+ * ---------------------------------------------------------------- */
+
+.rater-button--full-width {
+  display: flex;
+  width: 100%;
+}
+
+.rater-button__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--rater-icon-16);
+  height: var(--rater-icon-16);
+  flex-shrink: 0;
+}
+
+.rater-button__icon svg,
+.rater-button__icon img {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Smaller icon for sm/xs button sizes */
+.rater-button--xs .rater-button__icon,
+.rater-button--sm .rater-button__icon {
+  width: var(--rater-icon-14);
+  height: var(--rater-icon-14);
+}
+
+/* Larger icon for lg buttons (hero CTAs) */
+.rater-button--lg .rater-button__icon {
+  width: var(--rater-icon-20);
+  height: var(--rater-icon-20);
+}
+
+.rater-button__label {
+  display: inline-block;
+}
+
+/* ----------------------------------------------------------------
+ * Loading state — spinner
+ *
+ * Pure CSS spinner; no extra dep. Sized to match the icon slot so
+ * the button width stays stable when toggling between idle + loading.
+ * ---------------------------------------------------------------- */
+
+.rater-button__spinner {
+  width: var(--rater-icon-16);
+  height: var(--rater-icon-16);
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: var(--rater-r-full);
+  animation: rater-button-spin 0.6s linear infinite;
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+
+.rater-button--xs .rater-button__spinner,
+.rater-button--sm .rater-button__spinner {
+  width: var(--rater-icon-14);
+  height: var(--rater-icon-14);
+}
+
+.rater-button--lg .rater-button__spinner {
+  width: var(--rater-icon-20);
+  height: var(--rater-icon-20);
+}
+
+@keyframes rater-button-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rater-button__spinner {
+    animation-duration: 1.6s; /* slow, not absent — still signals "working" */
+  }
+  .rater-button:not(:disabled):active {
+    transform: none;
+  }
+}

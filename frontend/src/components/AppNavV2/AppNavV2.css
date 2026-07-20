@@ -1,0 +1,169 @@
+/* AppNavV2 — token-only BEM. Dark + light via the semantic aliases. */
+
+.rater-nav2 {
+  position: sticky;
+  top: 0;
+  z-index: var(--rater-z-sticky);
+  height: 56px;
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-8);
+  padding: 0 var(--rater-s-20);
+  background: var(--rater-surface-canvas);
+  border-bottom: 1px solid var(--rater-border-subtle);
+}
+
+.rater-nav2__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-10);
+  text-decoration: none;
+  margin-right: var(--rater-s-8);
+  /* F10 — the brand never wraps, at any width. */
+  white-space: nowrap;
+}
+.rater-nav2__mark {
+  width: var(--rater-s-24);
+  height: var(--rater-s-24);
+  border-radius: var(--rater-r-6);
+  background: var(--rater-accent-primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+}
+.rater-nav2__mark svg {
+  width: var(--rater-icon-16);
+  height: var(--rater-icon-16);
+  fill: var(--rater-on-accent);
+}
+.rater-nav2__wordmark {
+  font-family: var(--rater-fonts-display);
+  font-size: var(--rater-t-14);
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-strong);
+  letter-spacing: var(--rater-tracking-tight);
+}
+
+.rater-nav2__items {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-2);
+}
+.rater-nav2__item {
+  padding: var(--rater-s-6) var(--rater-s-12);
+  border-radius: var(--rater-r-6);
+  color: var(--rater-text-muted);
+  font-size: var(--rater-t-13);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background var(--rater-d-80) var(--rater-ease-snap),
+    color var(--rater-d-80) var(--rater-ease-snap);
+}
+.rater-nav2__item:hover {
+  background: var(--rater-surface-2);
+  color: var(--rater-text-default);
+}
+/* Brief 88 P1 — the cores rest one step stronger than the supporting
+   rooms; hierarchy reads through weight before the divider. */
+.rater-nav2__item--core {
+  color: var(--rater-text-default);
+}
+.rater-nav2__item--active {
+  background: var(--rater-surface-2);
+  color: var(--rater-text-strong);
+  font-weight: var(--rater-fw-medium);
+}
+
+/* Brief 88 P1 — the group hairline: the same sibling-separation idiom
+   WorkspaceTabs speaks inside the plan workspace, promoted one level.
+   border-default (not -subtle) so it reads at a glance — mockup-approved. */
+.rater-nav2__divider {
+  width: 1px;
+  height: var(--rater-s-16);
+  background: var(--rater-border-default);
+  margin: 0 var(--rater-s-10);
+  flex: none;
+}
+
+/* F10 — below 900px the supporting group folds into the "More" menu.
+   The trigger is a nav item, not a standard button. */
+.rater-nav2__more {
+  display: none;
+}
+.rater-nav2__more-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-4);
+  border: none;
+  background: none;
+  font-family: inherit;
+  cursor: pointer;
+}
+.rater-nav2__more-chevron {
+  width: var(--rater-icon-14);
+  height: var(--rater-icon-14);
+  color: var(--rater-text-subtle);
+}
+@media (max-width: 900px) {
+  .rater-nav2__items--supporting {
+    display: none;
+  }
+  .rater-nav2__more {
+    display: inline-flex;
+  }
+}
+@media (max-width: 720px) {
+  .rater-nav2__cmdk {
+    min-width: 0;
+  }
+  .rater-nav2__cmdk-label,
+  .rater-nav2__kbd {
+    display: none;
+  }
+}
+
+.rater-nav2__spacer {
+  flex: 1;
+}
+
+.rater-nav2__cmdk {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-8);
+  min-width: 200px;
+  height: var(--rater-s-32);
+  padding: 0 var(--rater-s-8) 0 var(--rater-s-10);
+  border: 1px solid var(--rater-border-default);
+  border-radius: var(--rater-r-6);
+  background: var(--rater-surface-1);
+  color: var(--rater-text-muted);
+  font-size: var(--rater-t-12);
+  font-family: inherit;
+  cursor: pointer;
+  transition: background var(--rater-d-80) var(--rater-ease-snap);
+}
+.rater-nav2__cmdk:hover {
+  background: var(--rater-surface-2);
+}
+.rater-nav2__cmdk-ico {
+  width: var(--rater-icon-14);
+  height: var(--rater-icon-14);
+  color: var(--rater-text-subtle);
+  flex: none;
+}
+.rater-nav2__cmdk-label {
+  flex: 1;
+  text-align: left;
+}
+.rater-nav2__kbd {
+  font-family: var(--rater-fonts-mono);
+  font-size: var(--rater-t-11);
+  color: var(--rater-text-subtle);
+  background: var(--rater-surface-2);
+  border: 1px solid var(--rater-border-default);
+  border-radius: var(--rater-r-4);
+  padding: 0 var(--rater-s-4);
+}
+
+/* Theme toggle now uses the design-system <IconButton variant=ghost>. */

@@ -1,0 +1,209 @@
+/* ============================================================================
+ * <GoLiveDialog> — the ONE deploy verb's dialog (Brief 84 D-B).
+ *
+ * Composes on top of <Modal> from @openrater/design-system; the form is the
+ * modal panel's direct child (same flex plumbing as FreezeVersionDialog).
+ *
+ * BEM names mirror the TSX:
+ *   .rater-go-live-dialog                    (form root)
+ *   .rater-go-live-dialog__error             (inline 409 banner)
+ *   .rater-go-live-dialog__error-icon
+ *   .rater-go-live-dialog__field             (label wrapper)
+ *   .rater-go-live-dialog__field-label
+ *   .rater-go-live-dialog__field-optional
+ *   .rater-go-live-dialog__field-hint        ([data-tone=muted|error])
+ *   .rater-go-live-dialog__input
+ *   .rater-go-live-dialog__textarea
+ *   .rater-go-live-dialog__what              (the what-happens box)
+ *   .rater-go-live-dialog__what-title
+ *   .rater-go-live-dialog__what-list
+ *   .rater-go-live-dialog__what-row
+ * ============================================================================ */
+
+.rater-go-live-dialog {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.rater-go-live-dialog .rater-modal__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-16);
+}
+
+/* ── Inline error banner (the 409 name collision) ──────────────── */
+
+.rater-go-live-dialog__error {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--rater-s-8);
+  padding: var(--rater-s-10) var(--rater-s-12);
+  border: 1px solid var(--rater-accent-danger);
+  border-radius: var(--rater-r-6);
+  background: var(--rater-feedback-error-bg);
+  color: var(--rater-feedback-error);
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-13);
+  line-height: var(--rater-lh-normal);
+}
+
+.rater-go-live-dialog__error-icon {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  padding-top: 2px;
+}
+
+/* ── Form fields ───────────────────────────────────────────────── */
+
+.rater-go-live-dialog__field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-6);
+}
+
+.rater-go-live-dialog__field-label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-6);
+  color: var(--rater-text-strong);
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-13);
+  font-weight: var(--rater-fw-medium);
+  line-height: var(--rater-lh-snug);
+}
+
+.rater-go-live-dialog__field-optional {
+  margin-left: var(--rater-s-2);
+  padding: 0 var(--rater-s-6);
+  border-radius: var(--rater-r-full);
+  background: var(--rater-surface-2);
+  color: var(--rater-text-muted);
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-11);
+  font-weight: var(--rater-fw-regular);
+  letter-spacing: 0.02em;
+  text-transform: lowercase;
+}
+
+.rater-go-live-dialog__field-hint {
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-12);
+  line-height: var(--rater-lh-snug);
+  color: var(--rater-text-muted);
+}
+
+.rater-go-live-dialog__field-hint[data-tone="error"] {
+  color: var(--rater-feedback-error);
+}
+
+.rater-go-live-dialog__input,
+.rater-go-live-dialog__textarea {
+  width: 100%;
+  box-sizing: border-box;
+  background: var(--rater-surface-canvas);
+  color: var(--rater-text-strong);
+  border: 1px solid var(--rater-border-default);
+  border-radius: var(--rater-r-6);
+  padding: var(--rater-s-8) var(--rater-s-10);
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-14);
+  line-height: var(--rater-lh-normal);
+  transition:
+    border-color var(--rater-d-80) var(--rater-ease-soft),
+    box-shadow var(--rater-d-80) var(--rater-ease-soft);
+}
+
+.rater-go-live-dialog__input {
+  font-family: var(--rater-fonts-mono);
+  letter-spacing: var(--rater-tracking-mono);
+}
+
+.rater-go-live-dialog__textarea {
+  resize: vertical;
+  min-height: 64px;
+}
+
+.rater-go-live-dialog__input:hover:not(disabled),
+.rater-go-live-dialog__textarea:hover:not(disabled) {
+  border-color: var(--rater-border-strong);
+}
+
+.rater-go-live-dialog__input:focus-visible,
+.rater-go-live-dialog__textarea:focus-visible {
+  outline: none;
+  border-color: var(--rater-focus-ring);
+  box-shadow: 0 0 0 3px
+    color-mix(in oklab, var(--rater-focus-ring) 24%, transparent);
+}
+
+.rater-go-live-dialog__input[aria-invalid="true"],
+.rater-go-live-dialog__textarea[aria-invalid="true"] {
+  border-color: var(--rater-accent-danger);
+}
+
+.rater-go-live-dialog__input:disabled,
+.rater-go-live-dialog__textarea:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ── The what-happens box — the dialog's honest soul ───────────── */
+
+.rater-go-live-dialog__what {
+  border: 1px solid var(--rater-border-subtle);
+  border-radius: var(--rater-r-6);
+  background: var(--rater-surface-canvas);
+  padding: var(--rater-s-10) var(--rater-s-12);
+}
+
+.rater-go-live-dialog__what-title {
+  display: block;
+  margin-bottom: var(--rater-s-8);
+  color: var(--rater-text-muted);
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-11);
+  font-weight: var(--rater-fw-semibold);
+  letter-spacing: var(--rater-tracking-label);
+  text-transform: uppercase;
+}
+
+.rater-go-live-dialog__what-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-6);
+}
+
+.rater-go-live-dialog__what-row {
+  display: flex;
+  align-items: baseline;
+  gap: var(--rater-s-8);
+  color: var(--rater-text-muted);
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-12);
+  line-height: var(--rater-lh-normal);
+}
+
+.rater-go-live-dialog__what-row svg {
+  flex-shrink: 0;
+  color: var(--rater-feedback-success);
+  position: relative;
+  top: 1px;
+}
+
+/* The republish-tripwire warning row (audit gap #3): live-serving apps
+   pause until the new version passes a Hub re-test — warn tone, so the
+   one consequential line can't read as just another green check. */
+.rater-go-live-dialog__what-row--warn {
+  color: var(--rater-text-default);
+}
+
+.rater-go-live-dialog__what-row--warn svg {
+  color: var(--rater-feedback-warn);
+}

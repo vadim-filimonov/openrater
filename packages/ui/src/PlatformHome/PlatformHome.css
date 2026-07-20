@@ -1,0 +1,269 @@
+/* ──────────────────────────────────────────────────────────────────
+   OpenRater Home — Overview-lens presentational primitives (Brief 74).
+   Conforms to V2_INTERFACE_SPEC Part 1: status rides feedback tokens,
+   the type ramp, panels r-12 with no shadows, the s-scale, no charts.
+   All values are design-system tokens (theme-adaptive) — no raw hex.
+   ────────────────────────────────────────────────────────────────── */
+
+/* ── StateHero — the one plain-language answer ── */
+.rater-home-hero {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-20);
+  padding: var(--rater-s-32) 0 var(--rater-s-8);
+}
+.rater-home-hero__badge {
+  width: var(--rater-s-48);
+  height: var(--rater-s-48);
+  border-radius: var(--rater-r-full);
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.rater-home-hero__badge svg {
+  width: var(--rater-icon-24);
+  height: var(--rater-icon-24);
+}
+.rater-home-hero__badge--ok {
+  color: var(--rater-feedback-success);
+  background: color-mix(
+    in oklab,
+    var(--rater-feedback-success) 16%,
+    transparent
+  );
+}
+.rater-home-hero__badge--warn {
+  color: var(--rater-feedback-warn);
+  background: color-mix(in oklab, var(--rater-feedback-warn) 18%, transparent);
+}
+.rater-home-hero__badge--error {
+  color: var(--rater-feedback-error);
+  background: color-mix(in oklab, var(--rater-feedback-error) 16%, transparent);
+}
+.rater-home-hero__badge--neutral {
+  color: var(--rater-text-muted);
+  background: var(--rater-surface-2);
+}
+.rater-home-hero__title {
+  font-family: var(--rater-font-display);
+  font-size: var(--rater-t-20);
+  font-weight: var(--rater-fw-semibold);
+  line-height: var(--rater-leading-tight);
+  letter-spacing: var(--rater-tracking-tight);
+  color: var(--rater-text-strong);
+  margin: 0;
+}
+.rater-home-hero__sub {
+  font-size: var(--rater-t-14);
+  color: var(--rater-text-muted);
+  margin: var(--rater-s-6) 0 0;
+}
+
+/* Brief 88 §3.2 Block 1 — the one-line status: dot + sentence. */
+.rater-home-hero--compact {
+  gap: var(--rater-s-10);
+  padding: var(--rater-s-8) 0 0;
+}
+.rater-home-hero__dot {
+  width: var(--rater-s-10);
+  height: var(--rater-s-10);
+  border-radius: var(--rater-r-full);
+  flex: none;
+}
+.rater-home-hero__dot--ok {
+  background: var(--rater-feedback-success);
+  box-shadow: 0 0 0 4px
+    color-mix(in oklab, var(--rater-feedback-success) 16%, transparent);
+}
+.rater-home-hero__dot--warn {
+  background: var(--rater-feedback-warn);
+  box-shadow: 0 0 0 4px
+    color-mix(in oklab, var(--rater-feedback-warn) 18%, transparent);
+}
+.rater-home-hero__dot--error {
+  background: var(--rater-feedback-error);
+  box-shadow: 0 0 0 4px
+    color-mix(in oklab, var(--rater-feedback-error) 16%, transparent);
+}
+.rater-home-hero__dot--neutral {
+  background: var(--rater-text-subtle);
+  box-shadow: 0 0 0 4px var(--rater-surface-2);
+}
+.rater-home-hero__title--compact {
+  font-size: var(--rater-t-18);
+  font-weight: var(--rater-fw-medium);
+}
+
+/* ── NavLabs — friendly destinations (pure navigation) ──
+   Brief 88 §3.2 — the head speaks the same eyebrow grammar as the
+   other Home blocks; the page's column gap owns the spacing above. */
+.rater-home-labs-head {
+  font-size: var(--rater-t-11);
+  font-weight: var(--rater-fw-semibold);
+  letter-spacing: var(--rater-tracking-label);
+  text-transform: uppercase;
+  color: var(--rater-text-subtle);
+  margin: 0 0 var(--rater-s-10);
+}
+/* Brief 88 §3.2 Block 5 — three supporting-room doors across. */
+.rater-home-labs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--rater-s-12);
+}
+@media (max-width: 1000px) {
+  .rater-home-labs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 700px) {
+  .rater-home-labs {
+    grid-template-columns: 1fr;
+  }
+}
+.rater-home-lab {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-12);
+  background: var(--rater-surface-1);
+  border: 1px solid var(--rater-border-subtle);
+  border-radius: var(--rater-r-12);
+  padding: var(--rater-card-pad-y) var(--rater-card-pad-x);
+  cursor: pointer;
+  color: inherit;
+  text-decoration: none;
+  transition:
+    border-color var(--rater-d-80) var(--rater-ease-snap),
+    background var(--rater-d-80) var(--rater-ease-snap);
+}
+/* Hover = the container shades (the platform's row/card affordance) —
+ * never an underline across the card's text. */
+.rater-home-lab:hover {
+  border-color: var(--rater-border-strong);
+  background: var(--rater-row-hover-bg);
+}
+.rater-home-lab:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: 2px;
+}
+.rater-home-lab__ico {
+  width: var(--rater-s-32);
+  height: var(--rater-s-32);
+  border-radius: var(--rater-r-6);
+  flex: none;
+  background: var(--rater-surface-2);
+  color: var(--rater-text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.rater-home-lab__ico svg {
+  width: var(--rater-icon-16);
+  height: var(--rater-icon-16);
+}
+.rater-home-lab__body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.rater-home-lab__name {
+  font-size: var(--rater-t-14);
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-strong);
+}
+.rater-home-lab__what {
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-muted);
+  margin-top: 1px;
+}
+.rater-home-lab__go {
+  width: var(--rater-icon-16);
+  height: var(--rater-icon-16);
+  color: var(--rater-text-subtle);
+  flex: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rater-home-lab {
+    transition-duration: 1ms;
+  }
+}
+
+/* ── AttentionList — the triage rows (one source, two registers) ── */
+.rater-home-attn {
+  background: var(--rater-surface-1);
+  border: 1px solid var(--rater-border-subtle);
+  border-radius: var(--rater-r-12);
+  overflow: hidden;
+}
+.rater-home-attn__row {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-12);
+  padding: var(--rater-s-14) var(--rater-card-pad-x);
+  border-bottom: 1px solid var(--rater-border-subtle);
+}
+.rater-home-attn__row:last-child {
+  border-bottom: none;
+}
+.rater-home-attn__dot {
+  width: var(--rater-s-6);
+  height: var(--rater-s-6);
+  border-radius: var(--rater-r-full);
+  flex: none;
+  background: var(--rater-text-subtle);
+}
+.rater-home-attn__dot--error {
+  background: var(--rater-feedback-error);
+}
+.rater-home-attn__dot--warn {
+  background: var(--rater-feedback-warn);
+}
+.rater-home-attn__dot--info {
+  background: var(--rater-feedback-success);
+}
+/* Brief 88 P4 — the setup tier (connectors): a neutral dot, never a
+   warning color. Setup is listed, not alarmed. */
+.rater-home-attn__dot--setup {
+  background: var(--rater-text-subtle);
+}
+.rater-home-attn__text {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--rater-t-13);
+  color: var(--rater-text-default);
+}
+/* Brief 88 Law 2 — the subject is bolded prose, not a mono chip; identity
+   reads as part of the sentence in every register. */
+.rater-home-attn__subject {
+  font-weight: var(--rater-fw-medium);
+  color: var(--rater-text-strong);
+}
+/* Grouped member names (e.g. the keyless connectors), muted after the lead. */
+.rater-home-attn__names {
+  color: var(--rater-text-muted);
+}
+.rater-home-attn__act {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-4);
+  font-size: var(--rater-t-13);
+  font-weight: var(--rater-fw-medium);
+  color: var(--rater-accent-primary);
+  white-space: nowrap;
+  text-decoration: none;
+  cursor: pointer;
+}
+.rater-home-attn__act:hover {
+  color: var(--rater-accent-primary-hover);
+}
+.rater-home-attn__arrow {
+  width: var(--rater-icon-14);
+  height: var(--rater-icon-14);
+}
+
+/* 88.4 — the rater-home-allclear + rater-home-attn-head blocks (Brief 74
+   drafts that never gained a component consumer) were pruned: the
+   all-clear state IS the status line's green dot since Brief 88 §3.2. */

@@ -1,0 +1,129 @@
+/* <UsChoropleth> — token-themed US choropleth (maps next-gen, Mode A). */
+.rater-us-choropleth {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 320px;
+}
+.rater-us-choropleth__svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* one region polygon. Fill is data-driven (the bucketed color, an attribute);
+   stroke + state come from tokens via CSS, so dark/light work for free. */
+.rater-us-choropleth__region {
+  stroke: var(--rater-hairline-base);
+  stroke-width: 0.5;
+  stroke-linejoin: round;
+  cursor: pointer;
+  transition: opacity var(--rater-d-120) var(--rater-ease-snap), stroke-width var(--rater-d-120) var(--rater-ease-snap);
+}
+.rater-us-choropleth__region:hover {
+  opacity: 0.86;
+}
+.rater-us-choropleth__region.is-empty {
+  fill: var(--rater-surface-2);
+}
+.rater-us-choropleth__region.is-dimmed {
+  opacity: 0.4;
+}
+.rater-us-choropleth__region.is-selected {
+  stroke: var(--rater-text-strong);
+  stroke-width: 1.6;
+  opacity: 1;
+}
+.rater-us-choropleth__region:focus {
+  outline: none;
+}
+.rater-us-choropleth__region:focus-visible {
+  outline: none;
+  stroke: var(--rater-focus-ring);
+  stroke-width: 2;
+  opacity: 1;
+}
+
+/* ── geographic-context backdrop (maps next-gen "Mode C") ──
+   A depth halo behind the land, a faint graticule over it, and a crisp
+   coastline on top — all pure SVG in the same Albers projection. The
+   cyan (choropleth-7) mirrors the ramp's brightest stop. pointer-events
+   off so the backdrop never steals a region's hover/click. */
+.rater-us-choropleth__halo {
+  fill: none;
+  stroke: var(--rater-cat-choropleth-7);
+  stroke-opacity: 0.22;
+  stroke-width: 3.5;
+  filter: drop-shadow(0 0 7px var(--rater-cat-choropleth-7));
+  pointer-events: none;
+}
+.rater-us-choropleth__graticule {
+  fill: none;
+  stroke: var(--rater-hairline-strong);
+  stroke-opacity: 0.4;
+  stroke-width: 0.5;
+  pointer-events: none;
+}
+.rater-us-choropleth__coastline {
+  fill: none;
+  stroke: var(--rater-cat-choropleth-7);
+  stroke-opacity: 0.5;
+  stroke-width: 1.1;
+  pointer-events: none;
+}
+
+/* hover tooltip card */
+.rater-us-choropleth__tt {
+  position: absolute;
+  pointer-events: none;
+  z-index: 4;
+  min-width: 150px;
+  background: var(--rater-surface-2);
+  border: 1px solid var(--rater-hairline-strong);
+  border-radius: var(--rater-r-8);
+  padding: 9px 11px;
+  box-shadow: var(--rater-shadow-floating, 0 8px 24px rgba(0, 0, 0, 0.5));
+}
+.rater-us-choropleth__tt-name {
+  font-size: 12.5px;
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-strong);
+}
+.rater-us-choropleth__tt-value {
+  font-size: 14px;
+  font-family: var(--rater-fonts-mono);
+  font-variant-numeric: tabular-nums;
+  color: var(--rater-cat-model-text);
+  margin-top: 2px;
+}
+.rater-us-choropleth__tt-metric {
+  font-size: 10.5px;
+  color: var(--rater-text-subtle);
+  margin-top: 2px;
+}
+
+/* loading + empty */
+.rater-us-choropleth--loading,
+.rater-us-choropleth--empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--rater-surface-1);
+  border-radius: var(--rater-r-8);
+}
+.rater-us-choropleth__shimmer {
+  width: 56%;
+  height: 56%;
+  border-radius: var(--rater-r-12);
+  background: linear-gradient(100deg, var(--rater-surface-1) 30%, var(--rater-surface-2) 50%, var(--rater-surface-1) 70%);
+  background-size: 200% 100%;
+  animation: rater-uschoro-shimmer 1.3s ease-in-out infinite;
+}
+@keyframes rater-uschoro-shimmer {
+  from { background-position: 200% 0; }
+  to { background-position: -200% 0; }
+}
+.rater-us-choropleth__empty-text {
+  font-size: 12px;
+  color: var(--rater-text-subtle);
+}

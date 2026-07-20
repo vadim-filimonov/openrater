@@ -1,0 +1,343 @@
+/**
+ * Brief 64 PR 64.2 — <RateDriversList> styles (the Overview "tornado").
+ *
+ * BEM + design tokens only. Bar geometry (left/width) + the gradient fill
+ * are data-driven inline styles set by the component; everything else is
+ * token-driven here.
+ */
+
+.rater-rate-drivers {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Toolbar ─────────────────────────────────────────────────────── */
+
+.rater-rate-drivers__toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-3, 10px);
+  margin-bottom: var(--rater-s-3, 12px);
+  flex-wrap: wrap;
+}
+
+.rater-rate-drivers__search {
+  flex: 1 1 220px;
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-2, 8px);
+  background: var(--rater-surface-1);
+  border: 1px solid var(--rater-hairline-base);
+  border-radius: var(--rater-r-8, 8px);
+  padding: var(--rater-s-2, 8px) var(--rater-s-3, 12px);
+  color: var(--rater-text-subtle);
+}
+
+.rater-rate-drivers__search:focus-within {
+  border-color: var(--rater-hairline-strong);
+  box-shadow: 0 0 0 3px var(--rater-focus-ring);
+}
+
+.rater-rate-drivers__search-glyph {
+  width: 15px;
+  height: 15px;
+  flex: none;
+}
+
+.rater-rate-drivers__search-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  color: var(--rater-text-default);
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-13, 13px);
+  outline: none;
+}
+
+.rater-rate-drivers__search-input::placeholder {
+  color: var(--rater-text-subtle);
+}
+
+.rater-rate-drivers__chips {
+  display: flex;
+  gap: var(--rater-s-1, 4px);
+  flex-wrap: wrap;
+}
+
+.rater-rate-drivers__chip {
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-caption, 12px);
+  font-weight: var(--rater-fw-semibold);
+  padding: var(--rater-s-1, 5px) var(--rater-s-3, 11px);
+  border-radius: var(--rater-r-full, 9999px);
+  border: 1px solid var(--rater-hairline-base);
+  background: var(--rater-surface-1);
+  color: var(--rater-text-muted);
+  cursor: pointer;
+  transition: background var(--rater-d-180, 180ms) var(--rater-ease-soft, ease),
+    color var(--rater-d-180, 180ms) var(--rater-ease-soft, ease);
+}
+
+.rater-rate-drivers__chip:hover {
+  color: var(--rater-text-default);
+}
+
+.rater-rate-drivers__chip.is-active {
+  background: var(--rater-surface-3);
+  color: var(--rater-text-strong);
+  border-color: var(--rater-hairline-strong);
+}
+
+.rater-rate-drivers__chip:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--rater-focus-ring);
+}
+
+.rater-rate-drivers__sort {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-2, 8px);
+  font-size: var(--rater-t-13, 13px);
+  color: var(--rater-text-muted);
+}
+
+.rater-rate-drivers__sort-select {
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-13, 13px);
+  color: var(--rater-text-default);
+  background: var(--rater-surface-1);
+  border: 1px solid var(--rater-hairline-base);
+  border-radius: var(--rater-r-8, 8px);
+  padding: var(--rater-s-1, 6px) var(--rater-s-2, 10px);
+  cursor: pointer;
+}
+
+.rater-rate-drivers__sort-select:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--rater-focus-ring);
+}
+
+/* ── List ────────────────────────────────────────────────────────── */
+
+.rater-rate-drivers__head,
+.rater-rate-drivers__row {
+  display: grid;
+  grid-template-columns: 26px 1.5fr 2.1fr 124px 52px;
+  align-items: center;
+  gap: var(--rater-s-3, 14px);
+}
+
+.rater-rate-drivers__head {
+  padding: var(--rater-s-2, 9px) var(--rater-s-4, 16px);
+  font-size: var(--rater-t-caption, 11px);
+  text-transform: uppercase;
+  letter-spacing: var(--rater-tracking-label);
+  color: var(--rater-text-subtle);
+  border: 1px solid var(--rater-hairline-base);
+  border-bottom: none;
+  border-radius: var(--rater-r-8, 8px) var(--rater-r-8, 8px) 0 0;
+  background: var(--rater-surface-1);
+}
+
+.rater-rate-drivers__col-r {
+  text-align: right;
+}
+
+.rater-rate-drivers__rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--rater-hairline-base);
+  border-radius: 0 0 var(--rater-r-8, 8px) var(--rater-r-8, 8px);
+  overflow: hidden;
+  background: var(--rater-surface-1);
+}
+
+.rater-rate-drivers__li + .rater-rate-drivers__li .rater-rate-drivers__row {
+  border-top: 1px solid var(--rater-hairline-soft);
+}
+
+.rater-rate-drivers__row {
+  width: 100%;
+  padding: var(--rater-s-2, 10px) var(--rater-s-4, 16px);
+  background: transparent;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  font-family: var(--rater-fonts-sans);
+  transition: background var(--rater-d-180, 180ms) var(--rater-ease-soft, ease);
+}
+
+.rater-rate-drivers__row:hover {
+  background: var(--rater-surface-2);
+}
+
+.rater-rate-drivers__row:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--rater-focus-ring);
+}
+
+.rater-rate-drivers__row.is-selected {
+  background: var(--rater-surface-2);
+  /* F15 — row selection is INTERACTION, not a computation kind (spec §1.1). */
+  box-shadow: inset 3px 0 0 var(--rater-accent-primary);
+}
+
+.rater-rate-drivers__rank {
+  font-size: var(--rater-t-13, 12px);
+  color: var(--rater-text-subtle);
+  font-variant-numeric: tabular-nums;
+}
+
+.rater-rate-drivers__id {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-2, 8px);
+  min-width: 0;
+}
+
+.rater-rate-drivers__name {
+  font-size: var(--rater-t-13, 13px);
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-strong);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rater-rate-drivers__kind {
+  flex: none;
+  font-size: var(--rater-t-caption, 10px);
+  font-weight: var(--rater-fw-semibold);
+  padding: 2px var(--rater-s-2, 8px);
+  border-radius: var(--rater-r-full, 9999px);
+}
+
+.rater-rate-drivers__kind--categorical {
+  color: var(--rater-cat-input-text);
+  background: var(--rater-cat-input-soft);
+}
+
+.rater-rate-drivers__kind--numeric {
+  color: var(--rater-cat-math-text);
+  background: var(--rater-cat-math-soft);
+}
+
+.rater-rate-drivers__kind--geographic {
+  color: var(--rater-cat-lookup-text);
+  background: var(--rater-cat-lookup-soft);
+}
+
+.rater-rate-drivers__lvls {
+  flex: none;
+  font-size: var(--rater-t-caption, 11px);
+  color: var(--rater-text-subtle);
+}
+
+/* ── The spread bar (tornado row) ────────────────────────────────── */
+
+.rater-rate-drivers__track {
+  position: relative;
+  height: 14px;
+  background: var(--rater-surface-3);
+  border-radius: var(--rater-r-full, 9999px);
+}
+
+.rater-rate-drivers__avg {
+  position: absolute;
+  top: -4px;
+  bottom: -4px;
+  width: 2px;
+  margin-left: -1px;
+  background: var(--rater-text-muted);
+  border-radius: 1px;
+}
+
+.rater-rate-drivers__bar {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-radius: var(--rater-r-full, 9999px);
+}
+
+.rater-rate-drivers__flat {
+  font-size: var(--rater-t-caption, 11px);
+  font-style: italic;
+  color: var(--rater-text-subtle);
+}
+
+.rater-rate-drivers__range {
+  font-size: var(--rater-t-13, 12px);
+  color: var(--rater-text-muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.rater-rate-drivers__swing {
+  font-size: var(--rater-t-13, 13px);
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-default);
+  font-variant-numeric: tabular-nums;
+}
+
+.rater-rate-drivers__empty {
+  padding: var(--rater-s-6, 24px) var(--rater-s-4, 16px);
+  text-align: center;
+  color: var(--rater-text-subtle);
+  font-size: var(--rater-t-13, 13px);
+}
+
+.rater-rate-drivers__more {
+  align-self: flex-start;
+  margin-top: var(--rater-s-2, 10px);
+  background: none;
+  border: none;
+  /* F15 — a nav link is INTERACTION, not a computation kind (spec §1.1). */
+  color: var(--rater-accent-primary);
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-13, 12.5px);
+  cursor: pointer;
+  padding: var(--rater-s-1, 4px) 0;
+}
+
+.rater-rate-drivers__more:hover {
+  text-decoration: underline;
+}
+
+.rater-rate-drivers__more:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--rater-focus-ring);
+  border-radius: var(--rater-r-4, 4px);
+}
+
+.rater-rate-drivers__sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ── Narrow viewport — drop the rank + range columns ─────────────── */
+
+@media (max-width: 720px) {
+  .rater-rate-drivers__head,
+  .rater-rate-drivers__row {
+    grid-template-columns: 1.2fr 2fr 52px;
+  }
+  .rater-rate-drivers__rank,
+  .rater-rate-drivers__range {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rater-rate-drivers__chip,
+  .rater-rate-drivers__row {
+    transition: none;
+  }
+}

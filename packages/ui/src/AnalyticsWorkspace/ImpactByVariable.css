@@ -1,0 +1,186 @@
+/**
+ * Brief 64 PR 64.4 — <ImpactByVariable> styles.
+ * Ranked diverging bars (emerald decrease ↔ orange increase) around a
+ * centered 0% line. BEM + design tokens; segment geometry is inline.
+ */
+
+.rater-impact {
+  display: flex;
+  flex-direction: column;
+  background: var(--rater-surface-1);
+  border: 1px solid var(--rater-hairline-base);
+  border-radius: var(--rater-r-12, 12px);
+  padding: var(--rater-s-4, 18px) var(--rater-s-5, 20px);
+}
+
+.rater-impact__head {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: var(--rater-s-3, 12px);
+}
+
+.rater-impact__title {
+  margin: 0;
+  font-size: var(--rater-t-20, 16px);
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-strong);
+}
+
+.rater-impact__sub {
+  font-size: var(--rater-t-13, 12.5px);
+  color: var(--rater-text-muted);
+}
+
+.rater-impact__axis,
+.rater-impact__row {
+  display: grid;
+  grid-template-columns: 1.4fr 2fr 72px;
+  align-items: center;
+  gap: var(--rater-s-3, 14px);
+}
+
+.rater-impact__axis {
+  padding: 0 var(--rater-s-3, 12px) var(--rater-s-2, 8px);
+  font-size: var(--rater-t-caption, 10.5px);
+  text-transform: uppercase;
+  letter-spacing: var(--rater-tracking-label);
+  color: var(--rater-text-subtle);
+}
+
+.rater-impact__col-r {
+  text-align: right;
+}
+
+.rater-impact__rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.rater-impact__li + .rater-impact__li .rater-impact__row {
+  border-top: 1px solid var(--rater-hairline-soft);
+}
+
+.rater-impact__row {
+  width: 100%;
+  padding: var(--rater-s-2, 9px) var(--rater-s-3, 12px);
+  background: transparent;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  font-family: var(--rater-fonts-sans);
+  transition: background var(--rater-d-180, 180ms) var(--rater-ease-soft, ease);
+}
+
+.rater-impact__row:hover {
+  background: var(--rater-surface-2);
+}
+
+.rater-impact__row:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--rater-focus-ring);
+}
+
+.rater-impact__row.is-selected {
+  background: var(--rater-surface-2);
+  box-shadow: inset 3px 0 0 var(--rater-accent-primary);
+}
+
+.rater-impact__id {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-2, 8px);
+  min-width: 0;
+}
+
+.rater-impact__name {
+  font-size: var(--rater-t-13, 13px);
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-strong);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rater-impact__kind {
+  flex: none;
+  font-size: var(--rater-t-caption, 10px);
+  font-weight: var(--rater-fw-semibold);
+  padding: 2px var(--rater-s-2, 8px);
+  border-radius: var(--rater-r-full, 9999px);
+}
+.rater-impact__kind--categorical {
+  color: var(--rater-text-muted);
+  background: var(--rater-surface-2);
+}
+.rater-impact__kind--numeric {
+  color: var(--rater-text-muted);
+  background: var(--rater-surface-2);
+}
+.rater-impact__kind--geographic {
+  color: var(--rater-text-muted);
+  background: var(--rater-surface-2);
+}
+
+/* Diverging Δ-range track. */
+.rater-impact__track {
+  position: relative;
+  height: 14px;
+  background: var(--rater-surface-3);
+  border-radius: var(--rater-r-full, 9999px);
+}
+
+.rater-impact__zero {
+  position: absolute;
+  top: -3px;
+  bottom: -3px;
+  left: 50%;
+  width: 1px;
+  margin-left: -0.5px;
+  background: var(--rater-text-muted);
+}
+
+.rater-impact__bar {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-radius: var(--rater-r-full, 9999px);
+}
+.rater-impact__bar.is-down {
+  background: var(--rater-viz-delta-down);
+}
+.rater-impact__bar.is-up {
+  background: var(--rater-viz-delta-up);
+}
+
+.rater-impact__flat {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-size: var(--rater-t-caption, 11px);
+  font-style: italic;
+  color: var(--rater-text-subtle);
+  white-space: nowrap;
+}
+
+.rater-impact__book {
+  font-size: var(--rater-t-13, 13px);
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-default);
+  font-variant-numeric: tabular-nums;
+}
+
+.rater-impact__empty {
+  padding: var(--rater-s-6, 24px) 0;
+  text-align: center;
+  color: var(--rater-text-subtle);
+  font-size: var(--rater-t-13, 13px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rater-impact__row {
+    transition: none;
+  }
+}

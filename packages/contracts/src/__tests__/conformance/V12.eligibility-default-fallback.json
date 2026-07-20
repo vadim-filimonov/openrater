@@ -1,0 +1,37 @@
+{
+  "name": "V12.eligibility-default-fallback",
+  "description": "eligibility.gate falls back to default_tier when no rule matches (TX account that's neither new nor core nor high-rev).",
+  "plan": {
+    "id": "v12.eligibility_default",
+    "version": "1.0.0",
+    "name": "Eligibility default fallback",
+    "lines": ["liability"],
+    "effective": "2026-01-01",
+    "nodes": [
+      {
+        "id": "gate",
+        "kind": "eligibility.gate",
+        "params": {
+          "rules": [
+            { "rule_id": "new_venture", "variable": "years_in_business", "op": "lt", "value": 1, "tier": "decline", "reasoning": "New ventures excluded." },
+            { "rule_id": "core_market", "variable": "state", "op": "in", "value": ["WI", "MN", "IL"], "tier": "preferred", "reasoning": "Core market state." }
+          ],
+          "default_tier": "standard",
+          "default_reasoning": "Standard appetite, no special handling."
+        },
+        "position": { "x": 0, "y": 0 }
+      },
+      { "id": "out_tier", "kind": "output", "params": { "fieldName": "tier", "fieldType": "string" }, "position": { "x": 200, "y": 0 } },
+      { "id": "out_reason", "kind": "output", "params": { "fieldName": "reasoning", "fieldType": "string" }, "position": { "x": 200, "y": 100 } }
+    ],
+    "edges": [
+      { "from": { "node": "gate", "port": "tier" }, "to": { "node": "out_tier", "port": "value" } },
+      { "from": { "node": "gate", "port": "reasoning" }, "to": { "node": "out_reason", "port": "value" } }
+    ]
+  },
+  "externalInputs": { "years_in_business": 10, "state": "TX", "annual_sales": 1000000 },
+  "expectedOutputs": {
+    "tier": "standard",
+    "reasoning": "Standard appetite, no special handling."
+  }
+}

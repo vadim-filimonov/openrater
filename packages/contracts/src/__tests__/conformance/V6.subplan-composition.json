@@ -1,0 +1,43 @@
+{
+  "name": "V6.subplan-composition",
+  "description": "Outer plan calls inner doubler subplan; 21 -> 42.",
+  "plan": {
+    "id": "v6.outer",
+    "version": "1.0.0",
+    "name": "Subplan caller",
+    "line": "bop",
+    "effective": "2026-01-01",
+    "nodes": [
+      { "id": "in_raw", "kind": "input", "params": { "fieldName": "raw", "fieldType": "float" }, "position": { "x": 0, "y": 0 } },
+      { "id": "sub", "kind": "subplan",
+        "params": {
+          "plan": {
+            "id": "v6.inner",
+            "version": "1.0.0",
+            "name": "Doubler",
+            "line": "bop",
+            "effective": "2026-01-01",
+            "nodes": [
+              { "id": "in_x", "kind": "input", "params": { "fieldName": "x", "fieldType": "float" }, "position": { "x": 0, "y": 0 } },
+              { "id": "k2", "kind": "constant", "params": { "value": 2, "type": "factor" }, "position": { "x": 0, "y": 60 } },
+              { "id": "mul", "kind": "chain.mult", "params": { "stopOnZero": false }, "position": { "x": 200, "y": 0 } },
+              { "id": "out", "kind": "output", "params": { "fieldName": "doubled", "fieldType": "float" }, "position": { "x": 400, "y": 0 } }
+            ],
+            "edges": [
+              { "from": { "node": "in_x", "port": "value" }, "to": { "node": "mul", "port": "base" } },
+              { "from": { "node": "k2",   "port": "value" }, "to": { "node": "mul", "port": "factors" } },
+              { "from": { "node": "mul",  "port": "result" }, "to": { "node": "out", "port": "value" } }
+            ]
+          }
+        },
+        "position": { "x": 200, "y": 0 } },
+      { "id": "out", "kind": "output", "params": { "fieldName": "result", "fieldType": "float" }, "position": { "x": 400, "y": 0 } }
+    ],
+    "edges": [
+      { "from": { "node": "in_raw", "port": "value" }, "to": { "node": "sub", "port": "x" } },
+      { "from": { "node": "sub",    "port": "doubled" }, "to": { "node": "out", "port": "value" } }
+    ]
+  },
+  "externalInputs": { "raw": 21 },
+  "expectedOutputs": { "result": 42 }
+}

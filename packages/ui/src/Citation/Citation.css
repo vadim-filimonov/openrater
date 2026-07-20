@@ -1,0 +1,80 @@
+/**
+ * <Citation> — single canonical citation rendering.
+ */
+
+.rater-citation {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--rater-s-6);
+  color: var(--rater-text-muted);
+  font-family: var(--rater-font-sans);
+  font-size: var(--rater-t-12);
+  line-height: var(--rater-lh-snug);
+}
+
+.rater-citation__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--rater-icon-12);
+  height: var(--rater-icon-12);
+  /* Lift the icon a hair so it sits on the baseline with text */
+  transform: translateY(1px);
+  flex-shrink: 0;
+  color: var(--rater-text-subtle);
+}
+
+.rater-citation__icon svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.rater-citation__source {
+  font-weight: var(--rater-fw-medium);
+  color: var(--rater-text-default);
+}
+
+.rater-citation__rule {
+  font-family: var(--rater-font-mono);
+  font-variant-numeric: var(--rater-num-tabular);
+  color: var(--rater-text-default);
+  white-space: nowrap;
+}
+
+.rater-citation__sep {
+  color: var(--rater-text-subtle);
+  /* Tighten the visual rhythm — the dot should sit close to the text
+   * either side of it, not feel like a wide pad. */
+  margin: 0 calc(-1 * var(--rater-s-2));
+}
+
+.rater-citation__page {
+  font-family: var(--rater-font-mono);
+  font-variant-numeric: var(--rater-num-tabular);
+  color: var(--rater-text-muted);
+  white-space: nowrap;
+}
+
+/* ----------------------------------------------------------------
+ * Block variant — two-line stack with left hairline.
+ *
+ * Used inside drawer bodies and audit-log entries where the
+ * citation deserves visual prominence (not just inline meta).
+ * ---------------------------------------------------------------- */
+
+.rater-citation--block {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--rater-s-6);
+  padding: var(--rater-s-8) var(--rater-s-12);
+  border-left: 2px solid var(--rater-hairline-soft);
+  background: var(--rater-surface-sunken);
+  border-radius: 0 var(--rater-r-4) var(--rater-r-4) 0;
+}
+
+.rater-citation--block .rater-citation__icon {
+  /* Pull the icon visually onto the leading hairline */
+  transform: translateY(2px);
+}

@@ -1,0 +1,255 @@
+/* ============================================================================
+ * <FinalAdjustmentsEditor> — the plan's Final-adjustments tail editor
+ * (Brief 62.4 R1). One ordered after-rating surface; floor pinned last.
+ * BEM + design tokens only. Matches mockup F3/F4.
+ * ============================================================================ */
+
+.rater-fae {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-10);
+}
+
+.rater-fae__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--rater-s-8);
+}
+.rater-fae__title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-strong);
+}
+.rater-fae__hint {
+  font-size: 11.5px;
+  color: var(--rater-text-faint);
+}
+
+.rater-fae__empty {
+  margin: 0;
+  padding: var(--rater-s-12);
+  border: 1px dashed var(--rater-border-default);
+  border-radius: var(--rater-r-8);
+  font-size: 12px;
+  color: var(--rater-text-muted);
+}
+
+.rater-fae__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-6);
+}
+
+.rater-fae__row {
+  border: 1px solid var(--rater-border-default);
+  border-radius: var(--rater-r-8);
+  background: var(--rater-surface-1);
+}
+.rater-fae__row--pinned {
+  border-style: dashed;
+  background: var(--rater-surface-sunken);
+}
+
+.rater-fae__row-head {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-8);
+  padding: var(--rater-s-8) var(--rater-s-10);
+}
+
+.rater-fae__chip {
+  flex: 0 0 auto;
+  padding: var(--rater-s-1) var(--rater-s-8);
+  border-radius: var(--rater-r-full);
+  font-size: 10.5px;
+  font-weight: var(--rater-fw-semibold);
+}
+.rater-fae__chip--sched { background: var(--rater-cat-transform-soft); color: var(--rater-cat-transform-text); }
+.rater-fae__chip--pkg { background: var(--rater-cat-math-soft); color: var(--rater-cat-math-text); }
+.rater-fae__chip--endo { background: var(--rater-cat-lookup-soft); color: var(--rater-cat-lookup-text); }
+.rater-fae__chip--min { background: var(--rater-cat-input-soft); color: var(--rater-cat-input-text); }
+
+.rater-fae__name {
+  flex: 1 1 auto;
+  min-width: 0;
+  text-align: left;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font: inherit;
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-strong);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* ADR-0055 read-only — the name renders as a span (no expand affordance). */
+span.rater-fae__name {
+  cursor: default;
+}
+
+.rater-fae__when {
+  flex: 0 0 auto;
+  font-size: 10.5px;
+  color: var(--rater-text-muted);
+  border: 1px solid var(--rater-border-default);
+  border-radius: var(--rater-r-6);
+  padding: var(--rater-s-1) var(--rater-s-6);
+}
+
+.rater-fae__eff {
+  flex: 0 0 auto;
+  font-weight: var(--rater-fw-semibold);
+  font-variant-numeric: tabular-nums;
+  color: var(--rater-text-strong);
+}
+
+.rater-fae__row-actions {
+  flex: 0 0 auto;
+  display: inline-flex;
+  gap: var(--rater-s-2);
+}
+.rater-fae__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: 1px solid transparent;
+  border-radius: var(--rater-r-6);
+  background: none;
+  cursor: pointer;
+  color: var(--rater-text-muted);
+}
+.rater-fae__icon:hover:not(disabled) {
+  background: var(--rater-surface-2);
+  color: var(--rater-text-strong);
+}
+.rater-fae__icon:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+.rater-fae__icon--danger:hover:not(disabled) {
+  color: var(--rater-feedback-error);
+}
+
+.rater-fae__form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--rater-s-10);
+  padding: var(--rater-s-10);
+  border-top: 1px solid var(--rater-border-subtle);
+  background: var(--rater-surface-sunken);
+}
+.rater-fae__field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-2);
+  font-size: 11px;
+  color: var(--rater-text-muted);
+}
+.rater-fae__field input,
+.rater-fae__field select {
+  padding: var(--rater-s-4) var(--rater-s-8);
+  border: 1px solid var(--rater-border-default);
+  border-radius: var(--rater-r-6);
+  background: var(--rater-surface-1);
+  color: var(--rater-text-default);
+  font: inherit;
+  font-size: 12px;
+}
+
+.rater-fae__source {
+  flex: 1 1 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-8);
+}
+.rater-fae__seg-row {
+  display: flex;
+  gap: var(--rater-s-6);
+  flex-wrap: wrap;
+}
+.rater-fae__seg {
+  flex: 1 1 0;
+  min-width: 120px;
+  text-align: left;
+  padding: var(--rater-s-8) var(--rater-s-10);
+  border: 1px solid var(--rater-border-default);
+  border-radius: var(--rater-r-8);
+  background: var(--rater-surface-1);
+  cursor: pointer;
+}
+.rater-fae__seg.is-on {
+  border-color: var(--rater-cat-transform-text);
+  background: var(--rater-cat-transform-soft);
+}
+.rater-fae__seg.is-off {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.rater-fae__seg-label {
+  display: block;
+  font-size: 12px;
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-strong);
+}
+.rater-fae__seg-hint {
+  display: block;
+  font-size: 10.5px;
+  color: var(--rater-text-faint);
+}
+
+.rater-fae__guard,
+.rater-fae__guard-add {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-6);
+  font-size: 11.5px;
+  color: var(--rater-text-muted);
+}
+.rater-fae__guard-add {
+  border: 1px dashed var(--rater-border-default);
+  border-radius: var(--rater-r-6);
+  background: none;
+  padding: var(--rater-s-4) var(--rater-s-8);
+  cursor: pointer;
+}
+.rater-fae__guard-add:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.rater-fae__warn {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-6);
+  margin: 0;
+  font-size: 11.5px;
+  color: var(--rater-feedback-warn);
+}
+
+.rater-fae__add {
+  display: flex;
+  gap: var(--rater-s-6);
+  flex-wrap: wrap;
+}
+.rater-fae__add-opt {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-4);
+  padding: var(--rater-s-6) var(--rater-s-10);
+  border: 1px dashed var(--rater-border-strong, var(--rater-border-default));
+  border-radius: var(--rater-r-8);
+  background: none;
+  color: var(--rater-text-muted);
+  font-size: 11.5px;
+  cursor: pointer;
+}
+.rater-fae__add-opt:hover {
+  color: var(--rater-text-strong);
+  border-color: var(--rater-text-muted);
+}

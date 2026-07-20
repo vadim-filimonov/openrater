@@ -1,0 +1,122 @@
+/**
+ * Brief 64 PR 64.2 — <DimensionDetailExhibit> styles.
+ *
+ * Thin chrome: header (title + numeric bin segmented) + KPI hero strip.
+ * The body delegates to <ChartPanel> / <FactorDistribution>, which bring
+ * their own styles. BEM + design tokens only.
+ */
+
+.rater-dim-detail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-3, 12px);
+  background: var(--rater-surface-1);
+  border: 1px solid var(--rater-hairline-base);
+  border-radius: var(--rater-r-12, 12px);
+  padding: var(--rater-s-4, 18px) var(--rater-s-5, 20px);
+}
+
+.rater-dim-detail__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--rater-s-3, 12px);
+}
+
+.rater-dim-detail__title {
+  margin: 0;
+  font-size: var(--rater-t-20, 16px);
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-strong);
+}
+
+.rater-dim-detail__sub {
+  font-size: var(--rater-t-13, 12.5px);
+  color: var(--rater-text-muted);
+}
+
+/* Numeric bin segmented (5 / 10 / 20) */
+.rater-dim-detail__bins {
+  display: inline-flex;
+  flex: none;
+  background: var(--rater-surface-2);
+  border: 1px solid var(--rater-hairline-base);
+  border-radius: var(--rater-r-8, 8px);
+  padding: 2px;
+  gap: 2px;
+}
+
+.rater-dim-detail__bin-btn {
+  border: none;
+  background: transparent;
+  color: var(--rater-text-muted);
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-13, 12.5px);
+  font-weight: var(--rater-fw-semibold);
+  padding: var(--rater-s-1, 5px) var(--rater-s-3, 12px);
+  border-radius: var(--rater-r-6, 6px);
+  cursor: pointer;
+}
+
+.rater-dim-detail__bin-btn.is-active {
+  background: var(--rater-surface-canvas);
+  color: var(--rater-text-strong);
+}
+
+.rater-dim-detail__bin-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--rater-focus-ring);
+}
+
+/* KPI hero strip */
+.rater-dim-detail__hero {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--rater-s-4, 16px);
+  padding-bottom: var(--rater-s-3, 12px);
+  border-bottom: 1px solid var(--rater-hairline-soft);
+}
+
+.rater-dim-detail__stat {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-1, 4px);
+  min-width: 0;
+}
+
+.rater-dim-detail__stat-label {
+  font-size: var(--rater-t-caption, 11px);
+  font-weight: var(--rater-fw-semibold);
+  letter-spacing: var(--rater-tracking-label);
+  text-transform: uppercase;
+  color: var(--rater-text-subtle);
+}
+
+.rater-dim-detail__stat-val {
+  font-size: var(--rater-t-20, 20px);
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-strong);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+/* Geographic detail — choropleth stacked above the ranked territory bars. */
+.rater-dim-detail__geo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-3, 12px);
+}
+
+.rater-dim-detail__note {
+  margin: 0;
+  font-size: var(--rater-t-caption, 11px);
+  color: var(--rater-text-subtle);
+  font-style: italic;
+}
+
+@media (max-width: 480px) {
+  .rater-dim-detail__hero {
+    grid-template-columns: 1fr;
+    gap: var(--rater-s-2, 8px);
+  }
+}

@@ -1,0 +1,94 @@
+/* ============================================================================
+ * <FactorEditor> — kind picker + per-kind config fields.
+ * Vertical stack of labeled form fields. No drawer chrome — that's
+ * the parent's responsibility.
+ * ============================================================================ */
+
+.rater-factor-editor {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-14);
+  font-family: var(--rater-fonts-sans);
+}
+
+.rater-factor-editor__per-kind {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-12);
+  padding-top: var(--rater-s-10);
+  border-top: 1px dashed var(--rater-hairline-soft);
+}
+
+.rater-factor-editor__field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-4);
+}
+
+.rater-factor-editor__label {
+  font-size: var(--rater-t-12);
+  font-weight: var(--rater-fw-medium);
+  color: var(--rater-text-strong);
+  text-transform: uppercase;
+  letter-spacing: var(--rater-tracking-label);
+}
+
+.rater-factor-editor__input {
+  height: 36px;
+  padding: 0 var(--rater-s-10);
+  border: 1px solid var(--rater-hairline-base);
+  border-radius: var(--rater-r-6);
+  background: var(--rater-surface-canvas);
+  color: var(--rater-text-strong);
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-13);
+}
+
+.rater-factor-editor__input:focus-visible {
+  outline: 2px solid var(--rater-brand-accent, var(--rater-text-strong));
+  outline-offset: 1px;
+}
+
+/* ADR-0056 — the unknown-key policy select shares the input skin. */
+.rater-factor-editor__select {
+  height: 36px;
+  padding: 0 var(--rater-s-10);
+  border: 1px solid var(--rater-hairline-base);
+  border-radius: var(--rater-r-6);
+  background: var(--rater-surface-canvas);
+  color: var(--rater-text-strong);
+  font-family: var(--rater-fonts-sans);
+  font-size: var(--rater-t-13);
+}
+
+.rater-factor-editor__select:focus-visible {
+  outline: 2px solid var(--rater-brand-accent, var(--rater-text-strong));
+  outline-offset: 1px;
+}
+
+.rater-factor-editor__hint {
+  margin: 0;
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-muted);
+  line-height: var(--rater-lh-relaxed);
+  font-style: italic;
+}
+
+.rater-factor-editor__deferred {
+  padding: var(--rater-s-10) var(--rater-s-12);
+  background: var(--rater-surface-sunken);
+  border: 1px dashed var(--rater-hairline-base);
+  border-radius: var(--rater-r-6);
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-muted);
+  line-height: var(--rater-lh-relaxed);
+}
+
+.rater-factor-editor__deferred code {
+  font-family: var(--rater-fonts-mono, var(--rater-fonts-sans));
+  font-size: var(--rater-t-11);
+  background: var(--rater-surface-canvas);
+  padding: 1px var(--rater-s-4);
+  border-radius: var(--rater-r-4);
+  color: var(--rater-text-strong);
+}

@@ -1,0 +1,71 @@
+{
+ "id": "IC8",
+ "name": "bound-lifecycle",
+ "spec": "§5 rules 2–4",
+ "asserts": "A quoted→bound event sequence records both facts on the ledger, request order, each acked applied. OpenRater keeps no book of record — events are records, never projections.",
+ "contract_version": "1.0",
+ "world": {
+  "integration": {
+   "name": "Example Integrator — fixture",
+   "paired": true
+  },
+  "plans": [
+   "plan-alpha"
+  ]
+ },
+ "steps": [
+  {
+   "note": "the market said quoted, then bound — one batch, request order",
+   "actor": "integrator",
+   "call": {
+    "method": "POST",
+    "path": "/api/v1/integrations/{{integration_id}}/events",
+    "headers": {
+     "X-OpenRater-Integration-Key": "{{integrator_key}}"
+    },
+    "body": {
+     "events": [
+      {
+       "event_id": "pe-fixture-0010",
+       "risk_ref": "r-fixture-0006",
+       "carrier": "acme-mutual",
+       "kind": "quoted",
+       "at": "2026-08-02T17:04:00Z",
+       "premium_cents": 473100,
+       "quote_pins": {
+        "plan_ref": "{{plan_alpha_ref}}",
+        "snapshot_id": "{{plan_alpha_snapshot}}",
+        "request_hash": "sha256:ic8-fixture"
+       }
+      },
+      {
+       "event_id": "pe-fixture-0011",
+       "risk_ref": "r-fixture-0006",
+       "carrier": "acme-mutual",
+       "kind": "bound",
+       "at": "2026-08-04T09:30:00Z",
+       "premium_cents": 481000,
+       "effective_on": "2026-08-15",
+       "term_months": 12
+      }
+     ]
+    }
+   },
+   "expect": {
+    "status": 202,
+    "body": {
+     "acks": [
+      {
+       "event_id": "pe-fixture-0010",
+       "status": "applied"
+      },
+      {
+       "event_id": "pe-fixture-0011",
+       "status": "applied"
+      }
+     ]
+    }
+   }
+  }
+ ]
+}

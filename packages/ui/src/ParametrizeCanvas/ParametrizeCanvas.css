@@ -1,0 +1,627 @@
+/* ──────────────────────────────────────────────────────────────
+   ParametrizeCanvas — Brief 33 PR 33.1.
+
+   Strict spacing scale: only --rater-s-{4,6,8,12,16,20,24,32,48}.
+   Three button variants × two sizes max.
+   No ad-hoc absolute positioning.
+   Matches the polished mockup at
+   `/mockup/33-parametrize-as-canvas.html`.
+   ────────────────────────────────────────────────────────────── */
+
+/* ── Shell layout — Polish PR 6 ────────────────────────────────
+ *
+ * Grid + bg + border + radius now owned by `<WorkspaceFrame>` (rail
+ * shrinks 260 → 240 to match the canonical lock). The `.rater-pc-shell`
+ * className is passed through to the frame root only for legacy
+ * scoped selectors (e.g., per-mode data-mode targeting).
+ */
+
+/* ── Left rail · dimension palette (inner chrome) ─────────────── */
+
+.rater-pc-rail {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  height: 100%;
+}
+.rater-pc-rail-head {
+  padding: var(--rater-s-12) var(--rater-s-16) var(--rater-s-6);
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-8);
+}
+/* Placement-only — the control itself is the DS <SearchField>. */
+.rater-pc-rail-search {
+  margin: 0 var(--rater-s-12) var(--rater-s-8);
+}
+.rater-pc-rail-empty {
+  padding: var(--rater-s-12) var(--rater-s-16);
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-muted);
+  line-height: 1.5;
+}
+.rater-pc-rail-section {
+  padding: var(--rater-s-6) var(--rater-s-12);
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-4);
+}
+.rater-pc-rail-section-label {
+  padding: var(--rater-s-6) var(--rater-s-4) var(--rater-s-4);
+}
+.rater-pc-rail-foot {
+  margin-top: auto;
+  padding: var(--rater-s-12);
+  border-top: 1px solid var(--rater-hairline-soft);
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-6);
+}
+
+/* ── Dim chip · shape ribbons + icon squares ───────────────────── */
+
+.rater-pc-dim-chip {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr) auto;
+  gap: var(--rater-s-8);
+  align-items: center;
+  padding: var(--rater-s-6) var(--rater-s-8) var(--rater-s-6) var(--rater-s-12);
+  background: var(--rater-surface-1);
+  border: 1px solid transparent;
+  border-radius: var(--rater-r-6);
+  cursor: grab;
+  position: relative;
+  font: inherit;
+  text-align: left;
+}
+.rater-pc-dim-chip:hover {
+  background: var(--rater-surface-2);
+  border-color: var(--rater-hairline-soft);
+}
+.rater-pc-dim-chip::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: var(--rater-s-4);
+  bottom: var(--rater-s-4);
+  width: 2px;
+  border-radius: 1px;
+}
+.rater-pc-dim-chip--categorical::before { background: var(--rater-cat-input); }
+.rater-pc-dim-chip--banded::before { background: var(--rater-cat-loading); }
+.rater-pc-dim-chip--classification::before { background: var(--rater-cat-lookup); }
+.rater-pc-dim-chip--geographic::before { background: var(--rater-cat-transform); }
+.rater-pc-dim-chip--composite::before { background: var(--rater-text-muted); }
+.rater-pc-dim-chip--default::before { background: var(--rater-text-muted); }
+
+.rater-pc-dim-chip-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: var(--rater-r-4);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--rater-t-11);
+  font-weight: var(--rater-fw-semibold);
+  font-family: var(--rater-fonts-mono);
+}
+.rater-pc-dim-chip-icon--categorical {
+  background: var(--rater-cat-input-soft);
+  color: var(--rater-cat-input-text);
+}
+.rater-pc-dim-chip-icon--banded {
+  background: var(--rater-cat-loading-soft);
+  color: var(--rater-cat-loading-text);
+}
+.rater-pc-dim-chip-icon--classification {
+  background: var(--rater-cat-lookup-soft);
+  color: var(--rater-cat-lookup-text);
+}
+.rater-pc-dim-chip-icon--geographic {
+  background: var(--rater-cat-transform-soft);
+  color: var(--rater-cat-transform-text);
+}
+.rater-pc-dim-chip-icon--composite,
+.rater-pc-dim-chip-icon--default {
+  background: var(--rater-surface-2);
+  color: var(--rater-text-default);
+}
+
+.rater-pc-dim-chip-body {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 1px;
+}
+.rater-pc-dim-chip-name {
+  font-size: var(--rater-t-12);
+  font-weight: var(--rater-fw-medium);
+  color: var(--rater-text-default);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.rater-pc-dim-chip-sub {
+  font-size: var(--rater-t-10);
+  color: var(--rater-text-subtle);
+  font-family: var(--rater-fonts-mono);
+}
+.rater-pc-dim-chip-count {
+  font-family: var(--rater-fonts-mono);
+  font-size: var(--rater-t-10);
+  color: var(--rater-text-subtle);
+  font-variant-numeric: tabular-nums;
+}
+
+/* PR 33.2 — Used-pill variant. Shown in place of the level count
+   when the dim is currently assigned to either axis of the active
+   draft. The chip itself softens (lower alpha) and drag is
+   disabled at the React layer (draggable={false}). */
+.rater-pc-dim-chip.is-used {
+  cursor: not-allowed;
+  opacity: 0.68;
+  background: var(--rater-surface-2);
+}
+.rater-pc-dim-chip.is-used:hover {
+  background: var(--rater-surface-2);
+  border-color: transparent;
+}
+.rater-pc-dim-chip-used {
+  font-family: var(--rater-fonts-mono);
+  font-size: var(--rater-t-10);
+  letter-spacing: var(--rater-tracking-label);
+  text-transform: uppercase;
+  font-weight: var(--rater-fw-semibold);
+  padding: 2px var(--rater-s-6);
+  border-radius: var(--rater-r-full);
+  background: color-mix(in srgb, var(--rater-cat-input) 16%, transparent);
+  color: var(--rater-cat-input-text);
+}
+
+/* ── Canvas backdrop · dotted-grid ─────────────────────────────── */
+
+.rater-pc-canvas {
+  position: relative;
+  background:
+    radial-gradient(
+      circle at 24px 24px,
+      var(--rater-surface-2) 1px,
+      transparent 1.4px
+    ) 0 0 / 24px 24px,
+    var(--rater-surface-canvas);
+  overflow-y: auto;
+  /* L19 — tighten the canvas top gutter (24 → 16) + the head→body gap
+     (20 → 16) so a loaded factor table's chart starts higher. The
+     dotted-grid backdrop keeps its 24px rhythm; only the content
+     inset shrinks. */
+  padding: var(--rater-s-16) var(--rater-s-24) var(--rater-s-24);
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-16);
+}
+.rater-pc-canvas-head {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-12);
+  flex-wrap: wrap;
+}
+
+/* `.rater-pc-canvas-placeholder` retired — the saved-empty body now
+   consumes `<EmptyState>` from @openrater/design-system. */
+
+/* ── Canvas body · the active draft + (optional) Frame 2 strip ──── */
+
+.rater-pc-canvas-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-20);
+}
+
+/* Step strip below the empty node */
+.rater-pc-step-strip {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--rater-s-12);
+}
+.rater-pc-step {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--rater-s-12);
+  padding: var(--rater-s-12) var(--rater-s-16);
+  background: var(--rater-surface-1);
+  border: 1px solid var(--rater-hairline-soft);
+  border-radius: var(--rater-r-8);
+}
+.rater-pc-step-num {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--rater-cat-input-soft);
+  color: var(--rater-cat-input-text);
+  font-size: var(--rater-t-11);
+  font-weight: var(--rater-fw-semibold);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--rater-fonts-mono);
+}
+.rater-pc-step-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.rater-pc-step-title {
+  font-size: var(--rater-t-12);
+  font-weight: var(--rater-fw-medium);
+  color: var(--rater-text-default);
+}
+.rater-pc-step-sub {
+  font-size: var(--rater-t-11);
+  color: var(--rater-text-subtle);
+  line-height: 1.45;
+}
+
+.rater-pc-onboarding-foot {
+  display: flex;
+  justify-content: center;
+}
+
+/* ── Buttons — Polish PR 7 ──────────────────────────────────────
+ *
+ * `.rater-pc-btn` + `.rater-pc-btn-primary` retired. The 4 ad-hoc
+ * button sites (add-dimension, show-all-consumers, onboarding
+ * blank-table, saved-empty new-table) now consume the canonical
+ * `<Button>` from @openrater/design-system. Audit §E1 P0 + §E5 P2
+ * closed for this surface.
+ *
+ * `.rater-pc-rail-add` is a placement-only modifier — the DS Button
+ * inside the rail-foot inherits the `fullWidth` prop, so no width
+ * override is needed here.
+ */
+
+/* Pill group (mode toggle) — Polish PR 8 retirement.
+ *
+ * `.rater-pc-pill-group` + `.rater-pc-pill` retired. The Canvas/Saved
+ * mode switch now consumes `<Segmented>` from @openrater/design-system.
+ * Audit §G2 closed.
+ */
+
+/* ── Utility ───────────────────────────────────────────────────── */
+
+.rater-pc-label-mini {
+  font-size: var(--rater-t-10);
+  letter-spacing: var(--rater-tracking-label);
+  text-transform: uppercase;
+  color: var(--rater-text-subtle);
+  font-weight: var(--rater-fw-semibold);
+}
+.rater-pc-mono {
+  font-family: var(--rater-fonts-mono);
+  color: var(--rater-text-default);
+  font-size: var(--rater-t-11);
+}
+.rater-pc-grow { flex: 1; }
+.rater-pc-kbd {
+  font-family: var(--rater-fonts-mono);
+  font-size: var(--rater-t-10);
+  padding: 1px var(--rater-s-4);
+  background: var(--rater-surface-2);
+  border: 1px solid var(--rater-hairline-base);
+  border-radius: var(--rater-r-4);
+  color: var(--rater-text-subtle);
+  margin-left: auto;
+}
+
+/* Brief 67 §3.2 — the honest save pill for editing sessions is now the
+   shared <SavePill> primitive (SavePill.css): the REAL bulk-sync state,
+   not a premature toast. */
+
+/* ── Brief 67 §3.1 — the catalog view (the section's resting state) ── */
+
+.rater-pc-catalog {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-16);
+  padding: var(--rater-s-16) var(--rater-s-24) var(--rater-s-24);
+  min-width: 0;
+  overflow-y: auto;
+}
+
+.rater-pc-catalog-head {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--rater-s-12);
+  flex-wrap: wrap;
+}
+
+.rater-pc-catalog-heading {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-2);
+  min-width: 0;
+}
+
+.rater-pc-catalog-title {
+  font-size: var(--rater-t-16);
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-strong);
+  margin: 0;
+}
+
+.rater-pc-catalog-def {
+  margin: 0;
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-muted);
+  line-height: var(--rater-lh-relaxed);
+  max-width: 52ch;
+}
+
+.rater-pc-catalog-search {
+  width: 220px;
+}
+
+.rater-pc-catalog-nomatch {
+  margin: 0;
+  padding: var(--rater-s-24);
+  font-size: var(--rater-t-13);
+  color: var(--rater-text-muted);
+  text-align: center;
+  border: 1px dashed var(--rater-hairline-base);
+  border-radius: var(--rater-r-12);
+}
+
+/* The editor act without the palette rail — the grid takes the full
+   width; same canvas backdrop, no frame columns. */
+.rater-pc-canvas--full {
+  flex: 1;
+  min-height: 0;
+}
+
+/* CSV-first creation — the inference confirm panel (preview-before-
+   apply: the user validates the inferred dim before the table exists). */
+.rater-pc-csvnew {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-10);
+  padding: var(--rater-s-8) var(--rater-s-12);
+  border: 1px solid var(--rater-hairline-base);
+  border-radius: var(--rater-r-8);
+  background: var(--rater-surface-1);
+}
+
+.rater-pc-csvnew--error {
+  border-color: var(--rater-feedback-error, var(--rater-hairline-strong));
+}
+
+.rater-pc-csvnew-text {
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-default);
+  line-height: var(--rater-lh-relaxed);
+  margin-right: auto;
+}
+
+.rater-pc-csvnew-text strong {
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-strong);
+}
+
+.rater-pc-dim-chip:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: 2px;
+}
+
+/* ── Brief 70 §1 — the creation question ───────────────────────── */
+
+.rater-pc-create {
+  padding: var(--rater-s-16) var(--rater-s-24) var(--rater-s-24);
+  overflow-y: auto;
+}
+
+.rater-pc-create-crumb {
+  display: flex;
+  align-items: center;
+  /* Break out of .rater-pc-create's 24px left padding so the crumb hugs the
+     section gutter (x=24) like every section title — it was double-indented
+     to x=48. The plain button's own left inset is zeroed below so the icon
+     starts at the gutter, matching the borderless GeoDimEditor back-crumb. */
+  margin-left: calc(-1 * var(--rater-s-24));
+}
+
+.rater-pc-create-crumb > button {
+  padding-left: 0;
+}
+
+.rater-pc-create-col {
+  max-width: 560px;
+  margin: 56px auto 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-16);
+}
+
+.rater-pc-create-q {
+  margin: 0;
+  font-size: var(--rater-t-20);
+  font-weight: var(--rater-fw-semibold);
+  color: var(--rater-text-strong);
+  text-align: center;
+}
+
+.rater-pc-create-sub {
+  margin: -8px 0 0;
+  font-size: var(--rater-t-13);
+  color: var(--rater-text-muted);
+  text-align: center;
+}
+
+.rater-pc-create-filters {
+  display: flex;
+  justify-content: center;
+}
+
+.rater-pc-create-list {
+  border: 1px solid var(--rater-hairline-subtle);
+  border-radius: var(--rater-r-12);
+  background: var(--rater-surface-1);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.rater-pc-create-list .rater-dimtoken--row {
+  border-radius: 0;
+  border-bottom: 1px solid var(--rater-hairline-subtle);
+}
+.rater-pc-create-list .rater-dimtoken--row:last-child {
+  border-bottom: 0;
+}
+
+.rater-pc-create-nomatch,
+.rater-pc-create-empty {
+  padding: var(--rater-s-20);
+  text-align: center;
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-faint);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--rater-s-10);
+}
+
+.rater-pc-create-nolevels {
+  margin-left: auto;
+  font-size: var(--rater-t-11);
+  color: var(--rater-text-faint);
+  white-space: nowrap;
+}
+
+.rater-pc-create-drop {
+  border: 1px dashed var(--rater-hairline-base);
+  background: transparent;
+  border-radius: var(--rater-r-12);
+  padding: var(--rater-s-20);
+  text-align: center;
+  color: var(--rater-text-subtle);
+  font-size: var(--rater-t-12);
+  font-family: inherit;
+  cursor: pointer;
+}
+.rater-pc-create-drop:hover {
+  border-color: var(--rater-hairline-strong);
+  color: var(--rater-text-muted);
+}
+.rater-pc-create-drop:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: 2px;
+}
+
+.rater-pc-create-foot {
+  margin: 0;
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-subtle);
+  text-align: center;
+}
+
+/* ── Brief 70 §1 — the editor head's RATES-BY group ─────────────── */
+
+.rater-pc-rates-eyebrow {
+  font-size: var(--rater-t-11);
+  font-weight: var(--rater-fw-semibold);
+  letter-spacing: var(--rater-tracking-label);
+  text-transform: uppercase;
+  color: var(--rater-text-subtle);
+  margin-left: var(--rater-s-8);
+}
+
+.rater-pc-axisgroup {
+  display: flex;
+  align-items: center;
+  gap: var(--rater-s-8);
+}
+
+.rater-pc-axischip-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-2);
+}
+
+.rater-pc-axischip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--rater-s-6);
+  border: 1px solid var(--rater-hairline-base);
+  background: transparent;
+  border-radius: var(--rater-r-8);
+  padding: var(--rater-s-4) var(--rater-s-10) var(--rater-s-4) var(--rater-s-6);
+  font: inherit;
+  color: var(--rater-text-default);
+  cursor: pointer;
+  transition: border-color var(--rater-d-80) var(--rater-ease-snap);
+}
+.rater-pc-axischip:hover:not(disabled) {
+  border-color: var(--rater-hairline-strong);
+}
+.rater-pc-axischip:focus-visible {
+  outline: 2px solid var(--rater-focus-ring);
+  outline-offset: 1px;
+}
+.rater-pc-axischip:disabled {
+  cursor: default;
+}
+
+.rater-pc-axischip-count {
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-subtle);
+}
+
+.rater-pc-axispop {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 50;
+  width: 360px;
+  background: var(--rater-surface-1);
+  border: 1px solid var(--rater-hairline-base);
+  border-radius: var(--rater-r-12);
+  box-shadow: var(--rater-shadow-overlay, 0 16px 48px rgb(0 0 0 / 0.5));
+  padding: var(--rater-s-8);
+  display: flex;
+  flex-direction: column;
+  gap: var(--rater-s-6);
+}
+
+.rater-pc-axispop-list {
+  display: flex;
+  flex-direction: column;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.rater-pc-axispop-coverage {
+  border: 0;
+  border-top: 1px solid var(--rater-hairline-subtle);
+  background: transparent;
+  padding: var(--rater-s-10) var(--rater-s-12);
+  text-align: left;
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-muted);
+  font-family: inherit;
+  cursor: pointer;
+}
+.rater-pc-axispop-coverage:hover {
+  color: var(--rater-text-strong);
+}
+
+.rater-pc-carryreport {
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rater-pc-axischip {
+    transition: none;
+  }
+}
