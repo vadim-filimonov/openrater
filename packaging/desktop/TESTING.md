@@ -10,7 +10,8 @@ experience a directory reviewer will see.
 Before the hands-on test, the `desktop-build` workflow must be green on
 macOS Apple Silicon, macOS Intel, and Windows. Both macOS jobs must say
 `notarization: Accepted` in the signing step; a green unsigned build does
-not satisfy this gate.
+not satisfy this gate. The Windows job must say that every PE file was
+verified and must finish the smoke test after re-packing.
 
 ## Clean-Mac walk
 
@@ -36,15 +37,28 @@ not satisfy this gate.
 8. Quit Claude Desktop, reopen it, and call `runtime_status` again. The
    extension must return healthy and the plan must still be present.
 
+## Clean-Windows walk
+
+Use a Windows 11 computer that has not had OpenRater installed, or remove the
+prior extension and its local data first.
+
+1. Download `openrater-mcpb-win32-x64` from the successful workflow run and
+   extract the `.mcpb` file.
+2. Install it in Claude Desktop and enable OpenRater. Windows must not show an
+   unknown-publisher warning for any OpenRater executable.
+3. Repeat steps 3-8 of the Clean-Mac walk. The expected sample premium remains
+   **$1,898**, and the plan must still be present after restarting Claude.
+
 ## Record the result
 
 Keep only a short release note with:
 
 - extension version and artifact name;
-- Mac model and macOS version;
+- computer model and operating-system version;
 - pass/fail for install, first boot, workbook review, build, quote, and
   restart persistence;
-- the workflow run URL that proves both notarizations were accepted.
+- the workflow run URL that proves notarization or Windows signature
+  verification succeeded.
 
 Do not attach a real filing, workbook, or book of business to a public issue.
 Use the bundled synthetic Meridian artifacts for bug reports.

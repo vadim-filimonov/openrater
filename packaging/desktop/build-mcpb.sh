@@ -15,8 +15,8 @@
 #     SKILL.md             (the transcription runbook, for reading)
 #
 # Output: packaging/desktop/dist/openrater-<version>-<platform>.mcpb
-# This script creates an unsigned bundle. Release CI signs and notarizes
-# macOS artifacts when the Apple credentials are configured.
+# This script creates an unsigned bundle. Release CI signs the native
+# binaries, notarizes macOS artifacts, and then re-packs the bundle.
 set -e
 cd "$(dirname "$0")/../.."
 REPO="$PWD"

@@ -7,11 +7,25 @@ name: desktop-build
 
 on:
   workflow_dispatch:
+    inputs:
+      platform:
+        description: Platform to build
+        required: true
+        default: all
+        type: choice
+        options:
+          - all
+          - macos
+          - windows
   push:
     tags: ["v*"]
 
+permissions:
+  contents: read
+
 jobs:
-  mcpb:
+  mcpb-macos:
+    if: github.event_name != 'workflow_dispatch' || inputs.platform != 'windows'
     strategy:
       fail-fast: false
       matrix:
@@ -20,11 +34,61 @@ jobs:
             label: darwin-arm64
           - os: macos-15-intel # x64 runner image
             label: darwin-x64
-          - os: windows-latest
-            label: win32-x64
     runs-on: ${{ matrix.os }}
     # Allow time for the Apple notary queue while bounding stalled jobs.
     timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: JS install
+        run: pnpm install --frozen-lockfile
+
+      - name: Python env
+        run: uv sync --project server
+
+      - name: Build the .mcpb
+        shell: bash
+        run: ./packaging/desktop/build-mcpb.sh
+
+      - name: Sign + notarize
+        shell: bash
+        env:
+          MACOS_CERT_P12_BASE64: ${{ secrets.MACOS_CERT_P12_BASE64 }}
+          MACOS_CERT_PASSWORD: ${{ secrets.MACOS_CERT_PASSWORD }}
+          MACOS_SIGN_IDENTITY: ${{ secrets.MACOS_SIGN_IDENTITY }}
+          NOTARY_APPLE_ID: ${{ secrets.NOTARY_APPLE_ID }}
+          NOTARY_TEAM_ID: ${{ secrets.NOTARY_TEAM_ID }}
+          NOTARY_PASSWORD: ${{ secrets.NOTARY_PASSWORD }}
+        run: ./packaging/desktop/sign-macos.sh
+
+      - name: Smoke the packed artifact (unpack -> full MCP loop)
+        shell: bash
+        run: ./packaging/desktop/smoke-mcpb.sh
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: openrater-mcpb-${{ matrix.label }}
+          path: packaging/desktop/dist/*.mcpb
+          if-no-files-found: error
+
+  mcpb-windows:
+    if: github.event_name != 'workflow_dispatch' || inputs.platform != 'macos'
+    runs-on: windows-latest
+    timeout-minutes: 90
+    environment: windows-signing
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - uses: actions/checkout@v4
 
@@ -50,40 +114,43 @@ jobs:
         shell: bash
         run: ./packaging/desktop/build-mcpb.sh
 
-      - name: Sign + notarize (macOS, secrets-gated — see SIGNING.md)
-        # Release jobs use the configured Developer ID and notarization
-        # secrets. Forks and local development can still produce unsigned
-        # artifacts because the script exits cleanly when secrets are absent.
-        if: runner.os == 'macOS'
-        shell: bash
-        env:
-          MACOS_CERT_P12_BASE64: ${{ secrets.MACOS_CERT_P12_BASE64 }}
-          MACOS_CERT_PASSWORD: ${{ secrets.MACOS_CERT_PASSWORD }}
-          MACOS_SIGN_IDENTITY: ${{ secrets.MACOS_SIGN_IDENTITY }}
-          NOTARY_APPLE_ID: ${{ secrets.NOTARY_APPLE_ID }}
-          NOTARY_TEAM_ID: ${{ secrets.NOTARY_TEAM_ID }}
-          NOTARY_PASSWORD: ${{ secrets.NOTARY_PASSWORD }}
-        run: ./packaging/desktop/sign-macos.sh
+      - name: Select unsigned Windows binaries
+        id: windows-signing-files
+        shell: powershell
+        run: ./packaging/desktop/prepare-windows-signing.ps1
 
-      - name: Smoke the packed artifact (unpack → full MCP loop)
+      - name: Azure login (passwordless)
+        if: steps.windows-signing-files.outputs.has_unsigned == 'true'
+        uses: azure/login@v3
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Sign Windows binaries
+        if: steps.windows-signing-files.outputs.has_unsigned == 'true'
+        uses: azure/artifact-signing-action@v2
+        with:
+          endpoint: ${{ vars.ARTIFACT_SIGNING_ENDPOINT }}
+          signing-account-name: ${{ vars.ARTIFACT_SIGNING_ACCOUNT }}
+          certificate-profile-name: ${{ vars.ARTIFACT_SIGNING_PROFILE }}
+          files: ${{ steps.windows-signing-files.outputs.files }}
+          file-digest: SHA256
+          timestamp-rfc3161: http://timestamp.acs.microsoft.com
+          timestamp-digest: SHA256
+          description: OpenRater Claude Desktop Extension
+          description-url: https://github.com/vadim-filimonov/openrater
+
+      - name: Verify signatures + repack
+        shell: powershell
+        run: ./packaging/desktop/finish-windows-signing.ps1
+
+      - name: Smoke the signed artifact (unpack -> full MCP loop)
         shell: bash
-        run: |
-          set -e
-          ART=$(ls packaging/desktop/dist/*.mcpb)
-          EXTRACT="$RUNNER_TEMP/mcpb-extract"
-          DATA="$RUNNER_TEMP/mcpb-data"
-          unzip -q "$ART" -d "$EXTRACT"
-          cd services/mcp
-          MCP_ENTRY="$EXTRACT/mcp/index.mjs" \
-          RATER_BUNDLE_ROOT="$EXTRACT" \
-          RATER_DATA_DIR="$DATA" \
-          RATER_SEED_COLD_TEST=0 \
-          node scripts/demo-loop.mjs | tee /tmp/loop.log
-          grep -q "premium=1898" /tmp/loop.log
-          grep -q "P1 loop complete" /tmp/loop.log
+        run: ./packaging/desktop/smoke-mcpb.sh
 
       - uses: actions/upload-artifact@v4
         with:
-          name: openrater-mcpb-${{ matrix.label }}
+          name: openrater-mcpb-win32-x64
           path: packaging/desktop/dist/*.mcpb
           if-no-files-found: error
