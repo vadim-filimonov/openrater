@@ -80,6 +80,28 @@ find "$ROOT" -type l | while IFS= read -r l; do
   fi
 done
 
+# V8 needs JIT memory. The official Node binary ships with allow-jit
+# entitlements, and the bare re-sign above strips them — newer macOS then
+# kills the runtime at startup ("Failed to reserve virtual memory for
+# CodeRange", SIGTRAP). Give the bundled runtime its entitlements back;
+# notarization accepts these.
+if [ -f "$ROOT/runtime/node" ]; then
+  ENTITLEMENTS="$RUNNER_TEMP/node.entitlements"
+  cat > "$ENTITLEMENTS" <<'PLIST'
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>com.apple.security.cs.allow-jit</key><true/>
+  <key>com.apple.security.cs.allow-unsigned-executable-memory</key><true/>
+</dict>
+</plist>
+PLIST
+  codesign --force --options runtime --timestamp \
+    --entitlements "$ENTITLEMENTS" \
+    --keychain "$KEYCHAIN" --sign "$MACOS_SIGN_IDENTITY" "$ROOT/runtime/node"
+fi
+
 # Forensics: prove the signatures are valid at each stage, so a runtime
 # "code signature invalid" can be pinned to the stage that broke it.
 echo "── verify signed root (spot-check)"
@@ -90,6 +112,9 @@ for f in "$ROOT/server/_internal/Python" "$ROOT/server/openrater-server" \
   codesign --verify --verbose=2 "$f" && echo "   OK: $f" \
     || echo "   VERIFY FAILED IN ROOT: $f"
 done
+codesign -d --entitlements :- "$ROOT/runtime/node" 2>/dev/null | grep -q allow-jit \
+  && echo "   OK: runtime keeps its allow-jit entitlement" \
+  || { echo "   FATAL: runtime/node lost its JIT entitlements"; exit 1; }
 
 echo "── re-pack the signed root"
 VERSION=$(node -p "require('./services/mcp/package.json').version")
