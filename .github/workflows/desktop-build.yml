@@ -17,6 +17,9 @@ on:
           - all
           - macos
           - windows
+      notary_skip:
+        description: "1 = sign + verify only, skip the Apple submission"
+        default: "0"
   push:
     tags: ["v*"]
 
@@ -36,7 +39,9 @@ jobs:
             label: darwin-x64
     runs-on: ${{ matrix.os }}
     # Allow time for the Apple notary queue while bounding stalled jobs.
-    timeout-minutes: 180
+    # 360 is the hosted-runner ceiling; the ~5h notary poll stays inside it,
+    # and a poll that outlasts Apple keeps the artifact (see sign-macos.sh).
+    timeout-minutes: 360
     steps:
       - uses: actions/checkout@v4
 
@@ -69,17 +74,21 @@ jobs:
           NOTARY_APPLE_ID: ${{ secrets.NOTARY_APPLE_ID }}
           NOTARY_TEAM_ID: ${{ secrets.NOTARY_TEAM_ID }}
           NOTARY_PASSWORD: ${{ secrets.NOTARY_PASSWORD }}
+          NOTARY_SKIP: ${{ inputs.notary_skip || '0' }}
         run: ./packaging/desktop/sign-macos.sh
 
-      - name: Smoke the packed artifact (unpack -> full MCP loop)
-        shell: bash
-        run: ./packaging/desktop/smoke-mcpb.sh
-
+      # Upload BEFORE the smoke test: a failed smoke must never discard a
+      # signed (and possibly already-submitted) artifact — Apple's
+      # acceptance attaches to these exact bytes retroactively.
       - uses: actions/upload-artifact@v4
         with:
           name: openrater-mcpb-${{ matrix.label }}
           path: packaging/desktop/dist/*.mcpb
           if-no-files-found: error
+
+      - name: Smoke the packed artifact (unpack -> full MCP loop)
+        shell: bash
+        run: ./packaging/desktop/smoke-mcpb.sh
 
   mcpb-windows:
     if: github.event_name != 'workflow_dispatch' || inputs.platform != 'macos'

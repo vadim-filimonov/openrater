@@ -61,11 +61,62 @@ COUNT=$(wc -l < "$MACHO_LIST" | tr -d ' ')
 echo "   $COUNT Mach-O files to sign"
 sort -rn "$MACHO_LIST" | cut -f2- | while IFS= read -r f; do sign "$f"; done
 
+# PyInstaller links _internal/Python into Python.framework, and codesign
+# gives the framework binary a bundle-context signature that leans on its
+# _CodeSignature sidecar. Zip packing materializes symlinks into copies,
+# orphaning that signature — the shipped copy then fails dyld validation.
+# Materialize Mach-O symlinks now and give each copy its own flat,
+# self-contained signature.
+find "$ROOT" -type l | while IFS= read -r l; do
+  # Framework-internal symlinks are bundle plumbing; their materialized
+  # copies are never loaded, and codesign refuses paths like
+  # Foo.framework/Foo as "bundle format is ambiguous". Leave them be.
+  case "$l" in *.framework/*) continue ;; esac
+  t="$(readlink -f "$l" 2>/dev/null)" || continue
+  [ -f "$t" ] || continue
+  if file -b "$t" 2>/dev/null | grep -q 'Mach-O'; then
+    rm "$l" && cp "$t" "$l" && sign "$l"
+    echo "   materialized + flat-signed: $l"
+  fi
+done
+
+# Forensics: prove the signatures are valid at each stage, so a runtime
+# "code signature invalid" can be pinned to the stage that broke it.
+echo "── verify signed root (spot-check)"
+for f in "$ROOT/server/_internal/Python" "$ROOT/server/openrater-server" \
+  "$ROOT/runtime/node"; do
+  [ -f "$f" ] || { echo "   missing: $f"; continue; }
+  codesign -dvv "$f" 2>&1 | grep -E 'CodeDirectory|Signature size' | head -2
+  codesign --verify --verbose=2 "$f" && echo "   OK: $f" \
+    || echo "   VERIFY FAILED IN ROOT: $f"
+done
+
 echo "── re-pack the signed root"
 VERSION=$(node -p "require('./services/mcp/package.json').version")
 PLATFORM=$(node -p "process.platform + '-' + process.arch")
 ARTIFACT="$OUT/openrater-$VERSION-$PLATFORM.mcpb"
 npx --yes @anthropic-ai/mcpb pack "$ROOT" "$ARTIFACT"
+
+echo "── verify the packed artifact roundtrip"
+RT="$RUNNER_TEMP/rt-extract"
+rm -rf "$RT" && mkdir -p "$RT"
+unzip -q "$ARTIFACT" -d "$RT"
+if cmp -s "$ROOT/server/_internal/Python" "$RT/server/_internal/Python"; then
+  echo "   python bytes identical root vs artifact"
+else
+  echo "   PYTHON BYTES DIFFER root vs artifact"
+fi
+codesign --verify --verbose=2 "$RT/server/_internal/Python" \
+  && echo "   OK: artifact python" || echo "   VERIFY FAILED IN ARTIFACT: python"
+# The kernel-grade check: static verify can pass where dyld refuses.
+python3 -c "import ctypes; ctypes.CDLL('$RT/server/_internal/Python')" \
+  && echo "   dlopen OK: artifact python" || echo "   DLOPEN FAILED IN ARTIFACT: python"
+
+if [ "${NOTARY_SKIP:-0}" = "1" ]; then
+  echo "── NOTARY_SKIP=1 — diagnostic build; not submitting to Apple"
+  echo "sign-macos: signed (not submitted) $ARTIFACT"
+  exit 0
+fi
 
 echo "── notarize: submit, then poll (ticket is server-side)"
 # Polling uses short, independent requests so a transient network error or
@@ -77,11 +128,11 @@ SUBMIT_JSON=$(xcrun notarytool submit "$RUNNER_TEMP/notarize.zip" \
 echo "$SUBMIT_JSON"
 SUBMIT_ID=$(printf '%s' "$SUBMIT_JSON" | python3 -c "import json,sys;print(json.load(sys.stdin).get('id',''))")
 [ -n "$SUBMIT_ID" ] || { echo "notarize: submit returned no id"; exit 1; }
-echo "── submission $SUBMIT_ID — polling for up to 150 minutes"
+echo "── submission $SUBMIT_ID — polling for up to ~5 hours"
 
 NOTARY_STATUS="In Progress"
 i=0
-while [ "$i" -lt 300 ]; do
+while [ "$i" -lt 550 ]; do
   i=$((i + 1))
   sleep 30
   INFO=$(xcrun notarytool info "$SUBMIT_ID" \
@@ -94,12 +145,24 @@ while [ "$i" -lt 300 ]; do
 done
 
 echo "── notarization: $NOTARY_STATUS (submission $SUBMIT_ID)"
-if [ "$NOTARY_STATUS" != "Accepted" ]; then
-  echo "── Not accepted — Apple's detailed findings:"
-  xcrun notarytool log "$SUBMIT_ID" \
-    --apple-id "$NOTARY_APPLE_ID" --team-id "$NOTARY_TEAM_ID" \
-    --password "$NOTARY_PASSWORD" || true
-  exit 1
-fi
-
-echo "sign-macos: signed + notarized $ARTIFACT"
+case "$NOTARY_STATUS" in
+  Accepted)
+    echo "sign-macos: signed + notarized $ARTIFACT"
+    ;;
+  Invalid | Rejected)
+    echo "── Not accepted — Apple's detailed findings:"
+    xcrun notarytool log "$SUBMIT_ID" \
+      --apple-id "$NOTARY_APPLE_ID" --team-id "$NOTARY_TEAM_ID" \
+      --password "$NOTARY_PASSWORD" || true
+    exit 1
+    ;;
+  *)
+    # Apple's queue outlasted the wait. The ticket attaches server-side to
+    # these exact bytes whenever acceptance lands, so a timeout must never
+    # discard the signed artifact — keep it and verify out-of-band.
+    echo "── WARNING: still '$NOTARY_STATUS' after the full wait."
+    echo "── Keeping the signed artifact; acceptance attaches retroactively."
+    echo "── Verify later: xcrun notarytool info $SUBMIT_ID"
+    echo "sign-macos: signed (notarization pending) $ARTIFACT"
+    ;;
+esac
