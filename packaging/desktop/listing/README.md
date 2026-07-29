@@ -40,7 +40,17 @@ from `../icon.svg` by `../render-icon.mjs`.
 2. Every tool exercised once via MCP Inspector against the packed
    bundle (`npx @modelcontextprotocol/inspector node mcp/index.mjs`
    with `RATER_BUNDLE_ROOT` set to an unpacked root).
-3. Cold install of the signed artifact on a clean macOS machine —
-   Walk 1 of `docs/audits/use-case-walks.md`, cold.
-4. Submit at the desktop-extension form (see
-   `docs/design-briefs/` claude-app notes / claude.com/docs/connectors).
+3. Cold install of the signed artifact on a clean machine — follow
+   [`../TESTING.md`](../TESTING.md) and record the result.
+4. Submit at the desktop-extension form (linked from
+   claude.com/docs/connectors/building/submission).
+
+## Version updates (resubmission)
+
+To move an existing listing to a new version: file the same
+desktop-extension form again with the new artifact attached and a
+note naming the prior submission ("supersedes the YYYY-MM-DD
+<version> submission"). Point the note at the GitHub Release for the
+per-platform artifacts and checksums. If the review thread is
+already open or the form misbehaves, mcp-review@anthropic.com is the
+escalation channel.

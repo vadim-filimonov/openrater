@@ -79,6 +79,14 @@
       "description": "Re-rate a CSV book (rows stay in files, out of chat)"
     },
     {
+      "name": "compare_plans",
+      "description": "What changed between two plans (tables, territories, rules)"
+    },
+    {
+      "name": "compare_runs",
+      "description": "Same book, two runs: totals, movers, newly refused rows"
+    },
+    {
       "name": "open_in_openrater",
       "description": "Deep link into the local review UI"
     },
