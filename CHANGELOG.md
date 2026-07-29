@@ -8,6 +8,68 @@ and [Semantic Versioning](https://semver.org/).
 
 Nothing yet.
 
+## [0.1.1] — 2026-07-29
+
+The trust release: every finding from an independent 35-problem
+first-contact audit of 0.1.0, fixed. The audit's verdict on the
+engine stood — "honest and exact" — and nearly everything around it
+needed work. Highlights; the full story is in the port commit.
+
+### Fixed — wrong numbers, presented as right
+
+- Book rating skipped the minimum-premium floor that quoting applied
+  — the same policy priced differently by path. One composition path
+  now serves both.
+- Yes/no eligibility rules never fired (a stored-answer vs compared-
+  literal seam); pinned by a new conformance vector.
+- Declared input defaults were honored nowhere; they now apply on
+  every path, and a required eligibility-only input that is omitted
+  refuses by name instead of rating.
+- Plans with failed verification checks quoted bare; quotes now carry
+  the plan's own health caveats.
+- The workbook validator and the builder disagreed (an unchecked
+  length limit refused spec-clean workbooks with no cell address).
+
+### Fixed — the desktop extension
+
+- 0.1.0's bundled Node runtime was signed without JIT entitlements,
+  so the scoring sidecar died at launch on every macOS install — and
+  `node --version` still succeeded, which is how it shipped. The
+  runtime now signs with a committed, comment-free entitlements
+  plist, a real-JS gate verifies the exact shipped bytes, and the
+  release smoke fails loudly on a degraded boot.
+
+### Added
+
+- A two-run compare — "same book, what changed": per-row deltas
+  joined on your own identifier column, totals, biggest movers, newly
+  refused rows — in the app's run drawer and as the `compare_runs`
+  tool.
+- `compare_plans`: committee-shaped plan-to-plan differences with
+  canonical territory-membership counts and an Exhibits deep link.
+- Check-time detectors for silent workbook holes: a declared level
+  with no factor row (R-174) and tolerance-less multi-coverage
+  expectations (R-175).
+- A documented schedule-rating door (form fields, input schema,
+  book-template column), a current-state workbook export that carries
+  in-app repairs, book-import transforms (`@times:` scaling,
+  bare-number schedule judgments), and a sectioned transcription spec
+  readable in pieces from chat.
+
+### Changed
+
+- Traces read like the manual: no float dust, no `NaN` arithmetic on
+  refusals, no zero-seed sums, exact-anchor interpolation named as
+  such, plain words instead of reserving jargon.
+- Numbers format like money: authored precision on the Rating sheet,
+  steady two-decimal report tables, uniform factor-grid precision,
+  thousands separators on exposures.
+- The muted-ink text tokens meet WCAG AA in both themes, enforced by
+  a CI contrast gate; the recurring 8px horizontal scroll is gone.
+- Run history is trustworthy: the Run tab no longer re-rates on its
+  own, chat quotes land in history with a review deep link, and
+  book-run rows survive a scoring-service restart.
+
 ## [0.1.0] — 2026-07-21
 
 First public release: the full loop — filing PDF → transcribed
