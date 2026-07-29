@@ -1,6 +1,6 @@
 {
   "name": "@openrater/mcp",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "private": true,
   "description": "OpenRater MCP server \u2014 lets any MCP client (Claude Desktop, Claude Code, \u2026) drive the deterministic rating platform: fetch the transcription spec, validate + build workbooks, read build reports, quote risks, re-rate books. The platform never calls an AI; the AI calls the platform.",
   "license": "Apache-2.0",
