@@ -43,7 +43,10 @@ echo "── [4/6] MCP server bundle (esbuild, ESM single file)"
 echo "── [5/6] assemble bundle root"
 rm -rf "$ROOT"
 mkdir -p "$ROOT/mcp" "$ROOT/scoring" "$ROOT/fixtures"
-sed "s/{{VERSION}}/$VERSION/" \
+# Each bundle carries one platform's binaries, so each manifest declares
+# exactly the platform it was built on — never its siblings'.
+MCPB_PLATFORM=$(node -p "process.platform")
+sed -e "s/{{VERSION}}/$VERSION/" -e "s/{{MCPB_PLATFORM}}/$MCPB_PLATFORM/" \
   "$REPO/packaging/desktop/manifest.template.json" > "$ROOT/manifest.json"
 # The directory-listing icon (512×512 RGBA, rendered from icon.svg —
 # see render-icon.mjs). manifest.json points at it by relative path.
