@@ -6,6 +6,17 @@ and [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+Nothing yet.
+
+## [0.1.0] — 2026-07-21
+
+First public release: the full loop — filing PDF → transcribed
+workbook → validated build → cited build report → quote with trace
+→ book re-rate — in the browser, over MCP, and as a signed Claude
+Desktop extension (macOS notarized, Windows Trusted Signing). See
+[packaging/desktop/RELEASE-0.1.0.md](./packaging/desktop/RELEASE-0.1.0.md)
+for artifacts and evidence.
+
 ### The platform
 
 - **Filing-transcription pipeline**: the transcription spec + the
@@ -40,3 +51,12 @@ and [Semantic Versioning](https://semver.org/).
 - **Deploy**: Docker Compose kit with SQLite persistence, optional
   Litestream backup and Cloudflare tunnel/Access overlay, upgrade
   script with pre-flight integrity sweep.
+
+### Fixed (release hardening)
+
+- Zip packing materialized a symlinked framework binary and orphaned
+  its signature — now materialized and flat-signed at build, with a
+  dlopen probe gate.
+- Re-signing stripped the bundled Node runtime's JIT entitlements
+  (newer macOS kills V8 at startup for it) — entitlements restored,
+  with a fail-hard entitlement check.

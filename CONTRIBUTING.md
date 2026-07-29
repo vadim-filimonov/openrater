@@ -140,6 +140,19 @@ openrater/
     └── fixtures/        # synthetic seeds + their provenance manifest
 ```
 
+## Reading the code comments
+
+Comments throughout the codebase cite design documents by id —
+`Brief NN`, `ADR-NNNN`, `R-###`, and audit finding numbers. The
+`R-###` rules are public (they're the transcription spec's own rule
+table, served by `get_transcription_spec`); the briefs and ADRs are
+the maintainer's private design history and are **not** part of this
+repository. Treat those citations as provenance markers — the
+sentence around each one states the actual constraint, and the public
+contracts live in [`docs/specs/`](./docs/specs). You never need a
+cited document to understand or change the code; if a comment doesn't
+stand on its own, that's a bug worth filing.
+
 ## Development discipline
 
 ### User-facing verification
