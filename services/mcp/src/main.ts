@@ -100,7 +100,7 @@ once, and nothing leaves their machine.`;
 const server = new McpServer(
   {
     name: "openrater",
-    version: "0.1.0",
+    version: "0.1.1",
   },
   { instructions: INSTRUCTIONS },
 );
