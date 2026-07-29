@@ -40,8 +40,8 @@ def make_tail() -> list[dict[str, Any]]:
         },
         {
             "kind": "package_factor",
-            "id": "first_term_credit",
-            "display_name": "First-term credit",
+            "id": "pioneer",
+            "display_name": "Pioneer discount",
             "factor": 0.9,
             "when": {"field": "is_first_term", "op": "eq", "value": True},
         },
@@ -93,7 +93,7 @@ class TestUpsertPolicyTail:
         ).json()
         assert [item["id"] for item in result["tail"]] == [
             "irpm",
-            "first_term_credit",
+            "pioneer",
             "min",
         ]
 

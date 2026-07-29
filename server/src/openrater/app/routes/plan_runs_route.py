@@ -17,6 +17,11 @@ Mounted under `/api/v1/plans/{rating_plan_id}/runs`:
   GET  /{run_id}/rows — a DONE book/probe run's per-row results page
                         (?offset=&limit= — projected inputs + outputs +
                         verdict, relayed from the scoring result store)
+  GET  /{run_id}/rows.csv — the whole run as ONE downloadable CSV
+                        (FCA #S2: the take-away spreadsheet used to be
+                        assembled by hand from per-row quote calls) —
+                        the caller's own source columns lead each row,
+                        so PolicyNbr survives to the deliverable
 
 Runs are append-only and NOT draft-gated: running a frozen/published
 plan is the point. Mirrors `plan_policy_tail_route.py` conventions.
@@ -24,7 +29,7 @@ plan is the point. Mirrors `plan_policy_tail_route.py` conventions.
 
 from __future__ import annotations
 
-from fastapi import APIRouter, Body, Query, Request
+from fastapi import APIRouter, Body, Query, Request, Response
 from fastapi import Path as FPath
 
 from openrater.errors import NotFoundError
@@ -39,6 +44,8 @@ from openrater.rates.runs import (
     list_runs,
     refresh_run,
 )
+from openrater.rates.runs.compare import RunCompare, compare_runs
+from openrater.rates.runs.service import collect_run_rows
 
 router = APIRouter()
 
@@ -143,4 +150,113 @@ def get_plan_run_rows(
         run_id=run_id,
         offset=offset,
         limit=limit,
+    )
+
+
+@router.get(
+    "/plans/{rating_plan_id}/runs/{run_id}/compare",
+    response_model=RunCompare,
+    tags=["plan-runs"],
+)
+def get_plan_run_compare(
+    request: Request,
+    rating_plan_id: str = FPath(..., min_length=1),
+    run_id: str = FPath(..., min_length=1),
+    with_run: str = Query(..., min_length=1),
+    with_plan: str | None = Query(default=None, min_length=1),
+) -> RunCompare:
+    """FCA #28 (finding 78) — the two-run compare: per-row deltas
+    joined on the caller's own identifier column, totals, movers,
+    refusal changes. `with_plan` reaches across plans (the same book
+    through two plans — the rate-committee question); it defaults to
+    this plan (before/after on one plan)."""
+    db = _resolve_db(request)
+    _require_plan_exists(db, rating_plan_id)
+    other_plan = with_plan or rating_plan_id
+    if other_plan != rating_plan_id:
+        _require_plan_exists(db, other_plan)
+    return compare_runs(
+        db=db,
+        rating_plan_id=rating_plan_id,
+        run_id=run_id,
+        with_plan_id=other_plan,
+        with_run_id=with_run,
+    )
+
+
+@router.get(
+    "/plans/{rating_plan_id}/runs/{run_id}/rows.csv",
+    tags=["plan-runs"],
+)
+def get_plan_run_rows_csv(
+    request: Request,
+    rating_plan_id: str = FPath(..., min_length=1),
+    run_id: str = FPath(..., min_length=1),
+) -> Response:
+    """FCA fca-2026-07-25 (#S2 — no export anywhere): the whole run as
+    one CSV. Column order: `row`, the caller's own SOURCE columns
+    (verbatim from the submitted book, so PolicyNbr-style identifiers
+    survive to the deliverable), the projected rating inputs that
+    aren't already source columns, then premium / tier / row_status /
+    first_issue. Pages the whole run from the scoring result store."""
+    db = _resolve_db(request)
+    _require_plan_exists(db, rating_plan_id)
+    rows = collect_run_rows(db=db, rating_plan_id=rating_plan_id, run_id=run_id)
+
+    def keys_of(field: str) -> list[str]:
+        seen: dict[str, None] = {}
+        for r in rows:
+            bag = r.get(field)
+            if isinstance(bag, dict):
+                for k in bag:
+                    seen.setdefault(str(k), None)
+        return list(seen)
+
+    source_keys = keys_of("source")
+    input_keys = keys_of("inputs")
+    # A projected input that duplicates a source column adds nothing —
+    # the source cell IS the value the caller knows it by.
+    source_set = {k.lower() for k in source_keys}
+    input_cols = [k for k in input_keys if k.lower() not in source_set]
+
+    import csv as _csv
+    import io
+
+    buf = io.StringIO()
+    writer = _csv.writer(buf)
+    writer.writerow(
+        ["row", *source_keys, *input_cols, "premium", "tier", "row_status", "first_issue"]
+    )
+    for i, r in enumerate(rows):
+        source = r.get("source") if isinstance(r.get("source"), dict) else {}
+        inputs = r.get("inputs") if isinstance(r.get("inputs"), dict) else {}
+        views = r.get("views") if isinstance(r.get("views"), dict) else {}
+        issues = r.get("rowIssues") if isinstance(r.get("rowIssues"), list) else []
+        first_issue = next(
+            (
+                str(x.get("message"))
+                for x in issues
+                if isinstance(x, dict) and x.get("severity") == "error"
+            ),
+            "",
+        )
+        writer.writerow(
+            [
+                i + 1,
+                *[source.get(k, "") for k in source_keys],
+                *[inputs.get(k, "") for k in input_cols],
+                views.get("premium", ""),
+                views.get("tier", ""),
+                r.get("row_status", ""),
+                first_issue,
+            ]
+        )
+    return Response(
+        content=buf.getvalue(),
+        media_type="text/csv; charset=utf-8",
+        headers={
+            "Content-Disposition": (
+                f'attachment; filename="{rating_plan_id}-{run_id}-rows.csv"'
+            )
+        },
     )

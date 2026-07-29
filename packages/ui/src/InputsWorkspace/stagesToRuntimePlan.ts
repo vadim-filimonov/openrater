@@ -36,12 +36,12 @@
  *   ✗ lookup_method ∈ {interpolated, binned, bracketed} — each maps
  *     to lookup.range / lookup.multi / curve.evaluate kinds; v2 work.
  *   ✗ flat_factor / modifier_schedule / clamp / round / eligibility
- *     stages — load-bearing for the Meridian BOP plan but not for the
+ *     stages — load-bearing for the ISO BOP plan but not for the
  *     nonprofit demo. Each lands in its own PR.
  *   ✓ Exposure ÷ unit_divisor (ADR-0044) — when a chainSpec carries a
  *     resolvable `exposure_input` + finite `exposure_unit_divisor`, the
  *     projector emits an exposure-rated tower: rate × (exposure ÷
- *     divisor) × LCM with filed-rate roundings (rate→3 dp, premium→nearest $),
+ *     divisor) × LCM with ISO roundings (rate→3 dp, premium→nearest $),
  *     all as runtime nodes. A `literal:<n>` exposure_input (spec §4.6 —
  *     a filed fixed exposure base) is a constant numerator, not an
  *     input read. Chains WITHOUT an exposure base stay "per account"
@@ -74,7 +74,7 @@ import {
   GUARD_PORT,
 } from "@openrater/contracts";
 import type { StageLike, FactorTableLike } from "./deriveRequiredInputs";
-import { normalizePath } from "./deriveRequiredInputs";
+import { normalizePath, sanitize } from "./deriveRequiredInputs";
 
 // ─────────────────────────────────────────────────────────────────
 // Public types
@@ -194,12 +194,11 @@ interface PlanEdge {
  * function, so the two never drift. The chainTraceValues integration test runs
  * a real projector→run→resolve round-trip and breaks if they diverge.
  */
-export function sanitize(s: string): string {
-  return s
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "_")
-    .replace(/^_+|_+$/g, "") || "x";
-}
+// FCA #23 — sanitize moved to deriveRequiredInputs (which this module
+// already imports from) so the schedule_app field-key derivation is
+// ONE function on both the projector and the mapping deriver.
+// Re-exported here for the existing import sites.
+export { sanitize };
 
 // ─────────────────────────────────────────────────────────────────
 // Local typed views over the substrate (read-only access)
@@ -230,6 +229,14 @@ interface BindingShape {
   readonly op?: string;
   readonly fields?: readonly string[];
   readonly value?: string | number | boolean;
+  /**
+   * ADR-0025 / FCA #21 — a composite axis (`source: "composite"`)
+   * carries its MEMBER dims' bindings, keyed by member slug. The
+   * ingest builder emits these from the inputs sheet's
+   * `maps_to_dimension` wiring so each member resolves from its real
+   * input field, not the member slug.
+   */
+  readonly axes?: Record<string, BindingShape>;
 }
 
 interface FactorLookupShape {
@@ -238,6 +245,12 @@ interface FactorLookupShape {
   readonly lookup_method?: string;
   readonly dimensions?: Record<string, BindingShape>;
   readonly description_template?: string;
+  /** The workbook's filed citation for this lookup — rule name/section
+   *  ("Table R-4, Premises column") and page ("pp.10-11"). The trace's
+   *  Citation: line renders THESE (FCA finding #9 — it used to render
+   *  description_template's raw "×{value}" placeholder instead). */
+  readonly citation_rule?: string;
+  readonly citation_page?: string;
   /**
    * ADR-0044 D6 — optional gate {path, equals}: the factor applies only
    * when `externalInputs[path] === equals`, else it is the
@@ -258,6 +271,24 @@ interface FactorLookupShape {
     readonly mode?: string;
     readonly value?: number;
   } | null;
+}
+
+/**
+ * The trace citation for a lookup — the workbook's filed
+ * citation_rule + citation_page ("Table R-4, Premises column -
+ * pp.10-11"). FCA fca-2026-07-25 finding #9: this used to wire
+ * description_template — a DESCRIPTION-rendering template whose
+ * "×{value}" placeholder is substituted only on the description path —
+ * so every trace citation rendered the raw template instead of the
+ * filed reference. When neither citation field is authored the
+ * citation is EMPTY (the trace omits the row — honest degrade); the
+ * template must never leak into a citation.
+ */
+function lookupCitation(lookup: FactorLookupShape): string {
+  const rule = (lookup.citation_rule ?? "").trim();
+  const page = (lookup.citation_page ?? "").trim();
+  if (rule && page) return `${rule} - ${page}`;
+  return rule || page;
 }
 
 interface ChainSpecShape {
@@ -282,7 +313,7 @@ interface ChainSpecShape {
    * ADR-0044 — the per-unit exposure divisor (e.g. 100 for per-$100
    * limit rates, 1000 for per-$1k sales/payroll). When this + a real
    * `exposure_input` are present, the projector emits the exposure-rated
-   * tower (rate × exposure ÷ divisor × LCM, with filed-rate roundings); absent,
+   * tower (rate × exposure ÷ divisor × LCM, with ISO roundings); absent,
    * the chain is treated as "per account" (the legacy behavior).
    */
   readonly exposure_unit_divisor?: number;
@@ -291,7 +322,7 @@ interface ChainSpecShape {
    * `towerPlanToStages` ALWAYS emits an `exposure_input` + divisor (the
    * 2nd submission field, else a `form_input.exposure` placeholder), so
    * presence alone can't tell a per-account base tower from a real
-   * exposure tower. Scalar exposure scaling + filed-rate rounding apply ONLY
+   * exposure tower. Scalar exposure scaling + ISO rounding apply ONLY
    * when this is true (or `exposure_options` is present, which the
    * Assemble default never emits). Default-false keeps every
    * per-account tower scoring base × factors × LCM, unrounded.
@@ -607,7 +638,7 @@ export function stagesToRuntimePlan(
     return { mode: "error" };
   };
   // Shared `derive.class_attribute` node ids (dedup). A chain can carry more
-  // than one factor lookup keyed on the SAME class-derived dim — e.g. Meridian BOP's
+  // than one factor lookup keyed on the SAME class-derived dim — e.g. ISO BOP's
   // rate_number_rel AND sprinkler_rel both key `prop_rate_number`. They must
   // share ONE derive node (+ one class-code edge); emitting it per lookup makes
   // the plan carry duplicate node ids + a spurious cycle, and it won't compile.
@@ -615,7 +646,7 @@ export function stagesToRuntimePlan(
 
   // ── Brief 83.2 — level aliases ─────────────────────────────────────
   // A categorical level may author `aliases` — the integrator-facing raw
-  // vocabulary for the same level ("1" ⟂ q1, "1500" ⟂ ded_1500,
+  // vocabulary for the same level ("1" ⟂ ppc_1, "1500" ⟂ ded_1500,
   // "300000" ⟂ the default 300_600_600 limit trio). Aliases resolve at
   // PROJECTION time by widening lookup tables (1-D keys + 2-D composite
   // keys): no wire transform (contract §11), no engine change — the
@@ -693,6 +724,15 @@ export function stagesToRuntimePlan(
     string,
     "number" | "money" | "factor" | "boolean" | "date"
   >();
+  // FCA fca-2026-07-25 (S0) — the workbook inputs sheet's authored
+  // default_value lands in the input_node config (and the schema echoes
+  // it to callers), but the projector only ever read options.defaults —
+  // which no scoring caller populates — so filed defaults were honored
+  // on NO path: quote, book, and canvas all refused (or NaNed) rows
+  // omitting a defaulted field. Harvest the declarations here; the
+  // runtime's input-node substitution applies them (and coerces to the
+  // port's fieldType), and the preflight stops demanding the field.
+  const declaredDefaults = new Map<string, unknown>();
   for (const s of stages) {
     if (s.stage_kind !== "input_node") continue;
     const cfg = asObject(s.config_json);
@@ -718,6 +758,13 @@ export function stagesToRuntimePlan(
                 : undefined;
     if (declared && !declaredInputTypes.has(fieldName)) {
       declaredInputTypes.set(fieldName, declared);
+    }
+    if (
+      cfg.default_value !== undefined &&
+      cfg.default_value !== null &&
+      !declaredDefaults.has(fieldName)
+    ) {
+      declaredDefaults.set(fieldName, cfg.default_value);
     }
   }
 
@@ -750,13 +797,18 @@ export function stagesToRuntimePlan(
     // PR D2b — when the caller supplied a defaultValue for this
     // field, attach it so the runtime falls back to the constant when
     // the row doesn't supply the field. Per-plan constants (base
-    // rates, LCM) shouldn't require CSV columns.
+    // rates, LCM) shouldn't require CSV columns. The caller's constant
+    // wins over the workbook-authored default_value (harvested above),
+    // which otherwise carries the filed semantics.
     const hasDefault = Object.prototype.hasOwnProperty.call(
       defaults,
       fieldName,
     );
     const params: Record<string, unknown> = { fieldName, fieldType };
     if (hasDefault) params.defaultValue = defaults[fieldName];
+    else if (declaredDefaults.has(fieldName)) {
+      params.defaultValue = declaredDefaults.get(fieldName);
+    }
     // Brief 83.2 — structurally-optional inputs (a declared override, an
     // exposure-option branch input, the IRPM schedule application): the
     // plan rates honestly without them, so the quote preflight must not
@@ -861,6 +913,17 @@ export function stagesToRuntimePlan(
       return { node: dId, port: "value" };
     }
 
+    // 2b. Composite axis (ADR-0025 / FCA #21) — the substrate has
+    // resolved composite levels since Brief 27, but the projection
+    // never wired it: a composite dim projected as a plain form_input
+    // nobody declared, so the spec's OWN recommended shape built into
+    // a plan that refused every row. Resolve each member through its
+    // own derivation (band / territory / class-attribute / raw), then
+    // join the level ids with "·" — the exact grammar the composite's
+    // authored levels and factor cells use.
+    const compositeRef = buildCompositeKeyRef(dimSlug, binding, idTag);
+    if (compositeRef) return compositeRef;
+
     // 3. Raw value producer: a computed sum (chain.add) or an input field.
     let rawRef: { node: string; port: string };
     if (
@@ -917,6 +980,53 @@ export function stagesToRuntimePlan(
       return { node: bId, port: "level_id" };
     }
     return rawRef;
+  };
+
+  // ── ADR-0025 / FCA #21 — composite-axis key derivation ─────────────
+  // Returns the {node, port} yielding a composite dim's level id, or
+  // null when the dim isn't a well-formed composite (2–3 existing,
+  // non-composite members — R-065's contract; anything else falls back
+  // to the raw path so a malformed catalog degrades, never loops).
+  // Each member resolves via resolveAxisKeyRef (its own band/territory/
+  // class derivation, fed by the member binding the builder harvested
+  // from `maps_to_dimension`), then `derive.composite` joins the level
+  // ids in axis order.
+  const buildCompositeKeyRef = (
+    dimSlug: string,
+    binding: BindingShape | undefined,
+    idTag: string,
+  ): { node: string; port: string } | null => {
+    const boundDim = dimsBySlug.get(dimSlug);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if ((boundDim as any)?.shape !== "composite") return null;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const axes = (boundDim as any)?.axes as readonly string[] | undefined;
+    if (!Array.isArray(axes) || axes.length < 2 || axes.length > 3) {
+      return null;
+    }
+    for (const memberSlug of axes) {
+      const member = dimsBySlug.get(memberSlug);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      if (!member || (member as any)?.shape === "composite") return null;
+    }
+    const joinId = `comp_${idTag}`;
+    nodes.push({
+      id: joinId,
+      kind: "derive.composite",
+      params: { dimSlug, partNames: [...axes] },
+    });
+    axes.forEach((memberSlug, i) => {
+      const memberRef = resolveAxisKeyRef(
+        memberSlug,
+        binding?.axes?.[memberSlug],
+        `${idTag}_m${i + 1}`,
+      );
+      edges.push({
+        from: memberRef,
+        to: { node: joinId, port: `part_${i + 1}` },
+      });
+    });
+    return { node: joinId, port: "level_id" };
   };
 
   // ── G7-full — ONE predicate resolver for every gate site ───────────
@@ -1165,7 +1275,7 @@ export function stagesToRuntimePlan(
         // are `row::col` in the table's `key_dimensions` order; a
         // sort_keys JSON round-trip (e.g. the plan-duplicate endpoint)
         // alphabetized the map and silently flipped every 2-D key
-        // (`loi::t2` looked up against `t2::loi` cells → the whole
+        // (`loi::702` looked up against `702::loi` cells → the whole
         // book errored). When the catalog declares key_dimensions and
         // every declared dim is bound, the DECLARED order wins; unbound
         // extras keep their tail position.
@@ -1300,7 +1410,7 @@ export function stagesToRuntimePlan(
               rows,
               defaultValue: 1.0,
               tableName: ft?.display_name ?? lookup.name ?? lkTag,
-              citation: lookup.description_template ?? "",
+              citation: lookupCitation(lookup),
               // ADR-0056 — authored unknown-key policy (error default).
               onMiss: onMissFor(lookup),
               keySource: `${axis0}, ${axis1}`,
@@ -1452,13 +1562,13 @@ export function stagesToRuntimePlan(
 
         // Brief 83.2 — level ALIASES widen the lookup table: every alias
         // keys the same factor as its level id, so an integrator's raw
-        // vocabulary ("1" for q1, "1500" for ded_1500) resolves with
+        // vocabulary ("1" for ppc_1, "1500" for ded_1500) resolves with
         // zero wire transforms. Authored plan data, applied at projection.
         table = widenTableWithAliases(table, boundDim);
 
         const tableName =
           ft?.display_name ?? lookup.name ?? lookup.factor_kind ?? "factor";
-        const citation = lookup.description_template ?? "";
+        const citation = lookupCitation(lookup);
         const lookupTag = lookup.factor_kind ?? lookup.name ?? dimSlug;
 
         // The producer of this factor's value (node + output port).
@@ -1617,7 +1727,19 @@ export function stagesToRuntimePlan(
           });
           factorRef = { node: lookupId, port: "value" };
 
-          if (derivedFrom?.source_dim && derivedFrom.attribute) {
+          // ── ADR-0025 / FCA #21 — composite dim on a 1-D table ─────
+          // members → their own derivations → derive.composite → key.
+          const compositeKey = buildCompositeKeyRef(
+            dimSlug,
+            binding,
+            `${safeSpec}_${sanitize(dimSlug)}`,
+          );
+          if (compositeKey) {
+            edges.push({
+              from: compositeKey,
+              to: { node: lookupId, port: "key" },
+            });
+          } else if (derivedFrom?.source_dim && derivedFrom.attribute) {
           const attribute = derivedFrom.attribute;
           const sourceDim = dimsBySlug.get(derivedFrom.source_dim);
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -1790,7 +1912,7 @@ export function stagesToRuntimePlan(
       // An authored per-chain carrier LCM (`lcm.value`, Brief 54 / ADR-0047) is
       // the MOST specific source → it wins over the generic per-template
       // {lcmOverride} default and the per-risk input column. This preserves the
-      // Filed rate → round(3 dp) → × LCM order; folding the LCM into base_value
+      // ISO rate → round(3 dp) → × LCM order; folding the LCM into base_value
       // rounds at the wrong point (KS-10 → 1216 vs the 1210 oracle). A chain
       // with no `lcm.value` is unchanged: {lcmOverride} then `lcm.input_path`.
       const lcmConst =
@@ -1804,7 +1926,20 @@ export function stagesToRuntimePlan(
         nodes.push({
           id: lcmNodeId,
           kind: "constant",
-          params: { value: lcmConst, type: "factor" },
+          // FCA #30 (findings 5/48) — when the value came from the
+          // caller's runtime default (chainRuntime E11's identity 1.0)
+          // rather than an AUTHORED lcm.value, it is platform
+          // scaffolding, not filed content: the node stays (it props
+          // up factor-less chains structurally) but carries the mark
+          // so trace + tower surfaces badge it instead of painting a
+          // phantom "× 1 (LCM)" step as filed.
+          params: {
+            value: lcmConst,
+            type: "factor",
+            ...(typeof lcmValue === "number" && Number.isFinite(lcmValue)
+              ? {}
+              : { synthesized: true }),
+          },
         });
       } else if (lcmPath) {
         // A colon-literal path (`literal:1.10`, spec §4.6) IS the LCM —
@@ -1829,7 +1964,7 @@ export function stagesToRuntimePlan(
 
       // ── 4. Exposure-rated tower detection (ADR-0044 D3) ─────────
       // A coverage tower's premium is rate × (exposure ÷ divisor) × LCM
-      // with filed-rate roundings (rate→3 dp, premium→nearest $). Activate this
+      // with ISO roundings (rate→3 dp, premium→nearest $). Activate this
       // mode ONLY when the chainSpec carries a real, resolvable exposure
       // base + a finite divisor > 0. Per-account chains (the IRS-990
       // nonprofit demo — no `exposure_input`) keep the legacy behavior:
@@ -1841,7 +1976,7 @@ export function stagesToRuntimePlan(
       const exposureOptions = Array.isArray(spec.exposure_options)
         ? spec.exposure_options
         : [];
-      // Cold-test (UI-authored Meridian BOP) — a COVERAGE tower (one that carries
+      // Cold-test (UI-authored ISO BOP) — a COVERAGE tower (one that carries
       // a `coverage_value`, e.g. building / bpp) is exposure-rated by
       // construction: its premium scales with that coverage's limit ÷ unit.
       // The Assemble tower-builder leaves `exposure_input` as the dead
@@ -1872,7 +2007,7 @@ export function stagesToRuntimePlan(
       // `exposure_options` is self-signalling (the Assemble default never
       // emits it), so it triggers exposure mode on its own.
       // A coverage tower is exposure-rated by construction — UNLESS it
-      // explicitly opts out with `apply_exposure: false` (e.g. an Meridian BOP
+      // explicitly opts out with `apply_exposure: false` (e.g. an ISO BOP
       // LIABILITY tower whose exposure is baked into its base loss-cost table,
       // keyed by exposure base, not scaled by a limit ÷ unit). Without the
       // opt-out, P1 would wrongly scale liability by its (categorical) limit.
@@ -1930,7 +2065,7 @@ export function stagesToRuntimePlan(
           to: { node: outId, port: "value" },
         });
       } else {
-        // Exposure-rated Meridian example, every step a runtime node
+        // Exposure-rated tower (ISO Rule 23), every step a runtime node
         // so the score needs no harness math:
         //   rate3    = round(rate, 3)
         //   exposure = exposure_input ÷ divisor            (math.op div)
@@ -1999,7 +2134,7 @@ export function stagesToRuntimePlan(
             const whenPath = normalizePath(opt.when?.path ?? "") || opt.when?.path || "";
             const equalsKey =
               opt.when?.equals === undefined ? "" : String(opt.when.equals);
-            // The `when` axis is often a DERIVED dim (Meridian BOP's liab_exposure_base
+            // The `when` axis is often a DERIVED dim (ISO BOP's liab_exposure_base
             // is derived from class_code) — resolve it through the SAME key
             // resolver the lookups use, so the class-conditional exposure
             // (loi/sales/payroll) selects correctly from the RAW submission
@@ -2840,8 +2975,7 @@ export function stagesToRuntimePlan(
   // max(total, min) and round, and emit a `total_premium` output —
   // every step a runtime node so a single-risk plan total is exact.
   //
-  // POLICY-level schedule rating / first-term credit / cross-line
-  // minimum-premium are NOT
+  // POLICY-level IRPM / Pioneer / cross-line minimum-premium are NOT
   // applied here — those live in composePolicy (Brief 62). This is the
   // PLAN total only; for a single plan it is the score, and as one line
   // of a multi-line policy composePolicy's floor governs above it.

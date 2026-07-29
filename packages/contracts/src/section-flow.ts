@@ -1,7 +1,8 @@
 /**
  * Section flow — which sections structurally "feed into" which.
  *
- * The Control Tower shows "feeds into X, Y, Z" hints on each
+ * Per the [plan-control-tower brief](../../../docs/design-briefs/plan-control-tower.md)
+ * §−1.Q8: the Control Tower shows "feeds into X, Y, Z" hints on each
  * section card based on STRUCTURAL spine semantics, regardless of
  * whether actual wires have been authored. This is the Lego studs
  * being visible even on empty plans.
@@ -22,7 +23,7 @@
  *     Eligibility · Territories — cross-cutting; do not feed downstream in this map.
  *
  * The exact downstream set is a judgment call; this is best-effort
- * spine semantics derived from Meridian BOP rating conventions. As the
+ * spine semantics derived from ISO BOP rating conventions. As the
  * substrate ports (Phase A.1) and conformance vectors reveal the
  * actual cascade shape, this map gets revised. The UI uses these
  * hints as "Lego studs" — visible connection intent, not runtime

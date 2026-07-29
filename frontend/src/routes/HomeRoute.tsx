@@ -10,7 +10,7 @@
  *   2 · needs attention — named, ranked, grouped (only when items exist)
  *   3 · Your plans — the core the actuary came for
  *   4 · Your book — the second core
- *   5 · the other rooms — doors to the supporting areas
+ *   5 · the other rooms — doors to the supporting Labs
  *
  * It orchestrates and deep-links; it never re-authors. Copy is
  * single-sourced in @openrater/ui platformCopy (Brief 88 §6).
@@ -68,8 +68,9 @@ const API_BASE = getApiBase();
 
 // Brief 88 P1 — the doors are the SUPPORTING rooms, in nav order (one map
 // of the building). The cores get no doors: Blocks 3–4 are their doors.
-// Model Lab and Data Lab are not part of this platform; Integrations is the
-// one supporting room.
+// Detachment Brief 1 S2 — Model Lab + Data Lab doors removed with the
+// cut; Integrations is the one supporting room. TODO(S2): two-core
+// Home layout pass.
 const DOORS: readonly NavLabItem[] = [
   {
     name: doorCopy.integrations.name,
@@ -81,7 +82,7 @@ const DOORS: readonly NavLabItem[] = [
 
 interface PlanFanResult {
   readonly facts: PlanFacts;
-  /**  — an API Lab route on this plan (opting into that room). */
+  /** MVP-005 — an API Lab route on this plan (opting into that room). */
   readonly hasRoutes: boolean;
 }
 
@@ -124,7 +125,7 @@ export function HomeRoute(): JSX.Element {
       queryKey: ["home", "plan-facts", p.rating_plan_id],
       queryFn: async (): Promise<PlanFanResult> => {
         const detail = await getPlan(p.rating_plan_id);
-        //  — routes ride the same fan-out: connector attention
+        // MVP-005 — routes ride the same fan-out: connector attention
         // engages only when some plan actually wired the API Lab.
         const routes = await listRoutes(p.rating_plan_id).catch(() => ({
           routes: [],
@@ -203,7 +204,7 @@ export function HomeRoute(): JSX.Element {
     () =>
       computePlatformAttention(planFacts, connectorFacts, {
         anyIntegrationPaired,
-        //  — a fresh install never opens on a key nag: the
+        // MVP-005 — a fresh install never opens on a key nag: the
         // connector rows engage once a route exists somewhere.
         hasApiLabRoutes,
       }),
@@ -215,7 +216,7 @@ export function HomeRoute(): JSX.Element {
     () => attention.filter((g) => isAlarm(g.kind) || isSetup(g.kind)),
     [attention],
   );
-  //  — the status line leads with PLANS (the thing the actuary
+  // MVP-005 — the status line leads with PLANS (the thing the actuary
   // came for); connector setup demotes to a suffix behind the route
   // gate above.
   const statusLine = useMemo(
@@ -307,7 +308,7 @@ export function HomeRoute(): JSX.Element {
           >
             {firstRunCopy.primaryCta}
           </Button>
-          {/* Brief 88 R4 — the "Start from the Meridian BOP template" secondary
+          {/* Brief 88 R4 — the "Start from the ISO BOP template" secondary
               ships only when a bundled template exists; recipes/ is empty
               today, so it hides. */}
         </div>
@@ -428,7 +429,7 @@ export function HomeRoute(): JSX.Element {
         </div>
       </section>
 
-      {/* 5 · the other rooms — the supporting areas, in nav order. */}
+      {/* 5 · the other rooms — the supporting Labs, in nav order. */}
       <NavLabs heading={doorCopy.heading} items={DOORS} onNavigate={navigate} />
     </div>
   );

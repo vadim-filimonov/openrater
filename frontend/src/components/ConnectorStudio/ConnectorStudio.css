@@ -380,7 +380,7 @@ select.cstudio__input {
   color: #fff;
   background: var(--rater-accent-primary);
 }
-.cstudio__btn--primary:hover:not(disabled) {
+.cstudio__btn--primary:hover:not(:disabled) {
   background: var(--rater-accent-primary-hover);
 }
 .cstudio__btn--ghost {
@@ -388,7 +388,7 @@ select.cstudio__input {
   background: var(--rater-surface-2);
   border-color: var(--rater-border-subtle);
 }
-.cstudio__btn--ghost:hover:not(disabled) {
+.cstudio__btn--ghost:hover:not(:disabled) {
   border-color: var(--rater-text-subtle);
   color: var(--rater-text-strong);
 }

@@ -34,7 +34,7 @@
  *     a partial chain value must never headline as THE premium.
  *
  * Decoupled from the API client on purpose: inputs are structural
- * wire shapes, so the app, history drawers, and future OpenRater surfaces can all
+ * wire shapes, so rate-lab, history drawers, and future Labs can all
  * feed it whatever their transport returned.
  */
 
@@ -113,6 +113,10 @@ export interface ServerRunTraceView {
 // ── Chain-spec mining ──────────────────────────────────────────────
 
 interface MinedChain {
+  /** FCA #30 (finding 5) — true when the chain AUTHORED an LCM
+   *  (lcm.value or an input binding); false means any const_lcm node
+   *  in the trace is the caller's identity scaffold, not filed. */
+  readonly lcmAuthored: boolean;
   readonly name: string;
   readonly safe: string;
   readonly outputField: string | null;
@@ -160,11 +164,18 @@ function mineChains(stages: readonly TraceStageLike[]): {
         const lookupName = l ? str(l["name"]) : null;
         if (factorKind && lookupName) lookupNames.set(factorKind, lookupName);
       }
+      const lcm = asRecord(c["lcm"]);
+      const lcmAuthored =
+        lcm !== null &&
+        (typeof lcm["value"] === "number" ||
+          (typeof lcm["input_path"] === "string" &&
+            lcm["input_path"] !== ""));
       chains.push({
         name,
         safe: sanitize(name),
         outputField,
         lookupNames,
+        lcmAuthored,
       });
     }
   }
@@ -198,7 +209,12 @@ function mineLabels(
   // Chain scopes — the authored lookup names + the build-up node.
   for (const chain of chains) {
     labels[`chain_${chain.safe}`] = `${chain.name} — build-up`;
-    labels[`const_lcm_${chain.safe}`] = "LCM";
+    // FCA #30 (findings 5/48) — an unauthored LCM node is the
+    // platform's identity scaffold; the label says so instead of
+    // presenting "× 1 (LCM)" as filed content.
+    labels[`const_lcm_${chain.safe}`] = chain.lcmAuthored
+      ? "LCM"
+      : "LCM — platform default, not filed";
     for (const [factorKind, lookupName] of chain.lookupNames) {
       labels[`lk_${chain.safe}_${sanitize(factorKind)}`] = lookupName;
       labels[`mlk_${chain.safe}_${sanitize(factorKind)}`] = lookupName;

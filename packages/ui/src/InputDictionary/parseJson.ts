@@ -48,7 +48,7 @@ function asStringArray(v: unknown): readonly string[] | undefined {
 /**
  * The allowed-value set (E01). Accepts a JSON array (the canonical form)
  * OR a delimited string — so a dictionary exported with
- * `"allowed_values": "t1, t2, t3"` round-trips instead of silently
+ * `"allowed_values": "701, 702, 703"` round-trips instead of silently
  * dropping the enum. A string is comma-split only when the field's
  * `data_type` is an enum (same prose guard as the CSV path).
  */

@@ -59,7 +59,7 @@ import "./FilterRuleEditor.css";
 /**
  * The 8 operators from `EligibilityOp` in @openrater/contracts. Duplicated
  * here as a string union to keep this primitive independent of
- * @openrater/contracts' BlockKind types (@openrater/ui doesn't depend on
+ * @openrater/contracts' BlockKind types (labs-ui doesn't depend on
  * contracts at the type level today; we keep the boundary clean).
  */
 export type FilterOp =
@@ -110,7 +110,7 @@ export interface FilterConditionRow {
 export interface FilterRuleDraft {
   /** Stable identifier; surfaces in the eligibility trace. */
   readonly rule_id: string;
-  /** Human-readable name (e.g., "Class c102 limit cap"). */
+  /** Human-readable name (e.g., "Class 71641 limit cap"). */
   readonly display_name: string;
   /** Quick vs Advanced authoring mode. */
   readonly mode: "quick" | "advanced";
@@ -587,7 +587,7 @@ export function FilterRuleEditor(
             id={`${uid}-name`}
             className="rater-filter-rule-editor__field-input"
             value={draft.display_name}
-            placeholder="e.g., Class c102 limit cap"
+            placeholder="e.g., Class 71641 limit cap"
             aria-required="true"
             onChange={(e) => updateDraft({ display_name: e.target.value })}
             data-testid={`${testId}-name`}
@@ -737,7 +737,7 @@ export function FilterRuleEditor(
             id={`${uid}-citation`}
             className="rater-filter-rule-editor__field-input is-mono"
             value={draft.citation}
-            placeholder="e.g., Meridian BOP 2024 · Rule 12.3"
+            placeholder="e.g., ISO BOP 2024 · Rule 12.3"
             onChange={(e) => updateDraft({ citation: e.target.value })}
             data-testid={`${testId}-citation`}
           />

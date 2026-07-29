@@ -19,6 +19,9 @@
  * Per spec §5.5: recursive subplans (a plan that transitively
  * references itself) are FORBIDDEN and MUST be rejected at compile
  * time as a `cycle` error.
+ *
+ * Ported from `<prototype>/plan-builder/src/blocks/kinds/
+ * subplan.tsx` (Phase A.1 PR 9). PURE half only.
  */
 
 import type { BlockKind, PortSpec } from "../block-types";

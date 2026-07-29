@@ -400,7 +400,7 @@
   font-family: var(--rater-fonts-sans);
   transition: background var(--rater-d-120) var(--rater-ease-soft);
 }
-.rater-geo-wizard__btn:hover:not(disabled) {
+.rater-geo-wizard__btn:hover:not(:disabled) {
   background: var(--rater-surface-3);
 }
 .rater-geo-wizard__btn:disabled {
@@ -412,7 +412,7 @@
   color: var(--rater-text-muted);
   border-color: transparent;
 }
-.rater-geo-wizard__btn--ghost:hover:not(disabled) {
+.rater-geo-wizard__btn--ghost:hover:not(:disabled) {
   background: var(--rater-surface-2);
   color: var(--rater-text-default);
 }
@@ -422,7 +422,7 @@
   border-color: var(--rater-cat-transform);
   font-weight: var(--rater-fw-semibold);
 }
-.rater-geo-wizard__btn--primary:hover:not(disabled) {
+.rater-geo-wizard__btn--primary:hover:not(:disabled) {
   background: color-mix(in srgb, var(--rater-cat-transform) 80%, white);
 }
 

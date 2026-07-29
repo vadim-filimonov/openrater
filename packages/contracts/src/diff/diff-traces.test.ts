@@ -64,10 +64,10 @@ describe("diffTraces — first-divergence detection", () => {
 
   it("citation/explanation differences don't count as outputs divergence", () => {
     const a = {
-      s1: entry("constant", { value: 1 }, { citation: "Meridian Rule MS-R1" }),
+      s1: entry("constant", { value: 1 }, { citation: "ISO §1" }),
     };
     const b = {
-      s1: entry("constant", { value: 1 }, { citation: "Meridian Rule MS-R2" }),
+      s1: entry("constant", { value: 1 }, { citation: "ISO §2" }),
     };
     const result = diffTraces(a, b);
     // The diff is still "changed" overall (citation differs) but

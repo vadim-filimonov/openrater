@@ -1,0 +1,36 @@
+{
+  "name": "V42.eligibility-ks-preferred-credit",
+  "description": "Brief 55: the SAME canonical KS gate fires PREFERRED for a within-appetite bceg_1 risk (18,000 sq ft, $250k sales). It skips the decline + both submit rules, then matches the preferred credit. Proves `preferred` is reachable and is NOT masked by the standard default (the §3.3 single-gate model) — the defect the 3-way editor + lossy bridge could not express.",
+  "plan": {
+    "id": "v40.eligibility_ks_preferred_credit",
+    "version": "1.0.0",
+    "name": "Sample BOP — appetite gate (standard default)",
+    "lines": ["bop"],
+    "effective": "2025-10-01",
+    "nodes": [
+      {
+        "id": "gate",
+        "kind": "eligibility.gate",
+        "params": {
+          "rules": [
+            { "rule_id": "decline_ineligible_class", "variable": "class_code", "op": "in", "value": ["99999"], "tier": "decline", "reasoning": "Class not in the BOP eligibility table — out of appetite." },
+            { "rule_id": "floor_area_cap", "variable": "total_floor_area_sqft", "op": "gt", "value": 35000, "tier": "submit", "reasoning": "Floor area exceeds the 35,000 sq ft BOP eligibility limit (Sample BOP Rule 22.A) — refer to underwriting." },
+            { "rule_id": "gross_sales_cap", "variable": "annual_gross_sales", "op": "gt", "value": 6000000, "tier": "submit", "reasoning": "Annual gross sales exceed the $6M referral threshold." },
+            { "rule_id": "preferred_protected", "variable": "bceg_grade", "op": "eq", "value": "bceg_1", "tier": "preferred", "reasoning": "Top building-code-effectiveness grade — preferred terms." }
+          ],
+          "default_tier": "standard",
+          "default_reasoning": "Within BOP appetite at standard filed rates."
+        },
+        "position": { "x": 0, "y": 0 }
+      },
+      { "id": "out_tier", "kind": "output", "params": { "fieldName": "tier", "fieldType": "string" }, "position": { "x": 200, "y": 0 } },
+      { "id": "out_rule", "kind": "output", "params": { "fieldName": "matched_rule_id", "fieldType": "string" }, "position": { "x": 200, "y": 100 } }
+    ],
+    "edges": [
+      { "from": { "node": "gate", "port": "tier" }, "to": { "node": "out_tier", "port": "value" } },
+      { "from": { "node": "gate", "port": "matched_rule_id" }, "to": { "node": "out_rule", "port": "value" } }
+    ]
+  },
+  "externalInputs": { "class_code": "53989", "total_floor_area_sqft": 18000, "annual_gross_sales": 250000, "bceg_grade": "bceg_1" },
+  "expectedOutputs": { "tier": "preferred", "matched_rule_id": "preferred_protected" }
+}

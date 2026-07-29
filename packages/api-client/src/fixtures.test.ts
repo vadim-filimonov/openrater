@@ -134,9 +134,9 @@ describe("resolveFixture — patterns", () => {
     setFixturePattern("GET", "/api/v1/plans/{id}", () => ({}));
     const resolved = resolveFixture(
       "GET",
-      "/api/v1/plans/meridian%20shopfront%20ne",
+      "/api/v1/plans/iso%20bop%20wi",
     );
-    expect(resolved?.params).toEqual({ id: "meridian shopfront ne" });
+    expect(resolved?.params).toEqual({ id: "iso bop wi" });
   });
 
   it("exact match takes precedence over pattern", () => {
@@ -271,8 +271,8 @@ describe("integration — listPlans through fixture mode", () => {
     enableFixtureMode();
     setFixture("GET", "/api/v1/plans", [
       {
-        rating_plan_id: "sample_bop_ne_2026_demo",
-        display_name: "Meridian BOP NE 2026 (demo fixture)",
+        rating_plan_id: "sample_bop_wi_2026_demo",
+        display_name: "ISO BOP WI 2026 (demo fixture)",
         line_of_business: "bop",
         jurisdiction: "WI",
         effective_date: "2026-07-01",
@@ -292,7 +292,7 @@ describe("integration — listPlans through fixture mode", () => {
     expect(plans).toHaveLength(1);
     const first = plans[0];
     if (!first) throw new Error("expected a plan in fixture");
-    expect(first.rating_plan_id).toBe("sample_bop_ne_2026_demo");
+    expect(first.rating_plan_id).toBe("sample_bop_wi_2026_demo");
     expect(first.line_of_business).toBe("bop");
   });
 });

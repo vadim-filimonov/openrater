@@ -5,7 +5,7 @@
   "asserts": "Republishing a new snapshot to a live plan whose mapping was never re-tested DEMOTES it: no member, a named live_version_untested issue, descriptor status paused; siblings keep rating; a re-test on the new version restores serving.",
   "contract_version": "1.0",
   "world": {
-    "integration": { "name": "Example Integrator — fixture", "paired": true },
+    "integration": { "name": "OpenRater Front — fixture", "paired": true },
     "plans": ["plan-alpha", "plan-beta"],
     "note": "both published + tested + live on v1; the fixture republishes plan-alpha only, so plan-beta is the untouched sibling proving isolation"
   },

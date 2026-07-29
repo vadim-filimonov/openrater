@@ -22,14 +22,18 @@ claude mcp add openrater -- npx tsx services/mcp/src/main.ts
 # env: RATER_API_URL (default http://127.0.0.1:8001) · RATER_APP_URL · RATER_API_KEY
 ```
 
-Tools: `get_transcription_spec` · `get_workbook_template` ·
+Tools: `get_transcription_spec` (sectioned — no argument returns the
+table of contents) · `get_workbook_template` ·
 `get_capability_registry` · `list_plans` · `get_plan` ·
 `get_plan_input_schema` · `validate_workbook` ·
 `build_plan_from_workbook` · `get_build_report` ·
-`export_plan_workbook` · `reingest_diff` · `apply_reingest` ·
-`quote_risk` · `rerate_book` · `open_in_openrater` · `runtime_status`
-(the doctor — health, next actions, and `sample`: the seeded reference
-plan + bundled sample filing/demo-book paths).
+`export_plan_workbook` (build or current state) · `reingest_diff` ·
+`apply_reingest` · `quote_risk` · `rerate_book` · `compare_plans`
+(what changed between two plans, with an Exhibits deep link) ·
+`compare_runs` (same book through two runs: totals, movers, newly
+refused rows) · `open_in_openrater` · `runtime_status` (the doctor —
+health, next actions, and `sample`: the seeded reference plan +
+bundled sample filing/demo-book paths).
 
 ## Rules you must follow
 

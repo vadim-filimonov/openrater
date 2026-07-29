@@ -1,0 +1,57 @@
+{
+  "name": "V64.eligibility-workbook-string-knockout",
+  "description": "FCA fca-2026-07-25 (S0, dead knock-out gates) — the knock-out-true vector the build checks never had. A workbook-built gate persists its boolean rule value as the TEXT 'true' (spec §2.1 declares that a legal boolean spelling); every schema-typed caller sends a JSON boolean. The strict comparator never matched, so the filed hard-decline (Rule 1.3.C, work above three stories) silently rated Standard on quote AND book paths while the trace asserted 'No rule matched' — and 25/25 build vectors stayed green because none set the flag true. The comparator now bridges the boolean/boolean-literal-string seam exactly like E3 bridged numbers: this vector pins tier=decline for the workbook shape (string RHS, boolean input). The ported money field rides along to prove rating arithmetic is untouched by the verdict.",
+  "plan": {
+    "id": "v64.eligibility_workbook_string_knockout",
+    "version": "1.0.0",
+    "name": "Workbook-string boolean knock-out fires on a typed input",
+    "lines": ["liability"],
+    "effective": "2026-01-01",
+    "nodes": [
+      {
+        "id": "in_base",
+        "kind": "input",
+        "params": { "fieldName": "base_premium", "fieldType": "money" },
+        "position": { "x": 0, "y": 0 }
+      },
+      {
+        "id": "gate",
+        "kind": "eligibility.gate",
+        "params": {
+          "rules": [
+            {
+              "rule_id": "decline_work_height",
+              "variable": "work_above_three_stories",
+              "op": "eq",
+              "value": "true",
+              "tier": "decline",
+              "reasoning": "Rule 1.3.C: any operations above three stories in height are not eligible."
+            }
+          ],
+          "default_tier": "standard",
+          "default_reasoning": "Rule 1.3 — no knock-out provision applies."
+        },
+        "position": { "x": 200, "y": 120 }
+      },
+      {
+        "id": "out_premium",
+        "kind": "output",
+        "params": { "fieldName": "premium", "fieldType": "money" },
+        "position": { "x": 400, "y": 0 }
+      },
+      {
+        "id": "out_tier",
+        "kind": "output",
+        "params": { "fieldName": "tier", "fieldType": "string" },
+        "position": { "x": 400, "y": 120 }
+      }
+    ],
+    "edges": [
+      { "from": { "node": "in_base", "port": "value" }, "to": { "node": "out_premium", "port": "value" } },
+      { "from": { "node": "gate", "port": "tier" }, "to": { "node": "out_tier", "port": "value" } }
+    ]
+  },
+  "externalInputs": { "work_above_three_stories": true, "base_premium": 691 },
+  "expectedOutputs": { "premium": 691, "tier": "decline" },
+  "expectedEligibilityTier": "decline"
+}

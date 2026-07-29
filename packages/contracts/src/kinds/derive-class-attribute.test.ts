@@ -3,8 +3,8 @@
  *
  * Locks the runtime contract:
  *   - a class code resolves to its derived structural attribute value
- *   - leading zeros are significant ("00101" ≠ "101") — no lowercasing
- *   - trimmed + coerced value matching (" 45101 ", numeric 45101)
+ *   - leading zeros are significant ("09015" ≠ "9015") — no lowercasing
+ *   - trimmed + coerced value matching (" 53983 ", numeric 53983)
  *   - a class not in the table falls back to defaultValue (or "" when
  *     unset, which then propagates to a downstream lookup's default)
  *   - explainStep renders the auditor-friendly derivation line
@@ -14,52 +14,52 @@
 import { describe, it, expect } from "vitest";
 import { DeriveClassAttributeKind } from "./derive-class-attribute";
 
-// Intentionally invented Meridian reference rows. These identifiers and
-// values are synthetic and are not copied from any carrier or bureau filing.
+// Real ISO BOP class → rate-number rows (from the KS filing class_table)
+// + TC-001's class 53983 (Army/Navy retail) → rate number 09.
 const CLASS_TO_RATE_NUMBER: Readonly<Record<string, string>> = {
-  "00101": "11", // Meridian general merchandise
-  "00102": "12", // Meridian apparel shop
-  "00103": "13", // Meridian professional office
-  "45101": "07", // Meridian neighborhood bakery (leading zero is intentional)
-  "56101": "22", // Meridian hardware shop
+  "09015": "18", // Bagelry
+  "09033": "19", // Catering
+  "09036": "18", // Wine Bar
+  "53983": "09", // Frame Army/Navy retail (test case TC-001)
+  "62106": "01", // Office
 };
 
 describe("derive.class_attribute — execute", () => {
   it("derives a structural attribute from a class code", () => {
     const out = DeriveClassAttributeKind.execute(
-      { class_code: "45101" },
+      { class_code: "53983" },
       { attributeKey: "prop_rate_number", table: CLASS_TO_RATE_NUMBER },
     );
-    expect(out.value).toBe("07");
+    expect(out.value).toBe("09");
   });
 
   it("derives a different class correctly", () => {
     const out = DeriveClassAttributeKind.execute(
-      { class_code: "00101" },
+      { class_code: "09015" },
       { attributeKey: "prop_rate_number", table: CLASS_TO_RATE_NUMBER },
     );
-    expect(out.value).toBe("11");
+    expect(out.value).toBe("18");
   });
 
   it("trims + coerces a numeric class code (defends unknown externalInputs)", () => {
     // A CSV cell or webhook field may arrive as a number or padded.
     const numeric = DeriveClassAttributeKind.execute(
-      { class_code: 45101 as unknown as string },
+      { class_code: 53983 as unknown as string },
       { attributeKey: "prop_rate_number", table: CLASS_TO_RATE_NUMBER },
     );
-    expect(numeric.value).toBe("07");
+    expect(numeric.value).toBe("09");
     const padded = DeriveClassAttributeKind.execute(
-      { class_code: "  45101  " },
+      { class_code: "  53983  " },
       { attributeKey: "prop_rate_number", table: CLASS_TO_RATE_NUMBER },
     );
-    expect(padded.value).toBe("07");
+    expect(padded.value).toBe("09");
   });
 
-  it("preserves leading zeros — '101' does NOT match '00101'", () => {
+  it("preserves leading zeros — '9015' does NOT match '09015'", () => {
     // Class codes are case-sensitive digit-strings; a number that dropped
     // its leading zero must NOT silently resolve to the wrong class.
     const out = DeriveClassAttributeKind.execute(
-      { class_code: 101 as unknown as string },
+      { class_code: 9015 as unknown as string },
       {
         attributeKey: "prop_rate_number",
         table: CLASS_TO_RATE_NUMBER,
@@ -75,10 +75,10 @@ describe("derive.class_attribute — execute", () => {
       {
         attributeKey: "prop_rate_number",
         table: CLASS_TO_RATE_NUMBER,
-        defaultValue: "fallback-rate",
+        defaultValue: "01",
       },
     );
-    expect(out.value).toBe("fallback-rate");
+    expect(out.value).toBe("01");
   });
 
   it("returns empty string on a miss when no default is set (propagates to lookup default)", () => {
@@ -95,22 +95,22 @@ describe("derive.class_attribute — execute", () => {
       {
         attributeKey: "prop_rate_number",
         table: CLASS_TO_RATE_NUMBER,
-        defaultValue: "fallback-rate",
+        defaultValue: "01",
       },
     );
-    expect(out.value).toBe("fallback-rate");
+    expect(out.value).toBe("01");
   });
 });
 
 describe("derive.class_attribute — override (Brief 83 / TV-19)", () => {
   const BASE_TABLE: Readonly<Record<string, string>> = {
-    "45101": "loi", // fictional Meridian occupant class
+    "53983": "loi", // occupant retail class — derived basis is LOI
   };
 
   it("a non-empty override supersedes the class-derived value", () => {
-    // A fictional Meridian occupant class elects the lessors basis.
+    // TV-19: occupant class 53983 electing the lessors basis.
     const out = DeriveClassAttributeKind.execute(
-      { class_code: "45101", override: "lessors_loi" },
+      { class_code: "53983", override: "lessors_loi" },
       { attributeKey: "liab_exposure_base", table: BASE_TABLE },
     );
     expect(out.value).toBe("lessors_loi");
@@ -119,7 +119,7 @@ describe("derive.class_attribute — override (Brief 83 / TV-19)", () => {
   it("an absent/empty/whitespace override falls through to the derivation", () => {
     for (const override of [undefined, "", "   "]) {
       const out = DeriveClassAttributeKind.execute(
-        { class_code: "45101", ...(override !== undefined ? { override } : {}) },
+        { class_code: "53983", ...(override !== undefined ? { override } : {}) },
         { attributeKey: "liab_exposure_base", table: BASE_TABLE },
       );
       expect(out.value).toBe("loi");
@@ -136,7 +136,7 @@ describe("derive.class_attribute — override (Brief 83 / TV-19)", () => {
 
   it("explainStep names the override as declared, not derived", () => {
     const line = DeriveClassAttributeKind.explainStep!(
-      { class_code: "45101", override: "lessors_loi" },
+      { class_code: "53983", override: "lessors_loi" },
       { attributeKey: "liab_exposure_base", table: BASE_TABLE },
       { value: "lessors_loi" },
     );
@@ -167,16 +167,16 @@ describe("derive.class_attribute — explainStep", () => {
     const params = {
       attributeKey: "prop_rate_number",
       table: CLASS_TO_RATE_NUMBER,
-      tableName: "Meridian fictional class table",
+      tableName: "ISO BOP class table",
     };
-    const out = DeriveClassAttributeKind.execute({ class_code: "45101" }, params);
+    const out = DeriveClassAttributeKind.execute({ class_code: "53983" }, params);
     const explain = DeriveClassAttributeKind.explainStep!(
-      { class_code: "45101" },
+      { class_code: "53983" },
       params,
       out,
     );
     expect(explain).toBe(
-      "Derived prop_rate_number of class 45101 → 07 (Meridian fictional class table)",
+      "Derived prop_rate_number of class 53983 → 09 (ISO BOP class table)",
     );
   });
 
@@ -184,7 +184,7 @@ describe("derive.class_attribute — explainStep", () => {
     const params = {
       attributeKey: "liab_class_group",
       table: CLASS_TO_RATE_NUMBER,
-      defaultValue: "mg_default",
+      defaultValue: "cg_01",
     };
     const out = DeriveClassAttributeKind.execute({ class_code: "00000" }, params);
     const explain = DeriveClassAttributeKind.explainStep!(
@@ -193,19 +193,19 @@ describe("derive.class_attribute — explainStep", () => {
       out,
     );
     expect(explain).toBe(
-      "Class 00000 not in liab_class_group table → mg_default (default)",
+      "Class 00000 not in liab_class_group table → cg_01 (default)",
     );
   });
 
   it("falls back to 'attribute' when attributeKey is empty", () => {
     const params = { attributeKey: "", table: CLASS_TO_RATE_NUMBER };
-    const out = DeriveClassAttributeKind.execute({ class_code: "56101" }, params);
+    const out = DeriveClassAttributeKind.execute({ class_code: "62106" }, params);
     const explain = DeriveClassAttributeKind.explainStep!(
-      { class_code: "56101" },
+      { class_code: "62106" },
       params,
       out,
     );
-    expect(explain).toBe("Derived attribute of class 56101 → 22");
+    expect(explain).toBe("Derived attribute of class 62106 → 01");
   });
 });
 

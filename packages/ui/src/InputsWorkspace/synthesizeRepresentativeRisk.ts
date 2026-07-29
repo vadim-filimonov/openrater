@@ -64,9 +64,22 @@ function representativeValueForDim(
   const first = levels[0];
   if (!first) return undefined;
   if (isRawBandPath) {
-    // The first banded level's lower bound always falls inside its own bucket.
+    // The first banded level's lower bound always falls inside its own
+    // bucket — but an OPEN lower bound is −Infinity, and that sentinel
+    // leaked into the rate card's pin chips as "model_year −Infinity"
+    // (FCA #33, finding 118). A representative value must be a FINITE
+    // in-band number: for [−∞, hi) use hi−1 (model year "<2014" pins
+    // 2013 — the natural reading); a fully unbounded band pins 0.
     const lo = bandedLo(first);
-    return lo ?? first.id;
+    if (lo !== undefined && Number.isFinite(lo)) return lo;
+    if (lo !== undefined) {
+      const hi =
+        "hi" in first && typeof first.hi === "number" && Number.isFinite(first.hi)
+          ? first.hi
+          : undefined;
+      return hi !== undefined ? hi - 1 : 0;
+    }
+    return first.id;
   }
   // Direct lookup → the level id IS the key.
   return first.id;

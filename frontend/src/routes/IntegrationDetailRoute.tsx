@@ -88,7 +88,7 @@ const TRACE_LABELS: Record<ExposedPlan["trace_policy"], string> = {
   none: "Premium only",
 };
 
-//  — absolute dates are ISO everywhere.
+// MVP-019 — absolute dates are ISO everywhere.
 const day = (iso: string | null): string => (iso ? isoDate(iso) : "—");
 
 /** Relative time for the pulse — recency is the signal, the exact

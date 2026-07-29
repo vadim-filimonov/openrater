@@ -158,7 +158,7 @@ describe("applyCohortPolicyTail", () => {
 
   it("applies a guarded package_factor per row based on that row's inputs", () => {
     const policy_tail: PolicyAdjustment[] = [
-      { kind: "package_factor", id: "first_term_credit", display_name: "First-term credit", factor: 0.9, when: { field: "is_first_term", op: "eq", value: true } },
+      { kind: "package_factor", id: "pioneer", display_name: "Pioneer", factor: 0.9, when: { field: "is_first_term", op: "eq", value: true } },
     ];
     const out = applyCohortPolicyTail({
       plan: { policy_tail },
@@ -166,7 +166,7 @@ describe("applyCohortPolicyTail", () => {
       results: results([1000, 1000]),
       premiumColumn: "final_premium",
     });
-    expect(out[0]!.filed).toBe(900); // first-term credit applies
+    expect(out[0]!.filed).toBe(900); // Pioneer applies
     expect(out[0]!.adjustments[0]!.applied).toBe(true);
     expect(out[1]!.filed).toBe(1000); // guard miss — visible no-op
     expect(out[1]!.adjustments[0]!.applied).toBe(false);
@@ -175,7 +175,7 @@ describe("applyCohortPolicyTail", () => {
   it("threads the full ordered tail (IRPM → package → endorsement → floor)", () => {
     const policy_tail: PolicyAdjustment[] = [
       { kind: "schedule_rating", id: "irpm", display_name: "IRPM", cap_pct: 25, source: { from: "literal", total: -10 } },
-      { kind: "package_factor", id: "first_term_credit", display_name: "First-term credit", factor: 0.9, when: { field: "is_first_term", op: "eq", value: true } },
+      { kind: "package_factor", id: "pioneer", display_name: "Pioneer", factor: 0.9, when: { field: "is_first_term", op: "eq", value: true } },
       { kind: "endorsement", id: "terror", display_name: "Terrorism", effect: { kind: "flat", amount: 18 } },
       { kind: "minimum_premium", id: "min", floor: 500 },
     ];

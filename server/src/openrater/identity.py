@@ -9,7 +9,7 @@
 
 One durable, pseudonymous `risk_id` per risk, minted ONCE at the risk's
 first durable touch (in practice by openrater-front) and echoed — never
-re-minted — by every other party. OpenRater never mints: this module only
+re-minted — by every other party. Labs never mints: this module only
 recognizes.
 
 The wire convention (ADR-0060 rule 2): there is no new wire field. A

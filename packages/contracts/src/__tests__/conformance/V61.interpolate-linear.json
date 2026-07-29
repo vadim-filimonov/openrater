@@ -1,6 +1,6 @@
 {
   "name": "V61.interpolate-linear",
-  "description": "A fictional Meridian relativity is interpolated between breakpoints. A building limit of 315000 lies between (250000, 1.30) and (500000, 1.45), producing 1.339; a banded table would instead use one factor for the entire band.",
+  "description": "interpolate kind — a relativity read off a curve BETWEEN breakpoints (ADR-0063; the F14 gap, audit A-2026-07-12 P5-01). building_limit=315000 sits between the (250000, 1.30) and (500000, 1.45) breakpoints; linear interpolation yields 1.30 + (315000-250000)/(500000-250000) * (1.45-1.30) = 1.339 — where a banded/stepped table would snap to the band's single factor. Proves the primitive computes the interpolated factor through the engine; the full Sample BOP F14 proof (TV-16 -> $2,430) lives in the cold-test fixture guard.",
   "plan": {
     "id": "v47.interpolate",
     "version": "1.0.0",

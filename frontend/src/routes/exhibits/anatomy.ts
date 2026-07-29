@@ -1,5 +1,5 @@
 /**
- * Exhibits — pure derivations for the wall (current Exhibits design).
+ * Exhibits — pure derivations for the wall (Brief: portfolio-redesign v2 §5.3).
  *
  * Everything the exhibit draws is computed here from the plan substrate
  * the API already serves: factor tables (with inline cell maps) and
@@ -15,6 +15,7 @@
  */
 
 import type { PlanDimension, PlanFactorTable } from "@openrater/api-client";
+import { compareNatural } from "@openrater/contracts";
 
 /** How a tile draws. Decided from the table's key dimensions. */
 export type TileKind =
@@ -122,9 +123,14 @@ export function orderedLevelValues(
   dim: PlanDimension,
 ): readonly LevelValue[] {
   const territories = dim.geo_territories;
+  // FCA #26 (finding 119) — territories present in NATURAL order
+  // (T1…T10) on every surface reading tile values (grid, legend,
+  // rail), not workbook source order. Display-only sort.
   const domain: readonly { id?: unknown; label?: unknown }[] =
     isGeographic(dim) && territories !== null && territories !== undefined && territories.length > 0
-      ? territories
+      ? [...territories].sort((a, b) =>
+          compareNatural(a.label || a.id, b.label || b.id),
+        )
       : (dim.levels as readonly LevelRecord[]);
   const out: LevelValue[] = [];
   for (const raw of domain) {

@@ -6,7 +6,7 @@
  * returns a `model_output` with the predicted value and per-feature
  * contributions.
  *
- * OpenRater supports one deterministic path:
+ * Detachment Brief 1 §4 S1 — ONE path in OpenRater:
  *
  *   · **Inline coefficients** (`params.coefficients` + `intercept` +
  *     `link`) evaluate directly through the shared pure GLM core
@@ -23,7 +23,7 @@
 import type { BlockKind, PortSpec } from "../block-types";
 import { evaluateGlm } from "../glm-math";
 
-/** A governed-by-id GLM cannot resolve in OpenRater. */
+/** S1 refusal — a governed-by-id GLM cannot resolve in OpenRater. */
 export const GLM_REGISTRY_RETIRED_MESSAGE =
   "model.glm: registry-governed models are not supported in OpenRater — " +
   "provide inline coefficients (a filed coefficient table is typed plan " +

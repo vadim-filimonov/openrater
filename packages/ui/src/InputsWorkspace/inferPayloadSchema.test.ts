@@ -21,8 +21,8 @@ describe("inferPayloadSchema — flat object", () => {
   it("emits one field per top-level key in document order", () => {
     const r = inferPayloadSchema({
       policy_id: "BOP-001",
-      class_code: "c101",
-      tiv: 1360000,
+      class_code: "09011",
+      tiv: 1247438,
     });
     expect(r.fields).toEqual([
       { name: "policy_id", dtype: "string" },
@@ -56,8 +56,8 @@ describe("inferPayloadSchema — nested object", () => {
     const r = inferPayloadSchema({
       policy_id: "BOP-001",
       policy: {
-        class_code: "c101",
-        tiv: 1360000,
+        class_code: "09011",
+        tiv: 1247438,
         construction: "Frame",
       },
     });
@@ -214,10 +214,10 @@ describe("inferPayloadSchema — Brief 38 fixture: realistic webhook response", 
       {
         policy_id: "BOP-001",
         policy: {
-          class_code: "c101",
-          tiv: 1360000,
+          class_code: "09011",
+          tiv: 1247438,
           construction: "Frame",
-          quality_grade: "q1",
+          protection_class: "4",
           sprinklered: true,
           year_built: 1987,
           eff_date: "2026-07-01",

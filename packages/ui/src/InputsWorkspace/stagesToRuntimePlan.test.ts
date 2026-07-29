@@ -190,7 +190,7 @@ describe("stagesToRuntimePlan", () => {
               },
             },
           ],
-          lcm: { value: 1.4 }, // authored carrier constant
+          lcm: { value: 1.401 }, // authored carrier constant
           output_field: "do_premium",
         },
       ]),
@@ -213,8 +213,8 @@ describe("stagesToRuntimePlan", () => {
       do_base_rate: 600,
       ntee_major: "philanthropy",
     });
-    // 600 × 0.85 × 1.4 = 714
-    expect(result.outputs.do_premium).toBeCloseTo(714, 6);
+    // 600 × 0.85 × 1.401 = 714.51
+    expect(result.outputs.do_premium).toBeCloseTo(714.51, 6);
   });
 
   it("lcm.value wins over lcmOverride (precedence)", () => {
@@ -224,7 +224,7 @@ describe("stagesToRuntimePlan", () => {
           name: "do_premium",
           base_input: "form_input.do_base_rate",
           factor_lookups: [],
-          lcm: { value: 1.4 }, // wins over the 1.35 override below
+          lcm: { value: 1.401 }, // wins over the 1.35 override below
           output_field: "do_premium",
         },
       ]),
@@ -234,8 +234,8 @@ describe("stagesToRuntimePlan", () => {
     });
     const compiled = compilePlan(plan);
     const result = runPlan(compiled, { do_base_rate: 600 });
-    // 600 × 1.4 = 840 (NOT 600 × 1.35 = 810)
-    expect(result.outputs.do_premium).toBeCloseTo(840, 6);
+    // 600 × 1.401 = 840.6 (NOT 600 × 1.35 = 810)
+    expect(result.outputs.do_premium).toBeCloseTo(840.6, 6);
   });
 
   // ── Cold-test L30 — literal base_value (no template_id, no defaults) ──
@@ -498,6 +498,238 @@ describe("stagesToRuntimePlan", () => {
     expect((baseInputNode!.params as { defaultValue?: unknown }).defaultValue).toBe(600);
   });
 
+  // FCA fca-2026-07-25 (S0 — declared defaults honored NOWHERE): the
+  // workbook inputs sheet's default_value lands in the input_node
+  // stage config and get_plan_input_schema echoes it, but the
+  // projector only ever read options.defaults — which no scoring
+  // caller populates — so a filed default ('no deductible means
+  // factor 1.000', 'absence means not elected') was dead on quote,
+  // book, and canvas paths alike: the omitted field refused or NaNed
+  // instead of defaulting. The projector now harvests the authored
+  // default_value from the input_node declarations themselves.
+  it("applies the workbook-authored default_value from input_node declarations (FCA default-applied)", () => {
+    const stages: StageLike[] = [
+      {
+        stage_id: "input_do_base_rate",
+        stage_kind: "input_node",
+        config_json: {
+          name: "do_base_rate",
+          data_type: "money",
+          source: "form",
+          source_path: "do_base_rate",
+          required: false,
+          default_value: 600,
+          output_field: "value",
+        },
+      },
+      {
+        stage_id: "input_ntee_major",
+        stage_kind: "input_node",
+        config_json: {
+          name: "ntee_major",
+          data_type: "string",
+          source: "form",
+          source_path: "ntee_major",
+          required: false,
+          default_value: "religion",
+          output_field: "value",
+        },
+      },
+      chainStage("do_chain_stage", [
+        {
+          name: "do_premium",
+          base_input: "form_input.do_base_rate",
+          factor_lookups: [
+            {
+              name: "ntee_factor_do",
+              factor_kind: "ntee_factor_do",
+              dimensions: {
+                ntee_major: { source: "form_input", path: "form_input.ntee_major" },
+              },
+            },
+          ],
+          lcm: { input_path: "form_input.lcm" },
+          output_field: "do_premium",
+        },
+      ]),
+    ];
+    const factorTables: FactorTableLike[] = [
+      { id: "ft_do", display_name: "NTEE D&O", key_dimension: "ntee_major", slug: "ntee_factor_do" } as unknown as FactorTableLike,
+    ];
+    const cells = new Map<string, ReadonlyMap<string, number>>([
+      ["ft_do", new Map([["religion", 1.20]])],
+    ]);
+    const { plan } = stagesToRuntimePlan(stages, [NTEE_DIM], factorTables, cells, {
+      lcmOverride: 1.35,
+      // NO options.defaults — the declarations alone must carry.
+    });
+
+    // Both authored defaults land on their input nodes.
+    const nodeDefault = (fieldName: string): unknown =>
+      (
+        plan.nodes.find(
+          (n) =>
+            n.kind === "input" &&
+            (n.params as { fieldName?: string }).fieldName === fieldName,
+        )?.params as { defaultValue?: unknown }
+      )?.defaultValue;
+    expect(nodeDefault("do_base_rate")).toBe(600);
+    expect(nodeDefault("ntee_major")).toBe("religion");
+
+    const compiled = compilePlan(plan);
+    // Row supplies NEITHER field — the filed defaults price the risk:
+    // 600 (default) × 1.20 (default key 'religion') × 1.35 = 972.
+    const result = runPlan(compiled, {});
+    expect(result.outputs.do_premium).toBeCloseTo(972, 6);
+    expect(result.row_status).toBe("ok");
+
+    // A supplied value still wins over the default.
+    const supplied = runPlan(compiled, { do_base_rate: 1000 });
+    // 1000 × 1.20 × 1.35 = 1620
+    expect(supplied.outputs.do_premium).toBeCloseTo(1620, 6);
+  });
+
+  // FCA fca-2026-07-25 finding #9 — the trace's Citation: line rendered
+  // the raw description template ('class_rate_premises: ×{value}')
+  // instead of the workbook's filed citation. The builder writes BOTH
+  // fields onto every lookup; the projector wired the wrong one.
+  describe("lookup citations (FCA #9 — ×{value} placeholder)", () => {
+    const stagesWith = (
+      lookupExtra: Record<string, unknown>,
+    ): StageLike[] => [
+      chainStage("do_chain_stage", [
+        {
+          name: "do_premium",
+          base_input: "form_input.do_base_rate",
+          factor_lookups: [
+            {
+              name: "class_rate_premises",
+              factor_kind: "ntee_factor_do",
+              dimensions: {
+                ntee_major: { source: "form_input", path: "form_input.ntee_major" },
+              },
+              ...lookupExtra,
+            } as never,
+          ],
+          lcm: { value: 1.0 },
+          output_field: "do_premium",
+        },
+      ]),
+    ];
+    const factorTables: FactorTableLike[] = [
+      { id: "ft_do", display_name: "NTEE D&O", key_dimension: "ntee_major", slug: "ntee_factor_do" } as unknown as FactorTableLike,
+    ];
+    const cells = new Map<string, ReadonlyMap<string, number>>([
+      ["ft_do", new Map([["religion", 1.2]])],
+    ]);
+    const lookupNode = (plan: { nodes: readonly { kind: string; params: unknown }[] }) =>
+      plan.nodes.find((n) => n.kind === "lookup.direct")!;
+
+    it("renders the workbook's citation_rule + citation_page, never the template", () => {
+      const { plan } = stagesToRuntimePlan(
+        stagesWith({
+          citation_rule: "Table R-4, Premises column",
+          citation_page: "pp.10-11",
+          description_template: "class_rate_premises: ×{value}",
+        }),
+        [NTEE_DIM],
+        factorTables,
+        cells,
+      );
+      const citation = (lookupNode(plan).params as { citation?: string })
+        .citation;
+      expect(citation).toBe("Table R-4, Premises column - pp.10-11");
+      expect(citation).not.toContain("{value}");
+
+      // …and the run trace carries it to the drawer.
+      const compiled = compilePlan(plan);
+      const result = runPlan(compiled, {
+        do_base_rate: 600,
+        ntee_major: "religion",
+      });
+      const traced = Object.values(result.trace).find(
+        (t) => t.citation !== undefined && t.citation !== "",
+      );
+      expect(traced?.citation).toBe("Table R-4, Premises column - pp.10-11");
+    });
+
+    it("degrades to the lone authored citation half", () => {
+      const { plan } = stagesToRuntimePlan(
+        stagesWith({
+          citation_rule: "Rule 1.6",
+          description_template: "ded: ×{value}",
+        }),
+        [NTEE_DIM],
+        factorTables,
+        cells,
+      );
+      expect(
+        (lookupNode(plan).params as { citation?: string }).citation,
+      ).toBe("Rule 1.6");
+    });
+
+    it("no citation fields → EMPTY citation (the template never leaks)", () => {
+      const { plan } = stagesToRuntimePlan(
+        stagesWith({ description_template: "class_rate_premises: ×{value}" }),
+        [NTEE_DIM],
+        factorTables,
+        cells,
+      );
+      expect(
+        (lookupNode(plan).params as { citation?: string }).citation,
+      ).toBe("");
+    });
+  });
+
+  it("caller-supplied options.defaults win over the declared default_value", () => {
+    const stages: StageLike[] = [
+      {
+        stage_id: "input_do_base_rate",
+        stage_kind: "input_node",
+        config_json: {
+          name: "do_base_rate",
+          data_type: "money",
+          source: "form",
+          source_path: "do_base_rate",
+          required: false,
+          default_value: 600,
+          output_field: "value",
+        },
+      },
+      chainStage("do_chain_stage", [
+        {
+          name: "do_premium",
+          base_input: "form_input.do_base_rate",
+          factor_lookups: [
+            {
+              name: "ntee_factor_do",
+              factor_kind: "ntee_factor_do",
+              dimensions: {
+                ntee_major: { source: "form_input", path: "form_input.ntee_major" },
+              },
+            },
+          ],
+          lcm: { input_path: "form_input.lcm" },
+          output_field: "do_premium",
+        },
+      ]),
+    ];
+    const factorTables: FactorTableLike[] = [
+      { id: "ft_do", display_name: "NTEE D&O", key_dimension: "ntee_major", slug: "ntee_factor_do" } as unknown as FactorTableLike,
+    ];
+    const cells = new Map<string, ReadonlyMap<string, number>>([
+      ["ft_do", new Map([["religion", 1.20]])],
+    ]);
+    const { plan } = stagesToRuntimePlan(stages, [NTEE_DIM], factorTables, cells, {
+      lcmOverride: 1.35,
+      defaults: { do_base_rate: 300 }, // the caller's constant wins
+    });
+    const compiled = compilePlan(plan);
+    const result = runPlan(compiled, { ntee_major: "religion" });
+    // 300 (caller default) × 1.20 × 1.35 = 486 — not 600-based 972.
+    expect(result.outputs.do_premium).toBeCloseTo(486, 6);
+  });
+
   it("inserts derive.band when the bound dim is banded + binding uses raw field name (PR D3.3 — ADR-0026)", () => {
     // The chain references `revenue_band` (the dim slug) but the
     // binding path supplies `revenue` (the raw column). The projector
@@ -583,7 +815,7 @@ describe("stagesToRuntimePlan", () => {
 
   it("clamps an out-of-range value onto the top band instead of silent 1.0 (cold-test L22)", () => {
     // The cold-test shape: a FINITE-tailed revenue band (top band stops
-    // at 5M). A $7.4M row falls past every band. Before L22 it resolved to
+    // at 5M). A $6M row falls past every band. Before L22 it resolved to
     // derive.band → "" → lookup default 1.0 (under-pricing). Now the
     // projector's clampToNearest pins it to the top band's factor.
     const stages: StageLike[] = [
@@ -611,7 +843,7 @@ describe("stagesToRuntimePlan", () => {
     const cells = new Map<string, ReadonlyMap<string, number>>([
       ["ft_rev_do", new Map([
         ["01_under_1m", 1.0],
-        ["02_1m_5m",    1.75], // top band — the out-of-range row must get it
+        ["02_1m_5m",    1.75], // top band — the factor the $6M row must get
       ])],
     ]);
     const REVENUE_DIM = {
@@ -633,8 +865,8 @@ describe("stagesToRuntimePlan", () => {
     });
     const compiled = compilePlan(plan);
 
-    // $7.4M is out of range → clamps to top band (1.75), NOT 1.0.
-    const r = runPlan(compiled, { revenue: 7_400_000 });
+    // $6M is out of range → clamps to top band (1.75), NOT 1.0.
+    const r = runPlan(compiled, { revenue: 6_000_000 });
     expect(r.outputs.do_premium).toBeCloseTo(1000 * 1.75 * 1.0, 4); // 1750, not 1000
 
     // The derive.band trace flags the clamp so the UI can warn.
@@ -903,8 +1135,8 @@ describe("stagesToRuntimePlan", () => {
       // Each level snapshots the class's derived attributes — the
       // projector builds the derive.class_attribute table from these.
       levels: [
-        { kind: "categorical", id: "c101", label: "Meridian Neighborhood Bakery", aliases: [], attributes: { prop_rate_number: "07" } },
-        { kind: "categorical", id: "c102", label: "Meridian General Merchandise", aliases: [], attributes: { prop_rate_number: "11" } },
+        { kind: "categorical", id: "53983", label: "Army/Navy Retail", aliases: [], attributes: { prop_rate_number: "09" } },
+        { kind: "categorical", id: "09015", label: "Bagelry", aliases: [], attributes: { prop_rate_number: "18" } },
       ],
     } as unknown as Dimension;
   }
@@ -919,8 +1151,8 @@ describe("stagesToRuntimePlan", () => {
       shape: "categorical",
       derived_from: { source_dim: "class_code", attribute: "prop_rate_number" },
       levels: [
-        { kind: "categorical", id: "07", label: "07" },
-        { kind: "categorical", id: "11", label: "11" },
+        { kind: "categorical", id: "09", label: "09" },
+        { kind: "categorical", id: "18", label: "18" },
       ],
     } as unknown as Dimension;
   }
@@ -957,7 +1189,7 @@ describe("stagesToRuntimePlan", () => {
     } as unknown as FactorTableLike,
   ];
   const classCells = new Map<string, ReadonlyMap<string, number>>([
-    ["ft_rate_no", new Map([["07", 1.25], ["11", 1.0]])],
+    ["ft_rate_no", new Map([["09", 1.504], ["18", 0.92]])],
   ]);
 
   it("inserts derive.class_attribute for a class-derived structural dim (ADR-0035 / Brief 51)", () => {
@@ -966,7 +1198,7 @@ describe("stagesToRuntimePlan", () => {
       [classCodeDim(), rateNumberDim()],
       classFactorTables,
       classCells,
-      { lcmOverride: 1.4, defaults: { base_rate: 0.4 } },
+      { lcmOverride: 1.401, defaults: { base_rate: 0.389 } },
     );
     const kinds = plan.nodes.map((n) => n.kind);
     expect(kinds).toContain("derive.class_attribute");
@@ -979,22 +1211,22 @@ describe("stagesToRuntimePlan", () => {
     };
     expect(params.attributeKey).toBe("prop_rate_number");
     // The class→attribute table is snapshotted from class_code's levels.
-    expect(params.table["c101"]).toBe("07");
-    expect(params.table["c102"]).toBe("11");
+    expect(params.table["53983"]).toBe("09");
+    expect(params.table["09015"]).toBe("18");
   });
 
-  it("scores a risk through a fictional class-derived rate number (c101 → 07 → 1.25)", () => {
+  it("scores a risk THROUGH the class-derived rate number (53983 → 09 → 1.504)", () => {
     const { plan } = stagesToRuntimePlan(
       classChainStages(),
       [classCodeDim(), rateNumberDim()],
       classFactorTables,
       classCells,
-      { lcmOverride: 1.4, defaults: { base_rate: 0.4 } },
+      { lcmOverride: 1.401, defaults: { base_rate: 0.389 } },
     );
     const compiled = compilePlan(plan);
-    const out = runPlan(compiled, { class_code: "c101" });
-    // Fictional values: base 0.4 × rate-number relativity 1.25 × LCM 1.4.
-    expect(out.outputs.building_premium).toBeCloseTo(0.4 * 1.25 * 1.4, 4);
+    const out = runPlan(compiled, { class_code: "53983" });
+    // base 0.389 × rate-number-rel 1.504 (derived from class 53983) × LCM 1.401
+    expect(out.outputs.building_premium).toBeCloseTo(0.389 * 1.504 * 1.401, 4);
   });
 
   it("honors derived_from.override_field — a declared value supersedes the class derivation (Brief 83 / TV-19)", () => {
@@ -1014,7 +1246,7 @@ describe("stagesToRuntimePlan", () => {
       [classCodeDim(), dimWithOverride],
       classFactorTables,
       classCells,
-      { lcmOverride: 1.4, defaults: { base_rate: 0.4 } },
+      { lcmOverride: 1.401, defaults: { base_rate: 0.389 } },
     );
     // The override input node exists and feeds the derive's override port.
     const derive = plan.nodes.find((n) => n.kind === "derive.class_attribute");
@@ -1024,46 +1256,46 @@ describe("stagesToRuntimePlan", () => {
     expect(ovEdge).toBeDefined();
 
     const compiled = compilePlan(plan);
-    // No override supplied → class-derived (c101 → 07 → 1.25).
-    const derived = runPlan(compiled, { class_code: "c101" });
+    // No override supplied → class-derived (53983 → 09 → 1.504).
+    const derived = runPlan(compiled, { class_code: "53983" });
     expect(derived.outputs.building_premium).toBeCloseTo(
-      0.4 * 1.25 * 1.4,
+      0.389 * 1.504 * 1.401,
       4,
     );
-    // Declared override → supersedes (→ 11 → 1.0).
+    // Declared override → supersedes (→ 18 → 0.92).
     const overridden = runPlan(compiled, {
-      class_code: "c101",
-      rate_number_override: "11",
+      class_code: "53983",
+      rate_number_override: "18",
     });
     expect(overridden.outputs.building_premium).toBeCloseTo(
-      0.4 * 1.0 * 1.4,
+      0.389 * 0.92 * 1.401,
       4,
     );
     // Blank override (the book's empty CSV cell) → class-derived again.
     const blank = runPlan(compiled, {
-      class_code: "c101",
+      class_code: "53983",
       rate_number_override: "",
     });
     expect(blank.outputs.building_premium).toBeCloseTo(
-      0.4 * 1.25 * 1.4,
+      0.389 * 1.504 * 1.401,
       4,
     );
   });
 
   it("level ALIASES widen lookups — the integrator's raw vocabulary rates exactly (Brief 83.2)", () => {
-    // q1 authors alias "1": a quote sending the raw "1" must resolve
+    // ppc_1 authors alias "1": a quote sending the raw "1" must resolve
     // the same factor as the level id, with zero wire transforms.
-    const qualityGradeDim = {
-      id: "quality_grade",
-      slug: "quality_grade",
-      display_name: "Meridian quality grade",
+    const ppcDim = {
+      id: "ppc",
+      slug: "ppc",
+      display_name: "Protection class",
       data_type: "string",
       role: "rating-input",
       dimension_type: "standard",
       shape: "categorical",
       levels: [
-        { kind: "categorical", id: "q1", label: "Quality grade 1", aliases: ["1"] },
-        { kind: "categorical", id: "q2", label: "Quality grade 2", aliases: ["2"] },
+        { kind: "categorical", id: "ppc_1", label: "PPC 1", aliases: ["1"] },
+        { kind: "categorical", id: "ppc_2", label: "PPC 2", aliases: ["2"] },
       ],
     } as unknown as Dimension;
     const stages: StageLike[] = [
@@ -1073,13 +1305,10 @@ describe("stagesToRuntimePlan", () => {
           base_input: "form_input.base_rate",
           factor_lookups: [
             {
-              name: "quality_grade_rel",
-              factor_kind: "quality_grade_rel",
+              name: "ppc_rel",
+              factor_kind: "ppc_rel",
               dimensions: {
-                quality_grade: {
-                  source: "form_input",
-                  path: "form_input.quality_grade",
-                },
+                ppc: { source: "form_input", path: "form_input.ppc" },
               },
             },
           ],
@@ -1090,26 +1319,26 @@ describe("stagesToRuntimePlan", () => {
     ];
     const fts: FactorTableLike[] = [
       {
-        id: "ft_quality_grade",
-        display_name: "Meridian quality-grade factor",
-        key_dimension: "quality_grade",
-        slug: "quality_grade_rel",
+        id: "ft_ppc",
+        display_name: "PPC relativity",
+        key_dimension: "ppc",
+        slug: "ppc_rel",
       } as unknown as FactorTableLike,
     ];
     const cells = new Map<string, ReadonlyMap<string, number>>([
-      ["ft_quality_grade", new Map([["q1", 0.9], ["q2", 1.1]])],
+      ["ft_ppc", new Map([["ppc_1", 0.9], ["ppc_2", 1.1]])],
     ]);
-    const { plan } = stagesToRuntimePlan(stages, [qualityGradeDim], fts, cells, {
+    const { plan } = stagesToRuntimePlan(stages, [ppcDim], fts, cells, {
       defaults: { base_rate: 100 },
     });
     const compiled = compilePlan(plan);
     // The level id and its alias resolve identically.
-    const byId = runPlan(compiled, { quality_grade: "q1" });
-    const byAlias = runPlan(compiled, { quality_grade: "1" });
+    const byId = runPlan(compiled, { ppc: "ppc_1" });
+    const byAlias = runPlan(compiled, { ppc: "1" });
     expect(byId.outputs.building_premium).toBeCloseTo(90, 6);
     expect(byAlias.outputs.building_premium).toBeCloseTo(90, 6);
     // An alias never shadows a real id from another level.
-    const other = runPlan(compiled, { quality_grade: "2" });
+    const other = runPlan(compiled, { ppc: "2" });
     expect(other.outputs.building_premium).toBeCloseTo(110, 6);
   });
 
@@ -1227,7 +1456,7 @@ describe("stagesToRuntimePlan", () => {
       [classCodeDim(), dimWithOverride],
       classFactorTables,
       classCells,
-      { lcmOverride: 1.4, defaults: { base_rate: 0.4 } },
+      { lcmOverride: 1.401, defaults: { base_rate: 0.389 } },
     );
     const inputFields = plan.nodes
       .filter((n) => n.kind === "input")
@@ -2008,12 +2237,12 @@ describe("stagesToRuntimePlan", () => {
           scope: "row",
           rules: [
             {
-              rule_id: "quality_decline",
-              variable: "quality_grade",
+              rule_id: "pc_decline",
+              variable: "protection_class",
               op: "eq",
-              value: "q10",
+              value: "10",
               tier: "decline",
-              reasoning: "Outside Meridian appetite.",
+              reasoning: "Unprotected.",
             },
           ],
           default_tier: "standard",
@@ -2325,8 +2554,8 @@ describe("stagesToRuntimePlan", () => {
   //
   // base_lc_property is territory × coverage (Sample BOP 2025). The
   // Building tower (coverage_value:"building") must pull the building
-  // column {t1:0.4, t2:0.4}; the BPP tower the bpp column
-  // {t1:0.199, t2:0.180}. Before the slice landed, the projector
+  // column {701:0.389, 702:0.389}; the BPP tower the bpp column
+  // {701:0.199, 702:0.180}. Before the slice landed, the projector
   // dropped every "rowId::colId" cell → empty table → both towers
   // priced at the neutral 1.0 (these tests were RED).
   // ──────────────────────────────────────────────────────────────────
@@ -2343,7 +2572,7 @@ describe("stagesToRuntimePlan", () => {
   const BASE_LC_TABLE: FactorTableLike[] = [
     {
       id: "ft_base_lc",
-      display_name: "Meridian base factor",
+      display_name: "KS base loss cost",
       key_dimensions: ["territory", "coverage"],
       slug: "base_lc_property",
     } as unknown as FactorTableLike,
@@ -2353,10 +2582,10 @@ describe("stagesToRuntimePlan", () => {
     [
       "ft_base_lc",
       new Map([
-        ["t1::building", 0.4],
-        ["t1::bpp", 0.199],
-        ["t2::building", 0.4],
-        ["t2::bpp", 0.18],
+        ["701::building", 0.389],
+        ["701::bpp", 0.199],
+        ["702::building", 0.389],
+        ["702::bpp", 0.18],
       ]),
     ],
   ]);
@@ -2414,15 +2643,15 @@ describe("stagesToRuntimePlan", () => {
     );
     const compiled = compilePlan(plan);
 
-    // territory t1 — building col 0.4, bpp col 0.199 (DIFFERENT cols)
-    const rT1 = runPlan(compiled, { territory: "t1" });
-    expect(rT1.outputs.building_premium).toBeCloseTo(400, 6); // 1000 × 0.4
-    expect(rT1.outputs.bpp_premium).toBeCloseTo(199, 6); // 1000 × 0.199
+    // territory 701 — building col 0.389, bpp col 0.199 (DIFFERENT cols)
+    const r701 = runPlan(compiled, { territory: "701" });
+    expect(r701.outputs.building_premium).toBeCloseTo(389, 6); // 1000 × 0.389
+    expect(r701.outputs.bpp_premium).toBeCloseTo(199, 6); // 1000 × 0.199
 
-    // territory t2 — building col 0.4, bpp col 0.180
-    const rT2 = runPlan(compiled, { territory: "t2" });
-    expect(rT2.outputs.building_premium).toBeCloseTo(400, 6);
-    expect(rT2.outputs.bpp_premium).toBeCloseTo(180, 6); // 1000 × 0.180
+    // territory 702 — building col 0.389, bpp col 0.180
+    const r702 = runPlan(compiled, { territory: "702" });
+    expect(r702.outputs.building_premium).toBeCloseTo(389, 6);
+    expect(r702.outputs.bpp_premium).toBeCloseTo(180, 6); // 1000 × 0.180
   });
 
   it("ADR-0044 D5 — a 2-D table with two LIVE axes (no coverage tower) resolves via lookup.multi", () => {
@@ -2472,11 +2701,11 @@ describe("stagesToRuntimePlan", () => {
     // The dual-input table is keyed by a lookup.multi (both axes live).
     expect(plan.nodes.map((n) => n.kind)).toContain("lookup.multi");
     const compiled = compilePlan(plan);
-    // territory t1 × coverage building → base_lc 0.4 → 1000 × 0.4 = 400.
-    const r = runPlan(compiled, { territory: "t1", coverage: "building" });
-    expect(r.outputs.premium).toBeCloseTo(400, 6);
+    // territory 701 × coverage building → base_lc 0.389 → 1000 × 0.389 = 389.
+    const r = runPlan(compiled, { territory: "701", coverage: "building" });
+    expect(r.outputs.premium).toBeCloseTo(389, 6);
     // …and the bpp column resolves through the same multi-key table.
-    const rb = runPlan(compiled, { territory: "t1", coverage: "bpp" });
+    const rb = runPlan(compiled, { territory: "701", coverage: "bpp" });
     expect(rb.outputs.premium).toBeCloseTo(199, 6); // 1000 × 0.199
   });
 
@@ -2633,7 +2862,7 @@ describe("stagesToRuntimePlan", () => {
     // Found replaying E7: the plan-duplicate endpoint re-serializes
     // config_json with sort_keys, ALPHABETIZING the `dimensions` map.
     // The projector keyed lookup.multi by map order, so every 2-D key
-    // flipped (`building::t1` against `t1::building` cells) and the
+    // flipped (`building::701` against `701::building` cells) and the
     // whole book errored. The table's key_dimensions is the contract;
     // JSON object key order is not a semantic carrier.
     const stages: StageLike[] = [
@@ -2677,9 +2906,9 @@ describe("stagesToRuntimePlan", () => {
       lcmOverride: 1.0,
     });
     const compiled = compilePlan(plan);
-    const r = runPlan(compiled, { territory: "t1", coverage: "building" });
-    expect(r.outputs.premium).toBeCloseTo(400, 6);
-    const rb = runPlan(compiled, { territory: "t1", coverage: "bpp" });
+    const r = runPlan(compiled, { territory: "701", coverage: "building" });
+    expect(r.outputs.premium).toBeCloseTo(389, 6);
+    const rb = runPlan(compiled, { territory: "701", coverage: "bpp" });
     expect(rb.outputs.premium).toBeCloseTo(199, 6);
   });
 
@@ -2687,7 +2916,7 @@ describe("stagesToRuntimePlan", () => {
   // ADR-0044 D3 — exposure-rated tower mode
   //
   // A coverage tower's premium is rate × (exposure ÷ divisor) × LCM with
-  // filed-rate roundings. The projector activates this ONLY when the chainSpec
+  // ISO roundings. The projector activates this ONLY when the chainSpec
   // carries a resolvable exposure_input + finite divisor > 0. Chains
   // without an exposure base stay per-account (LCM as a factor, no
   // rounding) — proven byte-stable below.
@@ -2743,11 +2972,11 @@ describe("stagesToRuntimePlan", () => {
       } as unknown as FactorTableLike,
     ];
     const cells = new Map<string, ReadonlyMap<string, number>>([
-      ["ftL", new Map([["t1", 1.37]])],
+      ["ftL", new Map([["701", 1.518]])],
     ]);
 
     const { plan } = stagesToRuntimePlan(stages, [LIAB_TERRITORY_DIM], factorTables, cells, {
-      lcmOverride: 1.4,
+      lcmOverride: 1.401,
     });
 
     // The exposure tail nodes are present in the runtime plan (no harness math).
@@ -2757,16 +2986,16 @@ describe("stagesToRuntimePlan", () => {
 
     const compiled = compilePlan(plan);
     const result = runPlan(compiled, {
-      territory: "t1",
+      territory: "701",
       annual_gross_sales: 800000,
     });
-    // rate 1.37 → round3 1.37 → ×(800000/1000=800) ×1.4
-    // = 1534.4 → round0 = 1534. Exact, no harness rounding.
-    expect(result.outputs.liability_premium).toBe(1534);
+    // rate 1.518 → round3 1.518 → ×(800000/1000=800) = 1214.4 → ×1.401
+    // = 1701.3744 → round0 = 1701. Exact, no harness rounding.
+    expect(result.outputs.liability_premium).toBe(1701);
   });
 
   it("divides by the divisor (per-$100 limit example)", () => {
-    // exposure = building_limit ÷ 100, as in the Meridian demo towers.
+    // exposure = building_limit ÷ 100, like the ISO property towers.
     const stages: StageLike[] = [
       {
         stage_id: "bld_chain",
@@ -2789,13 +3018,13 @@ describe("stagesToRuntimePlan", () => {
       },
     ];
     const { plan } = stagesToRuntimePlan(stages, [], [], new Map(), {
-      lcmOverride: 1.4,
+      lcmOverride: 1.401,
     });
     // No factor lookups → rate = base 1.0. premium = round(1.0 × (200000/100)
-    // × 1.4, 0) = round(2000 × 1.4, 0) = round(2800) = 2800.
+    // × 1.401, 0) = round(2000 × 1.401, 0) = round(2802) = 2802.
     const compiled = compilePlan(plan);
     const result = runPlan(compiled, { building_limit: 200000 });
-    expect(result.outputs.building_premium).toBe(2800);
+    expect(result.outputs.building_premium).toBe(2802);
   });
 
   it("a chain WITHOUT exposure_input stays per-account (LCM as factor, no rounding)", () => {
@@ -2914,7 +3143,7 @@ describe("stagesToRuntimePlan", () => {
       } as unknown as FactorTableLike,
     ];
     const cells = new Map<string, ReadonlyMap<string, number>>([
-      ["ftBPP", new Map([["l1", 1.0], ["l2", 1.0], ["l3", 0.87]])],
+      ["ftBPP", new Map([["l1", 1.0], ["l2", 1.0], ["l3", 0.938]])],
     ]);
 
     const { plan } = stagesToRuntimePlan(
@@ -2922,7 +3151,7 @@ describe("stagesToRuntimePlan", () => {
       [BPP_LIMIT_BANDED_DIM],
       factorTables,
       cells,
-      { lcmOverride: 1.4 },
+      { lcmOverride: 1.401 },
     );
     // A lookup.range node carries the joined buckets (no derive.band).
     const rangeNode = plan.nodes.find((n) => n.kind === "lookup.range");
@@ -2933,13 +3162,13 @@ describe("stagesToRuntimePlan", () => {
     ).toEqual([
       { lo: 0, hi: 50000, factor: 1.0 },
       { lo: 50000, hi: 60000, factor: 1.0 },
-      { lo: 60000, hi: 70000, factor: 0.87 },
+      { lo: 60000, hi: 70000, factor: 0.938 },
     ]);
 
-    // bpp_limit 60000 → band l3 → 0.87 ×(60000/100=600) ×1.4
-    // = 730.8 → round0 = 731.
+    // bpp_limit 60000 → band l3 → 0.938 → ×(60000/100=600) ×1.401
+    // = 0.938×600=562.8 ×1.401=788.4828 → round0 = 788.
     const result = runPlan(compilePlan(plan), { bpp_limit: 60000 });
-    expect(result.outputs.bpp_premium).toBe(731);
+    expect(result.outputs.bpp_premium).toBe(788);
   });
 
   it("keeps open-ended (hi:null) bands in the lookup.range buckets (finding E5)", () => {
@@ -3178,7 +3407,7 @@ describe("stagesToRuntimePlan", () => {
       [
         "ftDed",
         new Map([
-          ["ded_1500::b_50_250", 0.92],
+          ["ded_1500::b_50_250", 0.921],
           ["ded_1500::b_250_500", 0.943],
           ["ded_5000::b_50_250", 0.773],
         ]),
@@ -3189,22 +3418,22 @@ describe("stagesToRuntimePlan", () => {
       [DED_DIM, TOTAL_BAND_DIM],
       factorTables,
       cells,
-      { lcmOverride: 1.4 },
+      { lcmOverride: 1.401 },
     );
     const kinds = plan.nodes.map((n) => n.kind);
     expect(kinds).toContain("lookup.multi");
     expect(kinds).toContain("chain.add"); // the building+BPP total
     expect(kinds).toContain("derive.band"); // total → band
 
-    // total = 180000 + 40000 = 220000 → band b_50_250; ded_1500 → 0.92.
-    // premium = round(0.92 × (180000/100=1800) × 1.4, 0)
-    //         = round(2318.4) = 2318.
+    // total = 180000 + 40000 = 220000 → band b_50_250; ded_1500 → 0.921.
+    // premium = round(0.921 × (180000/100=1800) × 1.401, 0)
+    //         = round(1657.8 × 1.401) = round(2322.5778) = 2323.
     const result = runPlan(compilePlan(plan), {
       property_deductible: "ded_1500",
       building_limit: 180000,
       bpp_limit: 40000,
     });
-    expect(result.outputs.building_premium).toBe(2318);
+    expect(result.outputs.building_premium).toBe(2323);
   });
 
   it("projects a band × constant-group table (literal axis) to lookup.multi", () => {
@@ -3274,7 +3503,7 @@ describe("stagesToRuntimePlan", () => {
       [
         "ftLim",
         new Map([
-          ["l_175_200::group_c", 1.06],
+          ["l_175_200::group_c", 1.028],
           ["l_200_225::group_c", 1.0],
           ["l_175_200::group_a", 1.5],
         ]),
@@ -3285,15 +3514,15 @@ describe("stagesToRuntimePlan", () => {
       [BLD_LIMIT_DIM, GROUP_DIM],
       factorTables,
       cells,
-      { lcmOverride: 1.4 },
+      { lcmOverride: 1.401 },
     );
     expect(plan.nodes.map((n) => n.kind)).toContain("lookup.multi");
 
-    // building_limit 180000 → band l_175_200; group literal group_c → 1.06.
-    // premium = round(1.06 × (180000/100=1800) × 1.4, 0)
-    //         = round(2671.2) = 2671.
+    // building_limit 180000 → band l_175_200; group literal group_c → 1.028.
+    // premium = round(1.028 × (180000/100=1800) × 1.401, 0)
+    //         = round(1850.4 × 1.401) = round(2592.4104) = 2592.
     const result = runPlan(compilePlan(plan), { building_limit: 180000 });
-    expect(result.outputs.building_premium).toBe(2671);
+    expect(result.outputs.building_premium).toBe(2592);
   });
 });
 
@@ -3761,5 +3990,251 @@ describe("ADR-0056 · projection issues", () => {
     const { plan, issues } = stagesToRuntimePlan(stages, [], [], new Map());
     expect(issues.some((i) => i.code === "chain_missing_base")).toBe(true);
     expect(plan.nodes.filter((n) => n.kind === "chain.mult")).toHaveLength(0);
+  });
+});
+
+// ══════════════════════════════════════════════════════════════════
+// ADR-0025 / FCA fca-2026-07-25 #21 — composite dimensions rate.
+//
+// The spec's §4.4 composite shape (registry-recommended) used to
+// build into a plan that could not rate a single row: the composite
+// dim projected as a plain `form_input` nobody declared, every
+// lookup refused `key ∅::… not found`, and the input schema never
+// listed the field the engine then demanded. These tests lock the
+// projection: members resolve through their OWN derivations, a
+// `derive.composite` joins the level ids with "·", and the plan
+// demands only the REAL member inputs.
+// ══════════════════════════════════════════════════════════════════
+describe("composite dimensions (ADR-0025 / FCA #21)", () => {
+  const SDIP_DIM = {
+    id: "sdip_band",
+    slug: "sdip_band",
+    display_name: "SDIP point band",
+    data_type: "number",
+    role: "rating-input",
+    shape: "banded",
+    levels: [
+      { kind: "banded", id: "pts_0", label: "0 points", lo: Number.NEGATIVE_INFINITY, hi: 1 },
+      { kind: "banded", id: "pts_1", label: "1-2 points", lo: 1, hi: 3 },
+      { kind: "banded", id: "pts_3", label: "3+ points", lo: 3, hi: Number.POSITIVE_INFINITY },
+    ],
+  } as unknown as Dimension;
+  const LIC_DIM = {
+    id: "lic_band",
+    slug: "lic_band",
+    display_name: "Years licensed band",
+    data_type: "number",
+    role: "rating-input",
+    shape: "banded",
+    levels: [
+      { kind: "banded", id: "lic_0_10", label: "<10 yrs", lo: Number.NEGATIVE_INFINITY, hi: 10 },
+      { kind: "banded", id: "lic_10_plus", label: "10+ yrs", lo: 10, hi: Number.POSITIVE_INFINITY },
+    ],
+  } as unknown as Dimension;
+  const GD_DIM = {
+    id: "gd_basis",
+    slug: "gd_basis",
+    display_name: "Good-driver basis",
+    data_type: "string",
+    role: "rating-input",
+    shape: "composite",
+    axes: ["sdip_band", "lic_band"],
+    levels: [],
+  } as unknown as Dimension;
+  const MULTI_CAR_DIM = {
+    id: "multi_car",
+    slug: "multi_car",
+    display_name: "Multi-car",
+    data_type: "string",
+    role: "rating-input",
+    shape: "categorical",
+    levels: [
+      { id: "true", label: "Yes" },
+      { id: "false", label: "No" },
+    ],
+  } as unknown as Dimension;
+  const COMPOSITE_BINDING = {
+    source: "composite",
+    axes: {
+      sdip_band: { source: "form_input", path: "form_input.sdip_points" },
+      lic_band: { source: "form_input", path: "form_input.lic_years" },
+    },
+  } as unknown as { source: string; path: string };
+
+  it("1-D table over a composite dim: members derive, '·'-join keys the lookup, raw inputs rate", () => {
+    const stages: StageLike[] = [
+      chainStage("gd_stage", [
+        {
+          name: "gd_premium",
+          base_input: "form_input.base_rate",
+          factor_lookups: [
+            {
+              name: "gd_factor",
+              factor_kind: "gd_factor",
+              dimensions: {
+                gd_basis: COMPOSITE_BINDING,
+              },
+            },
+          ],
+          lcm: { value: 1.0 },
+          output_field: "gd_premium",
+        },
+      ]),
+    ];
+    const fts: FactorTableLike[] = [
+      {
+        id: "ft_gd",
+        display_name: "Good-driver factor",
+        key_dimension: "gd_basis",
+        slug: "gd_factor",
+      } as unknown as FactorTableLike,
+    ];
+    const cells = new Map<string, ReadonlyMap<string, number>>([
+      [
+        "ft_gd",
+        new Map([
+          ["pts_0·lic_10_plus", 0.75],
+          ["pts_1·lic_10_plus", 0.8],
+          ["pts_1·lic_0_10", 0.95],
+        ]),
+      ],
+    ]);
+    const { plan } = stagesToRuntimePlan(
+      stages,
+      [SDIP_DIM, LIC_DIM, GD_DIM],
+      fts,
+      cells,
+      { defaults: { base_rate: 500 } },
+    );
+
+    // The join is a visible node; the members bin through their own
+    // derive.band nodes.
+    const kinds = plan.nodes.map((n) => n.kind);
+    expect(kinds).toContain("derive.composite");
+    expect(kinds.filter((k) => k === "derive.band")).toHaveLength(2);
+
+    // Schema honesty: the plan demands the MEMBER inputs, never the
+    // composite slug (the audit's plan demanded a 13th input the
+    // schema didn't list).
+    const inputFields = plan.nodes
+      .filter((n) => n.kind === "input")
+      .map((n) => (n.params as { fieldName: string }).fieldName);
+    expect(inputFields).toContain("sdip_points");
+    expect(inputFields).toContain("lic_years");
+    expect(inputFields).not.toContain("gd_basis");
+
+    const compiled = compilePlan(plan);
+    // 2 SDIP points → pts_1; 12 years → lic_10_plus → 0.8.
+    const r = runPlan(compiled, { sdip_points: 2, lic_years: 12 });
+    expect(r.outputs.gd_premium).toBeCloseTo(500 * 0.8, 6);
+    // 0 points, 12 years → pts_0·lic_10_plus → 0.75.
+    const r2 = runPlan(compiled, { sdip_points: 0, lic_years: 12 });
+    expect(r2.outputs.gd_premium).toBeCloseTo(500 * 0.75, 6);
+  });
+
+  it("2-D table gd_basis × multi_car — the audit's exact 'key ∅::false' shape now rates", () => {
+    const stages: StageLike[] = [
+      chainStage("gd_stage", [
+        {
+          name: "gd_premium",
+          base_input: "form_input.base_rate",
+          factor_lookups: [
+            {
+              name: "combined_discount",
+              factor_kind: "combined_discount",
+              dimensions: {
+                gd_basis: COMPOSITE_BINDING,
+                multi_car: {
+                  source: "form_input",
+                  path: "form_input.multi_car",
+                },
+              },
+            },
+          ],
+          lcm: { value: 1.0 },
+          output_field: "gd_premium",
+        },
+      ]),
+    ];
+    const fts: FactorTableLike[] = [
+      {
+        id: "ft_combined",
+        display_name: "Combined discount factor",
+        key_dimensions: ["gd_basis", "multi_car"],
+        slug: "combined_discount",
+      } as unknown as FactorTableLike,
+    ];
+    const cells = new Map<string, ReadonlyMap<string, number>>([
+      [
+        "ft_combined",
+        new Map([
+          ["pts_1·lic_10_plus::false", 0.85],
+          ["pts_1·lic_10_plus::true", 0.75],
+        ]),
+      ],
+    ]);
+    const { plan } = stagesToRuntimePlan(
+      stages,
+      [SDIP_DIM, LIC_DIM, GD_DIM, MULTI_CAR_DIM],
+      fts,
+      cells,
+      { defaults: { base_rate: 500 } },
+    );
+    expect(plan.nodes.map((n) => n.kind)).toContain("derive.composite");
+
+    const compiled = compilePlan(plan);
+    const r = runPlan(compiled, {
+      sdip_points: 2,
+      lic_years: 12,
+      multi_car: "false",
+    });
+    expect(r.row_status).toBe("ok");
+    expect(r.outputs.gd_premium).toBeCloseTo(500 * 0.85, 6);
+  });
+
+  it("an unresolvable member refuses through ONE clean unknown-key path naming the composite", () => {
+    const stages: StageLike[] = [
+      chainStage("gd_stage", [
+        {
+          name: "gd_premium",
+          base_input: "form_input.base_rate",
+          factor_lookups: [
+            {
+              name: "gd_factor",
+              factor_kind: "gd_factor",
+              dimensions: { gd_basis: COMPOSITE_BINDING },
+            },
+          ],
+          lcm: { value: 1.0 },
+          output_field: "gd_premium",
+        },
+      ]),
+    ];
+    const fts: FactorTableLike[] = [
+      {
+        id: "ft_gd",
+        display_name: "Good-driver factor",
+        key_dimension: "gd_basis",
+        slug: "gd_factor",
+      } as unknown as FactorTableLike,
+    ];
+    const cells = new Map<string, ReadonlyMap<string, number>>([
+      ["ft_gd", new Map([["pts_1·lic_10_plus", 0.8]])],
+    ]);
+    const { plan } = stagesToRuntimePlan(
+      stages,
+      [SDIP_DIM, LIC_DIM, GD_DIM],
+      fts,
+      cells,
+      { defaults: { base_rate: 500 } },
+    );
+    const compiled = compilePlan(plan);
+    // lic_years absent → its band can't resolve → the composite emits
+    // "" and the lookup's unknown-key policy (error) refuses the row —
+    // with the MEMBER named in the issues, never a garbled '∅·…' key.
+    const r = runPlan(compiled, { sdip_points: 2 });
+    expect(r.row_status).toBe("error");
+    const messages = (r.issues ?? []).map((i) => i.message).join(" | ");
+    expect(messages).toContain("gd_basis");
   });
 });

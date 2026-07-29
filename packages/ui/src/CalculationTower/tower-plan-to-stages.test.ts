@@ -1,5 +1,5 @@
 /**
- * tower-plan-to-stages projection tests.
+ * tower-plan-to-stages tests — PR 12.1.
  *
  * Three concerns:
  *
@@ -130,7 +130,7 @@ const SAMPLE_BOP_BUILDING_CHAIN_STAGE: StageInput = {
             dimensions: {
               class_code: { source: "form_input", path: "class_code" },
             },
-            citation_rule: "Meridian BOP 1.A.2",
+            citation_rule: "ISO BOP 1.A.2",
             citation_page: "p. 12",
             description_template: "Class factor: ×{value}",
           },
@@ -240,7 +240,7 @@ describe("towerPlanToStages — direct shape", () => {
     expect(lcm["input_path"]).toBe("form_input.lcm");
   });
 
-  // An authored carrier LCM value reverse-projects onto
+  // ADR-0047 — an authored carrier LCM value reverse-projects onto
   // chain.lcm.value (a constant), NOT as a mappable input_path column.
   it("an authored LCM value reverse-projects into chain.lcm.value", () => {
     const baseNode = makeNode({
@@ -257,8 +257,8 @@ describe("towerPlanToStages — direct shape", () => {
       category: "math",
       subtype: "constant",
       title: "LCM",
-      ref: { kind: "constant", constantId: "LCM", value: 1.4 },
-      valueChip: { primary: "× 1.4", secondary: "carrier-set" },
+      ref: { kind: "constant", constantId: "LCM", value: 1.401 },
+      valueChip: { primary: "× 1.401", secondary: "carrier-set" },
       icon: "Target",
     });
     const output = makeNode({
@@ -299,11 +299,11 @@ describe("towerPlanToStages — direct shape", () => {
       .config_json as Record<string, unknown>;
     const chain = (cfg["chains"] as readonly Record<string, unknown>[])[0]!;
     const lcm = chain["lcm"] as Record<string, unknown>;
-    expect(lcm["value"]).toBe(1.4);
+    expect(lcm["value"]).toBe(1.401);
     expect(lcm["input_path"]).toBeUndefined();
   });
 
-  // A factor-table node's gate reverse-projects onto
+  // ADR-0047 — a factor-table node's gate reverse-projects onto
   // factor_lookups[].predicate.
   it("a factor predicate reverse-projects onto the factor lookup", () => {
     const baseNode = makeNode({
@@ -376,7 +376,7 @@ describe("towerPlanToStages — direct shape", () => {
     });
   });
 
-  // A 2-D table's per-axis sources reverse-project onto
+  // ADR-0047 — a 2-D table's per-axis sources reverse-project onto
   // factor_lookups[].dimensions[axis] (literal here; primary stays default).
   it("axis sources reverse-project onto the factor-lookup dimensions", () => {
     const baseNode = makeNode({
@@ -459,7 +459,7 @@ describe("towerPlanToStages — direct shape", () => {
     });
   });
 
-  // An authored axis source persists even with no catalog entry
+  // ADR-0047 — an authored axis source persists even with NO catalog entry
   // (buildDimensionsForTable unions axisSources keys, so it isn't dropped
   // when the factor-table catalog is absent or lags the table's keys).
   it("persists an axis source with no catalog entry", () => {
@@ -592,7 +592,7 @@ describe("towerPlanToStages — round-trip", () => {
     expect(chains.length).toBe(1);
     const chain = chains[0]!;
 
-    // Patch-over-original preserves an untouched chain field
+    // Brief 78 P5.3c — patch-over-original: an UNTOUCHED chain field
     // round-trips VERBATIM (the old converter regenerated base_input
     // to point at the re-minted input stage, silently rewriting bytes
     // the user never edited). The sheet can only author base_value;
@@ -612,10 +612,63 @@ describe("towerPlanToStages — round-trip", () => {
       path: "class_code",
     });
   });
+
+  // FCA fca-2026-07-25 #16 (the phantom edit) — a `literal:` exposure
+  // binding round-tripped to the malformed `form_input.literal:1`
+  // because the writer prefixed unconditionally: a VIEW session then
+  // persisted a hash-moving edit no user made, tripping the
+  // edited-since-build banner with a change the differ could not
+  // describe. Every R-127 binding form must round-trip VERBATIM.
+  it("a literal: exposure binding round-trips byte-identical (no phantom edit)", () => {
+    const literalExposureChain: StageInput = {
+      stage_id: "rating_chains",
+      sequence: 1,
+      stage_kind: "multiplicative_chain",
+      display_name: "Rating",
+      config_json: {
+        chains: [
+          {
+            name: "bi",
+            base_input: "literal.base_value",
+            base_value: 62,
+            factor_lookups: [],
+            lcm: {
+              factor_kind: "lcm",
+              input_path: "form_input.lcm",
+              citation_rule: "(carrier-set)",
+              citation_page: "(carrier-set)",
+              description_template: "LCM: {value}",
+            },
+            // The Cascade shape: a fixed one-unit exposure.
+            exposure_input: "literal:1",
+            exposure_unit_divisor: 1,
+            output_field: "bi_premium",
+          },
+        ],
+        output_total_field: "premium",
+      },
+    };
+    const towerPlan = stagesToTowerPlan({ stages: [literalExposureChain] });
+    const recovered = towerPlanToStages(towerPlan, {
+      preservedStages: [literalExposureChain],
+      factorTablesCatalog: [],
+    });
+    const chain = (
+      (recovered.find((s) => s.stage_kind === "multiplicative_chain")!
+        .config_json as Record<string, unknown>)["chains"] as readonly Record<
+        string,
+        unknown
+      >[]
+    )[0]!;
+    expect(chain["exposure_input"]).toBe("literal:1");
+    // …and a plain submission field still gains its namespace.
+    expect(chain["exposure_input"]).not.toContain("form_input.literal");
+  });
 });
 
 // ─────────────────────────────────────────────────────────────────
-// The last coverage must survive every save.
+// Platform-test E1 — the last coverage must survive every save
+// (docs/stress-tests/sample-bop-platform/rating-errors.md)
 // ─────────────────────────────────────────────────────────────────
 
 describe("towerPlanToStages — E1: no positional Total misclassification", () => {
@@ -701,10 +754,10 @@ describe("towerPlanToStages — E1: no positional Total misclassification", () =
 });
 
 // ─────────────────────────────────────────────────────────────────
-// Operator-representation canary.
+// ADR-0050 — operator-representation canary (Brief 68 §3.1)
 // ─────────────────────────────────────────────────────────────────
 
-describe("towerPlanToStages — typed constant roles", () => {
+describe("towerPlanToStages — typed constant roles (Brief 70.1)", () => {
   it("a RENAMED carrier constant with role:'lcm' still persists (the name-regex bug, dead)", () => {
     const baseNode = makeNode({
       id: "base",
@@ -725,9 +778,9 @@ describe("towerPlanToStages — typed constant roles", () => {
         kind: "constant",
         constantId: "carrier_multiplier",
         role: "lcm",
-        value: 1.4,
+        value: 1.401,
       },
-      valueChip: { primary: "× 1.4", secondary: "carrier-set" },
+      valueChip: { primary: "× 1.401", secondary: "carrier-set" },
       icon: "Target",
     });
     const output = makeNode({
@@ -768,7 +821,7 @@ describe("towerPlanToStages — typed constant roles", () => {
     expect(chain).toBeDefined();
     const spec = (chain!.config_json as { chains: Array<Record<string, unknown>> })
       .chains[0]!;
-    expect((spec.lcm as { value?: number }).value).toBe(1.4);
+    expect((spec.lcm as { value?: number }).value).toBe(1.401);
   });
 
   it("the loader stamps role:'lcm' so the round-trip is typed end to end", () => {
@@ -785,14 +838,14 @@ describe("towerPlanToStages — typed constant roles", () => {
   });
 });
 
-describe("towerPlanToStages — operator canary", () => {
+describe("towerPlanToStages — operator canary (ADR-0050)", () => {
   // The substrate is multiplicative by contract: the save converter
-  // cannot persist a non-× entryOp or a group reduction, which is why
-  // the operator picker and Group/Max/Min are intentionally absent from the
+  // cannot persist a non-× entryOp or a group reduction, which is WHY
+  // Brief 68.1 removed the operator picker + Group/Max/Min from the
   // canvas. This canary pins the constraint: a load-converted tower
   // carries ONLY multiply ops — if ChainSpec ever grows an operator
-  // representation, this test must be replaced by
-  // a true operations round-trip test when the picker is reintroduced.
+  // representation (ADR-0050 option B), this test MUST be replaced by
+  // a true ops round-trip test in the same PR that re-adds the picker.
   it("every load-converted entryOp is multiply (nothing else can persist)", () => {
     const towerPlan = stagesToTowerPlan({
       stages: [SAMPLE_BOP_BUILDING_CHAIN_STAGE],
@@ -876,7 +929,7 @@ describe("towerPlanToStages — sidecar passthrough", () => {
     expect(flatFactor?.config_json).toEqual(flatFactorStage.config_json);
   });
 
-  it("patches over a preserved multiplicative_chain — identity and envelope kept, chains re-emitted", () => {
+  it("patches over a preserved multiplicative_chain — identity + envelope kept, chains re-emitted (Brief 78 P5.3c)", () => {
     const oldChain: StageInput = {
       stage_id: "old_chain",
       sequence: 0,
@@ -919,7 +972,7 @@ describe("towerPlanToStages — sidecar passthrough", () => {
     const nodes = new Map(base.nodes);
     nodes.set("const_lcm", {
       ...lcmNode,
-      ref: { kind: "constant", constantId: "LCM", value: 1.4 },
+      ref: { kind: "constant", constantId: "LCM", value: 1.401 },
     });
     // The load path stamps every loaded chain's original bytes onto
     // the tower (Tower.chainVerbatim) — that's the patch target.
@@ -939,9 +992,9 @@ describe("towerPlanToStages — sidecar passthrough", () => {
     const chain = (cfg["chains"] as readonly Record<string, unknown>[])[0]!;
     const lcm = chain["lcm"] as Record<string, unknown>;
     // The authored constant lands…
-    expect(lcm["value"]).toBe(1.4);
+    expect(lcm["value"]).toBe(1.401);
     // …ON the original envelope (input_path + citations preserved; the
-    // projector prefers the authored value, so the stale
+    // projector prefers the authored value per ADR-0047, so the stale
     // column reference is inert).
     expect(lcm["input_path"]).toBe("form_input.carrier_lcm");
     expect(lcm["citation_rule"]).toBe("(carrier-set)");
@@ -1002,10 +1055,10 @@ describe("towerPlanToStages — sidecar passthrough", () => {
 });
 
 // ─────────────────────────────────────────────────────────────────
-// The input dictionary must survive every save.
+// Brief 59 — the input dictionary must survive every save
 // ─────────────────────────────────────────────────────────────────
 
-describe("towerPlanToStages — input-dictionary preservation", () => {
+describe("towerPlanToStages — input-dictionary preservation (Brief 59)", () => {
   function inputNode(field: string, seq: number): StageInput {
     return {
       stage_id: `input_${field}`,
@@ -1364,7 +1417,7 @@ describe("towerPlanToStages — base_value (cold-test L30)", () => {
   });
 });
 
-describe("tower exposure to chain", () => {
+describe("tower exposure → chain (ADR-0047)", () => {
   it("reverse-projects exposure input / divisor / apply_exposure", () => {
     const baseNode = makeNode({
       id: "base",

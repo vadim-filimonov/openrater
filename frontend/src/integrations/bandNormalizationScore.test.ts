@@ -1,8 +1,17 @@
 /**
- * Production-path band-normalization regression using fictional Meridian data.
+ * REAL-PATH band-normalization oracle — the in-app Score-all proof.
  *
- * The regression begins with banded dimensions using the editor's `min`/`max`
- * vocabulary. The engine's `derive.band` / `resolveBandedLevel` key
+ * The labs-ui harnesses (`sampleBopPersistedAsIs.verify.test.ts`) proved the
+ * PERSISTED plan + the labs-ui projector score the Sample BOP oracle Δ=0 — but
+ * the LIVE rate-lab UI still showed wrong premiums + a persistent
+ * "prop_limit_band — N of N rows fell outside every band" clamp. That harness
+ * could NOT import the production rate-lab API→projector adapter
+ * (`planDimensionToRow`), so it inlined a VERBATIM copy — which masked the one
+ * place the real UI diverges.
+ *
+ * Root cause: the Sample BOP banded dims were seeded with the editor's
+ * `min`/`max` level vocabulary (`/tmp/seed_dims.py`: `{kind:'banded', id,
+ * label, min, max}`). The engine's `derive.band` / `resolveBandedLevel` key
  * ONLY on `lo`/`hi`. The backend stores `levels` as an opaque JSON blob, so a
  * min/max-only level round-trips through the production `planDimensionToRow`
  * verbatim → the projector snapshots `lo:undefined, hi:undefined` into the
@@ -14,14 +23,14 @@
  * This test exercises the ACTUAL production path the live Score-all runs:
  *
  *   raw CSV row
- *     → projectRowsToExternalInputs(row, column_map)        [@openrater/ui, pure]
+ *     → projectRowsToExternalInputs(row, column_map)        [labs-ui, pure]
  *     → stagesToRuntimePlan(stages, dims.map(planDimensionToRow), …)
  *                                                            [production adapter]
  *     → executePlanBatch(plan, inputs)                       [the engine]
  *
- * on a synthetic property-deductible leg — the dual-input lookup.multi
+ * on the Sample BOP property-deductible leg — the dual-input lookup.multi
  * (`prop_limit_band` = building_limit + bpp_limit, computed-sum → derive.band)
- * × `property_deductible`, with invented cells + a min/max-only
+ * × `property_deductible`, with the EXACT seeded cells + a min/max-only
  * `prop_limit_band` dim. It asserts the deductible relativity resolves to the
  * authored banded cell (NOT the neutral 1.0) for the three oracle locations.
  *
@@ -52,13 +61,18 @@ import {
 
 const TS = "2026-06-04T00:00:00.000Z";
 
-// ── Fictional Meridian property-deductible substrate ──
+// ── The seeded property-deductible substrate (verbatim from /tmp/seed_*.py) ──
 // property_deductible 2-D table: keys "<deductible>::<prop_limit_band>".
-const PBANDS = ["band_1", "band_2", "band_3", "band_4", "band_5"];
+const PBANDS = ["up_to_50k", "50k_250k", "250k_500k", "500k_1m", "over_1m"];
 const DEDV: Record<string, readonly number[]> = {
-  ded_low: [1.02, 1.01, 1.0, 0.99, 0.98],
-  ded_standard: [0.94, 0.92, 0.9, 0.88, 0.86],
-  ded_high: [0.82, 0.8, 0.78, 0.76, 0.74],
+  ded_500: [1, 1, 1, 1, 1],
+  ded_1000: [0.945, 0.964, 0.974, 0.982, 0.987],
+  ded_1500: [0.88, 0.921, 0.943, 0.96, 0.972],
+  ded_2500: [0.815, 0.878, 0.912, 0.937, 0.957],
+  ded_5000: [0.668, 0.773, 0.835, 0.879, 0.917],
+  ded_7500: [0.574, 0.7, 0.778, 0.835, 0.886],
+  ded_10000: [0.508, 0.646, 0.735, 0.801, 0.86],
+  ded_250: [1.05, 1.05, 1.05, 1.05, 1.05],
 };
 
 function deductibleCells(): Record<string, number> {
@@ -79,9 +93,9 @@ function deductibleCells(): Record<string, number> {
 }
 
 // prop_limit_band banded dim — authored with the editor's min/max vocabulary
-// ONLY (the persistence shape covered by this regression).
+// ONLY (the seed shape that broke the live UI). Edges mirror the PBANDS labels.
 const PROP_LIMIT_BAND_DIM: PlanDimension = {
-  rating_plan_id: "meridian_band_demo",
+  rating_plan_id: "bop_ks_band",
   dim_id: "prop_limit_band",
   display_name: "Total property limit band",
   slug: "prop_limit_band",
@@ -90,18 +104,18 @@ const PROP_LIMIT_BAND_DIM: PlanDimension = {
   dimension_type: "standard",
   shape: "banded",
   levels: [
-    { kind: "banded", id: "band_1", label: "Band 1", min: 0, max: 50000 },
-    { kind: "banded", id: "band_2", label: "Band 2", min: 50000, max: 250000 },
-    { kind: "banded", id: "band_3", label: "Band 3", min: 250000, max: 500000 },
-    { kind: "banded", id: "band_4", label: "Band 4", min: 500000, max: 1000000 },
-    { kind: "banded", id: "band_5", label: "Band 5", min: 1000000, max: 999999999 },
+    { kind: "banded", id: "up_to_50k", label: "≤ $50k", min: 0, max: 50000 },
+    { kind: "banded", id: "50k_250k", label: "$50k–250k", min: 50000, max: 250000 },
+    { kind: "banded", id: "250k_500k", label: "$250k–500k", min: 250000, max: 500000 },
+    { kind: "banded", id: "500k_1m", label: "$500k–1m", min: 500000, max: 1000000 },
+    { kind: "banded", id: "over_1m", label: "> $1m", min: 1000000, max: 999999999 },
   ] as unknown as PlanDimension["levels"],
   created_at: TS,
   updated_at: TS,
 };
 
 const PROPERTY_DEDUCTIBLE_DIM: PlanDimension = {
-  rating_plan_id: "meridian_band_demo",
+  rating_plan_id: "bop_ks_band",
   dim_id: "property_deductible",
   display_name: "Property deductible",
   slug: "property_deductible",
@@ -109,20 +123,18 @@ const PROPERTY_DEDUCTIBLE_DIM: PlanDimension = {
   role: "rating-input",
   dimension_type: "standard",
   shape: "categorical",
-  levels: [
-    { kind: "categorical", id: "ded_low", label: "Low deductible", aliases: [] },
-    { kind: "categorical", id: "ded_standard", label: "Standard deductible", aliases: [] },
-    { kind: "categorical", id: "ded_high", label: "High deductible", aliases: [] },
-  ] as unknown as PlanDimension["levels"],
+  levels: (
+    [250, 500, 1000, 1500, 2500, 5000, 7500, 10000] as const
+  ).map((n) => ({ kind: "categorical", id: `ded_${n}`, label: `$${n}`, aliases: [] })) as unknown as PlanDimension["levels"],
   created_at: TS,
   updated_at: TS,
 };
 
 // Two raw inputs the deductible leg reads — building_limit + bpp_limit (summed
 // in-plan) + property_deductible. The chain.add fields are the bare field
-// names used by the computed-sum binding.
+// names (matching /tmp/fix_live_chain.py: fields:["building_limit","bpp_limit"]).
 const BUILDING_LIMIT_DIM: PlanDimension = {
-  rating_plan_id: "meridian_band_demo",
+  rating_plan_id: "bop_ks_band",
   dim_id: "building_limit",
   display_name: "Building limit",
   slug: "building_limit",
@@ -146,7 +158,7 @@ const BPP_LIMIT_DIM: PlanDimension = {
 // DECLARED axis order — the contract the projector keys lookup.multi by
 // (Brief 80.3), regardless of the chain's dimensions-map JSON key order.
 const DEDUCTIBLE_FT: PlanFactorTable = {
-  rating_plan_id: "meridian_band_demo",
+  rating_plan_id: "bop_ks_band",
   table_id: "property_deductible",
   display_name: "Property deductible",
   slug: "property_deductible",
@@ -162,7 +174,7 @@ const DEDUCTIBLE_FT: PlanFactorTable = {
  * the resolved deductible factor, so we can read it back directly. The
  * `prop_limit_band` axis is a computed-sum (building_limit + bpp_limit) →
  * derive.band; `property_deductible` is a form_input. This is the exact
- * binding shape persisted by the production adapter.
+ * binding shape /tmp/fix_live_chain.py persisted on the live plan.
  */
 const STAGES = [
   {
@@ -204,12 +216,12 @@ const STAGES = [
 // Expected deductible factor = DEDV[deductible][band index] for sum =
 // building_limit + bpp_limit.
 const ROWS = [
-  // M-01: 800000 + 50000 = 850000 → band_4; ded_standard → 0.88
-  { id: "M-01", building_limit: "800000", bpp_limit: "50000", property_deductible: "ded_standard", expected: 0.88 },
-  // M-02: 150000 + 60000 = 210000 → band_2; ded_standard → 0.92
-  { id: "M-02", building_limit: "150000", bpp_limit: "60000", property_deductible: "ded_standard", expected: 0.92 },
-  // M-03: 200000 + 60000 = 260000 → band_3; ded_standard → 0.90
-  { id: "M-03", building_limit: "200000", bpp_limit: "60000", property_deductible: "ded_standard", expected: 0.9 },
+  // KS-10: 800000 + 50000 = 850000 → 500k_1m (idx 3); ded_1500 → 0.96
+  { id: "KS-10", building_limit: "800000", bpp_limit: "50000", property_deductible: "ded_1500", expected: 0.96 },
+  // KS-12: 150000 + 60000 = 210000 → 50k_250k (idx 1); ded_1500 → 0.921
+  { id: "KS-12", building_limit: "150000", bpp_limit: "60000", property_deductible: "ded_1500", expected: 0.921 },
+  // KS-06: 200000 + 60000 = 260000 → 250k_500k (idx 2); ded_1500 → 0.943
+  { id: "KS-06", building_limit: "200000", bpp_limit: "60000", property_deductible: "ded_1500", expected: 0.943 },
 ] as const;
 
 // The column_map the live Inputs workspace builds — raw CSV column → the
@@ -233,11 +245,11 @@ function buildPlan(): Plan {
   ) as unknown as Parameters<typeof stagesToRuntimePlan>[2];
   const cells: FactorTableCellsMap = planFactorTablesToCellMap([DEDUCTIBLE_FT]);
   return stagesToRuntimePlan(STAGES, dims, fts, cells, {
-    planId: "meridian-band-demo-runtime",
+    planId: "bop_ks_band-runtime",
   }).plan as unknown as Plan;
 }
 
-describe("production-path Meridian deductible band resolves through the adapter", () => {
+describe("REAL-PATH Sample BOP deductible band resolves through the production adapter", () => {
   beforeAll(() => registerBuiltinKinds());
 
   it("derive.band bins the computed sum (no row falls outside every band)", () => {

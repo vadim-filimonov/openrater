@@ -5,7 +5,7 @@
  * active factor table. Per Brief 33 §−1 + mockup Frame 13:
  *
  *   • Open on ⌘K (parent owns the keybinding + toggles `open`)
- *   • Type a row + col fragment ("class c103 modern") → see
+ *   • Type a row + col fragment ("class 91342 modern") → see
  *     matching cells with their current value
  *   • Enter → jump (fires `onJumpToCell(rowId, colId)`)
  *   • ↑ ↓ navigate; Escape closes

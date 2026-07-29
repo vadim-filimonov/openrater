@@ -1,37 +1,42 @@
 """Generate the canonical filing-transcription-spec v1.0 example bundle.
 
-Builds a spec-conformant nonprofit D&O + GL workbook from the synthetic
-reference design and 20 verification cases embedded below. The generator
-has no external data inputs: before writing anything it re-derives every
-band and recomputes every expected premium and tier. A single mismatch
-aborts the run, so the committed docs and packaged artifacts cannot drift
-silently.
+Rebuilds the nonprofit D&O + GL rating program
+(docs/rating-algorithms/nonprofit_990_do_gl_rating_v1.xlsx, a synthetic
+pre-filing design) as a spec-conformant workbook — the worked example the
+spec, the profiles, and (in Brief 92 Phase 92.3) the CI golden path all
+point at.
 
-Run from the repository root:
+The generator is SELF-VERIFYING: before writing anything it re-derives
+every band and recomputes every expected premium + tier for all 20 test
+cases from docs/rating-algorithms/nonprofit_990_test_cases.csv, and
+asserts them against the source's prebinned CSV and stated expectations.
+A single mismatch aborts the run — the canonical artifact is never
+silently wrong.
 
-    uv run --project server python \
-        docs/specs/examples/nonprofit-do-gl/generate_workbook.py
+Run from the repo root:
 
-Outputs:
-    docs/specs/examples/nonprofit-do-gl/nonprofit_do_gl.workbook.xlsx
-    server/src/openrater/rates/ingest/assets/nonprofit_do_gl.workbook.xlsx
+    cd api-lab/backend && uv run --with openpyxl python \
+        ../../docs/specs/examples/nonprofit-do-gl/generate_workbook.py
+
+Output: docs/specs/examples/nonprofit-do-gl/nonprofit_do_gl.workbook.xlsx
 """
 
 from __future__ import annotations
 
+import csv
 from decimal import ROUND_HALF_UP, Decimal
 from pathlib import Path
-from shutil import copyfile
 
 from openpyxl import Workbook
 
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[3]
+SRC = REPO / "docs" / "rating-algorithms"
 OUT = HERE / "nonprofit_do_gl.workbook.xlsx"
-PACKAGED_OUT = REPO / "server" / "src" / "openrater" / "rates" / "ingest" / "assets" / OUT.name
 
 # ---------------------------------------------------------------------------
-# Synthetic reference data. Every value is illustrative and locally defined.
+# The filed data, verbatim from the source workbook (dump verified 2026-07-14:
+# no formulas; every value literal).
 # ---------------------------------------------------------------------------
 
 NTEE = [
@@ -122,7 +127,7 @@ PAYROLL_BANDS = [  # (level_id, label, lo, hi, do) over employee_count; __defaul
     ("03_mid", "26-100 employees", 26, 101, 1.15),
     ("04_large", "100+ employees", 101, float("inf"), 1.4),
 ]
-PAYROLL_DEFAULT = 1.1  # authored "99_unknown" load
+PAYROLL_DEFAULT = 1.1  # the filed "99_unknown" load
 
 STRESS_BANDS = [  # over expense_ratio; __default__ 1.1
     ("01_under_85", "<0.85 (healthy surplus)", 0, 0.85, 0.9),
@@ -142,38 +147,7 @@ OCCUPANCY_BANDS = [  # over occupancy_ratio; __default__ 1.15
 OCCUPANCY_DEFAULT = 1.15
 
 DO_BASE, GL_BASE, LCM = 600, 300, 1.35
-CITE = "Nonprofit D&O + GL synthetic reference design v1"
-
-# The committed workbook's 20 current test-case rows, embedded so this
-# public example is reproducible without external files or paths.
-CASE_COLUMNS = (
-    "case_id", "name", "ntee_major", "revenue", "state", "subsection_type",
-    "employee_count", "expense_ratio", "occupancy_ratio",
-    "expected_do_premium", "expected_gl_premium", "expected_total_premium",
-    "expected_tier",
-)
-CASE_ROWS = [
-    ("np_001", "Faith Community Church", "religion", 45_000, "TN", "501c3", 2, 0.95555556, 0.17777778, 658, 396, 1054, "standard"),
-    ("np_002", "Lakeside Youth Camp", "youth_development", 180_000, "MI", "501c3", 9, 1.08333333, 0.17777778, 1166, 711, 1877, "standard"),
-    ("np_003", "Riverside Family Services", "human_services", 425_000, "WI", "501c3", 18, 0.96470588, 0.05176471, 1018, 525, 1543, "standard"),
-    ("np_004", "Lakeshore Arts Foundation", "philanthropy", 2_400_000, "MA", "501c3", 11, 0.79166667, 0.02083333, 1084, 578, 1662, "preferred"),
-    ("np_005", "Mountain Conservation Trust", "environment", 650_000, "CO", "501c3", 7, 0.95384615, 0.02153846, 1094, 568, 1662, "standard"),
-    ("np_006", "Westside Free Clinic", "health_care", 1_200_000, "CA", "501c3", 35, 1.125, 0.0625, 3306, 1651, 4957, "standard"),
-    ("np_007", "Veterans Support League", "human_services", 88_000, "TX", "501c4", 3, 1.04545455, 0.07386364, 1194, 570, 1764, "standard"),
-    ("np_008", "Northridge Animal Rescue", "animal", 215_000, "OH", "501c3", 5, 1.11627907, 0.17674419, 833, 615, 1448, "standard"),
-    ("np_009", "Tech Education Alliance", "education", 880_000, "WA", "501c3", 22, 0.86363636, 0.05113636, 1203, 699, 1902, "standard"),
-    ("np_010", "Harbor Disaster Relief", "public_safety", 1_750_000, "FL", "501c3", 14, 0.91428571, 0.02171429, 1712, 954, 2666, "standard"),
-    ("np_011", "Civic Choir Society", "arts_culture", 32_000, "VT", "501c3", 0, 0.875, 0.125, 439, 321, 760, "standard"),
-    ("np_012", "Urban Housing Coalition", "housing_shelter", 1_900_000, "NY", "501c3", 28, 1.21052632, 0.22105263, 3656, 2388, 6044, "submit"),
-    ("np_013", "Statewide Bar Association", "crime_legal", 540_000, "IL", "501c6", 4, 0.92592593, 0.03333333, 1505, 727, 2232, "standard"),
-    ("np_014", "Inner-City Food Pantry", "food_agriculture", 110_000, "MO", "501c3", 1, 0.95454545, 0.10909091, 768, 590, 1358, "standard"),
-    ("np_015", "International Aid Bridge", "international", 3_200_000, "DC", "501c3", 19, 0.96875, 0.0296875, 1701, 795, 2496, "standard"),
-    ("np_016", "Statewide Recreation League", "recreation", 740_000, "NJ", "501c7", 8, 0.97297297, 0.12162162, 1188, 1653, 2841, "standard"),
-    ("np_017", "Heritage Museum", "arts_culture", 480_000, "PA", "501c3", 6, 0.95833333, 0.13541667, 932, 689, 1621, "standard"),
-    ("np_018", "Civic Advocacy Now", "civil_rights", 95_000, "OR", "501c4", 2, 1.10526316, 0.08421053, 1083, 396, 1479, "standard"),
-    ("np_019", "Endangered Languages Fund", "social_science", 320_000, "MA", "501c3", 4, 0.8125, 0.028125, 757, 372, 1129, "preferred"),
-    ("np_020", "Faith Youth Mission", "religion", 28_000, "MS", "501c3", 1, 1.28571429, 0.16071429, 883, 352, 1235, "decline"),
-]
+CITE = "Nonprofit 990 D&O+GL rating v1 (source workbook)"
 
 
 def band_of(value: float | None, bands) -> str | None:
@@ -222,10 +196,12 @@ def derive_tier(ntee: str, revenue: float, ratio: float | None, _employees: floa
 # Verification pass — abort on any mismatch.
 # ---------------------------------------------------------------------------
 
-def load_cases() -> tuple[list[dict], int]:
-    raw = [dict(zip(CASE_COLUMNS, row, strict=True)) for row in CASE_ROWS]
-    assert len(raw) == 20, "expected the 20 canonical cases"
-    assert len({row["case_id"] for row in raw}) == 20, "case ids must be unique"
+def load_cases() -> list[dict]:
+    with open(SRC / "nonprofit_990_test_cases.csv", newline="") as fh:
+        raw = {r["acct_id"]: r for r in csv.DictReader(fh)}
+    with open(SRC / "nonprofit_990_test_cases_prebinned.csv", newline="") as fh:
+        pre = {r["acct_id"]: r for r in csv.DictReader(fh)}
+    assert set(raw) == set(pre) and len(raw) == 20, "expected the 20 canonical cases"
 
     ntee_do = {i: d for i, _l, d, _g, _r in NTEE}
     ntee_gl = {i: g for i, _l, _d, g, _r in NTEE}
@@ -236,20 +212,25 @@ def load_cases() -> tuple[list[dict], int]:
 
     cases = []
     total_round_divergence = 0
-    for row in raw:
-        case_id = row["case_id"]
+    for acct_id, row in sorted(raw.items()):
+        p = pre[acct_id]
         revenue = float(row["revenue"])
-        employees = None if row["employee_count"] is None else float(row["employee_count"])
-        ratio_w = float(row["expense_ratio"])
-        occ_w = float(row["occupancy_ratio"])
+        expenses = float(row["total_expenses"])
+        occupancy = float(row["occupancy_expense"])
+        employees = float(row["employee_count"]) if row["employee_count"] != "" else None
+        ratio = expenses / revenue
+        occ_ratio = occupancy / revenue
+
+        # ratios as they will be WRITTEN to the sheet (8 dp) must bin identically
+        ratio_w, occ_w = round(ratio, 8), round(occ_ratio, 8)
         rev_band = band_of(revenue, REVENUE_BANDS)
         pay_band = band_of(employees, PAYROLL_BANDS)
         stress_band = band_of(ratio_w, STRESS_BANDS)
         occ_band = band_of(occ_w, OCCUPANCY_BANDS)
-        assert rev_band is not None, f"{case_id} revenue is outside the reference bands"
-        assert pay_band is not None or employees is None, f"{case_id} payroll band"
-        assert stress_band is not None, f"{case_id} stress band"
-        assert occ_band is not None, f"{case_id} occupancy band"
+        assert rev_band == p["revenue_band"], f"{acct_id} revenue band {rev_band} != {p['revenue_band']}"
+        assert (pay_band or "99_unknown") == p["payroll_band"], f"{acct_id} payroll band"
+        assert (stress_band or "99_unknown") == p["stress_band"], f"{acct_id} stress band"
+        assert (occ_band or "99_unknown") == p["occupancy_intensity_band"], f"{acct_id} occupancy band"
 
         tier_code = STATE_TIER[row["state"]]
         st_do, st_gl = STATE_TIERS[tier_code]
@@ -275,13 +256,12 @@ def load_cases() -> tuple[list[dict], int]:
         do = round_half_up(do_unrounded)
         gl = round_half_up(gl_unrounded)
         tier = derive_tier(row["ntee_major"], revenue, ratio_w, employees)
-        assert do == int(row["expected_do_premium"]), f"{case_id} D&O {do} != {row['expected_do_premium']}"
-        assert gl == int(row["expected_gl_premium"]), f"{case_id} GL {gl} != {row['expected_gl_premium']}"
-        assert do + gl == int(row["expected_total_premium"]), f"{case_id} total"
-        assert tier.lower() == row["expected_tier"], f"{case_id} tier {tier} != {row['expected_tier']}"
+        assert do == int(row["expected_do_premium"]), f"{acct_id} D&O {do} != {row['expected_do_premium']}"
+        assert gl == int(row["expected_gl_premium"]), f"{acct_id} GL {gl} != {row['expected_gl_premium']}"
+        assert do + gl == int(row["expected_total_premium"]), f"{acct_id} total"
+        assert tier == row["expected_tier"], f"{acct_id} tier {tier} != {row['expected_tier']}"
         # The platform rounds the PACKAGE total once (registry r2,
-        # per_coverage_rounding); the embedded expectations round each
-        # coverage first.
+        # per_coverage_rounding); the source rounds each coverage first.
         # Track where the two disagree so the test_cases tolerances are
         # honest rather than hoped-for.
         engine_total = round_half_up(do_unrounded + gl_unrounded)
@@ -290,7 +270,7 @@ def load_cases() -> tuple[list[dict], int]:
 
         cases.append(
             {
-                "case_id": case_id,
+                "case_id": acct_id.lower().replace("-", "_"),
                 "name": row["name"],
                 "ntee_major": row["ntee_major"],
                 "revenue": revenue,
@@ -302,7 +282,7 @@ def load_cases() -> tuple[list[dict], int]:
                 "expected_do_premium": do,
                 "expected_gl_premium": gl,
                 "expected_total_premium": do + gl,
-                "expected_tier": row["expected_tier"],
+                "expected_tier": tier.lower(),
             }
         )
     print(
@@ -331,15 +311,15 @@ def add_ft(wb, slug, display, row_dim, method, rows, default=None, note=None):
         ("row_dimension", row_dim),
         ("lookup_method", method),
         ("citation_rule", CITE),
-        ("citation_page", note or "Synthetic reference design"),
+        ("citation_page", note or "source workbook"),
     ]
     sheet_rows(ws, meta)
     ws.append([])
     ws.append(["level_id", "factor", "citation_rule", "citation_page"])
     for level_id, factor in rows:
-        ws.append([level_id, factor, CITE, note or "Synthetic reference design"])
+        ws.append([level_id, factor, CITE, note or "source workbook"])
     if default is not None:
-        ws.append(["__default__", default, CITE, "Authored unknown-value load"])
+        ws.append(["__default__", default, CITE, "filed unknown-value load"])
 
 
 def build(cases: list[dict], divergence: int) -> None:
@@ -351,8 +331,8 @@ def build(cases: list[dict], divergence: int) -> None:
         ws,
         [
             ("Canonical example bundle — filing-transcription-spec v1.0",),
-            ("Generated from the self-contained synthetic D&O + GL reference design "
-             "embedded in generate_workbook.py.",),
+            ("Transcribed from docs/rating-algorithms/nonprofit_990_do_gl_rating_v1.xlsx "
+             "(synthetic pre-filing D&O + GL program for IRS-990 nonprofits).",),
             ("Regenerate: see generate_workbook.py next to this file. The generator "
              "re-verifies all 20 test cases (bands, premiums, tiers) before writing.",),
             ("Note: this program has no 2-D factor tables; see the spec §9 mini-example "
@@ -376,9 +356,9 @@ def build(cases: list[dict], divergence: int) -> None:
             ("effective_date", "2026-05-25"),
             ("coverages", "do,gl"),
             ("filing_type", "other"),
-            ("source_documents", "embedded-synthetic-reference"),
+            ("source_documents", "nonprofit_990_do_gl_rating_v1.xlsx"),
             ("description",
-             "Synthetic reference program (heuristic factors; no regulatory data). "
+             "Synthetic pre-filing program (heuristic factors; no regulatory filing). "
              "D&O and GL rated as two towers; eligibility tier is a side verdict."),
         ],
     )
@@ -390,17 +370,17 @@ def build(cases: list[dict], divergence: int) -> None:
         ws,
         [
             ("ntee_major", "NTEE major group", "string", False, "", "unknown_no_ntee", "",
-             "ntee_major", "Missing NTEE maps to the authored unknown level (1.50x both LOBs).",
+             "ntee_major", "Missing NTEE maps to the filed unknown level (1.50x both LOBs).",
              CITE, "Plan Spine — edge cases"),
             ("revenue", "Total revenue", "currency", True, "", "", "USD",
-             "revenue_band", "Binned into the 7 authored revenue bands.", CITE, "Dim - Revenue Band"),
+             "revenue_band", "Binned into the 7 filed revenue bands.", CITE, "Dim - Revenue Band"),
             ("state", "State", "string", True, "", "", "",
              "state", "USPS 2-letter code; 50 states + DC.", CITE, "Dim - State"),
             ("subsection_type", "IRS 501(c) subsection", "string", False, "", "501c_other", "",
              "subsection_type", "Long-tail subsections fold into 501(c) other.",
              CITE, "Dim - Subsection Type"),
             ("employee_count", "Employee count", "number", False, "", "", "",
-             "payroll_band", "Absent -> the authored unknown payroll load (table __default__ 1.10).",
+             "payroll_band", "Absent -> the filed unknown payroll load (table __default__ 1.10).",
              CITE, "Dim - Payroll Band"),
             ("expense_ratio", "Expense-to-revenue ratio", "number", False, "", "", "",
              "stress_band", "total_expenses / total_revenue, supplied pre-computed "
@@ -536,11 +516,11 @@ def build(cases: list[dict], divergence: int) -> None:
         ws,
         [
             # ONE package-level round — the engine's round is the plan-tail
-            # total-rounder (registry r2 per_coverage_rounding). The reference
+            # total-rounder (registry r2 per_coverage_rounding). The source's
             # per-coverage rounding is recorded in gaps_and_assumptions and
             # absorbed by test-case tolerances.
             ("round_total", "round", 1, "", "", "", 1, "", CITE,
-             "Chains (round.nearest_dollar; per-coverage in reference cases — see gaps)"),
+             "Chains (round.nearest_dollar; per-coverage in source — see gaps)"),
         ],
     )
 
@@ -550,9 +530,9 @@ def build(cases: list[dict], divergence: int) -> None:
         ws,
         [
             ("out_do", "do_premium", "D&O premium", "do_lcm",
-             "The D&O tower (unrounded; reference value rounds to $1 — tolerance 0.5)."),
+             "The D&O tower (unrounded; filed value rounds to $1 — tolerance 0.5)."),
             ("out_gl", "gl_premium", "GL premium", "gl_lcm",
-             "The GL tower (unrounded; reference value rounds to $1 — tolerance 0.5)."),
+             "The GL tower (unrounded; filed value rounds to $1 — tolerance 0.5)."),
             ("out_total", "total_premium", "Total premium", "round_total",
              "Package total, floored + rounded once."),
         ],
@@ -585,48 +565,45 @@ def build(cases: list[dict], divergence: int) -> None:
         ws,
         [
             ("unsupported",
-             "The synthetic design derives stress (total_expenses / total_revenue) and occupancy intensity "
+             "The source derives stress (total_expenses / total_revenue) and occupancy intensity "
              "(occupancy_expense / total_revenue) inside the plan; the workbook format has no "
              "derivation step (capability registry: formula_stage).",
              CITE, "Plan Spine — derived",
              "Datasets must supply expense_ratio and occupancy_ratio pre-computed; test_cases carry them.",
              "inputs!expense_ratio"),
             ("unsupported",
-             "The synthetic design's Submit trigger includes 'payroll_band = Unknown' — a test for a missing "
+             "The source's Submit trigger includes 'payroll_band = Unknown' — a test for a missing "
              "field, which gates cannot express.",
              CITE, "Eligibility Tiers",
-             "Unknown-payroll accounts rate with the authored 1.10 default factor and tier by the "
+             "Unknown-payroll accounts rate with the filed 1.10 default factor and tier by the "
              "remaining rules.",
              "gates"),
             ("assumption",
-             "The subsection table notes '501(c) other — refer if unknown', but the synthetic design's "
+             "The subsection table notes '501(c) other — refer if unknown', but the source's "
              "Eligibility Tiers has no such rule. Transcribed as default_value=501c_other with the "
-             "authored 1.10/1.05 factors and no submit rule.",
+             "filed 1.10/1.05 factors and no submit rule.",
              CITE, "Dim - Subsection Type",
              "Unknown-subsection accounts rate at the 501(c)-other factors and tier normally.",
              "inputs!subsection_type"),
             ("gap",
-             "Boundary-case decision: Lakeshore Arts occupancy is 2.08%, so the stated "
-             "less-than-3% binning rule maps it to 01_under_03.",
-             CITE, "Synthetic case np_004",
-             "np_004 expects GL 578 under the explicit binning rule.",
+             "Source discrepancy: the 'Worked Examples' sheet bins Lakeshore Arts occupancy at "
+             "02_03_06 (GL 680) while 'Test Cases' bins 01_under_03 (GL 578). The stated binning "
+             "rule (50000 / 2400000 = 2.08% < 3%) supports Test Cases — transcribed accordingly.",
+             CITE, "Worked Examples vs Test Cases",
+             "np_004 expects GL 578 per the source's own Test Cases sheet.",
              "test_cases!np_004"),
             ("unsupported",
-             "The embedded expected cases round each coverage to $1 before summing; the platform's round is the "
+             "The source rounds each coverage to $1 before summing; the platform's round is the "
              "plan-tail total-rounder (capability registry r2: per_coverage_rounding).",
              CITE, "Chain - D&O / Chain - GL (round.nearest_dollar)",
-             "Per-coverage expected premiums carry tolerance 0.5 (unrounded towers vs reference "
+             "Per-coverage expected premiums carry tolerance 0.5 (unrounded towers vs filed "
              "rounded values); the package total rounds once at the tail.",
              "final_adjustments!round_total"),
         ],
     )
 
-    wb.properties.creator = "OpenRater"
-    wb.properties.title = "OpenRater synthetic nonprofit D&O and GL workbook"
     wb.save(OUT)
-    copyfile(OUT, PACKAGED_OUT)
     print(f"verified 20/20 cases (bands + premiums + tiers) — wrote {OUT.relative_to(REPO)}")
-    print(f"copied byte-identically to {PACKAGED_OUT.relative_to(REPO)}")
     print(f"sheets: {len(wb.sheetnames)} -> {', '.join(wb.sheetnames)}")
 
 

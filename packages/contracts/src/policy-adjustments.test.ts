@@ -1,4 +1,12 @@
-/** Policy-adjustment schema-validation tests. */
+/**
+ * Policy-adjustment type-guard tests (Brief 62.1 / ADR-0042).
+ *
+ * Verifies the schema-validation boundary for the post-aggregation tail:
+ * `isGuardExpr`, `isIrpmSourceSpec`, `isPolicyAdjustment`. The composer
+ * algorithm + the trace are tested in `policy-compose.test.ts` (PR2); the
+ * `isPolicy`-level integration (incl. the adjustments/legacy mutual
+ * exclusion) is in `policy-types.test.ts`.
+ */
 
 import { describe, it, expect } from "vitest";
 import { isGuardExpr, isPolicyAdjustment } from "./policy-adjustments";
@@ -8,7 +16,7 @@ describe("isGuardExpr", () => {
   it("accepts each gate-vocabulary operator", () => {
     expect(isGuardExpr({ field: "is_first_term", op: "eq", value: true })).toBe(true);
     expect(isGuardExpr({ field: "years_in_business", op: "lt", value: 3 })).toBe(true);
-    expect(isGuardExpr({ field: "state", op: "in", value: ["NE", "IA"] })).toBe(true);
+    expect(isGuardExpr({ field: "state", op: "in", value: ["KS", "MO"] })).toBe(true);
     expect(isGuardExpr({ field: "x", op: "ne", value: null })).toBe(true);
   });
 
@@ -39,19 +47,19 @@ describe("isPolicyAdjustment", () => {
     display_name: "Schedule rating (IRPM)",
     cap_pct: 25,
     source: { from: "literal", total: -7 },
-    citation: "Meridian Rule MS-R4",
+    citation: "KS BOP §4",
   };
   const pkg: PolicyAdjustment = {
     kind: "package_factor",
-    id: "first_term_credit",
-    display_name: "Meridian first-term credit",
+    id: "pioneer",
+    display_name: "Pioneer credit",
     factor: 0.9,
     when: { field: "is_first_term", op: "eq", value: true },
   };
   const flatEndt: PolicyAdjustment = {
     kind: "endorsement",
-    id: "service_fee",
-    display_name: "Meridian service endorsement",
+    id: "terror",
+    display_name: "Terrorism",
     effect: { kind: "flat", amount: 18 },
   };
   const factorEndt: PolicyAdjustment = {

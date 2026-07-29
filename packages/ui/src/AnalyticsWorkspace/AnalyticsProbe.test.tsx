@@ -265,7 +265,7 @@ describe("<PlanReport> (Brief 93 §1.1)", () => {
             stage_id: "s2",
             stage_kind: "multiplicative_chain",
             display_name: "Chain",
-            //  — the lede states the public counting (the
+            // MVP-013 — the lede states the public counting (the
             // Rating tab's rows), so the chain carries real structure:
             // base + 1 factor = 2 steps across 1 chain.
             config_json: {
@@ -525,7 +525,7 @@ describe("<PlanReport> embedded exhibits (Brief 93 §1.1.5/.7)", () => {
         hasBook={false}
         probeBookSlot={<div data-testid="probe-book-content">book</div>}
         verifiedExamples={{
-          verdict: "40 of 40 reproduce the filing exactly",
+          verdict: "40 of 40 checks reproduce the filing exactly",
           tone: "success",
           rows: [
             {
@@ -543,10 +543,12 @@ describe("<PlanReport> embedded exhibits (Brief 93 §1.1.5/.7)", () => {
       />,
     );
     expect(screen.getByTestId("rater-plan-report-verdict")).toHaveTextContent(
-      "40 of 40 reproduce the filing exactly",
+      "40 of 40 checks reproduce the filing exactly",
     );
     const table = screen.getByTestId("rater-plan-report-ex-table");
-    expect(table).toHaveTextContent("Filing says");
+    // FCA #19/#20 — the expected column is the workbook's test case,
+    // not a number the filing necessarily prints.
+    expect(table).toHaveTextContent("Expected (test case)");
     expect(table).toHaveTextContent("Restaurant · territory 1");
     // The probe book yields to the verified variant…
     expect(screen.queryByTestId("probe-book-content")).toBeNull();

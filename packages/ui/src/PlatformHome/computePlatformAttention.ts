@@ -117,7 +117,7 @@ export interface AttentionOpts {
    *  `unconnected` nudge only fires when this is true: an API-only shop
    *  with no integrations must never be nagged to connect one. */
   readonly anyIntegrationPaired?: boolean;
-  /**  — an API Lab route exists somewhere. Connector setup rows
+  /** MVP-005 — an API Lab route exists somewhere. Connector setup rows
    *  fire only when true: a configured route is the opt-in to that
    *  room, so a fresh install never opens on a key nag. Defaults true
    *  (legacy callers keep their behavior); Home passes the real
@@ -229,7 +229,7 @@ export function computePlatformAttention(
   }
 
   // 5 — connector setup, GROUPED per problem (Brief 88 P4): repetitive
-  // facts collapse into one row carrying the member names.  —
+  // facts collapse into one row carrying the member names. MVP-005 —
   // only once an API Lab route exists: the route is the opt-in.
   if (opts.hasApiLabRoutes === false) {
     return groups.slice().sort((a, b) => RANK[a.kind] - RANK[b.kind]);

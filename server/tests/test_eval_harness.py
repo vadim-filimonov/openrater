@@ -5,7 +5,7 @@
 # You may obtain a copy of the License at
 #
 #     http://www.apache.org/licenses/LICENSE-2.0
-"""The eval harness's own regression net.
+"""The eval harness's own regression net (Brief 2 P2).
 
 Two invariants keep the scorer honest:
   · IDENTITY — the golden scored against itself is a perfect PASS

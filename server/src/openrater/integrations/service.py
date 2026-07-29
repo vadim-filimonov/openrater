@@ -348,7 +348,7 @@ def _hub_status(exposed, *, required_missing: int = 0) -> str:  # noqa: ANN001 �
 
 
 def _natural_key(value: str) -> tuple:
-    """q2 before q10 — digit runs compare numerically."""
+    """ppc_2 before ppc_10 — digit runs compare numerically."""
     return tuple(int(part) if part.isdigit() else part for part in re.split(r"(\d+)", value))
 
 

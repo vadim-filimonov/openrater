@@ -5,7 +5,7 @@
   "asserts": "A plan that refuses answers with a null premium and a named reason; sibling members compute unaffected.",
   "contract_version": "1.0",
   "world": {
-    "integration": { "name": "Example Integrator — fixture", "paired": true },
+    "integration": { "name": "OpenRater Front — fixture", "paired": true },
     "plans": ["plan-alpha", "plan-beta"],
     "note": "plan-beta refuses tiv > 2,000,000; the request sends 2,500,000"
   },

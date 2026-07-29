@@ -5,7 +5,7 @@
   "asserts": "Identity-class fact keys are rejected with a 422 that names every offending key — never silently stripped.",
   "contract_version": "1.0",
   "world": {
-    "integration": { "name": "Example Integrator — fixture", "paired": true },
+    "integration": { "name": "OpenRater Front — fixture", "paired": true },
     "plans": ["plan-alpha"]
   },
   "steps": [

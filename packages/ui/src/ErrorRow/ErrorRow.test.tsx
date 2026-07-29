@@ -23,7 +23,7 @@ const RUNTIME_WARNING: Issue = {
   message: "Curve 'wc_curve_v1' was renamed to 'wc_curve_v2'.",
   location: { section: "curves" },
   filing_blocking: false,
-  citation: "Meridian BOP §3.4",
+  citation: "ISO BOP §3.4",
   fix_hint: {
     label: "Update reference",
     target: { section: "rating-chains", entity: "ref_chain" },
@@ -46,7 +46,7 @@ describe("<ErrorRow>", () => {
 
   it("renders citation when present", () => {
     render(<ErrorRow issue={RUNTIME_WARNING} />);
-    expect(screen.getByText("Meridian BOP §3.4")).toBeInTheDocument();
+    expect(screen.getByText("ISO BOP §3.4")).toBeInTheDocument();
   });
 
   it("does NOT render citation when absent", () => {

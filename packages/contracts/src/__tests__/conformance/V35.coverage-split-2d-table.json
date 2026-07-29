@@ -1,10 +1,10 @@
 {
   "name": "V35.coverage-split-2d-table",
-  "description": "A fictional Meridian 2-D factor table (territory × coverage) rates the correct column per coverage tower. Fed the same synthetic territory t1, the Building and BPP columns return different factors (0.4 and 0.2), proving the coverage axis is preserved.",
+  "description": "ADR-0039 — a 2-D factor table (Sample BOP 2025 base_lc_property, territory × coverage) rates the correct column per coverage tower. The Building and BPP towers each consume a 1-D lookup.direct that is the table's building / bpp COLUMN, sliced at projection time (stagesToRuntimePlan.sliceCellsToCoverageColumn). Fed the SAME territory (701), the two columns return DIFFERENT, correct factors — Building 0.389, BPP 0.199 — proving the coverage axis selects the column rather than collapsing to the neutral 1.0. This is the portable record of the brief-53 acceptance; a non-TS engine port that slices a 2-D coverage table to per-tower 1-D lookups matches the same outputs.",
   "plan": {
     "id": "v35.coverage_split_2d",
     "version": "1.0.0",
-    "name": "Meridian coverage split (t1 → Building 0.4 / BPP 0.2)",
+    "name": "Coverage-split base loss cost (territory 701 → Building 0.389 / BPP 0.199)",
     "line": "bop",
     "effective": "2026-01-01",
     "nodes": [
@@ -18,9 +18,9 @@
         "id": "lkp_building",
         "kind": "lookup.direct",
         "params": {
-          "table": { "t1": 0.4, "t2": 0.35 },
+          "table": { "701": 0.389, "702": 0.389 },
           "defaultValue": 1.0,
-          "tableName": "Meridian synthetic property table · Building column"
+          "tableName": "base_lc_property · Building column"
         },
         "position": { "x": 220, "y": 0 }
       },
@@ -28,9 +28,9 @@
         "id": "lkp_bpp",
         "kind": "lookup.direct",
         "params": {
-          "table": { "t1": 0.2, "t2": 0.18 },
+          "table": { "701": 0.199, "702": 0.18 },
           "defaultValue": 1.0,
-          "tableName": "Meridian synthetic property table · BPP column"
+          "tableName": "base_lc_property · BPP column"
         },
         "position": { "x": 220, "y": 120 }
       },
@@ -54,6 +54,6 @@
       { "from": { "node": "lkp_bpp", "port": "value" }, "to": { "node": "out_bpp", "port": "value" } }
     ]
   },
-  "externalInputs": { "territory": "t1" },
-  "expectedOutputs": { "building_base_lc": 0.4, "bpp_base_lc": 0.2 }
+  "externalInputs": { "territory": "701" },
+  "expectedOutputs": { "building_base_lc": 0.389, "bpp_base_lc": 0.199 }
 }

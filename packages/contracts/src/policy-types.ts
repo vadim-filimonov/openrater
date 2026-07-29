@@ -22,7 +22,8 @@
  * lives in `policy-compose.ts` (it depends on the runtime; these shapes
  * deliberately do not, so they stay portable).
  *
- * Pure types. No React and no DOM.
+ * Pure types. No React, no DOM. See
+ * `docs/adr/0034-policy-account-composition.md`.
  */
 
 import type { ProductCode } from "./product-types";
@@ -38,7 +39,7 @@ export interface PlanRef {
   readonly plan_id: string;
   /** Pins the algorithm version (the Plan's content_hash). */
   readonly content_hash: string;
-  /** Opaque tag for labeling and analytics, NEVER a branch. */
+  /** Opaque tag (ADR-0033) — for labeling / analytics, NEVER a branch. */
   readonly product: ProductCode;
 }
 

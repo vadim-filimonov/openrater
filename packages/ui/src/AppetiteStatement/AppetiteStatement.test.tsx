@@ -28,6 +28,8 @@ const ROW_FIELDS = [
   { id: "contractor_receipts", label: "Contractor receipts", dtype: "money", group: "Inputs" as const },
   { id: "liab_exposure_base", label: "Liability exposure base", dtype: "string", group: "Inputs" as const },
   { id: "class_code", label: "Class code", dtype: "class_code", group: "Inputs" as const },
+  // FCA S2 — a boolean input gets the yes/no picker, never free text.
+  { id: "sprinklered", label: "Sprinklered", dtype: "bool", group: "Inputs" as const },
   // Brief 89.3 follow-up — a dimension-backed field carries its
   // authored levels; the value seat must offer THEM, not free text.
   {
@@ -304,5 +306,133 @@ describe("<AppetiteStatement> — dimension level picker (Brief 89.3 follow-up)"
     expect(
       screen.getByTestId("rater-appetite-level-warn"),
     ).toHaveTextContent("“stucco”");
+  });
+});
+
+// FCA S2 — "the affordance that invites the type mismatch": a boolean
+// variable rendered a free-text value box, and a typed 'banana'
+// authored a rule the runtime comparator could never match (the
+// audit's stress probe silently disarmed the knock-out). The value
+// seat is now a strict yes/no picker.
+describe("<AppetiteStatement> — boolean yes/no picker (FCA S2)", () => {
+  function openComposer() {
+    fireEvent.click(screen.getByRole("button", { name: "Add rule" }));
+  }
+  function pickField(i: number, field: string) {
+    fireEvent.click(
+      screen.getByTestId(`rater-appetite-composer-slots-slot-field_${i}`),
+    );
+    fireEvent.click(
+      screen.getByTestId(`rater-appetite-composer-slots-opt-field_${i}-${field}`),
+    );
+  }
+  function pickValue(i: number, literal: string) {
+    fireEvent.click(
+      screen.getByTestId(`rater-appetite-composer-slots-slot-value_${i}`),
+    );
+    fireEvent.click(
+      screen.getByTestId(
+        `rater-appetite-composer-slots-opt-value_${i}-${literal}`,
+      ),
+    );
+  }
+
+  it("a bool field turns the value seat into a Yes/No picker; the pick commits 'true'", () => {
+    const onAddRule = vi.fn();
+    renderStatement({ onAddRule });
+    openComposer();
+    pickField(0, "sprinklered");
+    const seat = screen.getByTestId(
+      "rater-appetite-composer-slots-slot-value_0",
+    );
+    expect(seat.tagName).toBe("BUTTON"); // a picker, not free text
+    pickValue(0, "true");
+    expect(seat).toHaveTextContent("Yes"); // the seat echoes the label
+    fireEvent.click(screen.getByTestId("rater-appetite-composer-commit"));
+    expect(onAddRule).toHaveBeenCalledWith(
+      "row",
+      expect.objectContaining({
+        conditions: [{ variable: "sprinklered", op: "eq", value: "true" }],
+      }),
+    );
+  });
+
+  it("free text has no escape row — an off-vocabulary entry cannot commit", () => {
+    renderStatement();
+    openComposer();
+    pickField(0, "sprinklered");
+    fireEvent.click(
+      screen.getByTestId("rater-appetite-composer-slots-slot-value_0"),
+    );
+    fireEvent.change(screen.getByLabelText("choose a value…"), {
+      target: { value: "banana" },
+    });
+    expect(
+      screen.queryByTestId("rater-appetite-composer-slots-freetext-value_0"),
+    ).not.toBeInTheDocument();
+  });
+
+  it("the op seat offers only is / is not", () => {
+    renderStatement();
+    openComposer();
+    pickField(0, "sprinklered");
+    fireEvent.click(
+      screen.getByTestId("rater-appetite-composer-slots-slot-op_0"),
+    );
+    expect(
+      screen.getByTestId("rater-appetite-composer-slots-opt-op_0-eq"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByTestId("rater-appetite-composer-slots-opt-op_0-ne"),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByTestId("rater-appetite-composer-slots-opt-op_0-in"),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId("rater-appetite-composer-slots-opt-op_0-ge"),
+    ).not.toBeInTheDocument();
+  });
+
+  it("a stored boolean rule reads as Yes/No in the sentence", () => {
+    renderStatement({
+      rowRules: [
+        {
+          id: "no_sprinkler",
+          tier: "decline",
+          variable: "sprinklered",
+          op: "eq",
+          value: "false",
+          conditions: [{ variable: "sprinklered", op: "eq", value: "false" }],
+          reasoning: "",
+          citation: "",
+        },
+      ],
+    });
+    expect(screen.getByLabelText("Location rules")).toHaveTextContent(
+      /Sprinklered is No/,
+    );
+  });
+
+  it("a legacy off-vocabulary value draws the never-matches warning; a real pick clears it", () => {
+    const deadRule: AppetiteRuleView = {
+      id: "dead",
+      tier: "decline",
+      variable: "sprinklered",
+      op: "eq",
+      value: "banana",
+      conditions: [{ variable: "sprinklered", op: "eq", value: "banana" }],
+      reasoning: "",
+      citation: "",
+    };
+    renderStatement({ rowRules: [deadRule] });
+    fireEvent.click(screen.getByText("Sprinklered"));
+    const warn = screen.getByTestId("rater-appetite-level-warn");
+    expect(warn).toHaveTextContent("“banana” isn't a yes/no answer");
+    expect(warn).toHaveTextContent("Sprinklered");
+    expect(warn).toHaveTextContent("would never match");
+    pickValue(0, "false");
+    expect(
+      screen.queryByTestId("rater-appetite-level-warn"),
+    ).not.toBeInTheDocument();
   });
 });

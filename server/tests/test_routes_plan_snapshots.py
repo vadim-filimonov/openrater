@@ -77,8 +77,8 @@ class TestFreezeSnapshot:
         r = client.post(
             f"/api/v1/plans/{plan_id}/class-codes",
             json={
-                "class_code": "c101",
-                "display_name": "Meridian Neighborhood Bakery",
+                "class_code": "09015",
+                "display_name": "Bagelry",
                 "family": "restaurant",
             },
         )
@@ -89,7 +89,7 @@ class TestFreezeSnapshot:
         )
         assert response.status_code == 201, response.text
         codes = response.json()["body"]["class_codes"]
-        assert [c["class_code"] for c in codes] == ["c101"]
+        assert [c["class_code"] for c in codes] == ["09015"]
 
     def test_freeze_allows_null_notes(self, client: TestClient) -> None:
         """Notes is optional — omitting should land None."""

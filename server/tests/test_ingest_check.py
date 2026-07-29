@@ -79,8 +79,8 @@ def build_mini() -> Workbook:
 
     ws = wb.create_sheet("dimension_levels")
     ws.append(["dimension_slug", "kind", "level_id", "label", "aliases", "min", "max", "territory_ref"])
-    ws.append(["construction_class", "categorical", "frame", "Frame (type c1)", "wood,c1", "", "", ""])
-    ws.append(["construction_class", "categorical", "fire_resistive", "Fire-resistive (type c2)", "fr,c2", "", "", ""])
+    ws.append(["construction_class", "categorical", "frame", "Frame (ISO 1)", "wood,iso1", "", "", ""])
+    ws.append(["construction_class", "categorical", "fire_resistive", "Fire-resistive (ISO 6)", "fr,iso6", "", "", ""])
     ws.append(["building_age", "banded", "age_0_25", "0-25 yrs", "", 0, 25, ""])
     ws.append(["building_age", "banded", "age_25_plus", "25+ yrs", "", 25, "+inf", ""])
 
@@ -210,7 +210,7 @@ def _add_valid_endorsements(wb: Workbook) -> None:
     ws = wb.create_sheet("endorsements")
     ws.append(["endorsement_id", "kind", "form_number", "display_name",
                "factor", "amount", "coverage", "sublimit", "trigger"])
-    ws.append(["spoilage", "factor", "MS 10 13", "Spoilage", 1.05, "", "", "", ""])
+    ws.append(["spoilage", "factor", "BP 04 15", "Spoilage", 1.05, "", "", "", ""])
 
 
 def _add_valid_loadings(wb: Workbook) -> None:
@@ -348,8 +348,24 @@ CASES: list[tuple[str, str, Mutator]] = [
     ("R-168", "errors", lambda wb: (_add_valid_adjustments(wb), wb["final_adjustments"].cell(row=2, column=5, value=""))),
     ("R-169", "errors", lambda wb: (_add_valid_gates(wb), wb["gates"].cell(row=2, column=6, value="tiv"))),
     ("R-170", "errors", lambda wb: (_add_valid_adjustments(wb), wb["final_adjustments"].cell(row=2, column=4, value="boat"))),
+    ("R-171", "warnings", lambda wb: (_add_valid_gates(wb), wb["gates"].cell(row=2, column=5, value="banana"))),
+    ("R-172", "warnings", lambda wb: (
+        _add_valid_gates(wb),
+        wb["gates"].cell(row=2, column=3, value="construction_class"),
+        wb["gates"].cell(row=2, column=4, value="eq"),
+        wb["gates"].cell(row=2, column=5, value="brick"),
+    )),
     ("R-180", "errors", lambda wb: wb["gaps_and_assumptions"].append(
         ["wish", "Something", "", "", "Impact", ""])),
+    # FCA #20 — the audited false ship-belief, verbatim shape: a gap
+    # declaring a SUPPORTED construct unsupported must draw the
+    # registry cross-check.
+    ("R-173", "warnings", lambda wb: wb["gaps_and_assumptions"].append(
+        ["unsupported",
+         "Rule 4 coverage election unsupported — every quote prices "
+         "all four coverages; storage risks cannot be quoted correctly.",
+         "Rule 4", "p.6",
+         "Physical-damage-only risks priced for all coverages", ""])),
     ("R-201", "warnings", lambda wb: (
         wb["ft.construction_class"].cell(
             row=find_row(wb["ft.construction_class"], 1, "citation_rule"), column=1, value="was_citation"),
@@ -455,6 +471,96 @@ def test_issue_cites_sheet_and_cell() -> None:
     assert "brick" in hit.message and "construction_class" in hit.message
 
 
+def _gates_bound_to(wb: Workbook, variable: str, op: str, value) -> None:
+    ws = wb.create_sheet("gates")
+    ws.append(["order", "rule_id", "variable", "op", "value",
+               "variable_2", "op_2", "value_2", "variable_3", "op_3", "value_3",
+               "tier", "reasoning"])
+    ws.append([1, "probe", variable, op, value, "", "", "", "", "", "",
+               "decline", "Probe rule"])
+    ws.append([99, "__default__", "", "", "", "", "", "", "", "", "",
+               "standard", "Standard appetite"])
+
+
+@pytest.mark.parametrize(
+    ("data_type", "op", "value", "fires"),
+    [
+        # The audit's stress probe: a literal a boolean can never equal
+        # silently disarmed the rule — now it warns at check time.
+        ("boolean", "eq", "banana", True),
+        ("boolean", "eq", "true", False),      # the §2.1 literal spelling
+        ("boolean", "eq", True, False),         # a typed cell
+        ("boolean", "eq", 1, True),             # bools never equate numbers
+        ("number", "eq", "40", False),          # numeric text parses
+        ("number", "ge", "forty", True),
+        ("number", "in", "10, twenty, 30", True),   # one dead entry warns
+        ("number", "in", "10, 20, 30", False),
+        ("string", "eq", 60989, False),         # strings bridge every seam
+        ("string", "eq", "banana", False),
+    ],
+    ids=lambda v: repr(v),
+)
+def test_r171_gate_literal_type_mismatch(
+    data_type: str, op: str, value, fires: bool
+) -> None:
+    """R-171 (FCA S2) — warn when a gate literal can never match its
+    bound input's declared data_type; the runtime comparator degrades
+    to never-equal rather than erroring, so without this the rule
+    looks armed but never fires (eq/in) or always fires (ne/nin)."""
+    wb = build_mini()
+    wb["inputs"].append(["probe_input", "Probe", data_type, False, "", "", ""])
+    _gates_bound_to(wb, "probe_input", op, value)
+    result = run_check(wb)
+    assert result.ok is True, [(i.rule, i.message) for i in result.errors]
+    hits = [i for i in result.warnings if i.rule == "R-171"]
+    assert bool(hits) is fires, [(i.rule, i.message) for i in result.warnings]
+    if fires:
+        assert hits[0].sheet == "gates"
+        assert "probe_input" in hits[0].message
+
+
+@pytest.mark.parametrize(
+    ("allowed", "op", "value", "fires"),
+    [
+        # The headline case: a spelling the closed set doesn't contain
+        # silently disarms the rule, exactly like R-171's type seam.
+        ("frame,fire_resistive", "eq", "brick", True),
+        ("frame,fire_resistive", "eq", "frame", False),
+        ("frame,fire_resistive", "eq", "Frame", True),   # looseEq is case-sensitive
+        ("frame,fire_resistive", "ne", "brick", True),   # ne always passes
+        ("frame,fire_resistive", "in", "frame, brick", True),  # one dead entry warns
+        ("frame,fire_resistive", "in", "frame, fire_resistive", False),
+        ("frame,fire_resistive", "nin", "brick", True),
+        ("25,50,100", "eq", 25, False),        # numeric seam: 25 reaches "25"
+        ("25,50,100", "eq", 25.0, False),      # ... and so does 25.0
+        ("25,50,100", "eq", 30, True),
+        ("25,50,100", "gt", 30, False),        # ordering exempt: a threshold
+        ("frame,fire_resistive", "gt", "brick", False),  # ... even a dead one (out of scope)
+        ("true,false", "eq", True, False),     # typed bool bridges the literal seam
+    ],
+    ids=lambda v: repr(v),
+)
+def test_r172_gate_literal_outside_enum_allowed_values(
+    allowed: str, op: str, value, fires: bool
+) -> None:
+    """R-172 — R-171's enum seat: an enum input's runtime value never
+    leaves its declared allowed_values, so an eq/ne/in/nin literal
+    outside that closed set is decided before any risk arrives and the
+    rule is silently disarmed. Ordering ops compare numerically and
+    are exempt (a threshold need not be a member)."""
+    wb = build_mini()
+    wb["inputs"].append(["probe_input", "Probe", "enum", False, allowed, "", ""])
+    _gates_bound_to(wb, "probe_input", op, value)
+    result = run_check(wb)
+    assert result.ok is True, [(i.rule, i.message) for i in result.errors]
+    hits = [i for i in result.warnings if i.rule == "R-172"]
+    assert bool(hits) is fires, [(i.rule, i.message) for i in result.warnings]
+    if fires:
+        assert hits[0].sheet == "gates"
+        assert "probe_input" in hits[0].message
+        assert "allowed_values" in hits[0].message
+
+
 # ---------------------------------------------------------------------------
 # 2. The canonical bundle is green.
 # ---------------------------------------------------------------------------
@@ -557,8 +663,8 @@ def test_meridian_all_constructs_bundle_checks_clean() -> None:
     assert m is not None
     assert m.counts.factor_tables == 8
     assert m.counts.chains == 3 and m.counts.chain_stages == 21
-    # The reference program covers 40 classes and 6 territories; its vectors
-    # and pre-existing factors remain unchanged.
+    # Brief 2 P2 widened the program (40 classes, 6 territories) for the
+    # reference filing; the vectors + all pre-existing factors unchanged.
     assert m.counts.geo_rows == 36
     assert m.counts.dimension_levels == 64
     assert m.counts.factor_cells == 115
@@ -1002,6 +1108,82 @@ def test_unknown_zcta_is_r085_notice() -> None:
     ]
 
 
+def _add_county_geo_setup(wb: Workbook) -> None:
+    """A county-grain Nebraska geographic dimension for the FCA #25
+    calibration tests."""
+    ws = wb["dimensions"]
+    ws.append(["territory", "Territory", "geographic", "rating-input", "string",
+               "geographic", "county", "subset:NE", ""])
+    ws = wb["dimension_levels"]
+    ws.append(["territory", "geographic", "t1", "Territory 1", "", "", "", "T1"])
+
+
+def test_dual_keyed_county_names_are_not_typo_suspects() -> None:
+    """FCA fca-2026-07-25 #25 (findings 35/108) — the sanctioned way to
+    make the manual's own vocabulary quotable is double-keying the geo
+    sheet: a name row beside each FIPS row, same territory. Every
+    validate of that CORRECT workbook used to re-flag all 93 names as
+    R-085 typo-suspects — a standing false alarm that trains users to
+    ignore real hits. A name-shaped key whose territory group also
+    carries an in-universe key is the alias convention, not a typo."""
+    wb = build_mini()
+    _add_county_geo_setup(wb)
+    ws = wb.create_sheet("geo.territory")
+    ws.append(["county", "territory_code"])
+    ws.append(["31019", "T1"])   # Buffalo County, NE (FIPS)
+    ws.append(["Buffalo", "T1"])  # the manual's vocabulary — alias row
+    result = run_check(wb)
+    assert not any(n.rule == "R-085" for n in result.notices), [
+        (i.rule, i.message) for i in result.notices
+    ]
+
+
+def test_name_key_without_a_fips_sibling_still_flags_and_names_the_vocabulary() -> None:
+    """A name key in a territory group with NO in-universe sibling is a
+    genuine suspect — and the message finally SAYS what the platform
+    joins counties by (finding 2: the FIPS vocabulary was stated
+    nowhere)."""
+    wb = build_mini()
+    _add_county_geo_setup(wb)
+    ws = wb.create_sheet("geo.territory")
+    ws.append(["county", "territory_code"])
+    ws.append(["Bufalo", "T1"])  # misspelled, alone — no FIPS sibling
+    result = run_check(wb)
+    hits = [n for n in result.warnings + result.notices if n.rule == "R-085"]
+    assert hits and "Bufalo" in hits[0].message, [
+        (i.rule, i.message) for i in result.notices
+    ]
+    assert "FIPS" in hits[0].message
+
+
+def test_zero_mapped_coverage_escalates_r083_to_warning() -> None:
+    """FCA #25 (finding 108's inverse defect) — a sheet keyed entirely
+    in the WRONG vocabulary maps 0% of the declared scope, and every
+    quote will refuse; that earned the same quiet notice as a partial
+    book. 0% now warns and names the likely cause."""
+    wb = build_mini()
+    _add_county_geo_setup(wb)
+    ws = wb.create_sheet("geo.territory")
+    ws.append(["county", "territory_code"])
+    ws.append(["Buffalo", "T1"])
+    ws.append(["Dodge", "T1"])
+    result = run_check(wb)
+    hits = [w for w in result.warnings if w.rule == "R-083"]
+    assert hits, [(i.rule, i.message, i.severity) for i in result.notices]
+    assert "0 of" in hits[0].message
+    assert "FIPS" in hits[0].message
+    # A partially-mapped sheet stays a notice (a program may write
+    # only part of its state).
+    wb2 = build_mini()
+    _add_county_geo_setup(wb2)
+    ws2 = wb2.create_sheet("geo.territory")
+    ws2.append(["county", "territory_code"])
+    ws2.append(["31019", "T1"])
+    result2 = run_check(wb2)
+    assert any(n.rule == "R-083" for n in result2.notices)
+    assert not any(w.rule == "R-083" for w in result2.warnings)
+
+
 def test_geographic_without_indicator_is_r086_warning() -> None:
     """shape=geographic with zip granularity but NO geo sheet and NO
     territory_members: a bare territory list — the filing's geography
@@ -1039,3 +1221,111 @@ def test_duplicate_loading_id_is_r007() -> None:
     assert any(e.rule == "R-007" for e in result.errors), [
         (e.rule, e.message) for e in result.errors
     ]
+
+
+def test_r173_stays_quiet_on_innocent_gap_prose() -> None:
+    """R-173's precision guard: a construct NAME in a gap that claims
+    no inability (kind `assumption`, no inability wording) is innocent
+    prose, not a false ship-belief."""
+    wb = build_mini()
+    wb["gaps_and_assumptions"].append([
+        "assumption",
+        "Deductible defaults follow the coverage election pattern the "
+        "registry documents; we assumed ded_500 when the filing is "
+        "silent.",
+        "Rule 1.6", "p.4", "Quotes assume ded_500", "",
+    ])
+    result = run_check(wb)
+    assert "R-173" not in {i.rule for i in result.warnings}
+    assert result.ok is True
+
+
+def test_capability_registry_serves_the_lob_boundary(client) -> None:  # noqa: ANN001
+    """FCA #20 — the LOB validation boundary lived only in
+    LIMITATIONS.md, which no product surface serves; the registry
+    endpoint (and therefore the chat tool) now states it."""
+    res = client.get("/api/v1/plans/ingest/capability-registry")
+    assert res.status_code == 200
+    body = res.json()
+    lob = body["lines_of_business"]
+    assert lob["validated"] == ["bop", "gl"]
+    assert "SUBSTRATE-READY, NOT YET VALIDATED" in lob["note"]
+    assert "personal" in lob["note"]
+
+
+def test_declared_level_without_a_factor_row_is_named_at_check_time() -> None:
+    """FCA fca-2026-07-25 #31 (finding 32) — the S4 workbook declared
+    ded_1000 while its table carried only none/ded_500/ded_2500, and
+    validate returned ok with ZERO findings; the hole surfaced as a
+    quote-time refusal. Declared-levels→rows is checked now (R-104
+    covers only the inverse)."""
+    wb = build_mini()
+    ws = wb["dimension_levels"]
+    ws.append(["construction_class", "categorical", "masonry", "Masonry", "", "", "", ""])
+    result = run_check(wb)
+    hits = [n for n in result.notices + result.warnings if n.rule == "R-174"]
+    # Both tables keyed by construction_class miss the level — the 1-D
+    # direct table and the 2-D matrix each get named.
+    assert len(hits) == 2, [(i.rule, i.message) for i in result.notices]
+    assert all("masonry" in h.message for h in hits)
+    # No __default__ row → the miss refuses honestly at quote time →
+    # a NOTICE (visible, not alarming).
+    assert all(h.severity == "notice" for h in hits)
+
+
+def test_missing_level_with_a_default_row_escalates_to_warning() -> None:
+    """A `__default__` row silently PRICES a missing level instead of
+    refusing — that's a wrong number waiting, so the same hole warns."""
+    wb = build_mini()
+    ws = wb["dimension_levels"]
+    ws.append(["construction_class", "categorical", "masonry", "Masonry", "", "", "", ""])
+    ft = wb["ft.construction_class"]
+    ft.append(["__default__", 1.0, "Table 5.A", "p.51"])
+    result = run_check(wb)
+    hits = [w for w in result.warnings if w.rule == "R-174"]
+    assert hits, [(i.rule, i.message, i.severity) for i in result.notices + result.warnings]
+    assert "masonry" in hits[0].message and "__default__" in hits[0].message
+    # The matrix (no default rows possible) still notices.
+    assert any(n.rule == "R-174" for n in result.notices)
+
+
+def test_per_coverage_expected_values_without_tolerances_get_the_rounding_nudge() -> None:
+    """FCA #31 (finding 45) — per-coverage rounding is genuinely
+    unsupported (the registry says so), and 20 of 30 audited checks
+    came back 'near' with no pre-ingestion warning. The detectable
+    signal — test_cases carrying per-coverage expected_* columns with
+    NO tolerance_* columns — now nudges with the registry's own
+    tolerance recipe BEFORE the human review stop."""
+    wb = build_mini()
+    result = run_check(wb)
+    # build_mini's test_cases carry one expected_* column → quiet.
+    assert not any(
+        n.rule == "R-175" for n in result.notices + result.warnings
+    ), [(i.rule, i.message) for i in result.notices]
+
+    wb2 = build_mini()
+    wb2["outputs"].append(
+        ["out_liability", "liability_premium", "Liability premium", "bld_exposure"]
+    )
+    tc = wb2["test_cases"]
+    # A second per-coverage expected column, no tolerance_* anywhere.
+    tc.cell(row=1, column=tc.max_column + 1).value = "expected_liability_premium"
+    tc.cell(row=2, column=tc.max_column).value = 100.0
+    result2 = run_check(wb2)
+    hits = [n for n in result2.notices if n.rule == "R-175"]
+    assert hits, [(i.rule, i.message) for i in result2.notices]
+    assert "tolerance" in hits[0].message.lower()
+    assert "rounds" in hits[0].message.lower()
+
+    # And tolerances present → the recipe is already applied → quiet.
+    wb3 = build_mini()
+    wb3["outputs"].append(
+        ["out_liability", "liability_premium", "Liability premium", "bld_exposure"]
+    )
+    tc3 = wb3["test_cases"]
+    tc3.cell(row=1, column=tc3.max_column + 1).value = "expected_liability_premium"
+    tc3.cell(row=2, column=tc3.max_column).value = 100.0
+    tc3.cell(row=1, column=tc3.max_column + 1).value = "tolerance_building_premium"
+    tc3.cell(row=2, column=tc3.max_column).value = 0.5
+    result3 = run_check(wb3)
+    assert not any(n.rule == "R-175" for n in result3.notices + result3.warnings)

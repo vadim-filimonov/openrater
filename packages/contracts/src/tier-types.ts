@@ -20,7 +20,8 @@
  *   submit    — manual underwriter review required
  *   decline   — out of appetite; no quote
  *
- * Pure types. No React, no DOM.
+ * Pure types. No React, no DOM. See `docs/design-briefs/eligibility-
+ * appetite-section.md` for the design rationale.
  */
 
 /** Closed eligibility tier vocabulary. */
@@ -137,19 +138,52 @@ function toFiniteNumber(v: unknown): number | undefined {
 }
 
 /**
- * Loose equality across the number/numeric-string seam: strict
- * equality first; when that misses AND at least one side is a string,
- * both sides that parse as finite numbers compare numerically (so
- * 60989 == "60989" and "09035" == 9035). Never coerces booleans and
- * never equates two non-numeric values that differ strictly.
+ * A typed boolean's literal-string spelling, or the boolean itself:
+ * true / 'true' / 'TRUE ' → true; false / 'false' → false; anything
+ * else — 'yes', '1', 1, '' — undefined. ONLY the literal spellings
+ * participate (spec §2.1 declares the strings 'true'/'false' legal
+ * boolean forms); wire-spelling variants like 'Y'/'yes' belong to the
+ * input-coercion seam, never the comparator. Internal.
+ */
+function toBooleanLiteral(v: unknown): boolean | undefined {
+  if (typeof v === "boolean") return v;
+  if (typeof v === "string") {
+    const s = v.trim().toLowerCase();
+    if (s === "true") return true;
+    if (s === "false") return false;
+  }
+  return undefined;
+}
+
+/**
+ * Loose equality across two seams: strict equality first; when that
+ * misses AND at least one side is a string, both sides that parse as
+ * finite numbers compare numerically (so 60989 == "60989" and
+ * "09035" == 9035), and a typed boolean compares against its literal
+ * string spelling (so true == "true" and false == "FALSE"). Never
+ * equates booleans with numbers ('1'/1 vs true stays false) and never
+ * equates two non-numeric strings that differ strictly ("true" vs
+ * "TRUE" only bridges when ONE side is a typed boolean).
  *
  * Platform-test finding E3: rule builders persist numeric-looking
  * codes as ints while book columns deliver strings (and vice versa);
  * strict `includes()` silently missed, leaking declines to Standard.
+ *
+ * FCA fca-2026-07-25 (S0, dead knock-out gates): workbook gates
+ * sheets persist boolean rule values as TEXT ('true') while schema-
+ * typed callers send JSON booleans — the strict comparison above
+ * never matched, so every boolean knock-out silently rated ineligible
+ * risks as Standard on both quote and book paths. The boolean seam
+ * below is the same widening E3 got for numbers.
  */
 function looseEq(a: unknown, b: unknown): boolean {
   if (a === b) return true;
   if (typeof a !== "string" && typeof b !== "string") return false;
+  if (typeof a === "boolean" || typeof b === "boolean") {
+    const ab = toBooleanLiteral(a);
+    if (ab === undefined) return false;
+    return ab === toBooleanLiteral(b);
+  }
   const an = toFiniteNumber(a);
   if (an === undefined) return false;
   const bn = toFiniteNumber(b);

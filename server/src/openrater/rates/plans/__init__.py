@@ -7,7 +7,7 @@
 #     http://www.apache.org/licenses/LICENSE-2.0
 """`openrater.rates.plans` — RatingPlan substrate + Plan Author state machine.
 
-Owns:
+Slice 2 of the API Lab port. Owns:
 
   · models.py            — typed RatingPlan / Stage / StageInput / StageOutput
                            contracts (Pydantic, frozen).
@@ -18,9 +18,13 @@ Owns:
                            `parse_stage_config(stage)` dispatch.
   · stage_kind_specs.py  — operator-visible taxonomy registry.
   · repo.py              — DB persistence for plans + stages + IO.
-  · plan_signoff.py      — sign-off reads, edit-lock enforcement, and
-                           revoke helpers; sign-off creation is unavailable.
+  · plan_signoff.py      — lock-for-filing read path + revoke (port note:
+                           the SIGN-OFF CREATE path is deferred to a later
+                           slice — see the module docstring).
   · author.py            — fork / patch / promote / discard / rollback /
                            audit / position / wire state-machine
                            primitives.
+
+The original prototype's `preview` module is NOT in this slice — it requires
+the cascade engine (`rates.plans.engine`) which lands in its own slice.
 """

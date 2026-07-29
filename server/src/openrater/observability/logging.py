@@ -40,8 +40,8 @@ Usage
     configure_logging()  # once at startup, in main.create_app
 
     log = get_logger(__name__)
-    log.info("created_plan", rating_plan_id="bop_ne_2026", lob="bop")
-    # → {"event": "created_plan", "rating_plan_id": "bop_ne_2026",
+    log.info("created_plan", rating_plan_id="bop_wi_2026", lob="bop")
+    # → {"event": "created_plan", "rating_plan_id": "bop_wi_2026",
     #    "lob": "bop", "request_id": "...", "timestamp": "...", ...}
 
 Request-scoped context (request_id, route, method) is bound by the

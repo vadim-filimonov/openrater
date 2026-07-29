@@ -2,10 +2,10 @@
   "id": "IC3",
   "name": "quote-set-parity",
   "spec": "§4.2 rule 1 (Law 1 — one premium)",
-  "asserts": "A quote-set member and a direct plan quote with the mapped inputs return the identical premium on the identical version.",
+  "asserts": "A quote-set member and a direct Brief-76 quote with the mapped inputs return the identical premium on the identical version.",
   "contract_version": "1.0",
   "world": {
-    "integration": { "name": "Example Integrator — fixture", "paired": true },
+    "integration": { "name": "OpenRater Front — fixture", "paired": true },
     "plans": ["plan-alpha"]
   },
   "steps": [
@@ -51,7 +51,7 @@
       }
     },
     {
-      "note": "quote the same risk directly at the plan, using plan vocabulary with the mapping applied by hand",
+      "note": "quote the same risk directly at the plan (Brief 76), plan vocabulary — the mapping applied by hand",
       "actor": "operator",
       "call": {
         "method": "POST",

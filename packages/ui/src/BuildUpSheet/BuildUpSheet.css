@@ -80,7 +80,7 @@
   font-family: inherit;
   cursor: pointer;
 }
-.rater-buildup__expo-pill:hover:not(disabled) {
+.rater-buildup__expo-pill:hover:not(:disabled) {
   border-color: var(--rater-hairline-strong);
   color: var(--rater-text-default);
 }
@@ -368,7 +368,7 @@
   color: var(--rater-text-subtle);
 }
 
-/*  — the filed provenance, one quiet clause in the header. */
+/* MVP-016 — the filed provenance, one quiet clause in the header. */
 .rater-buildup__insp-cite {
   font-size: var(--rater-t-11);
   color: var(--rater-text-muted);
@@ -549,7 +549,7 @@
   font: inherit;
   width: 100%;
 }
-.rater-buildup__pick-row:hover:not(disabled) {
+.rater-buildup__pick-row:hover:not(:disabled) {
   background: var(--rater-row-hover-bg);
 }
 .rater-buildup__pick-row:disabled {

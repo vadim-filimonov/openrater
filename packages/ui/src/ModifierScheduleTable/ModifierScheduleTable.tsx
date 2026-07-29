@@ -24,7 +24,7 @@
  *   │ Equipment                ±5%                  │
  *   │ Cooperation programs     ±5%                  │
  *   │ ────────────────────────────────────────────  │
- *   │ Citation: Meridian BOP §4.2                        │
+ *   │ Citation: ISO BOP §4.2                        │
  *   └──────────────────────────────────────────────┘
  */
 
@@ -55,7 +55,7 @@ export interface ModifierScheduleTableProps {
   readonly totalCapPct: number;
   /** Ordered categories. */
   readonly categories: readonly ModifierScheduleCategoryRow[];
-  /** Optional citation to the filed schedule (e.g., "Meridian BOP §4.2"). */
+  /** Optional citation to the filed schedule (e.g., "ISO BOP §4.2"). */
   readonly citation?: string;
   /** Optional scope label rendered in the header (e.g., "per coverage"). */
   readonly scopeLabel?: string;

@@ -1,4 +1,4 @@
-"""Generate the starter-kit template workbook.
+"""Generate the starter-kit template workbook (Brief 94 §2, register U1).
 
 The template IS the spec §9 mini example — a complete, conformant,
 *working* program (one categorical + one banded dimension, a 1-D and a
@@ -13,15 +13,14 @@ from the factors it is about to write (base × construction × constr×age
 × TIV/100 × LCM) and asserts the spec §9 stated expectation ($390.00).
 A mismatch aborts — the template is never silently wrong.
 
-Run from the repository root:
+Run from the repo root:
 
-    uv run --project server python \
-        docs/specs/examples/template/generate_template.py
+    cd api-lab/backend && uv run --with openpyxl python \
+        ../../docs/specs/examples/template/generate_template.py
 
 Output: docs/specs/examples/template/openrater_workbook_template.xlsx
-(The packaged copy under
-`server/src/openrater/rates/ingest/assets/` is pinned byte-identical
-by CI; copy the regenerated file there too.)
+(The packaged copy under openrater/rates/ingest/assets/ is pinned
+byte-identical by CI — after regenerating, copy it there.)
 """
 
 from __future__ import annotations

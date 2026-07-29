@@ -1,5 +1,5 @@
 /**
- * NavLabs — supporting destinations rendered as friendly cards on OpenRater
+ * NavLabs — the Labs as friendly destination cards on OpenRater
  * Home's Overview lens (Brief 74). Pure navigation: a soft glyph + name +
  * one plain-language purpose + a chevron. No counts, no status chips
  * (those live in Operations). Rendered as anchors so middle-click /

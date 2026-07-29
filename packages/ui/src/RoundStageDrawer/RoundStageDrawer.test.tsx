@@ -29,7 +29,7 @@ const COMPLETE: RoundDraft = {
   display_name: "Round to nearest dollar",
   increment_input: "literal:1",
   min_value_input: "literal:500",
-  citation_rule: "Meridian BOP §6.B.1",
+  citation_rule: "ISO BOP §6.B.1",
   citation_page: "p. 48",
 };
 

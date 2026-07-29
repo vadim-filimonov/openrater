@@ -6,7 +6,7 @@
  *     ▸ class_factor                            (header row, children)
  *
  *     Factor value: 1.20 → 1.35  +12.5%        (leaf — changed)
- *     New row "c103" added                    (leaf — added)
+ *     New row "91342" added                    (leaf — added)
  *     Row "98765" removed                      (leaf — removed)
  *     = unchanged (3 fields)                   (collapsed identical
  *                                                subtree)

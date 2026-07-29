@@ -1,4 +1,4 @@
-/* ExhibitsRoute — token-only BEM (current Exhibits design).
+/* ExhibitsRoute — token-only BEM (Brief: portfolio-redesign v2 §5).
  * One page: header bar · lede · the wall · provenance footer. */
 
 .rater-exh {
@@ -499,6 +499,40 @@
   max-height: 460px;
   overflow-y: auto;
   padding-right: var(--rater-s-6);
+  /* FCA #33 (finding 149) — a scroll HINT for overlay-scrollbar
+   * platforms: content past the fold used to hide behind nothing but
+   * a half-cut row (the tile's own annotation named a class below
+   * the fold). CSS-only mask: fade the last rows out UNLESS the
+   * container is scrolled to the bottom — scrollable content
+   * announces itself. */
+  mask-image: linear-gradient(
+    to bottom,
+    black calc(100% - 36px),
+    transparent 100%
+  );
+  mask-composite: intersect;
+}
+/* At-bottom containers unmask via scroll-driven state when supported;
+ * without support the last row keeps a soft fade — a hint, never a
+ * data loss (scrolling reveals everything). */
+@supports (animation-timeline: scroll(self)) {
+  .rater-exh__rows--scroll {
+    animation: rater-exh-unmask linear both;
+    animation-timeline: scroll(self);
+  }
+  @keyframes rater-exh-unmask {
+    0%,
+    95% {
+      mask-image: linear-gradient(
+        to bottom,
+        black calc(100% - 36px),
+        transparent 100%
+      );
+    }
+    100% {
+      mask-image: none;
+    }
+  }
 }
 .rater-exh__row {
   display: grid;
@@ -744,7 +778,7 @@
 .rater-exh__ledger-row:hover {
   background: var(--rater-surface-2);
 }
-/*  — underwriting rows: same grammar, not doors (mark · name ·
+/* MVP-009 — underwriting rows: same grammar, not doors (mark · name ·
  * the one-line change spans the numeric columns). */
 .rater-exh__ledger-row--static {
   grid-template-columns: 16px minmax(0, 1.1fr) minmax(0, 2.6fr);
@@ -837,6 +871,10 @@
 }
 .rater-exh__ledger-rm {
   color: var(--rater-text-subtle);
+}
+/* FCA #24 — the reassigned-members mark (⇄) in the Questions block. */
+.rater-exh__ledger-mv {
+  color: var(--rater-cat-transform-text);
 }
 .rater-exh__ledger-q {
   margin-top: var(--rater-s-14);

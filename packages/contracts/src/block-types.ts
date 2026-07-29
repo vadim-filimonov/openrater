@@ -1,9 +1,12 @@
 /**
  * Block contract — pure types only.
  *
- * React-dependent fields (`renderBody`, `renderInspector`,
- * `BlockProps`, `BlockAction.run`) live in the frontend. This package
- * has zero runtime dependencies on any UI framework.
+ * Ported verbatim from `<prototype>/plan-builder/src/blocks/types.ts`
+ * (Phase A.1 of the original port plan). React-dependent fields (`renderBody`,
+ * `renderInspector`, `BlockProps`, `BlockAction.run`) are split out;
+ * they live in the rate-lab frontend (where React is a dep), NOT
+ * here in `@openrater/contracts` (which has zero runtime dependencies on
+ * any UI framework).
  *
  * Per node-design-principle P-N1 (pure execute) + P-N2 (typed I/O):
  * the `BlockKind.execute()` function is the canonical "what does
@@ -150,7 +153,7 @@ export interface BlockKind<P = unknown, I = unknown, O = unknown> {
     inputs: readonly PortSpec[];
     outputs: readonly PortSpec[];
   };
-  /** Optional citation reference for the math (e.g., 'Meridian Rule MS-R5, p.47'). */
+  /** Optional citation reference for the math (e.g., 'ISO BP-2024-RLC pp.47'). */
   citation?: string;
   /** Optional · where this kind came from (core | template | imported | ai-authored | custom). */
   provenance?: string;
@@ -208,8 +211,8 @@ export interface BlockKind<P = unknown, I = unknown, O = unknown> {
    * trace entry and surfaces in the audit / trace UI as-is.
    *
    * Audience: actuary or underwriter, not engineer. No code, no
-   * variable names, no jargon. "Classified c202 → 1.25" beats
-   * "table[key]=1.25".
+   * variable names, no jargon. "Classified 73912 → 1.32" beats
+   * "table[key]=1.32".
    *
    * Per node-design-principle P-N5 (trace contract): the trace must
    * be self-describing without consulting external metadata. This is
@@ -224,7 +227,7 @@ export interface BlockKind<P = unknown, I = unknown, O = unknown> {
    */
   explainStep?: (inputs: I, params: P, outputs: O) => string;
 
-  // ── Structured row issues (optional) ──
+  // ── Structured row issues (optional) — ADR-0056 ──
   /**
    * Report NON-FATAL structured issues about what this node did with
    * one row: an authored `default(x)` resolution applied, an unmapped
@@ -236,7 +239,7 @@ export interface BlockKind<P = unknown, I = unknown, O = unknown> {
    *
    * Like `explainStep`: pure, MUST NOT throw (the runtime wraps it
    * and drops the result if it does), audience is the actuary. Named
-   * `collectRowIssues` to distinguish it from the plan-level
+   * `collectRowIssues` to stay clear of the Brief-13 plan-level
    * `collectIssues` aggregator.
    */
   collectRowIssues?: (
@@ -246,7 +249,7 @@ export interface BlockKind<P = unknown, I = unknown, O = unknown> {
   ) => readonly RowIssueSeed[] | undefined;
 }
 
-// ── ExecuteContext ─────
+// ── ExecuteContext — V.22.S3 follow-up + Phase B M1.2 additions ─────
 // Re-exported here so block kinds can import it without a circular
 // dependency on `plan-types.ts`. (The same type is exported from
 // plan-types.ts for runtime consumers; both point at this one.)
@@ -268,8 +271,8 @@ export interface ExecuteContext {
    * which picks the right exposure key after a class lookup) can read
    * from the same source as the runtime's `input` special-case.
    *
-   * Optional for backward compatibility; callers using the bundled
-   * runtime always get this populated, but third-party
+   * Per Brief 16 (M1.2). Optional for backward compat; callers using
+   * the bundled runtime always get this populated, but third-party
    * runtimes that don't pass it through gracefully degrade.
    */
   readonly externalInputs?: Readonly<Record<string, unknown>>;
@@ -278,7 +281,7 @@ export interface ExecuteContext {
    * Class library handle — used by `input.class_exposure` to resolve
    * a bound class's declared exposure(s) at execution time.
    *
-   * Optional — when omitted, kinds requiring it
+   * Per Brief 16 (M1.2). Optional — when omitted, kinds requiring it
    * surface a clear error via the trace.
    */
   readonly classLibrary?: ClassLibrary;

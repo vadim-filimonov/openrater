@@ -1,14 +1,28 @@
 // @ts-check
 //
-// OpenRater — ESLint flat config.
+// OpenRater — ESLint flat config (Rate Lab v4 P2 / G20 remainder).
 //
-// The configuration covers TypeScript correctness, React hooks, console use,
-// and JSX accessibility. Type-aware checks stay in the separate TypeScript
-// build so this lint pass remains fast and deterministic.
+// G20 wired the four design checkers (tokens / raw-palette / v2-buttons /
+// color-domains) into CI but deliberately left ESLint un-wired — the handoff
+// (§7) said "run it first, turn red into follow-ups" rather than blind-wiring
+// a red gate. This is that follow-up: the preset the codebase already assumes.
+//
+// The preset is reverse-engineered from the 75 `eslint-disable` comments the
+// original-prototype port carried in with it — they pin the original rule set exactly:
+//   @typescript-eslint/*      (21 sites)  → typescript-eslint recommended
+//   react-hooks/*             (33 sites)  → eslint-plugin-react-hooks
+//   no-console                (16 sites)  → core no-console
+//   jsx-a11y/no-autofocus     ( 4 sites)  → eslint-plugin-jsx-a11y
+//   no-await-in-loop, ...     ( 1 site )  → core
+//
+// Non-type-checked on this first landing (fast CI, low noise). The typed tier
+// (no-floating-promises, no-misused-promises, no-unsafe-*) is a documented
+// follow-up — it needs a project-service pass across 1058 files and would bury
+// the signal on the first run.
 //
 // Layer rule (pnpm-workspace.yaml): apps depend on packages; packages depend
-// downward only. Package manifests and TypeScript project references enforce
-// that boundary; ESLint focuses on source-level rules.
+// downward only. Not yet enforced here — a boundaries follow-up, tracked with
+// the typed tier.
 
 import js from "@eslint/js";
 import tseslint from "typescript-eslint";
@@ -16,8 +30,14 @@ import reactHooks from "eslint-plugin-react-hooks";
 import jsxA11y from "eslint-plugin-jsx-a11y";
 import globals from "globals";
 
-// Apply the recommended JSX accessibility rules as warnings. Options such as
-// `controlComponents` are preserved, and rules disabled by the preset stay off.
+// jsx-a11y recommended, every rule pinned to `warn`. The 92 accessibility
+// findings across the component library are real debt, but remediating them is
+// design work (per user-pref #2 a11y touches the surfaces and wants a brief;
+// commitment #2 is the bar). Per the G20 handoff (§7) the first landing SURFACES
+// the red as a tracked follow-up rather than blind-wiring 92 hard failures or
+// papering them over with 92 inline disables. Follow-up: a11y-remediation brief,
+// after which these graduate rule-by-rule back to `error`. Options (e.g.
+// controlComponents) are preserved; `off` rules stay off.
 const jsxA11yWarn = Object.fromEntries(
   Object.entries(jsxA11y.flatConfigs.recommended.rules).map(([rule, level]) => {
     if (level === "off" || level === 0) return [rule, level];

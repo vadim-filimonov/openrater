@@ -1,16 +1,20 @@
--- 001_baseline.sql — the OpenRater schema baseline.
+-- 001_baseline.sql — the OpenRater schema baseline (Detachment Brief 1 S4).
 --
--- This is a consolidated baseline containing the schema OpenRater needs.
--- It intentionally excludes tables for retired product surfaces:
+-- This is a SQUASH: the effective schema of the pre-detachment
+-- upstream 50-migration chain (001–050, effective pin 5a16b57) minus
+-- the tables whose consumers were cut in the detachment:
 --   · models, model_eval_snapshots (021 — Model Lab registry)
 --   · model_audit_log              (022)
 --   · data_lab_sources / _files / _file_rows (043 — Data Lab)
 -- Everything else — plans + stages + dimensions + factor tables,
 -- snapshots/publish, connectors + integrations,
 -- plan runs + build reports, API keys,
--- quote ledger, and audit tables — is represented in this baseline.
+-- quote ledger, audit tables — is present byte-for-byte as the old
+-- chain left it (table rebuilds included), verified by a
+-- sqlite_master diff at squash time.
 --
--- Migration history starts here. Future migrations append as
+-- A fresh OSS repo has no deployed databases to walk the historical
+-- chain, so history starts here. Future migrations append as
 -- 002_*.sql and are exercised against POPULATED data by
 -- server/tests/test_migrations_populated.py (anchor = this baseline).
 

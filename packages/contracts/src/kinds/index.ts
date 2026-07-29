@@ -1,9 +1,13 @@
 /**
  * Block kinds — pure execute() implementations.
  *
- * Each kind is a standalone module exporting the pure compute surface:
- * params, execute, jacobian, and validation. React renderers live in
- * the frontend.
+ * Each kind is a standalone module exporting a `BlockKind`. Phase A.1
+ * ports them one-batch-at-a-time from the legacy
+ * `<prototype>/plan-builder/src/blocks/kinds/` directory.
+ *
+ * Per the original port plan: only the PURE half (params type + execute +
+ * jacobian + validate) ports here. React renderBody/renderInspector
+ * live in the rate-lab frontend.
  *
  * Importing this barrel does NOT register the kinds — registration is
  * an explicit opt-in via `registerBuiltinKinds()` so consumers (tests,
@@ -261,6 +265,22 @@ export type {
   DeriveBandOutputs,
 } from "./derive-band";
 
+// ── ADR-0025 / FCA #21 — derive.composite kind ──────────────────
+//
+// Joins member-dim level ids into a composite dim's level id
+// ("pts_1·lic_10_plus"). The projector inserts this whenever a
+// lookup axis binds a shape:"composite" dim — each member resolves
+// through its own derivation first, then this node joins them with
+// the substrate's COMPOSITE_LEVEL_SEPARATOR. Before it existed, the
+// spec-recommended composite shape built into a plan that refused
+// every row.
+export { DeriveCompositeKind } from "./derive-composite";
+export type {
+  DeriveCompositeParams,
+  DeriveCompositeInputs,
+  DeriveCompositeOutputs,
+} from "./derive-composite";
+
 // ── ADR-0028 — derive.territory kind (cold-test L13) ────────────
 //
 // The geographic analogue of derive.band: resolves a raw geographic
@@ -352,6 +372,7 @@ import {
 import { ModifierModelKind } from "./modifier-model";
 import { CoverageElectionKind } from "./coverage-election";
 import { DeriveBandKind } from "./derive-band";
+import { DeriveCompositeKind } from "./derive-composite";
 import { DeriveTerritoryKind } from "./derive-territory";
 import { DeriveClassAttributeKind } from "./derive-class-attribute";
 import { DeriveComputedKind } from "./derive-computed";
@@ -428,6 +449,11 @@ export function registerBuiltinKinds(): void {
   // Per ADR-0026. Inserted by stagesToRuntimePlan before
   // lookup.direct whenever the bound dim has shape: "banded".
   registerBlockKind(DeriveBandKind);
+  // ── ADR-0025 / FCA #21 — derive.composite kind ────────────────
+  // Inserted by stagesToRuntimePlan whenever a lookup axis binds a
+  // shape:"composite" dim: each member axis resolves through its own
+  // derivation, then this node joins the level ids with "·".
+  registerBlockKind(DeriveCompositeKind);
   // ── ADR-0028 — derive.territory kind (cold-test L13) ──────────
   // Inserted by stagesToRuntimePlan before lookup.direct whenever the
   // bound dim is geographic AND has a non-empty `geo_territories`

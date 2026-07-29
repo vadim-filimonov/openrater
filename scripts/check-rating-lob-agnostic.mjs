@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Check that rating surfaces remain line-of-business agnostic.
+ * check-rating-lob-agnostic.mjs — Brief 82 O-2 (owner, 2026-07-10).
  *
  * "This rating platform has to be plan agnostic — it should work for
  * a BOP plan as well as it would work for a personal auto."
@@ -14,7 +14,7 @@
  *    they are plan data; this scans only the shipped component
  *    sources.
  *
- * 2. BACKEND — no program VALUE ships
+ * 2. BACKEND (owner directive 2026-07-14) — no program VALUE ships
  *    as a platform default in the plan-authoring core. The leak this
  *    ratchets against: `configs.py` used to default
  *    `ClassificationLookupConfig.output_fields` to a BOP column
@@ -55,8 +55,8 @@ const BANNED =
 /**
  * Backend platform core — the plan-authoring module. Scans every .py
  * in `rates/plans/`, no exemptions (the last two pieces of dormant
- * port debt such as disabled starter-template constants or legacy
- * error aliases).
+ * port debt — author.py's disabled starter-template constant and
+ * errors.py's legacy error aliases — retired 2026-07-14).
  */
 const BACKEND_SCAN_DIR = "server/src/openrater/rates/plans";
 const BACKEND_SCAN_FILES = readdirSync(join(root, BACKEND_SCAN_DIR))
@@ -132,7 +132,7 @@ if (violations.length > 0) {
     console.error(`  ${v.file}:${v.line} — "${v.word}" in: ${v.text}`);
   }
   console.error(
-    "Every LOB noun and program value must come from plan data.",
+    "Every LOB noun and program value must come from plan data (Brief 82 O-2; ADR-0033 §0).",
   );
   process.exit(1);
 }

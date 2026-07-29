@@ -1,5 +1,5 @@
 /**
- * Exhibits anatomy — derivation tests (current Exhibits design).
+ * Exhibits anatomy — derivation tests (Brief: portfolio-redesign v2 §5.3).
  *
  * Values mirror the seeded Meridian NE 2026 fixture so the derivations
  * are pinned against the same numbers the demo renders.
@@ -210,6 +210,40 @@ describe("orderedLevelValues", () => {
     const values = orderedLevelValues(buildingIlf, buildingBand);
     expect(values.map((v) => v.value)).toEqual([1.0, 0.93, 0.87, 0.82, 0.78]);
     expect(values[0]?.label).toBe("0–100k");
+  });
+
+  it("presents territories in NATURAL order, not workbook source order (FCA #26)", () => {
+    // Finding 119: every surface reading tile values (grid, legend,
+    // rail) showed T6, T8, T4, T5, T7, T1, T2, T3 — the workbook's
+    // arbitrary sequence — so cross-referencing filing Exhibit T-1
+    // meant hunting. Natural order also beats lexicographic: T10
+    // sorts after T2.
+    const dim = {
+      dim_id: "territory",
+      slug: "territory",
+      display_name: "Territory",
+      dimension_type: "geographic",
+      levels: [],
+      geo_territories: ["T6", "T10", "T4", "T1", "T2"].map((id) => ({
+        id,
+        label: id,
+        members: [id.toLowerCase()],
+      })),
+    } as unknown as Parameters<typeof orderedLevelValues>[1];
+    const table = {
+      table_id: "ft_terr",
+      slug: "territory_factor",
+      display_name: "Territory factor",
+      key_dimensions: ["territory"],
+      cells: { T6: 1.6, T10: 2.0, T4: 1.4, T1: 1.1, T2: 1.2 },
+    } as unknown as Parameters<typeof orderedLevelValues>[0];
+    expect(orderedLevelValues(table, dim).map((v) => v.id)).toEqual([
+      "T1",
+      "T2",
+      "T4",
+      "T6",
+      "T10",
+    ]);
   });
 });
 

@@ -3,10 +3,10 @@ import { MultiLookupKind } from "./lookup-multi";
 import type { MultiLookupRow } from "./lookup-multi";
 
 const RATING_ROWS: readonly MultiLookupRow[] = [
-  { keys: ["c101", "t1", "p1"], factor: 1.1 },
-  { keys: ["c101", "t1", "p2"], factor: 1.25 },
-  { keys: ["c101", "t2", "p1"], factor: 0.95 },
-  { keys: ["c102", "t1", "p1"], factor: 0.75 },
+  { keys: ["00811", "01", "B"], factor: 1.1 },
+  { keys: ["00811", "01", "C"], factor: 1.25 },
+  { keys: ["00811", "02", "B"], factor: 0.95 },
+  { keys: ["00812", "01", "B"], factor: 0.75 },
 ];
 
 describe("MultiLookupKind", () => {
@@ -19,7 +19,7 @@ describe("MultiLookupKind", () => {
   it("returns the factor of the row whose key tuple matches positionally", () => {
     const r = MultiLookupKind.execute(
       {
-        keys: { class_code: "c101", territory: "t1", protection: "p2" },
+        keys: { class_code: "00811", territory: "01", protection: "C" },
       },
       {
         keyNames: ["class_code", "territory", "protection"],
@@ -33,7 +33,7 @@ describe("MultiLookupKind", () => {
   it("returns defaultValue when no row matches the input tuple", () => {
     const r = MultiLookupKind.execute(
       {
-        keys: { class_code: "c999", territory: "t1", protection: "p1" },
+        keys: { class_code: "99999", territory: "01", protection: "B" },
       },
       {
         keyNames: ["class_code", "territory", "protection"],
@@ -123,7 +123,8 @@ describe("MultiLookupKind", () => {
     expect(r.valid).toBe(true);
   });
 
-  describe("derivedPorts — one port per key", () => {
+  // ── ADR-0044 — derived per-key input ports ──────────────────────────
+  describe("derivedPorts (ADR-0044 — one port per key)", () => {
     it("exposes one input port per keyName when keyNames is set", () => {
       const ports = MultiLookupKind.derivedPorts!({
         keyNames: ["territory", "exposure_base"],
@@ -152,37 +153,37 @@ describe("MultiLookupKind", () => {
       // The runtime gathers each per-key edge into inputs[keyName]; there
       // is no `keys` record. execute must still build the tuple.
       const r = MultiLookupKind.execute(
-        { territory: "t1", exposure_base: "sales" },
+        { territory: "701", exposure_base: "sales" },
         {
           keyNames: ["territory", "exposure_base"],
           rows: [
-            { keys: ["t1", "sales"], factor: 1.5 },
-            { keys: ["t2", "sales"], factor: 1.6 },
-            { keys: ["t1", "area"], factor: 0.05 },
+            { keys: ["701", "sales"], factor: 1.518 },
+            { keys: ["702", "sales"], factor: 1.577 },
+            { keys: ["701", "loi"], factor: 0.025 },
           ],
           defaultValue: 1.0,
         },
       );
-      expect(r.value).toBe(1.5);
+      expect(r.value).toBe(1.518);
     });
 
     it("execute still honors the legacy `keys` record (back-compat)", () => {
       const r = MultiLookupKind.execute(
-        { keys: { territory: "t2", exposure_base: "sales" } },
+        { keys: { territory: "702", exposure_base: "sales" } },
         {
           keyNames: ["territory", "exposure_base"],
           rows: [
-            { keys: ["t1", "sales"], factor: 1.5 },
-            { keys: ["t2", "sales"], factor: 1.6 },
+            { keys: ["701", "sales"], factor: 1.518 },
+            { keys: ["702", "sales"], factor: 1.577 },
           ],
           defaultValue: 1.0,
         },
       );
-      expect(r.value).toBe(1.6);
+      expect(r.value).toBe(1.577);
     });
   });
 });
-describe("lookup.multi — numeric keys match string row keys", () => {
+describe("lookup.multi — numeric keys match string row keys (Brief 83.2)", () => {
   it("a number input meaning the same key matches ('1500' row, 1500 input)", () => {
     const params = {
       keyNames: ["ded", "band"],
@@ -209,6 +210,7 @@ describe("lookup.multi — numeric keys match string row keys", () => {
     expect(out.value).toBe(1.0);
   });
 
+  // ── ADR-0063 amendment — interpolateOn (2-D-axis interpolation, F14) ──
   describe("interpolateOn — interpolate one axis of a 2-D lookup", () => {
     // Building Limit relativity shape: (limit-band × construction-group).
     // group_c's curve: b1@100k=1.0, b2@250k=1.3, b3@500k=1.45, b4@1M=1.6.
@@ -288,7 +290,8 @@ describe("lookup.multi — numeric keys match string row keys", () => {
       // Omit the key entirely — under exactOptionalPropertyTypes an explicit
       // `interpolateOn: undefined` is not assignable to the optional param.
       const { interpolateOn: _omit, ...stepParams } = params;
-      // A raw 315000 with no matching band id misses without interpolation.
+      // a raw 315000 with no matching band id → miss → default (the pre-fix
+      // behavior; the projector pairs interpolateOn with a raw-value wire).
       const out = MultiLookupKind.execute(
         { band: 315_000 as unknown as string, group: "group_c" },
         stepParams,
@@ -308,3 +311,4 @@ describe("lookup.multi — numeric keys match string row keys", () => {
     });
   });
 });
+

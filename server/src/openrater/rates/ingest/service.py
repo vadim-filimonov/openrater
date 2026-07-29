@@ -39,6 +39,13 @@ class AlreadyBuilt(BaseModel):
     rating_plan_id: str
     report_id: str
     created_at: str
+    #: FCA fca-2026-07-25 #16 — the staleness half: these bytes built
+    #: that plan, but the plan has been edited IN-APP since. A what-if
+    #: built from this workbook silently resurrects whatever those
+    #: edits repaired; the check now says so instead of leaving the
+    #: discovery to declined-counter archaeology.
+    edited_since_build: bool = False
+    edits_note: str | None = None
 
 
 class RevisionCandidate(BaseModel):
@@ -251,7 +258,7 @@ def build_workbook(
         if parsed.gaps is not None
         else []
     )
-    # Drift tracking: capture the as-built content hash so
+    # Drift honesty (MVP-008): capture the as-built content hash so
     # "edited since build" is a hash comparison, never a guess.
     if check.manifest is not None:
         check.manifest.plan_content_hash_at_build = _plan_content_hash(
@@ -332,15 +339,22 @@ class EditChange(BaseModel):
 
 
 class EditsSinceBuild(BaseModel):
-    """Drift tracking: what the
+    """Drift honesty (brief drift-honesty.md, MVP-002/008): what the
     live plan carries that its workbook doesn't. `edited` is the
     PERFECT-fidelity signal (content hash when the report stored one,
-    else the last_edited_at timestamp); `changes` is the best-effort
-    itemization (factor cells today); `note` names the gap when the
-    signal trips but the itemizer sees nothing."""
+    else the last_edited_at timestamp); `changes` is the cell-level
+    itemization; `stage_edits` (FCA #16) itemizes everything else from
+    the audit timeline; `note` names whatever remains."""
 
     edited: bool = False
     changes: list[EditChange] = []
+    #: FCA fca-2026-07-25 #16 — stage-level in-app edits since the
+    #: build (gates, chains, inputs, dimensions — the classes the cell
+    #: itemizer can't see), read from the audit timeline the platform
+    #: already keeps. Oldest first, '<when> · <what>'. The old behavior
+    #: told the user edits exist and would be destroyed but could not
+    #: show them.
+    stage_edits: list[str] = []
     note: str | None = None
 
 
@@ -410,6 +424,32 @@ def _itemize_cell_edits(
     return out
 
 
+def _stage_edit_summaries(
+    db: Any, rating_plan_id: str, since_iso: str, cap: int = 50
+) -> list[str]:
+    """FCA #16 — itemize post-build stage-level edits from the audit
+    timeline (the platform records every author mutation with a note
+    and a before/after diff; the differ just never read them). Oldest
+    first so the story reads forward."""
+    from openrater.rates.plans.author import list_audit_events
+
+    events = list_audit_events(
+        db=db, rating_plan_id=rating_plan_id, limit=200, event_kind="edit"
+    )
+    out: list[str] = []
+    for e in reversed(events):
+        if e.event_at <= since_iso:
+            continue
+        summary = (e.note or "").strip()
+        if not summary and isinstance(e.after_json, dict):
+            summary = "changed " + ", ".join(sorted(e.after_json)[:4])
+        if summary:
+            out.append(f"{e.event_at[:19]} · {summary}")
+        if len(out) >= cap:
+            break
+    return out
+
+
 def edits_since_build(db: Any, rating_plan_id: str) -> EditsSinceBuild:
     """The plan's in-app edits relative to its latest build — the fact
     the re-ingest preview, the apply gate, and the drift chip share."""
@@ -456,20 +496,40 @@ def edits_since_build(db: Any, rating_plan_id: str) -> EditsSinceBuild:
     # later restored by hand) is not an edit.
     legacy_touch = (at_build is None or base_blob is None) and touched_since
     edited = bool(changes) or hash_moved or legacy_touch
+    # FCA #16 — the cell itemizer can't see stage-level edits (gates,
+    # chains, inputs, dimensions); the audit timeline can. The old
+    # note claimed such changes were 'outside what this differ
+    # itemizes' — wrong AND unhelpful when the destroyed edit was a
+    # behavior-changing gate repair.
+    stage_edits = (
+        _stage_edit_summaries(db, rating_plan_id, base_report.created_at)
+        if edited
+        else []
+    )
     note = None
-    if edited and not changes:
+    if edited and not changes and not stage_edits:
         note = (
-            "The plan changed since its build, but not in factor cells "
-            "— the change is outside what this differ itemizes "
-            "(dimensions, chains, gates, or inputs). Applying a "
-            "workbook replaces those edits too."
+            "The plan's content changed since its build, but neither "
+            "the cell itemizer nor the audit timeline records what — "
+            "treat the exported workbook as PRE-DATING the live plan. "
+            "Applying a workbook replaces the live state."
         )
-    return EditsSinceBuild(edited=edited, changes=changes, note=note)
+    elif stage_edits:
+        n = len(stage_edits)
+        note = (
+            f"{n} in-app edit{'s' if n != 1 else ''} since the build "
+            f"(itemized in stage_edits) — the exported workbook "
+            f"pre-dates {'them' if n != 1 else 'it'}, and applying a "
+            f"workbook replaces them."
+        )
+    return EditsSinceBuild(
+        edited=edited, changes=changes, stage_edits=stage_edits, note=note
+    )
 
 
 class ReingestWouldReplaceEdits(Exception):
     """Apply refused: the plan carries in-app edits the workbook would
-    silently replace, and the caller didn't consent ()."""
+    silently replace, and the caller didn't consent (MVP-002)."""
 
     def __init__(self, edits: EditsSinceBuild) -> None:
         self.edits = edits
@@ -505,7 +565,7 @@ class ReingestCheckResult(BaseModel):
     base_missing_reason: str | None = None
     hand_edited_since_build: bool = False
     plan_content_hash: str | None = None
-    # : the itemized in-app edits an apply would replace.
+    # MVP-002: the itemized in-app edits an apply would replace.
     edits_since_build: EditsSinceBuild | None = None
 
 
@@ -702,7 +762,7 @@ def reingest_apply(
     ):
         raise ReingestIdentityMismatch(wb_plan_id, rating_plan_id)
 
-    # Drift tracking: applying replaces the WHOLE substrate —
+    # Drift honesty (MVP-002): applying replaces the WHOLE substrate —
     # if the plan carries in-app edits, refuse without explicit consent,
     # and cut an automatic pre-apply version when consent is given.
     edits = edits_since_build(db, rating_plan_id)
@@ -762,7 +822,7 @@ def reingest_apply(
         if parsed.gaps is not None
         else []
     )
-    # Drift tracking: the as-applied hash makes the next
+    # Drift honesty (MVP-008): the as-applied hash makes the next
     # "edited since build" a hash comparison, never a guess.
     if check.manifest is not None:
         check.manifest.plan_content_hash_at_build = _plan_content_hash(

@@ -6,7 +6,8 @@
 # You may obtain a copy of the License at
 #
 #     http://www.apache.org/licenses/LICENSE-2.0
-"""API Lab ↔ scoring HTTP contract check.
+"""api-lab ↔ scoring HTTP contract check (the seam the 2026-07-11 audit found
+UNTESTED).
 
 Every backend pytest monkeypatches `score_once`
 (`server/tests/test_routes_quotes.py`) and the scoring service's own
@@ -26,7 +27,7 @@ This script closes that gap. It drives the REAL two-service pipeline over HTTP:
     POST /api/v1/plans/{id}/quote            (2 locations → scoring /score-policy)
     POST /api/v1/plans/{id}/quote            (unrateable risk → named refusal)
 
-and asserts the committed reference oracle to the dollar, plus the response envelope
+and asserts the AUDITED oracle to the dollar, plus the response envelope
 (`version.snapshot_id` + the ADR-0056 tri-facet). It assumes BOTH services are
 already running and api-lab is wired to scoring via `RATER_SCORING_URL`,
 against a DB with the committed Meridian fixture loaded
@@ -47,7 +48,7 @@ against a DB with the committed Meridian fixture loaded
   Inputs are sent TYPED, coerced per the plan's own declared input schema
   (`GET /plans/{id}/input-schema` — which this check thereby also
   exercises); typed inputs remain the correct client behavior. Since
-  The engine ALSO coerces wire strings onto the
+  Phase F (2026-07-17) the engine ALSO coerces wire strings onto the
   plan's declared input ports once at the run seam (conformance V62), so
   a string-encoded boolean ("true") can no longer price correctly while
   silently missing an appetite gate's match — the wire-string probe
@@ -84,7 +85,7 @@ PLAN_ID = os.environ.get("RATER_CONTRACT_PLAN_ID", "meridian-shopfront-bop-ne-20
 RAW_BOOK = Path(os.environ.get("RATER_CONTRACT_RAW_BOOK", _DEFAULT_RAW_BOOK))
 FIXTURE = Path(os.environ.get("RATER_CONTRACT_FIXTURE", _DEFAULT_FIXTURE))
 
-# ── The committed reference oracle ───────────────────────────────────────────────────────
+# ── The audited oracle ───────────────────────────────────────────────────────
 # The anchor row (the filing's first worked example) + its literal premium.
 # Row-level expectations are read from the committed demo book itself —
 # `expected_total` / `expected_tier` are engine-verified by the frontend
@@ -327,7 +328,8 @@ def check_wire_string_policy(
     per_location: int,
     expected_tier: str,
 ) -> None:
-    """Check the same anchor risk with EVERY value left as the raw
+    """Phase F (2026-07-17) — the seam this check's docstring used to flag
+    as a known issue: the same anchor risk with EVERY value left as the raw
     CSV string (the wire form integrators actually produce). The engine now
     coerces the record onto the plan's declared input ports once at the run
     seam (conformance V62), so the uncoerced form must price AND tier
@@ -455,7 +457,7 @@ def main() -> int:
         )
         return 1
 
-    print("\nCONTRACT OK — the API Lab ↔ scoring seam prices the reference oracle to the dollar.")
+    print("\nCONTRACT OK — the api-lab ↔ scoring seam prices the audited oracle to the dollar.")
     return 0
 
 

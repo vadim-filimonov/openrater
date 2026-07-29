@@ -23,7 +23,7 @@ function asConfig(v: unknown): Record<string, unknown> | null {
 export interface PlanReportFacts {
   /** Application inputs the plan asks for (`input_node` stages). */
   readonly inputCount: number;
-  /** THE public step count (): the rows the Rating tab shows —
+  /** THE public step count (MVP-013): the rows the Rating tab shows —
    *  chain build-up steps + Final-adjustment rows. Never the wire
    *  stage count. */
   readonly stepCount: number;
@@ -48,7 +48,7 @@ export function computePlanReportFacts(
     if (s.stage_kind === "input_node") inputCount += 1;
     else if (s.stage_kind === "interpolate") curveCount += 1;
     else if (s.stage_kind === "eligibility.gate") {
-      //  — one counting: a gate stage holds N filed RULES
+      // MVP-013 — one counting: a gate stage holds N filed RULES
       // (config_json.rules), the same number the Overview checklist
       // states and the report's gates section lists. A config-less
       // stage still counts as one rule.
@@ -56,7 +56,7 @@ export function computePlanReportFacts(
       gateCount += Array.isArray(rules) && rules.length > 0 ? rules.length : 1;
     }
   }
-  //  — one public counting everywhere: the lede states the same
+  // MVP-013 — one public counting everywhere: the lede states the same
   // "chains · steps" the Rating tab renders and the Overview checklist
   // prints, via the shared derivation.
   const algo = countPublicAlgorithm(
@@ -94,7 +94,7 @@ export function buildProvenanceClause(args: {
 }
 
 /** "3 chains · 24 steps · 9 inputs · 12 tables" — the title-block
- *  meta, leading with the public counting (). */
+ *  meta, leading with the public counting (MVP-013). */
 export function buildReportMetaLine(facts: PlanReportFacts): string {
   const parts = [
     ...(facts.chainCount > 0

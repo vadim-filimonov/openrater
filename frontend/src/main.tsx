@@ -23,8 +23,9 @@ import "./index.css";
 // call. Idempotent: re-registering the same kind is a no-op.
 registerBuiltinKinds();
 
-// Client fixture mode is intentionally absent. The app always talks to the
-// real backend; seeded demo content arrives server-side.
+// Detachment Brief 1 (Phase B) — client fixture mode retired with the
+// bundled sample-plan cut (§3.2). The app always talks to the real
+// backend; seeded demo content arrives server-side (S3, Phase D).
 
 const rootElement = document.getElementById("root");
 if (!rootElement) {

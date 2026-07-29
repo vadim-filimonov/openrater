@@ -870,8 +870,8 @@ describe("computeScoringFingerprint", () => {
     { stage_id: "base", stage_kind: "input_node", config_json: { source_path: "x" } },
     { stage_id: "tower", stage_kind: "multiplicative_chain", config_json: { lcm: 1.4 } },
   ];
-  const dims = [{ slug: "territory", levels: [{ id: "t1" }, { id: "t2" }] }];
-  const cells = new Map([["ft1", new Map([["t1", 0.4], ["t2", 0.41]])]]);
+  const dims = [{ slug: "territory", levels: [{ id: "701" }, { id: "702" }] }];
+  const cells = new Map([["ft1", new Map([["701", 0.389], ["702", 0.41]])]]);
 
   it("is deterministic for the same inputs", () => {
     expect(computeScoringFingerprint(stages, dims, cells)).toBe(
@@ -884,7 +884,7 @@ describe("computeScoringFingerprint", () => {
     const b = computeScoringFingerprint(
       [stages[1]!, stages[0]!],
       dims,
-      new Map([["ft1", new Map([["t2", 0.41], ["t1", 0.4]])]]),
+      new Map([["ft1", new Map([["702", 0.41], ["701", 0.389]])]]),
     );
     expect(a).toBe(b);
   });
@@ -897,13 +897,13 @@ describe("computeScoringFingerprint", () => {
 
   it("changes when a factor cell value changes", () => {
     const a = computeScoringFingerprint(stages, dims, cells);
-    const edited = new Map([["ft1", new Map([["t1", 0.5], ["t2", 0.41]])]]);
+    const edited = new Map([["ft1", new Map([["701", 0.5], ["702", 0.41]])]]);
     expect(computeScoringFingerprint(stages, dims, edited)).not.toBe(a);
   });
 
   it("changes when a dimension level is added", () => {
     const a = computeScoringFingerprint(stages, dims, cells);
-    const edited = [{ slug: "territory", levels: [{ id: "t1" }, { id: "t2" }, { id: "t3" }] }];
+    const edited = [{ slug: "territory", levels: [{ id: "701" }, { id: "702" }, { id: "703" }] }];
     expect(computeScoringFingerprint(stages, edited, cells)).not.toBe(a);
   });
 
@@ -1046,14 +1046,14 @@ describe("runRowsToScoredBatchResult (Brief 75 phase 4)", () => {
     });
   });
 
-  it("never overwrites a REAL output column with views.premium", () => {
+  it("never overwrites a REAL output column with an UNEXPLAINED views.premium", () => {
     const out = runRowsToScoredBatchResult({
       rows: [
         {
           inputs: {},
           outputs: { total_premium: 500 },
-          // e.g. a composed view diverging from the raw output — the
-          // engine's own column stays authoritative for the column feed.
+          // A divergence with no declared basis — the engine's own
+          // column stays authoritative for the column feed.
           views: { premium: 525 },
           row_status: "ok",
         },
@@ -1062,5 +1062,36 @@ describe("runRowsToScoredBatchResult (Brief 75 phase 4)", () => {
       scoredAt: "2026-07-15T00:00:00Z",
     });
     expect(out.rows[0]?.outputs["total_premium"]).toBe(500);
+  });
+
+  it("a COMPOSED premium basis overrides the pre-floor engine column (FCA book floor)", () => {
+    // The book worker's per-row composition (FCA fca-2026-07-25)
+    // deliberately keeps outputs at the pre-floor chain total for
+    // quote parity and serves the filed number in views.premium with
+    // premiumBasis 'composed'. The premium column must read the filed
+    // number — otherwise Analytics sums the exact pre-floor figure
+    // the ledger and totals stopped serving.
+    const out = runRowsToScoredBatchResult({
+      rows: [
+        {
+          inputs: {},
+          outputs: { total_premium: 140 },
+          views: { premium: 500, premiumBasis: "composed" },
+          row_status: "ok",
+        },
+        {
+          inputs: {},
+          outputs: { total_premium: 140 },
+          // Error rows stay premium-less regardless of basis.
+          views: { premium: null, premiumBasis: "composed" },
+          row_status: "error",
+        },
+      ],
+      premiumColumn: "total_premium",
+      scoredAt: "2026-07-15T00:00:00Z",
+    });
+    expect(out.rows[0]?.outputs["total_premium"]).toBe(500);
+    expect(out.rows[1]?.outputs["total_premium"]).toBe(140);
+    expect(out.rows[1]?.outputs["row_status"]).toBe("error");
   });
 });

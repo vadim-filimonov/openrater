@@ -3,7 +3,7 @@
  *
  * The single source of truth for color, type, spacing, radius, motion,
  * shadow, icon size, and z-index in openrater. Every primitive, every
- * OpenRater component, every chrome surface reads tokens from this
+ * Lab-specific component, every chrome surface reads tokens from this
  * file via CSS custom properties — never from hard-coded values, never
  * from inline styles.
  *
@@ -35,9 +35,13 @@
  *
  * Namespace:
  *
- *   - Every token starts with `--rater-` so embedders can drop OpenRater
- *     UI CSS into a host page without colliding with the host's
+ *   - Every token starts with `--rater-` so embedders can drop rater-
+ *     labs CSS into a host page without colliding with the host's
  *     own custom properties.
+ *
+ * See `docs/design-briefs/tokens-rebuild-rationale.md` for the side-
+ * by-side diff against the source v2 tokens and the reasoning per
+ * change.
  * ============================================================================ */
 
 :root {
@@ -59,7 +63,21 @@
   --rater-color-zinc-200: #e4e4e7;
   --rater-color-zinc-300: #d4d4d8;
   --rater-color-zinc-400: #a1a1aa;
+  /* FCA fca-2026-07-25 #32 — three TUNED steps between the standard
+   * ramp stops. The instrumented visual pass measured the muted-ink
+   * family below WCAG AA on ~1,300 instances (zinc-500 tops out at
+   * 3.08:1 on dark surface-2; zinc-400 at 2.46:1 on zinc-100). These
+   * are the dimmest grays that still clear 4.5:1 on their theme's
+   * WORST text-bearing surface (dark: zinc-800 hover/raised; light:
+   * zinc-100):
+   *   450 → 4.83:1 on zinc-800 (dark faint)
+   *   530 → 4.80:1 on zinc-100 (light faint)
+   *   550 → 5.49:1 on zinc-100 (light subtle)
+   */
+  --rater-color-zinc-450: #92929b;
   --rater-color-zinc-500: #71717a;
+  --rater-color-zinc-530: #6b6b74;
+  --rater-color-zinc-550: #62626b;
   --rater-color-zinc-600: #52525b;
   --rater-color-zinc-700: #3f3f46;
   --rater-color-zinc-800: #27272a;
@@ -363,11 +381,18 @@
   --rater-surface-3: var(--rater-color-zinc-700); /* Active, selected */
   --rater-surface-overlay: rgba(9, 9, 11, 0.85); /* Modal backdrop */
 
-  /* Text — foreground hierarchy, descending. */
+  /* Text — foreground hierarchy, descending.
+   * FCA #32 — every READABLE tier clears WCAG AA (4.5:1) on the
+   * darkest text-bearing surface (zinc-800 hover/raised): muted
+   * 10.1:1, subtle 5.8:1, faint 4.8:1. The old subtle (zinc-500,
+   * 3.08:1 worst) and faint (zinc-600, 1.93:1 worst) failed on
+   * ~1,000 measured instances — including the parked workspace tabs
+   * and load-bearing annotations. `disabled` alone stays sub-AA by
+   * intent: non-interactive, conventionally dimmed. */
   --rater-text-strong: var(--rater-color-zinc-50);
   --rater-text-default: var(--rater-color-zinc-200);
-  --rater-text-muted: var(--rater-color-zinc-400);
-  --rater-text-subtle: var(--rater-color-zinc-500);
+  --rater-text-muted: var(--rater-color-zinc-300);
+  --rater-text-subtle: var(--rater-color-zinc-400);
   --rater-text-disabled: var(--rater-color-zinc-600);
   --rater-text-inverse: var(--rater-color-zinc-950);
 
@@ -432,7 +457,9 @@
   --rater-accent-primary: var(--rater-color-azure-600);
   --rater-accent-success: var(--rater-color-emerald-500);
   --rater-accent-warning: var(--rater-color-amber-500);
-  --rater-accent-danger: var(--rater-color-red-500);
+  /* FCA #32 (finding 21) — red-500 fills put white text at 3.61:1
+   * ("Discard plan"); red-600 clears 4.83:1 and stays the same hue. */
+  --rater-accent-danger: var(--rater-color-red-600);
 
   /* Polish PR 9 — accent hover + on-accent text aliases.
    *
@@ -452,11 +479,27 @@
    *   --rater-accent-danger-text    — lighter red used by `danger-text`
    *                                  variant on hover (text-only
    *                                  destructive buttons). */
+  /* FCA #33 (finding 16) — the page's horizontal gutter as a token.
+   * Pages override it responsively (.plan-detail-page: 24px, 12px
+   * below 1366px); bleed-into-gutter effects (the workspace tab
+   * strip's hover fills) take min(16px, this) so they can never
+   * overhang the viewport — the fixed 16px bleed used to put a
+   * permanent 8px horizontal scrollbar on every plan screen. */
+  --rater-page-gutter: var(--rater-s-24);
+
   --rater-on-accent: var(--rater-color-zinc-50);
-  /* The base uses azure-600, so hover steps to azure-700 to keep the
+  /* FCA #32 (finding 20) — accent-primary is a FILL color tuned for
+   * white-on-top (azure-600, 5.17:1); used AS TEXT on dark surfaces
+   * it reads at 3.43:1 (Home row actions, the empty-state door).
+   * This is the TEXT role: azure-400 on dark (5.9–7.8:1), re-resolved
+   * to azure-700 in light mode (6.7:1 on white). Point link-shaped
+   * accent text here, never at the fill token. */
+  --rater-accent-primary-text: var(--rater-color-azure-400);
+  /* F02 — base moved to azure-600, so hover steps to azure-700 to keep the
      "one step darker" feedback (white-on-700 is darker still → AA-safe). */
   --rater-accent-primary-hover: var(--rater-color-azure-700);
-  --rater-accent-danger-hover: var(--rater-color-red-600);
+  /* FCA #32 — danger moved to red-600, so hover steps to red-700. */
+  --rater-accent-danger-hover: var(--rater-color-red-700);
   --rater-accent-danger-text: var(--rater-color-red-400);
 
   /* ============================================================
@@ -464,8 +507,13 @@
    *
    * Component CSS uses several semantic names that didn't exist
    * in §9 before. Rather than rewriting every component, these
-   * aliases route the names to existing semantic tokens. Components
-   * can migrate off the aliases if a cleaner name lands.
+   * aliases route the names to existing semantic tokens. Phase
+   * A.5 surface redesigns can migrate components off the aliases
+   * if a cleaner name lands.
+   *
+   * Provenance note: the audit in docs/design-pass/audit.md §1.1
+   * documents the 30+ references that previously fell through
+   * to browser defaults (no border, default font, etc.).
    * ============================================================ */
 
   /* Surfaces — extended hierarchy.
@@ -479,15 +527,19 @@
   --rater-surface-emphasis: var(--rater-color-zinc-800);
   /* raised = the "Hover, raised" role (cards, hover/selected rows,
    * stat cells). Routes onto surface-2 so it tracks the ramp in both
-   * modes. */
+   * modes. Adopted by the Integration Hub (Brief 77). */
   --rater-surface-raised: var(--rater-surface-2);
 
   /* Text — additional steps.
    *   base   = default body text (alias for text-default).
-   *   faint  = below subtle, above disabled. Hairline-level fade.
+   *   faint  = below subtle, above disabled. The quietest READABLE
+   *            tier — FCA #32: zinc-600 measured 1.93–2.57:1 (the
+   *            near-invisible parked tabs); the tuned zinc-450 is
+   *            the dimmest gray clearing 4.5:1 on every dark
+   *            text-bearing surface.
    */
   --rater-text-base: var(--rater-text-default);
-  --rater-text-faint: var(--rater-color-zinc-600);
+  --rater-text-faint: var(--rater-color-zinc-450);
 
   /* Hairlines — alias layer mapping to the existing border scale.
    * `hairline` names the visual role (a 1px divider). Adopted by
@@ -517,7 +569,7 @@
    *   info    → azure     (advisory, neutral notice)
    */
   /* ============================================================
-   * COLOR GOVERNANCE — four domains:
+   * COLOR GOVERNANCE (V2_INTERFACE_SPEC §1.1) — four domains:
    *   1. INTERACTION  = accent-primary / focus-ring (azure). The one
    *      primary per screen, links, active indicators, selection.
    *      Never decorative.
@@ -567,7 +619,8 @@
 
   /* Row interaction tokens — semantic names for table row backgrounds.
    * The "selected" state mixes 18% of accent-primary into surface-1 via
-   * oklab for perceptual brightness consistency. Hover is just surface-2. */
+   * oklab for perceptual brightness consistency. Hover is just surface-2.
+   * Documented at docs/design-pass/design-language.md §16. */
   --rater-row-hover-bg: var(--rater-surface-2);
   --rater-row-selected-bg:
     color-mix(in oklab, var(--rater-accent-primary) 18%, var(--rater-surface-1));
@@ -576,8 +629,13 @@
    * 9.b — CATEGORICAL PALETTE (territory polygons, plan-compare
    *       track lines, etc.).
    *
-   * Eight-color cycle for surfaces that need a categorical palette. Wrap modulo
+   * Per docs/design-pass/design-language.md §4.7 — 8-color cycle
+   * for surfaces that need a categorical palette. Wrap modulo
    * length when there are more series than colors.
+   *
+   * A5.10 (territories §7.7 follow-up) introduces these tokens
+   * to replace the raw matplotlib defaults (#1f77b4 / #ff7f0e /
+   * #2ca02c / etc.) that lived in the territory fixture.
    * ============================================================ */
   --rater-cat-categorical-1: var(--rater-color-azure-500);
   --rater-cat-categorical-2: var(--rater-color-emerald-500);
@@ -649,7 +707,9 @@
   --rater-text-strong: var(--rater-color-zinc-950);
   --rater-text-default: var(--rater-color-zinc-800);
   --rater-text-muted: var(--rater-color-zinc-600);
-  --rater-text-subtle: var(--rater-color-zinc-500);
+  /* FCA #32 — subtle clears 4.5:1 on zinc-100 (5.49:1; zinc-500 sat
+   * at 4.40:1 there). Faint below re-resolves to zinc-530 (4.80:1). */
+  --rater-text-subtle: var(--rater-color-zinc-550);
   --rater-text-disabled: var(--rater-color-zinc-400);
   --rater-text-inverse: var(--rater-color-zinc-50);
 
@@ -702,7 +762,18 @@
   --rater-surface-sunken: var(--rater-color-zinc-100);
   --rater-surface-emphasis: var(--rater-color-zinc-200);
 
-  --rater-text-faint: var(--rater-color-zinc-400);
+  /* FCA #32 — light faint was zinc-400 (2.46:1 on white — the audit's
+   * 316 light-theme failures, incl. load-bearing rating annotations).
+   * zinc-530 is the lightest gray clearing 4.5:1 on zinc-100. */
+  --rater-text-faint: var(--rater-color-zinc-530);
+
+  /* FCA #32 (findings 3, 21) — accents the light theme never
+   * re-resolved: amber-500 warning text sat at 2.15:1 on white (the
+   * preflight warning measured 2.06:1); danger-text red-400 at
+   * 3.03:1. amber-700 → 5.02:1, red-600 → 4.83:1. */
+  --rater-accent-warning: var(--rater-color-amber-700);
+  --rater-accent-danger-text: var(--rater-color-red-600);
+  --rater-accent-primary-text: var(--rater-color-azure-700);
 
   --rater-hairline-subtle: var(--rater-border-subtle);
   --rater-hairline-soft: var(--rater-border-subtle);

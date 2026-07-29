@@ -7,8 +7,10 @@
  * `schema_mismatch` (per the standard fetcher error envelope) so the
  * problem surfaces immediately instead of silently corrupting state.
  *
- * The matching backend endpoint and fixture mode both use this schema,
- * keeping live and test responses on the same contract.
+ * Slice 3 of the API Lab port adds the matching backend endpoint
+ * (per `docs/API_LAB_SCOPING_M3_4.md`). Until then, consumers use
+ * fixture mode (`@openrater/api-client` setFixture) to satisfy the
+ * `listClassCodes()` call.
  */
 
 import { z } from "zod";
@@ -76,7 +78,7 @@ export type ListClassesFilter = z.infer<typeof listClassesFilterSchema>;
 // `PlanClassCode` is the wire shape from
 // `/api/v1/plans/{id}/class-codes` (adds rating_plan_id + timestamps +
 // content_hash on top of ClassRecord). `UpsertClassCodeRequest` is the
-// write body. Mirrors server/src/openrater/rates/class_codes/models.py.
+// write body. Mirrors api-lab/backend rates/class_codes/models.py.
 // ---------------------------------------------------------------------------
 
 export const planClassCodeSchema = z.object({

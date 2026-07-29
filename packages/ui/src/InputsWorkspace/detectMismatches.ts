@@ -48,6 +48,7 @@ import {
 import { levenshtein } from "./autoMatch";
 import type { RequiredInputEntry } from "./ColumnMappingTable";
 import { isRatioMapping } from "./ratioMapping";
+import { isTimesMapping } from "./timesMapping";
 
 // ─────────────────────────────────────────────────────────────────
 // Public types
@@ -356,11 +357,11 @@ export function detectMismatches(
     const columnName = columnMap[input.id];
     if (!columnName) continue;
 
-    // Derived-ratio mappings (Brief 45 K8) are a user assertion, not a
-    // literal CSV column — there is no `row["@ratio:…"]` to inspect.
-    // Skip mismatch detection; the ratio resolves to a number that the
-    // engine's `derive.band` bins at runtime.
-    if (isRatioMapping(columnName)) continue;
+    // Derived-ratio and scaled-column mappings (Brief 45 K8 / FCA #23)
+    // are user assertions, not literal CSV columns — there is no
+    // `row["@ratio:…"]` or `row["@times:…"]` to inspect. Skip mismatch
+    // detection; both resolve to numbers the engine bins at runtime.
+    if (isRatioMapping(columnName) || isTimesMapping(columnName)) continue;
 
     const dim = dimsBySlug.get(input.dimSlug);
     if (!dim) continue;
@@ -385,7 +386,7 @@ export function detectMismatches(
       // geoAcceptanceSet, the same canonical domain the factor grid keys on
       // and derive.territory resolves, so the grid, the validator, and the
       // engine can never disagree (the F3 root cause). A policy CSV that
-      // carries `territory` (t1/t2) OR a raw ZIP both validate.
+      // carries `territory` (701/702) OR a raw ZIP both validate.
       const accept = geoAcceptanceSet(dim);
       for (const row of rows) {
         const raw = row[columnName];

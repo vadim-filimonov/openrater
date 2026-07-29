@@ -7,6 +7,9 @@
  *
  * Each primitive ships with its own colocated CSS, which Vite (or any
  * bundler resolving the package) inlines automatically on import.
+ *
+ * See docs/design-briefs/tokens-rebuild-rationale.md for the token
+ * design rationale + the per-primitive briefs (forthcoming).
  */
 
 export { Button } from "./primitives/Button";
@@ -38,18 +41,18 @@ export type { NumProps, NumFormat, NumDelta } from "./primitives/Num";
 
 export { ToastProvider, useToast } from "./primitives/Toast";
 
-// Global save-failure surface. The root host and
+// Brief 58 Pillar A — global save-failure surface. The root host +
 // the `apiErrorBus` channel the data layer (@openrater/hooks) pushes into.
 // NOT for FYI messages (that's Toast); NOT for plan-content issues
-// (that's PlanStatusBar). A failed save lands here.
+// (that's Brief 13's PlanStatusBar). A failed save lands here.
 export { GlobalErrorSurface, apiErrorBus, MAX_NOTICES } from "./primitives/GlobalErrorSurface";
 export type { ApiErrorNotice, ApiErrorInput } from "./primitives/GlobalErrorSurface";
 
 export { Drawer } from "./primitives/Drawer";
 export type { DrawerProps } from "./primitives/Drawer";
 
-// Canonical empty-state pattern: hero icon, title, lede, optional CTA,
-// and optional cue.
+// Polish PR 5 — canonical empty-state pattern (hero icon + title +
+// lede + optional CTA + optional cue). See docs/design/UI_AUDIT.md §F.
 export { EmptyState } from "./primitives/EmptyState";
 export type { EmptyStateProps } from "./primitives/EmptyState";
 
@@ -85,9 +88,10 @@ export type {
 export { ProgressBar } from "./primitives/ProgressBar";
 export type { ProgressBarProps, ProgressBarTone } from "./primitives/ProgressBar";
 
-// Segmented control. Replaces the bespoke
+// Polish PR 8 — segmented control. Replaces the bespoke
 // `.rater-pc-pill-group` (Parametrize Canvas/Saved) and
-// `.rater-dsp-toggle` (Inputs CSV/Webhook) patterns.
+// `.rater-dsp-toggle` (Inputs CSV/Webhook) patterns. See
+// `docs/design/UI_AUDIT.md` §G2.
 export { InlineEdit } from "./primitives/InlineEdit";
 export type { InlineEditProps, InlineEditVariant } from "./primitives/InlineEdit";
 

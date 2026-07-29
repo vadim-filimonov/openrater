@@ -91,7 +91,13 @@ export function DivergingRows({
         const alpha = 0.35 + 0.65 * intensity(v.value, maxDev);
         return (
           <div className="rater-exh__row" key={v.id}>
-            <span className="rater-exh__row-label" title={v.id}>
+            {/* FCA #33 (findings 2/8) — the tooltip carries the FULL
+                truncating label (the id alone left "Paint and wallp…"
+                unreadable anywhere). */}
+            <span
+              className="rater-exh__row-label"
+              title={v.label === v.id ? v.id : `${v.label} (${v.id})`}
+            >
               {v.label}
             </span>
             <span className="rater-exh__row-track">

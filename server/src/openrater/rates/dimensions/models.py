@@ -92,7 +92,7 @@ class DerivedFrom(BaseModel):
 
     `override_field` (Brief 83 / TV-19) — optional DECLARED override: the
     submission field whose non-empty value supersedes the class-derived
-    attribute (Meridian BOP's `liab_exposure_basis_override` lets an
+    attribute (ISO BOP's `liab_exposure_basis_override` lets an
     occupant-class insured elect the lessors basis). The projector wires
     it onto the derive node's `override` port; absent = unwired = legacy
     graphs unchanged."""

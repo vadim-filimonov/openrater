@@ -25,7 +25,7 @@ export type JobSpec = PlanResolution & {
   readonly chunkSize: number;
   readonly total: number;
   /** Brief 75 (P3) — when present, the stored input rows are RAW book
-   *  rows: the worker projects them (one shared UI path), rates, then
+   *  rows: the worker projects them (one labs-ui path), rates, then
    *  composes policies per this bag + the plan substrate. */
   readonly book?: BookBag;
 };

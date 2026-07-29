@@ -81,8 +81,8 @@ const CLASS_CODE: DimensionRow = {
   data_type: "string",
   role: "rating-input",
   levels: [
-    { kind: "categorical", id: "c102", label: "Meridian Hospitality", aliases: [] },
-    { kind: "categorical", id: "c103", label: "Meridian Contracting", aliases: [] },
+    { kind: "categorical", id: "71641", label: "Restaurants", aliases: [] },
+    { kind: "categorical", id: "91342", label: "Concrete contractors", aliases: [] },
   ],
 };
 const TERRITORY: DimensionRow = {

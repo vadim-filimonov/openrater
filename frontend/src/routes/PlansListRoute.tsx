@@ -93,7 +93,7 @@ function readAdditionalCoverages(plan: PlanSummary): readonly string[] {
 }
 
 // Titleize an opaque coverage tag for display: "premises_liability" →
-// "Premises Liability", "professional" → "Professional".  —
+// "Premises Liability", "professional" → "Professional". MVP-017 —
 // acronym tags keep their casing ("bpp" → "BPP", never "Bpp").
 function coverageLabel(tag: string): string {
   return fixAcronymCase(
@@ -224,7 +224,7 @@ export function PlansListRoute() {
         actions={
           data && data.length > 0 ? (
             <>
-              {/* The list's own search
+              {/* MVP-030 cut (owner-approved) — the list's own search
                   box is gone: ⌘K already searches plans by the same
                   fields, so the toolbar carried two ways to do one
                   thing. Removing it deletes a state + a component from
@@ -241,7 +241,7 @@ export function PlansListRoute() {
                 />
               )}
               {/* Brief 88 P3 — API Lab's door in the room that owns
-                  plans. It is flag-off for the cold
+                  plans. MVP-027 (owner O2): flag-off for the cold
                   test — the room's code stays; the door leaves the
                   first-run story. */}
               {showApiLab() ? (
@@ -523,3 +523,4 @@ function ErrorState({
     </div>
   );
 }
+

@@ -156,6 +156,128 @@ def test_quote_the_draft_with_the_query_flag(
     assert q["version"]["snapshot_id"] is None
 
 
+def test_quote_carries_plan_health_caveats(
+    client: TestClient, monkeypatch: Any
+) -> None:
+    """FCA fca-2026-07-25 #6 (critical): a plan whose build
+    verification MISMATCHED the filing and whose ledger declares gaps
+    quoted a bare premium — row_status 'ok', plan_issues null, the
+    only qualifier a version.kind buried in metadata. The quote
+    payload now carries machine-readable plan-health warnings: the
+    verification verdict (with counts), the declared-gaps ledger, and
+    the draft caveat — without ever flipping row_status (a warning is
+    a qualifier, not a refusal)."""
+    import os
+    from pathlib import Path
+
+    from openrater.persistence.db import Database
+    from openrater.rates.ingest.model import (
+        Manifest,
+        ManifestCounts,
+        ManifestProvenance,
+    )
+    from openrater.rates.ingest.reports import (
+        VectorsSummary,
+        insert_build_report,
+    )
+
+    plan_id = create_plan(client)["rating_plan_id"]
+    db = Database(Path(os.environ["RATER_DB_PATH"]))
+    insert_build_report(
+        db=db,
+        rating_plan_id=plan_id,
+        workbook_hash="wh_test",
+        filename="prairie.xlsx",
+        spec_version="1.0",
+        workbook_plan_id=plan_id,
+        manifest=Manifest(
+            provenance=ManifestProvenance(), counts=ManifestCounts()
+        ),
+        issues=[],
+        vectors=VectorsSummary(
+            status="ran", total_cases=12, matched=9, mismatched=3
+        ),
+        gaps=[
+            {"kind": "assumption", "description": f"gap {i}"}
+            for i in range(8)
+        ],
+    )
+    _stub_scoring(monkeypatch, OK_RESULT)
+
+    res = client.post(
+        f"/api/v1/plans/{plan_id}/quote?draft=true",
+        json={"inputs": {"class_code": "62114"}},
+    )
+    assert res.status_code == 200, res.text
+    q = res.json()
+    # The number still serves — qualified, not refused.
+    assert q["premium"] == 4731
+    assert q["row_status"] == "ok"
+    issues = q["plan_issues"]
+    assert issues, "plan health must ride the quote payload"
+    by_code = {i["code"]: i for i in issues}
+    assert set(by_code) >= {
+        "verification_mismatches",
+        "declared_gaps",
+        "draft_version",
+    }
+    for i in issues:
+        assert i["severity"] == "warning"
+    # The caveats carry the numbers a reader needs, not just labels.
+    assert "3" in by_code["verification_mismatches"]["message"]
+    assert "12" in by_code["verification_mismatches"]["message"]
+    assert "8" in by_code["declared_gaps"]["message"]
+
+
+def test_clean_published_quote_stays_uncaveated(
+    client: TestClient, monkeypatch: Any
+) -> None:
+    """The other half of FCA #6: a published plan whose latest build
+    verified all-green with an empty gaps ledger keeps plan_issues
+    exactly as before — no caveat noise on healthy plans."""
+    import os
+    from pathlib import Path
+
+    from openrater.persistence.db import Database
+    from openrater.rates.ingest.model import (
+        Manifest,
+        ManifestCounts,
+        ManifestProvenance,
+    )
+    from openrater.rates.ingest.reports import (
+        VectorsSummary,
+        insert_build_report,
+    )
+
+    plan_id = create_plan(client)["rating_plan_id"]
+    db = Database(Path(os.environ["RATER_DB_PATH"]))
+    insert_build_report(
+        db=db,
+        rating_plan_id=plan_id,
+        workbook_hash="wh_clean",
+        filename="clean.xlsx",
+        spec_version="1.0",
+        workbook_plan_id=plan_id,
+        manifest=Manifest(
+            provenance=ManifestProvenance(), counts=ManifestCounts()
+        ),
+        issues=[],
+        vectors=VectorsSummary(
+            status="ran", total_cases=12, matched=12, mismatched=0
+        ),
+        gaps=[],
+    )
+    _freeze_and_publish(client, plan_id)
+    _stub_scoring(monkeypatch, OK_RESULT)
+
+    res = client.post(
+        f"/api/v1/plans/{plan_id}/quote",
+        json={"inputs": {"class_code": "62114"}},
+    )
+    assert res.status_code == 200, res.text
+    assert res.json()["plan_issues"] is None
+
+
 def test_quote_a_specific_snapshot(
     client: TestClient, monkeypatch: Any
 ) -> None:
@@ -292,7 +414,7 @@ def test_policy_quote_composes_locations_into_one_premium(
         json={
             "locations": [
                 {"class_code": "62114", "irpm_location": "L1"},
-                {"class_code": "c102", "irpm_location": "L2"},
+                {"class_code": "09033", "irpm_location": "L2"},
             ],
             "policy_inputs": {"years_in_business": "12", "is_first_term": "false"},
         },
@@ -353,3 +475,54 @@ def test_policy_quote_relays_a_composition_refusal(
     assert q["row_status"] == "error"
     assert q["premium"] is None
     assert q["row_issues"][0]["code"] == "composition_failed"
+
+
+def test_quote_lands_in_run_history_with_a_run_id(
+    client: TestClient, monkeypatch: Any
+) -> None:
+    """FCA fca-2026-07-25 #27 (finding 83) — chat/API quotes never
+    entered the app's run history: the Run tab said 'Not run yet'
+    about a quote the user just watched happen. Every recorded quote
+    is now a sample run, and the response names it."""
+    plan_id = create_plan(client)["rating_plan_id"]
+    _freeze_and_publish(client, plan_id)
+    _stub_scoring(monkeypatch, OK_RESULT)
+
+    res = client.post(
+        f"/api/v1/plans/{plan_id}/quote",
+        json={"inputs": {"class_code": "62114"}},
+    )
+    assert res.status_code == 200, res.text
+    q = res.json()
+    assert isinstance(q["run_id"], str) and q["run_id"].startswith("run_")
+
+    runs = client.get(f"/api/v1/plans/{plan_id}/runs").json()["runs"]
+    mine = [r for r in runs if r["run_id"] == q["run_id"]]
+    assert mine, runs
+    assert mine[0]["kind"] == "sample"
+    assert mine[0]["status"] == "done"
+    # The stored result renders in the drawer: premium + trace ride it.
+    detail = client.get(
+        f"/api/v1/plans/{plan_id}/runs/{q['run_id']}"
+    ).json()
+    assert detail["result"]["views"]["premium"] == 4731
+
+
+def test_quote_record_false_stays_out_of_history(
+    client: TestClient, monkeypatch: Any
+) -> None:
+    """FCA #27 (finding 16) — the drawer's row-Trace view re-rates a
+    stored row for DISPLAY; `?record=false` keeps those reads from
+    spawning phantom history entries."""
+    plan_id = create_plan(client)["rating_plan_id"]
+    _freeze_and_publish(client, plan_id)
+    _stub_scoring(monkeypatch, OK_RESULT)
+
+    res = client.post(
+        f"/api/v1/plans/{plan_id}/quote?record=false",
+        json={"inputs": {"class_code": "62114"}},
+    )
+    assert res.status_code == 200, res.text
+    assert res.json()["run_id"] is None
+    runs = client.get(f"/api/v1/plans/{plan_id}/runs").json()["runs"]
+    assert runs == [], runs

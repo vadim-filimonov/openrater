@@ -2,44 +2,48 @@
 
 | Field | Value |
 | --- | --- |
-| **Status** | **v1 — normative.** |
-| **Maintained by** | OpenRater contributors |
-| **Audience** | Integrators connecting a distribution platform (an agency portal, a broker system, or a rating portal) to an OpenRater deployment for live quoting and placement-event reporting. |
+| **Status** | **v1 — normative.** Ratified by decision record ADR-0057 (**Accepted** 2026-07-09; owner validated). The §12 open items are resolved — see §12. |
+| **Created** | 2026-07-09 |
+| **Drafted by** | Claude (Fable 5) for Vadim Filimonov ([@vadim-filimonov](https://github.com/vadim-filimonov)) |
+| **Audience** | Integrators connecting a distribution platform (an agency portal, a broker system, a raterfront) to an OpenRater deployment for live quoting + book-of-record feed. |
 | **Companions** | [`engine-contract.md`](./engine-contract.md) (the compute) and the Integration Hub surface in the app (the GUI that authors everything in this spec). |
 | **Supersedes** | Nothing. It *composes* the per-plan quote endpoint (`/quote`), which is unchanged and remains the documented single-plan path. |
+| **Decision records** | This spec cites internal decision records (ADR-####) and design briefs (Brief ##) by number. They live in the project's pre-detachment private archive; **the normative content is in this document** — the citations are provenance, not required reading. |
 
 ---
 
 ## 0. Why this document exists
 
 The engine contract lets anyone **compute** a premium. This contract lets a
-platform **converse** with an OpenRater deployment: discover what's quotable, send a
+platform **converse** with a Labs deployment: discover what's quotable, send a
 pseudonymous risk once and receive an indicative premium **per carrier**, and
 report what the market later did (quoted / bound / declined / lost) onto an
 append-only event ledger — all without the integrator ever learning
-OpenRater's internal plan vocabulary, and without OpenRater ever learning who the insured
+Labs' internal plan vocabulary, and without Labs ever learning who the insured
 is.
 
 Two design facts drive every choice below:
 
-1. **The reference client and OpenRater implement both sides**, so the handshake
-   can be a pairing code, not an API-onboarding project. But the contract is written
-   for *any* integrator — the reference client is the example consumer, the way Rate
+1. **We control both sides** (OpenRater Front ↔ OpenRater), so the handshake can be
+   a pairing code, not an API-onboarding project. But the contract is written
+   for *any* integrator — OpenRater Front is the reference consumer, the way Rate
    Lab is the engine contract's reference consumer.
-2. **All integration semantics live in OpenRater, authored in a GUI** (the
+2. **All integration semantics live Labs-side, authored in a GUI** (the
    Integration Hub wizard). The integrator sends its *own* canonical field
-   vocabulary; a non-technical operator maps it to plan inputs in OpenRater. Adding
+   vocabulary; a non-technical operator maps it to plan inputs in Labs. Adding
    a carrier plan to the pipeline is a wizard run, not a sprint on either
-   system.
+   repo.
 
 ### 0.1 The fences (unchanged, restated)
 
-- OpenRater **never executes a bind**. `POST …/events` records market events
-  that occurred elsewhere.
-- OpenRater is **not a PAS**: no issuance, endorsements, billing, documents.
-- OpenRater quoting **writes nothing on the compute path**. The
+- Labs **never executes a bind**. `POST …/events` records that market events
+  occurred elsewhere (ADR-0049 §"bind/quote API" — stands verbatim).
+- Labs is **not a PAS**: no issuance, endorsements, billing, documents.
+- Labs quoting **writes nothing on the compute path** (Brief 76 D-A). The
   durable record of a quote lives with the integrator; OpenRater keeps the
-  event LEDGER only (see §5). A *passive, record-only*
+  event LEDGER only (see the §5 amendment — the book-of-record sink was
+  removed with the Exhibits re-founding). **Amended by
+  ADR-0058:** a *passive, record-only*
   forensic row is now also written post-response (off the response path,
   best-effort, never read back) — the compute path, its determinism, and
   retry-safety are unchanged.
@@ -53,21 +57,21 @@ Two design facts drive every choice below:
 
 | Noun | Meaning |
 | --- | --- |
-| **Integration** | One paired peer: a named, keyed relationship between an OpenRater deployment and one integrator deployment. Deployment-level — the integrator owns its own tenancy (§6.3). |
+| **Integration** | One paired peer: a named, keyed relationship between a Labs deployment and one integrator deployment. Deployment-level — the integrator owns its own tenancy (§6.3). |
 | **Peer catalog** | The integrator's canonical field vocabulary — `{key, label, dtype, unit, example}` per field (e.g. `rest.gross_receipts` / "Annual gross receipts" / number / USD) — uploaded at pairing, refreshable. What the mapping GUI shows humans. |
 | **Exposed plan** | One published rating plan made quotable through this integration, wearing a **carrier label** (the integrator's vocabulary — see §1.1) plus an input mapping, a trace policy, and a validity window. |
-| **Input mapping** | Per exposed plan: `peer field key → plan input key`. Direct key-to-key in v1, with no transform DSL. Authored in the wizard and persisted in an integration-scoped envelope. |
+| **Input mapping** | Per exposed plan: `peer field key → plan input key`. Direct key-to-key in v1 (no transform DSL — same reasoning that kept expression DSLs out of portfolio KPIs). Authored in the wizard; persists via the ADR-0027 envelope mechanism, integration-scoped. |
 | **Descriptor** | The machine-readable statement of the integration: exposed plans, their carrier labels, their **required peer fields** (mapping ∘ plan's consumed inputs), policies, contract version. The integrator's field tracker is driven by this. |
-| **Quote-set** | One request, N answers: the risk quoted against every live exposed plan (or a named subset). Each member is a direct-plan `QuoteResponse` — same shape, same premium the Run tab shows (Law 1). |
-| **Placement event** | An append-only fact from the integrator about what the market did: `sent · quoted · bound · declined · lost · corrected`. The one stream that feeds the OpenRater event ledger, and — integrator-side — the warehouse and PAS sinks. |
+| **Quote-set** | One request, N answers: the risk quoted against every live exposed plan (or a named subset). Each member is a Brief-76 `QuoteResponse` — same shape, same premium the Run tab shows (Law 1). |
+| **Placement event** | An append-only fact from the integrator about what the market did: `sent · quoted · bound · declined · lost · corrected`. The one stream that feeds the Labs event ledger, and — integrator-side — the warehouse and PAS sinks. |
 
 ### 1.1 Vocabulary rule — "carrier" and "submission"
 
-- **Carrier is integrator vocabulary.** OpenRater plans stay carrier-agnostic
-  (`product` × `state`); the *integration* pins a carrier label
+- **Carrier is integrator vocabulary.** Labs plans stay carrier-agnostic
+  (`product` × `state`, per ADR-0033); the *integration* pins a carrier label
   onto an exposed plan. Nothing named "carrier" enters the plan model.
 - **"Submission" is banned on the wire.** It means a carrier placement in
-  the integrator and a ledger row in OpenRater. The wire says *quote-set* and
+  OpenRater Front and a ledger row in Labs. The wire says *quote-set* and
   *placement event*.
 
 ---
@@ -77,12 +81,12 @@ Two design facts drive every choice below:
 Pairing turns "integrate two platforms" into "copy one code."
 
 ```
-OpenRater operator (wizard)               Integrator admin (GUI)
+Labs operator (wizard)                    Integrator admin (GUI)
 ──────────────────────                    ──────────────────────
 1. Create Integration
 2. Generate pairing code
    RATE-7Q2M-…  (TTL 10 min,
-   single-use, shows OpenRater URL)
+   single-use, shows Labs URL)
                     ── code + URL (human copies) ──▶
                                           3. Paste into Admin → Rating
                                           4. POST /integrations/pair
@@ -96,7 +100,7 @@ OpenRater operator (wizard)               Integrator admin (GUI)
   expires in 10 minutes and is revoked on use. Regenerating invalidates prior
   codes. Codes are displayed once, like key material.
 - The exchange **uploads the peer catalog** in the same call — so by the time
-  the OpenRater operator opens the mapping step, every dropdown speaks the peer's
+  the Labs operator opens the mapping step, every dropdown speaks the peer's
   human labels. Catalog refresh: `PUT …/catalog` (integrator key) any time.
 - Re-pairing (lost key) = new code, same integration; old key revoked on
   exchange.
@@ -114,7 +118,7 @@ OpenRater operator (wizard)               Integrator admin (GUI)
     {
       "carrier": "acme-mutual",            // the integrator's label (§1.1)
       "plan_ref": "opaque-stable-id",      // NOT the internal plan id
-      "product": "bop", "state": "WA",     // the platform ProductCode, verbatim
+      "product": "bop", "state": "WA",     // the ADR-0033 ProductCode, verbatim
 
       "status": "live",                    // live | paused | unmapped
       "required_fields": [                  // peer-vocabulary keys
@@ -123,7 +127,7 @@ OpenRater operator (wizard)               Integrator admin (GUI)
       ],
       "optional_fields": [ … ],
       "trace_policy": "summary",           // ceiling for this peer (§4.3)
-      "validity_days": 30                   // default validity window
+      "validity_days": 30                   // ★ default pending owner call
     }
   ],
   "events": { "accepted_kinds": ["sent","quoted","bound","declined","lost","corrected"] }
@@ -135,7 +139,7 @@ OpenRater operator (wizard)               Integrator admin (GUI)
   pulled back through the input mapping into peer vocabulary. When a plan
   edit changes its consumed inputs, the descriptor changes on next publish —
   the integrator's field tracker updates itself. This is the load-bearing
-  trick of the whole seam: **the integrator's forms are steered by OpenRater plans
+  trick of the whole seam: **the front's forms are steered by Labs' plans
   without either side writing schema by hand.**
 - `status: "unmapped"` is a **coverage statement** against the CURRENT
   published version, not a has-any-mapping statement: it means at least one
@@ -143,10 +147,10 @@ OpenRater operator (wizard)               Integrator admin (GUI)
   republish case, where a new version consumes a required input the operator
   hasn't mapped yet (a field the mapping doesn't name can be neither listed
   in `required_fields` nor sent, so every quote would refuse). Integrators
-  should treat an `unmapped` plan as not quotable; the OpenRater Hub shows the
+  should treat an `unmapped` plan as not quotable; Labs' Hub shows the
   operator the same demotion with the gap named.
 - `plan_ref` is an opaque stable alias minted per integration (internal ids
-  and snapshot ids are OpenRater's own; snapshot ids do appear in version pins,
+  and snapshot ids are Labs' own; snapshot ids do appear in version pins,
   which are audit data, not addressing).
 - `status` is `paused` **both** when the operator toggles a plan off **and**
   when its live version drifted from the tested one and was demoted (§4.5) —
@@ -165,12 +169,12 @@ OpenRater operator (wizard)               Integrator admin (GUI)
   "as_of": null,                   // temporal anchor; defaults to effective_date
   "carriers": null,                // null = all live exposed plans; or ["acme-mutual"]
   "trace": "summary",             // request ≤ per-plan trace_policy ceiling
-  "facts": {                       // PEER vocabulary — OpenRater maps per plan
+  "facts": {                       // PEER vocabulary — Labs maps per plan
     "rest.gross_receipts": 1250000,
     "property.construction": "JM",
     "geo.county_fips": "53033"
   },
-  "locations": null                // reserved — policy quotes are v1.1
+  "locations": null                // reserved — policy quotes (Brief 76 P4.1b) are v1.1
 }
 ```
 
@@ -184,7 +188,7 @@ OpenRater operator (wizard)               Integrator admin (GUI)
     {
       "carrier": "acme-mutual", "plan_ref": "…",
       "version": { "kind": "published", "snapshot_id": "…", "content_hash": "…" },
-      "row_status": "ok",           // direct-plan quote body from here down
+      "row_status": "ok",           // Brief-76 body verbatim from here down
       "premium": 4821.00, "tier": "standard",
       "composed": { … },             // build-up: subtotal → tail → final
       "input_issues": { … },         // NAMED missing/unknown fields (peer vocabulary!)
@@ -206,7 +210,7 @@ OpenRater operator (wizard)               Integrator admin (GUI)
 
 Normative rules:
 
-1. **One premium** (Law 1): each member reuses the direct-plan scoring
+1. **One premium** (Law 1): each member reuses the Brief-76 scoring
    delegation. A quote-set member and a direct `POST /plans/{id}/quote` with
    the mapped inputs MUST return identical premiums for the same version.
    (Conformance IC3.)
@@ -224,11 +228,12 @@ Normative rules:
    plan. Partial failure is normal: each member stands alone. `quotes[]` is
    **ordered by carrier label, ascending** — responses are deterministic all
    the way down (fixture-forced; IC5/IC10 match by position).
-4. **The compute writes nothing.** The endpoint computes
-   and returns. The integrator persists its own quote records; placement events
-   become durable only through the ledger (§5). `request_hash` makes retries safe by
+4. **The compute writes nothing** (Brief 76 D-A stands). The endpoint computes
+   and returns. The integrator persists its own quote records; the book becomes
+   durable only via events (§5). `request_hash` makes retries safe by
    construction — same bytes in, same bytes out (engine determinism).
-   A passive forensic row per served member is recorded *after* the response — no
+   **ADR-0058 amends this narrowly:** a
+   passive forensic row per served member is recorded *after* the response — no
    dedup on `request_hash`, never read back by the quote path — so this rule's
    idempotency semantics are untouched.
 5. **Version pins are mandatory** in every member (`version`, `as_of`,
@@ -253,14 +258,14 @@ pinned one. Re-quotes are new quotes; nothing mutates.
 
 Everything above **soft-flags** supersession: a live plan whose published
 snapshot advances to a new version keeps serving that new version, and the
-integrator re-quotes on its own signal (§4.4). That
+integrator re-quotes on its own signal (§4.4; ADR-0057 resolution 1). That
 holds while the new version's mapping is still valid.
 
 It does **not** hold when the new live version's **mapping was never
 validated**. A published plan's consumed-input surface can change on republish
 — a newly-required input the mapping doesn't cover (the `unmapped_plan_inputs`
 case of §4.2 rule 2) — and an unvalidated mapping then prices live money with a
-silent wiring gap. So OpenRater enforces one — and only one — **server-side hard
+silent wiring gap. So Labs enforces one — and only one — **server-side hard
 gate**:
 
 > A live exposed plan serves quotes only while its **currently-published
@@ -279,13 +284,13 @@ gate**:
 >   recovery; nothing else changes.
 
 This is deliberately conservative: any republish demands one re-test, even a
-byte-identical one, because OpenRater will not assume the consumed-input surface is
-unchanged. The gate lives entirely in OpenRater — the reference integrator needs
+byte-identical one, because Labs will not assume the consumed-input surface is
+unchanged. The gate lives entirely Labs-side — the reference integrator needs
 no new behavior: a demoted plan reaches it as an ordinary integration-level
 issue (§9), and its field tracker already renders a plan whose status left
 `live`. (Conformance **IC11**.)
 
-### 4.6 Pinned re-rate — quote a named frozen version
+### 4.6 Pinned re-rate — quote a NAMED frozen version (ADR-0060 rule 8)
 
 The request MAY carry `pins: { plan_ref, snapshot_id }`. The fan-out then
 collapses to **that one exposed plan at that one frozen version** — the same
@@ -316,12 +321,15 @@ Precedence and gates, exactly:
 The integrator reports market facts; the ledger records them. One stream,
 integrator-side fan-out to its other sinks (warehouse, PAS).
 
-> **Ledger behavior:** OpenRater does not keep a book of record. The
-> wire shape below creates one ledger row for every accepted event — no
-> submission row is created, no status machine runs, and servicing kinds record without
+> **Amended (Exhibits re-founding, 2026-07-18 — design brief
+> `portfolio-redesign` §6):** OpenRater no longer keeps a book of
+> record. The wire shape below is unchanged, but every accepted event
+> is now a LEDGER ROW ONLY — no submission row is created, no status
+> machine runs, and the ADR-0060 servicing kinds record without
 > projecting. Validation that guards the contract itself (idempotency,
 > identity-class fact keys, the exposure fence, required
-> `premium_cents`/`policy_ref`) applies before the event is accepted.
+> `premium_cents`/`policy_ref`) is unchanged. IC13–IC17, which pinned
+> the book projections, were retired with the sink.
 
 ```jsonc
 { "events": [
@@ -332,10 +340,10 @@ integrator-side fan-out to its other sinks (warehouse, PAS).
     "kind": "bound",                // sent | quoted | bound | declined | lost | corrected
     "at": "2026-08-02T17:04:00Z",
     "premium_cents": 482100,        // agency-DECLARED (may differ from indicative)
-    "quote_pins": {                 // when the event descends from an OpenRater quote
+    "quote_pins": {                 // when the event descends from a Labs quote
       "plan_ref": "…", "snapshot_id": "…", "request_hash": "sha256:…"
     },
-    "facts": {                      // OPTIONAL — the risk restated at
+    "facts": {                      // OPTIONAL (ADR-0059) — the risk restated at
       "rest.gross_receipts": 250000,//   placement; §4.1's field + peer vocabulary,
       "geo.zip": "67202"            //   ≤ 64 scalar values (rule 6)
     },
@@ -355,12 +363,14 @@ Normative rules:
    ack as `duplicate`. (Conformance IC7.)
 2. **Ledger identity:** `(integration_id, risk_ref, carrier)` names the
    risk the fact is about; the ledger stores the wire verbatim and derives
-   `risk_id` from a `risk_`-prefixed ref at read time.
+   `risk_id` from a `risk_`-prefixed ref at read time (ADR-0060 rule 2).
+   *(Amended: formerly this keyed the book-of-record status lifecycle —
+   removed with the sink.)*
 3. **The fence, again:** these are records of events that happened elsewhere.
    No event triggers any market action, workflow, queue, or notification in
-   OpenRater.
+   Labs. (ADR-0049 language applies verbatim.)
 4. **Declared ≠ indicative:** `premium_cents` is the agency's number; the
-   pinned quote's premium is OpenRater's number. The book stores both; the delta is
+   pinned quote's premium is Labs' number. The book stores both; the delta is
    an analytics column, not a correction.
 5. **`corrected` is the soft-undo** (`removed: true`): it re-opens the row
    the prior fact created — `bound`/`declined`/`lost` → `quoted` — through
@@ -369,8 +379,8 @@ Normative rules:
    original `quoted` fact leaves the row standing (no prior state to
    restore); a `cancelled` row refuses correction (cancellation is a market
    fact). `removed: false` restatements are ledger-only records in v1 — the
-   ledger keeps the original declaration. (Conformance IC12.)
-6. **`facts` are validated, then dropped.**
+   book keeps the original declaration. (Conformance IC12.)
+6. **`facts` are validated, then dropped (ADR-0059, amended).**
    `quoted`/`bound` MAY restate the risk's facts — the same field and
    peer vocabulary as §4.1, ≤ 64 scalar values. Identity-class keys ack
    `error` (`identity_keys_rejected`) for that event alone. The ledger
@@ -378,24 +388,33 @@ Normative rules:
    validated and discarded — the event records that a declaration was
    made, never the risk's attributes. Facts are DECLARED, like
    `premium_cents` (rule 4) — never re-rated, never verified; the
-   quote ledger remains the cross-check via `request_hash`.
-7. **Risk identity rides the existing ref.** A
+   ADR-0058 quote ledger remains the cross-check via `request_hash`.
+   *(Formerly conformance IC13 — retired with the book sink.)*
+7. **Risk identity rides the existing ref (ADR-0060, amended).** A
    `risk_`-prefixed, format-valid `risk_ref` (`risk_` + lowercase
    canonical UUID) IS the global risk id — minted once, echoed by every
    later reporter, never re-minted. The ledger stores the wire verbatim
    and derives `risk_id` at read time; the same convention threads the
-   quote ledger on both quote paths.
-8. **`issued` requires its pointer.**
+   quote ledger on both quote paths. *(The cross-integration book-row
+   unification this rule drove was retired with the book sink —
+   formerly IC14.)*
+8. **`issued` requires its pointer (ADR-0060 Part 2, amended).**
    `policy_ref` (opaque, ≤64 chars — a POINTER to the PAS's policy
    record; OpenRater remains not-a-PAS) is required: an `issued` event
    without one acks `error`. With it, the event records. Idempotent via
-   `event_id`.
+   `event_id`. *(Ratification onto a bound book row — and the
+   `policy_ref_conflict` verdict that guarded it — retired with the
+   book sink; formerly IC15.)*
 9. **`endorsed` records the declared in-force truth.** `premium_cents`
    on an `endorsed` event is the restated in-force TOTAL (never a delta
    — deltas drift), recorded as declared; nothing is verified and no
-   stored premium moves (there is none).
+   stored premium moves (there is none). *(The `premium_current_cents`
+   projection and the `endorsement_seq` monotonic guard were retired
+   with the book sink; formerly IC16.)*
 10. **`cancelled` / `reinstated` record the loop's ends.** Both are
     market facts on the ledger, timestamped from the event's `at`.
+    *(The `bound ⇄ cancelled` status machine they drove was retired
+    with the book sink; formerly IC17.)*
 
 ### 5.2 Reading the ledger back
 
@@ -403,7 +422,7 @@ Normative rules:
 (`applied_at`), filterable by `kind` / `risk_ref` / `since` / `until`.
 Operator-facing (auth-shim posture, like `GET /quote-ledger`: internal
 forensic data; integrators bring identity), and the surface a downstream
-journey collector PULLS — OpenRater never pushes; the "no
+journey collector (Brief 85's Spine) PULLS — Labs never pushes; the "no
 outbound webhooks" fence stands.
 
 ## 6. Auth + deployment posture
@@ -413,7 +432,7 @@ outbound webhooks" fence stands.
 - Minted once at pairing; scope = this integration's descriptor/quote-set/
   events/catalog endpoints, nothing else. Sent as `X-OpenRater-Integration-Key`.
 - Revocable + rotatable from the wizard (re-pair = rotate). Reveal-once.
-- Distinct from **per-plan** keys (which remain for direct single-
+- Distinct from Brief-76 **per-plan** keys (which remain for direct single-
   plan callers) and from operator sessions (which own authoring).
 
 ### 6.2 Transport
@@ -424,10 +443,10 @@ self-hosters aren't forced into one topology.
 
 ### 6.3 Tenancy
 
-OpenRater keeps a **single-operator posture**: one
+Labs keeps its **single-operator posture** (ADR-0049 §single-operator): one
 integration = one peer *deployment*. The integrator owns its own tenants;
-`risk_ref` opacity means OpenRater cannot tell tenants apart and doesn't need to.
-Per-tenant federation (a tenant pairing its *own* OpenRater deployment) is out of scope v1
+`risk_ref` opacity means Labs cannot tell tenants apart and doesn't need to.
+Per-tenant federation (a tenant pairing its *own* Labs) is out of scope v1
 and nothing here precludes it — it's another Integration row.
 
 ## 7. PII — pseudonymous by construction, enforced twice
@@ -436,7 +455,7 @@ and nothing here precludes it — it's another Integration row.
   identity.
 - **Deny-classes** (normative): fact keys matching identity patterns —
   legal/display/owner name, dba, address, phone, email, website/url,
-  editorial prose, license numbers — MUST be rejected by OpenRater with `422`,
+  editorial prose, license numbers — MUST be rejected by Labs with `422`,
   error code **`identity_keys_rejected`**, and every offending key named in
   `error.details.keys` (the envelope's structured-payload slot; never
   silently stripped). The same guard runs on catalog upload, so the Hub's
@@ -446,7 +465,7 @@ and nothing here precludes it — it's another Integration row.
   county FIPS, tract, flood zone, protection class MAY cross. Raw street
   address MUST NOT; derive-then-drop happens integrator-side.
 - Firewalled-signal rules (the integrator's demographic firewall) bind the
-  *integrator's* payload assembly; OpenRater additionally refuses any key the
+  *integrator's* payload assembly; Labs additionally refuses any key the
   exposed plan's mapping doesn't consume — unmapped facts are dropped, not
   stored (quoting writes nothing anyway).
 
@@ -476,8 +495,8 @@ the integrator must render differently:
 
 Portable JSON fixtures at
 [`docs/specs/conformance/integration/`](./conformance/integration/README.md)
-(format, world bindings, and matcher vocabulary in that README), run by both
-server and client CI (OpenRater against its live routes; the
+(**drafted 2026-07-09** — format, world bindings, and matcher vocabulary in
+that README), run by **both** repos' CI (Labs against its live routes; the
 integrator against its client + a fixture server). Pass the suite ⇒
 contract-compatible — the same discipline as engine conformance V1–V7.
 
@@ -485,7 +504,7 @@ contract-compatible — the same discipline as engine conformance V1–V7.
 | --- | --- | --- |
 | IC1 | `pairing-exchange` | code → key + descriptor; code single-use; reuse → 401 |
 | IC2 | `descriptor-shape` | required_fields derived through mapping, peer vocabulary |
-| IC3 | `quote-set-parity` | member premium ≡ direct plan quote, same version, byte-equal |
+| IC3 | `quote-set-parity` | member premium ≡ direct Brief-76 quote, same version, byte-equal |
 | IC4 | `named-gaps` | gaps → 200 + `input_issues` in peer vocabulary at both layers (mapping + engine preflight), no 4xx |
 | IC5 | `honest-refusal` | refusing plan → `premium:null` + named reason; sibling members unaffected |
 | IC6 | `identity-rejected` | `facts` containing `legal_name`-class key → 422 with keys named |
@@ -497,26 +516,30 @@ contract-compatible — the same discipline as engine conformance V1–V7.
 
 ## 11. What this contract is NOT
 
-- **Not a bind/quote execution API** — records and computations only.
+- **Not a bind/quote execution API** — records and computations only
+  (ADR-0049 fence, verbatim).
 - **Not a PAS bridge.** PAS hand-off is the *integrator's* sink on its own
-  placement-event stream; OpenRater never talks to a
+  placement-event stream (see the front brief §PAS); Labs never talks to a
   PAS.
 - **Not a transform engine.** v1 mapping is key-to-key; unit mismatches
   surface as wizard warnings. A mapping-transform DSL is explicitly out
-  because it would hide rating behavior from the audit trail.
-- **Not multi-tenant OpenRater.** One peer per integration; tenancy is the
+  (audit hole + gimmick magnet — the portfolio-KPI precedent).
+- **Not multi-tenant Labs.** One peer per integration; tenancy is the
   integrator's job.
 - **Not a message bus.** Events are HTTP-batched, idempotent, integrator-
   retried. No queues in v1 on either side.
 
-## 12. Locked v1 choices
+## 12. Open items — RESOLVED by ADR-0057 (Accepted 2026-07-09)
 
 1. `validity_days` default **30**; snapshot supersession **soft-flags** —
    the integrator prompts re-quote, nothing hard-expires server-side. *(One
    exception, §4.5: a live version whose mapping was never re-tested is
    **demoted** server-side — a serving-eligibility gate, not a quote expiry —
-   because an unvalidated mapping can silently misprice; conformance IC11.)*
-2. Events land on the ledger **on by default**.
+   because an unvalidated mapping silently misprices. Added by the 2026-07-11
+   audit; conformance IC11.)*
+2. Events land on the ledger **on by default**. *(Amended: the
+   events→portfolio sink this resolved was removed with the book of
+   record — Exhibits re-founding.)*
 3. `plan_ref` = **per-integration opaque alias**.
 4. **No rate limiting** on quote-set for paired peers in v1.
 5. `locations` stays **reserved-null** in v1.0 (policy quotes are v1.1).

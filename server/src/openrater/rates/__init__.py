@@ -7,6 +7,8 @@
 #     http://www.apache.org/licenses/LICENSE-2.0
 """`openrater.rates` — rating substrate (plans, stages, factor tables, …).
 
-Subpackages own the typed models, persistence, validation, and service logic
-for plans and their supporting rating entities.
+The hierarchy mirrors the original prototype's layout for ease of port: each
+subpackage is a slice in the API Lab port checklist. Today only
+`plans` ships; the other slices (dimensions, class-codes, coverage-
+chains, curves, factor-tables, etc.) land in subsequent commits.
 """

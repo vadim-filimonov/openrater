@@ -34,8 +34,8 @@ handling against.
 
 1. Subclass `RaterError` with a unique `code`, a default `status_code`,
    and a `hint` if there's a non-obvious next step.
-2. Add at least one test asserting the envelope shape.
-3. Record user-visible contract changes in `CHANGELOG.md`.
+2. Document the code in `docs/api/errors.md` (TBD — M3.5.4 OSS scaffolding).
+3. Add at least one test asserting the envelope shape.
 
 ## Mapping legacy errors
 

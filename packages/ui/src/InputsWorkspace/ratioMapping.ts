@@ -85,7 +85,7 @@ export function formatRatio(numerator: string, denominator: string): string {
  * `null` like an empty cell (skip the input).
  *
  * Numeric parsing strips thousands commas to match the dtype-coercion
- * path in projectRowsForBatch (so "1,360,000" parses).
+ * path in projectRowsForBatch (so "1,247,438" parses).
  */
 export function computeRatioForRow(
   row: Readonly<Record<string, string>>,

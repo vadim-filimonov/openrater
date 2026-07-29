@@ -2,7 +2,7 @@
   "name": "@openrater/design-system",
   "version": "0.0.0",
   "private": true,
-  "description": "OpenRater design tokens and accessible React primitives for the authoring and review app.",
+  "description": "The OpenRater visual language: design tokens (color, type, spacing, motion, radius, shadow) + the base primitive component set (Button, IconButton, Chip, Card, Kbd, Divider, Label, Num, etc.). Dark mode default; light mode opt-in via [data-theme=\"light\"]. BEM CSS via tokens. lucide SVG icons. WCAG AA verified both modes. Re-authored from the original prototype's v2 styles — same intent, cleaner semantic layering. See docs/specs/platform-model.md §5.",
   "license": "Apache-2.0",
   "type": "module",
   "main": "./src/index.ts",

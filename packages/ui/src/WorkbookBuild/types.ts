@@ -1,7 +1,7 @@
 /**
  * WorkbookBuild wire-shape mirrors — Brief 92.
  *
- * @openrater/ui stays off the HTTP layer (the GeoDimWizard precedent):
+ * labs-ui stays off the HTTP layer (the GeoDimWizard precedent):
  * these types MIRROR @openrater/api-client's zod-inferred shapes
  * structurally, and the panel's two operations arrive as injected
  * props. The app layer (rate-lab) passes the real api-client
@@ -84,7 +84,7 @@ export interface WorkbookCheckResultLike {
 }
 
 /** Brief 92.R (D3) — the diff's wire shape, structurally (the engine
- *  serializes with ADR-0017 aliases; @openrater/ui only reads). */
+ *  serializes with ADR-0017 aliases; labs-ui only reads). */
 export interface DiffFieldChangeLike {
   readonly field: string;
   readonly from?: unknown;
@@ -168,6 +168,12 @@ export interface WorkbookVectorsSummary {
   readonly matched: number;
   readonly near: number;
   readonly mismatched: number;
+  /** FCA #19 — gate-rule vector coverage from the real engine traces
+   *  (optional: reports written before the fields existed parse as
+   *  before). */
+  readonly gate_rules_total?: number;
+  readonly gate_rules_exercised?: number;
+  readonly unexercised_gate_rules?: readonly string[];
 }
 
 export interface BuildReportLike {

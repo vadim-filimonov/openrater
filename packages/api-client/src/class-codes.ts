@@ -1,9 +1,17 @@
 /**
  * Class-codes entity client.
  *
- * Wraps the `GET /api/v1/class-codes` endpoint with a typed function
- * and Zod-validated response. Tests can also satisfy the same client
- * surface through `setFixture("GET", "/api/v1/class-codes", […])`.
+ * Wraps the (future) `GET /api/v1/class-codes` endpoint with a typed
+ * function + Zod-validated response. Per the M3.4 scoping doc
+ * (`docs/API_LAB_SCOPING_M3_4.md`), the backend endpoint lands in
+ * slice 3 of the API Lab port. Pre-slice-3, callers use fixture mode
+ * (`setFixture("GET", "/api/v1/class-codes", […])`) to satisfy this
+ * function.
+ *
+ * The function exists today so M4.1 (Classification section) can be
+ * built against the real api-client surface — no special test code
+ * paths. When slice 3 lands, the only change is "drop the fixture";
+ * the calling code is unchanged.
  */
 
 import { z } from "zod";

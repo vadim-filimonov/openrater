@@ -127,7 +127,7 @@ span.rater-fae__name {
   cursor: pointer;
   color: var(--rater-text-muted);
 }
-.rater-fae__icon:hover:not(disabled) {
+.rater-fae__icon:hover:not(:disabled) {
   background: var(--rater-surface-2);
   color: var(--rater-text-strong);
 }
@@ -135,7 +135,7 @@ span.rater-fae__name {
   opacity: 0.35;
   cursor: not-allowed;
 }
-.rater-fae__icon--danger:hover:not(disabled) {
+.rater-fae__icon--danger:hover:not(:disabled) {
   color: var(--rater-feedback-error);
 }
 

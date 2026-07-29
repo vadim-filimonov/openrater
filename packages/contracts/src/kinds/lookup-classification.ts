@@ -1,14 +1,22 @@
 /**
  * `lookup.classification` kind — class code → factor.
  *
- * Per Plan Format Spec v1 §4.5: takes a classification code and returns
+ * Per Plan Format Spec v1 §4.5: takes an ISO-style class code, returns
  * the filed base-rate factor for that class. Structurally identical to
  * `lookup.direct` (string key → number) but typed with the `class_code`
  * semantic port so the engine + UI can route class-code flows
  * specifically.
  *
- * Distinguishing classification from generic direct lookup lets authoring
- * tools route class-code flows and report class-table dependencies separately.
+ * Distinguishing classification from generic direct lookup matters
+ * because:
+ *   1. class-code resolution is the entry point of most rating schemes
+ *   2. the Class Plan entity (V.22.A1) surfaces only this kind in
+ *      class-context pickers
+ *   3. audit reports flag class-table dependencies separately from
+ *      arbitrary table lookups
+ *
+ * Ported from `<prototype>/plan-builder/src/blocks/kinds/
+ * lookup-classification.tsx` (Phase A.1 PR 6). PURE half only.
  */
 
 import type { BlockKind, PortSpec } from "../block-types";

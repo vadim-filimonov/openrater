@@ -186,7 +186,7 @@ describe("P2 G5 · /score names missing/unknown inputs", () => {
     // G8 — and the row REFUSED (no plausible number ever left).
     expect(body.row_status).toBe("error");
     expect(body.views.premium).toBeNull();
-    //  — no verdict on an unrateable row either: a derived
+    // MVP-011 — no verdict on an unrateable row either: a derived
     // tier would be fabricated from partial state.
     expect(
       (body.views as { tier?: string | null }).tier ?? null,
@@ -262,7 +262,7 @@ describe("P2 G8 · /score withholds money on partial chain execution", () => {
 });
 
 /**
- * The model-registry resolution path is retired.
+ * Detachment Brief 1 §4 S1 — the registry-resolution path is retired.
  * A legacy model-sourced tail refuses BY NAME (`composition_failed`
  * carrying the canonical message + the pinned ref), never the pre-tail
  * number served as THE premium (Law 2), and never an identity factor.

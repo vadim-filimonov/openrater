@@ -561,7 +561,7 @@
   cursor: pointer;
   transition: border-color var(--rater-d-80) var(--rater-ease-snap);
 }
-.rater-pc-axischip:hover:not(disabled) {
+.rater-pc-axischip:hover:not(:disabled) {
   border-color: var(--rater-hairline-strong);
 }
 .rater-pc-axischip:focus-visible {

@@ -1,21 +1,22 @@
 /**
  * `round` kind — round a value to a fixed number of decimal places.
  *
- * Filed rate algorithms round at well-defined points: the per-$100
+ * The ISO rate algorithms round at well-defined points: the per-$100
  * RATE rounds to 3 decimals before the exposure/LCM close-out, and the
  * final PREMIUM rounds to the nearest dollar (0 decimals). Those
  * roundings change the answer by a few dollars, so they must live IN
  * the runtime plan, not in a harness post-step — the
- * `stagesToRuntimePlan` projector emits a `round` node for each required
- * rounding so a UI-authored plan scores exactly.
+ * `stagesToRuntimePlan` projector (ADR-0044) emits a `round` node for
+ * each ISO rounding so a UI-authored plan scores exactly.
  *
- * Semantics use `Math.round(value × 10^decimals) /
+ * Semantics are byte-identical to the reference build
+ * (`sample_bop_track_a.test.ts`): `Math.round(value × 10^decimals) /
  * 10^decimals`. JS `Math.round` is half-up toward +∞ on ties — the
  * `mode` param is reserved for future tie-breaking variants but only
  * `half_up` ships today.
  *
- * Execution is pure: the same value and parameters produce the same
- * output. In the trace, `explainStep` reads
+ * Per node-design-principles P-N1 (pure execute): same value + same
+ * params → same output forever. P-N5 (trace): `explainStep` reads
  * "round 0.6159 → 0.616 (3 dp)".
  */
 

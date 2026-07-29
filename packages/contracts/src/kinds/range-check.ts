@@ -11,6 +11,9 @@
  *   · false → half-open `[lo, hi)` (value <  hi)
  *
  * Lower boundary is always inclusive — matches the source.
+ *
+ * Ported from `<prototype>/plan-builder/src/blocks/kinds/
+ * range-check.tsx` (Phase A.1 PR 8). PURE half only.
  */
 
 import type { BlockKind, PortSpec } from "../block-types";

@@ -1,23 +1,23 @@
 /**
  * Policy-level adjustments — the ordered, post-aggregation premium tail
- * applied after coverage-level aggregation.
+ * (Brief 62 / ADR-0042).
  *
  * After a policy's per-coverage rating chains aggregate to a `subtotal`
- * (`composePolicy`), a filing can layer on an ORDERED list of
+ * (ADR-0034 `composePolicy`), a real filing layers on an ORDERED list of
  * policy-level adjustments before the premium is final:
  *
  *   subtotal → × IRPM (schedule rating) → × package mods → + endorsements
  *            → max(_, minimum premium) = filed premium
  *
- * The legacy model covered only the last-two-step special case (one
- * `package_credit`, then a `minimum_premium`). This module generalizes
+ * ADR-0034 modelled only the last-two-step special case (one
+ * `package_credit`, then a `minimum_premium`). This module generalises
  * that fixed tail into an authored, reorderable `PolicyAdjustment[]` that
  * the composer evaluates in order, recording each step in the trace
- * each step in the trace. The legacy two-field tail maps onto two adjustments,
+ * (ADR-0042 D1/D4). The legacy two-field tail maps onto two adjustments,
  * so every existing policy composes identically (see `policy-compose.ts`
  * §back-compat).
  *
- * ── SOURCE-BLIND ──
+ * ── SOURCE-BLIND (ADR-0042 D2 / Genericity invariant ADR-0033 §0) ──
  *
  * An IRPM value can come from four places — a literal the underwriter
  * typed, a CSV column, a Model Lab model, or an API Lab connector — but
@@ -25,11 +25,12 @@
  * inline or asks an injected resolver; the four sources converge on the
  * single `{ total?, sections?, provenance }` shape. `IrpmSourceSpec`
  * declares all four `from` tags here; only `literal` is implemented in
- * the literal path is evaluated directly and other sources use the resolver.
+ * 62.1 (`column` → 62.2, `model` → 62.5, `connector` → 62.6).
  *
  * Pure data + type guards. No React, no DOM, no I/O. The evaluation
  * algorithm lives in `policy-compose.ts` (it depends on the runtime;
- * these shapes deliberately do not, so they stay portable).
+ * these shapes deliberately do not, so they stay portable). See
+ * `docs/adr/0042-policy-adjustments-and-irpm-resolver.md`.
  */
 
 import type { EligibilityOp } from "./tier-types";
@@ -37,8 +38,8 @@ import { ELIGIBILITY_OPS } from "./tier-types";
 import type { IrpmSourceSpec } from "./irpm-source";
 import { isIrpmSourceSpec } from "./irpm-source";
 
-// `IrpmSourceSpec` and its guard live in shared `irpm-source.ts`, alongside
-// the per-row resolver. Re-exported here so existing
+// `IrpmSourceSpec` + its guard moved to the shared `irpm-source.ts` (62.2,
+// where the per-row resolver also lives). Re-exported here so existing
 // imports from `policy-adjustments` stay unbroken.
 export type { IrpmSourceSpec } from "./irpm-source";
 export { isIrpmSourceSpec } from "./irpm-source";
@@ -83,7 +84,7 @@ export type AdjustmentKind =
 /**
  * How an endorsement modifies the running premium: a flat dollar charge
  * (additive) or a multiplicative factor (D6 — KS endorsements include
- * both; some endorsements are per-unit charges while others are flat or factor).
+ * both; terrorism is a per-$100 charge, others are flat or factor).
  */
 export type EndorsementEffect =
   | { readonly kind: "flat"; readonly amount: number }
@@ -106,7 +107,7 @@ export type PolicyAdjustment =
       readonly citation?: string;
     }
   | {
-      /** A package modifier applied as a multiplicative factor. */
+      /** A package modifier — × factor (Pioneer −10%, new-business +10%). */
       readonly kind: "package_factor";
       readonly id: string;
       readonly display_name: string;
@@ -121,7 +122,7 @@ export type PolicyAdjustment =
       readonly id: string;
       readonly display_name: string;
       readonly effect: EndorsementEffect;
-      /** Optional: a flat amount may be resolved from policy inputs. */
+      /** Optional: a flat amount may be resolved (e.g. terrorism from limits). */
       readonly source?: IrpmSourceSpec;
       readonly when?: GuardExpr;
       readonly citation?: string;

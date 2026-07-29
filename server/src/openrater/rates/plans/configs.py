@@ -47,12 +47,19 @@ class DimensionBinding(BaseModel):
 
     model_config = ConfigDict(extra="forbid", frozen=True)
 
-    source: Literal["context", "form_input", "literal", "derived", "computed"]
+    source: Literal[
+        "context", "form_input", "literal", "derived", "computed", "composite"
+    ]
     path: str | None = Field(default=None, min_length=1, max_length=200)
     value: bool | int | float | str | None = None
     op: Literal["sum"] | None = None
     fields: tuple[str, ...] | None = None
     format: str | None = None
+    # ADR-0025 / FCA fca-2026-07-25 #21 — a `composite` axis carries its
+    # MEMBER dims' bindings (member slug → binding); the projector
+    # resolves each member through its own derivation and joins the
+    # level ids with "·". Members cannot themselves be composite (v1).
+    axes: dict[str, DimensionBinding] | None = None
 
     @model_validator(mode="after")
     def _resolvable(self) -> DimensionBinding:
@@ -67,6 +74,18 @@ class DimensionBinding(BaseModel):
                     "DimensionBinding: source 'computed' requires `op` and a "
                     "non-empty `fields`."
                 )
+        elif self.source == "composite":
+            if not self.axes or len(self.axes) < 2:
+                raise ValueError(
+                    "DimensionBinding: source 'composite' requires `axes` "
+                    "with 2+ member bindings."
+                )
+            for member, binding in self.axes.items():
+                if binding.source == "composite":
+                    raise ValueError(
+                        "DimensionBinding: composite axes cannot nest — "
+                        f"member {member!r} is itself composite."
+                    )
         elif not (self.path and self.path.strip()):
             raise ValueError(
                 f"DimensionBinding: source {self.source!r} requires `path`."

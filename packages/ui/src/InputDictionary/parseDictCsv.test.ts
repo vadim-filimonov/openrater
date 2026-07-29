@@ -7,8 +7,8 @@ import { parseInputDictCsv, parseInputDictText } from "./parseDictCsv";
 
 const DICT_CSV = [
   "category,input_key,display_name,data_type,required,source,allowed_values,description",
-  'A. Classification,class_code,Meridian BOP class code,class_code,true,form_input,in class_table,5-digit Meridian BOP code',
-  'B. Location,territory,KS rating territory,enum,true,derived_from_zip,t1 / t2,Kansas BOP territory',
+  'A. Classification,class_code,ISO BOP class code,class_code,true,form_input,in class_table,5-digit ISO BOP code',
+  'B. Location,territory,KS rating territory,enum,true,derived_from_zip,701 / 702,Kansas BOP territory',
   'C. Property,construction_class,Construction type,enum,true,form_input,frame / joisted_masonry / fire_resistive,6 ISO classes',
   'D. Coverage,building_limit,Building limit ($),currency,false,form_input,>= 0,Building coverage limit',
 ].join("\n");
@@ -24,10 +24,10 @@ describe("parseInputDictCsv", () => {
     expect(byField.class_code!.required).toBe(true);
     expect(byField.class_code!.category).toBe("A. Classification");
 
-    // enum → string; derived_from_zip → derived; "t1 / t2" → allowedValues.
+    // enum → string; derived_from_zip → derived; "701 / 702" → allowedValues.
     expect(byField.territory!.dataType).toBe("string");
     expect(byField.territory!.source).toBe("derived");
-    expect(byField.territory!.allowedValues).toEqual(["t1", "t2"]);
+    expect(byField.territory!.allowedValues).toEqual(["701", "702"]);
 
     // currency → money; ">= 0" is prose (no slash) → no allowedValues.
     expect(byField.building_limit!.dataType).toBe("money");

@@ -1,6 +1,6 @@
 /**
  * public-counts — THE user-facing counting of a plan's algorithm
- * (presentation consistency).
+ * (MVP-013, mvp-tightness §3.3).
  *
  * The sweep found the algorithm counted five ways (rating towers /
  * wire `stages` / `chain_stages` / report "rating steps" / Rating-tab

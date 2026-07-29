@@ -1,5 +1,5 @@
 /**
- * <InputsPanelV2> — book intake pre-flight tests  .
+ * <InputsPanelV2> — book-intake §2 pre-flight tests (MVP-004 · MVP-010).
  *
  * The sentence above the Match table names the leftovers — ignored
  * columns, fuzzy suggestions, missing required inputs — with the SAME
@@ -49,7 +49,7 @@ const MAPPING: PlanInputMapping = {
   column_map: {},
 };
 
-describe("<InputsPanelV2> — the pre-flight sentence (book intake)", () => {
+describe("<InputsPanelV2> — the pre-flight sentence (book-intake §2)", () => {
   it("names the misspelled, the unknown, and the missing in one line", () => {
     render(
       <InputsPanelV2
@@ -66,7 +66,7 @@ describe("<InputsPanelV2> — the pre-flight sentence (book intake)", () => {
       "building_lmit looks like building_limit — confirm the match in Inputs.",
     );
     expect(line).toHaveTextContent(
-      "1 of your column isn't a plan input (sq_footage) — ignored unless mapped.",
+      "1 of your columns isn't a plan input (sq_footage) — ignored unless mapped.",
     );
     expect(line).toHaveTextContent("Missing: class_code.");
   });

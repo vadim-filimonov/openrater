@@ -67,8 +67,8 @@ export interface PolicyBookConfig {
   /** The plan output that carries each row's row-scope gate tier verdict (if
    *  the plan has a row gate). Read per location for the precedence combine. */
   readonly rowVerdictOutput?: string;
-  /** Optional ordered policy tail of post-aggregation adjustments
-   *  (schedule rating → package modifiers →
+  /** OPT-IN policy tail (Brief glm-irpm-lightbox-in-policy-rollup) — the ordered
+   *  post-aggregation adjustments (schedule_rating IRPM → package mods →
    *  endorsements → minimum premium) applied to each policy's rolled premium
    *  subtotal, EXACTLY like `composePolicy` does for a multi-line policy. Omit
    *  ⇒ no tail composed; `PolicyBookResult.composed` stays absent and the
@@ -268,8 +268,8 @@ export function evaluatePolicyBook(
 }
 
 /**
- * Compose the optional policy tail on a policy's rolled premium subtotal.
- * Returns the composed final + per-step
+ * Compose the opt-in policy tail on a policy's rolled premium subtotal (Brief
+ * glm-irpm-lightbox-in-policy-rollup). Returns the composed final + per-step
  * build-up, or `undefined` when no tail is configured / the subtotal isn't a
  * finite number — so the caller omits `composed` and stays byte-stable.
  *

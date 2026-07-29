@@ -26,7 +26,7 @@ import {
 } from "./PlanDeleteDialog";
 
 const PLAN: PlanDeleteTarget = {
-  rating_plan_id: "bop_ne_draft_abc",
+  rating_plan_id: "bop_wi_draft_abc",
   display_name: "Nonprofit 990 D&O + GL",
   status: "draft",
 };

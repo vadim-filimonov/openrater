@@ -187,7 +187,7 @@ describe("<InputsPanelV2> — genesis (Brief 89)", () => {
       source: {
         kind: "csv",
         columns: ["exposure", "lcm"],
-        sample_rows: [{ exposure: "100000", lcm: "1.4" }],
+        sample_rows: [{ exposure: "100000", lcm: "1.401" }],
       },
       column_map: {},
     };

@@ -1,7 +1,7 @@
 /**
  * Zod schemas for the plans-author endpoint group.
  *
- * Mirrors `server/src/openrater/app/routes/plan_author_route.py`
+ * Mirrors the Pydantic models in api-lab/backend's plan_author_route.py
  * (PlanSummary, PlanDetail, StageSummary, CreatePlanRequest, etc.).
  *
  * If the backend shape changes, this file updates first; consumers
@@ -51,10 +51,12 @@ export const planSummarySchema = z.object({
   jurisdiction: z.string().nullable(),
   effective_date: z.string(),
   status: z.string(),
-  // Lineage fields stay in the database rather than this list-response wire.
+  // MVP-029 — parent_plan_id / source_filing_id / draft_session_id left
+  // this wire (no first-party reader); lineage lives in the DB + audit.
   created_at: z.string().nullable(),
-  // The creation note is serialized on both reads. Nullable for plans
-  // created without a note and for older rows.
+  // Brief 91 follow-up — the creation note ("+ Add a note"). Was
+  // write-only (POST persisted it, GET dropped it); now serialized on
+  // both reads. Nullable: note-less creates + pre-existing rows.
   description: z.string().nullable().optional(),
   template_id: z.string().nullable().optional(),
   coverages: z.array(z.string()).nullable().optional(),

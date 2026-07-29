@@ -1,6 +1,11 @@
 /**
  * @openrater/contracts — public API surface.
  *
+ * The substrate ports from the legacy `<prototype>/plan-builder/
+ * src/canvas/` in the original port plan. Phase A.1 lands types first, then
+ * runtime + validation + the 18 kind execute() functions + the 7
+ * conformance vectors.
+ *
  * Pure types + pure functions. No React, no DOM, no I/O, no runtime
  * deps. Consumed by Rate Lab UI, the cascade engine, integrators, and
  * the OSS conformance suite.
@@ -372,7 +377,7 @@ export type {
 // Authoring-time types for territory schemas. State-scoped (V1).
 // Boundary modes: zip_set / fips_set / polygon. Pure types + format
 // validators + small boundary-enumeration helpers. No MapLibre — the
-// @openrater/ui consumer handles rendering.
+// labs-ui consumer handles rendering.
 export {
   enumerateFipsFromBoundary,
   enumerateZipsFromBoundary,
@@ -629,7 +634,7 @@ export {
   parseNonNegativeNumber,
   parseInteger,
   parseEnum,
-  // Shared name matching and header preflight.
+  // Book-intake §2 — shared name matching + the header pre-flight.
   normalizeIdent,
   tokenize,
   levenshtein,
@@ -672,8 +677,8 @@ export type {
 
 // ── Chain config wire shapes (M4.3.8a) ──
 //
-// Mirrors the Pydantic models in server/src/openrater/rates/plans/configs.py.
-// These are substrate-level invariants
+// Mirrors the Pydantic models in api-lab/backend's
+// rates/plans/configs.py. These are substrate-level invariants
 // (config_json shape) that the runtime enforces — not endpoint
 // request/response shapes (which stay in @openrater/api-client).
 export {
@@ -704,7 +709,8 @@ export type {
 // The deterministic core the `model.glm` kind evaluates inline
 // coefficients through. The Model Lab artifact seam (registry, format
 // adapters, evaluators, score-bands, gate model sources, factor-table
-// export) is retired; external scores enter plans as typed inputs.
+// export) was retired with the Detachment Brief 1 §4 S1 cut — external
+// scores enter plans as typed inputs.
 export type {
   ModelPrediction,
   GlmLink,
@@ -776,6 +782,8 @@ export {
   // companion to the existing dimension-types helpers.)
   resolveBandedLevel,
   resolveCategoricalLevel,
+  // FCA #26 — numeric-aware display ordering (T1 < T2 < T10).
+  compareNatural,
   // ADR-0025 (Brief 27) — composite shape helpers.
   isCompositeDimension,
   resolveCompositeLevel,
@@ -803,7 +811,7 @@ export type { BandedDimensionIssue } from "./dimension-validation";
 
 // Brief 30 PR 30.4 — Dimension reference resolver. Walks plan
 // stages + factor tables + modifiers and emits the
-// `DimensionReferenceLite[]` the @openrater/ui UsedInPanel consumes.
+// `DimensionReferenceLite[]` the labs-ui UsedInPanel consumes.
 // Brief 34 PR 34.7 removed the Curves walk; curves no longer exist.
 export { findDimensionReferences } from "./dimension-references";
 export type {
@@ -832,5 +840,43 @@ export {
   findModelInput,
   findModelOutput,
 } from "./model-types";
+
+// ── FCA #24 — the plan-to-plan comparison model ──────────────────────
+//
+// One derivation for "what changed between these two plans", shared
+// by the Exhibits compare AND the chat-side compare_plans tool
+// (finding 75: the only structured diff was identity-locked).
+// Membership reassignments are first-class (findings 74/102: the
+// rollup diffed factor cells only, so moved counties read
+// "unchanged"), dual-keyed geo members collapse, and coverage/tower
+// presence is enumerated (finding 76: retired endorsement towers
+// were invisible).
+export {
+  cellDelta,
+  compareFacts,
+  coveragePresence,
+  membershipDelta,
+  memberAssignments,
+  pairChanged,
+  pairTables,
+  tableKey,
+  tableName,
+  territoryVerdict,
+} from "./compare-model";
+export type {
+  CellDelta,
+  CompareDimLike,
+  CompareFacts,
+  CompareStageLike,
+  CompareTableLike,
+  CoveragePresence,
+  GeoTerritoryLike,
+  MembershipDelta,
+  PairedTables,
+  TablePair,
+  TerritoryReassignment,
+  TerritoryReassignmentFact,
+  TerritoryVerdict,
+} from "./compare-model";
 
 export const PACKAGE_NAME = "@openrater/contracts" as const;

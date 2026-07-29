@@ -7,7 +7,7 @@
 //
 //     http://www.apache.org/licenses/LICENSE-2.0
 /**
- * @openrater/mcp — the OpenRater MCP server over stdio.
+ * @openrater/mcp — the OpenRater MCP server (Brief 2 §4, stdio).
  *
  * Lets any MCP client drive the deterministic rating platform:
  * spec/template/registry → validate → build → report → quote →
@@ -27,6 +27,8 @@ import {
   ApiError,
   buildFromWorkbook,
   checkWorkbook,
+  comparePlans,
+  compareRuns,
   configFromEnv,
   downloadWorkbookTemplate,
   exportPlanWorkbook,
@@ -34,7 +36,7 @@ import {
   getCapabilityRegistry,
   getInputSchema,
   getPlan,
-  getTranscriptionSpec,
+  getTranscriptionSpecSectioned,
   listPlans,
   planLink,
   quoteRisk,
@@ -63,7 +65,12 @@ conversation — including "what is this?" or "show me" — call
 runtime_status BEFORE answering. It boots the local engine, and on a
 fresh install the app opens itself in their browser (tell them to keep
 that window beside the chat; runtime_status returns app_url as the
-fallback link). Then offer, once, the three doors:
+fallback link). If the user asks about returning to the app later, or
+the app link seems dead, relay runtime_status's app_lifecycle
+verbatim — in the managed runtime the app lives only while the chat
+host runs, and a message in the chat is what relights it; never let a
+dead bookmarked link go unexplained. Then offer, once, the three
+doors:
 1. "See it work" — a ~3-minute guided tour on the bundled synthetic
    sample (runtime_status.sample has the filing PDF and demo-book
    paths; the seeded plan quotes with draft:true; worked example
@@ -82,7 +89,11 @@ Bulk data travels as file paths, never rows in chat. Never fetch from
 SERFF or any filing portal. Present results as reconstructions — the
 carrier's filed and approved rates govern. The plan is the user's to
 open and CHANGE in the app (Rating and Eligibility tabs); share
-open_in_openrater links at every artifact. First-time users will see
+open_in_openrater links at every artifact. The app's Exhibits tab
+draws any plan and compares two visually — compare_plans returns its
+deep link (open_in_exhibits; the URL carries the whole compare, so it
+can be bookmarked or sent to a colleague), and compare_runs answers
+"same book, what changed" across two runs. First-time users will see
 a permission prompt per tool — tell them "Always allow" handles each
 once, and nothing leaves their machine.`;
 
@@ -140,10 +151,14 @@ server.registerTool(
       "The filing-transcription spec (markdown) — the contract an AI " +
       "follows to transcribe a rate filing or rating manual into the " +
       "workbook. Read it BEFORE transcribing; cite sheet/column rules " +
-      "by their R-### ids when fixing check failures.",
-    inputSchema: {},
+      "by their R-### ids when fixing check failures. The full spec " +
+      "exceeds one call (FCA #29): call with NO section for the table " +
+      "of contents, then request sections by number (\"4.15\"), " +
+      "prefix (\"4\" = every §4.x), or heading fragment.",
+    inputSchema: { section: z.string().optional() },
   },
-  () => run(() => getTranscriptionSpec(config)),
+  ({ section }) =>
+    run(() => getTranscriptionSpecSectioned(config, section)),
 );
 
 server.registerTool(
@@ -234,6 +249,65 @@ server.registerTool(
     run(async () =>
       summarizePlan((await getPlan(config, plan_id)) as Record<string, unknown>),
     ),
+);
+
+server.registerTool(
+  "compare_plans",
+  {
+    // Permission-prompt hints (MCP tool annotations): clients use
+    // these to soften/group consent for read-only, closed-world tools.
+    annotations: {
+      title: "Compare two plans",
+      readOnlyHint: true,
+      idempotentHint: true,
+      openWorldHint: false,
+    },
+    description:
+      "What changed between two plans (FCA #24) — the same arithmetic " +
+      "the app's Exhibits → Compare renders: changed tables with their " +
+      "largest cell moves, inputs/tables/coverage towers present on one " +
+      "side only, and territory MEMBERSHIP reassignments (moved " +
+      "counties/ZIPs, dual-keyed members counted once, names leading). " +
+      "Use for committee-shaped 'what changed' questions; no plan-id " +
+      "masquerade needed. Present results as a reconstruction — the " +
+      "filed documents govern.",
+    inputSchema: { plan_a: z.string(), plan_b: z.string() },
+  },
+  ({ plan_a, plan_b }) => run(() => comparePlans(config, plan_a, plan_b)),
+);
+
+server.registerTool(
+  "compare_runs",
+  {
+    // Permission-prompt hints (MCP tool annotations): clients use
+    // these to soften/group consent for read-only, closed-world tools.
+    annotations: {
+      title: "Compare two book runs",
+      readOnlyHint: true,
+      idempotentHint: true,
+      openWorldHint: false,
+    },
+    description:
+      "Row-by-row deltas between two DONE book runs (FCA #28) — the " +
+      "rate-committee artifact: totals with the % move, the top " +
+      "movers by dollar swing, rows newly refused or newly rated, " +
+      "and rows present on one side only. Rows join on the caller's " +
+      "own identifier column (PolicyNbr-style) when both runs carry " +
+      "one; otherwise by position, disclosed in caveats. Use after " +
+      "rerate_book on two plans (pass with_plan) or two runs of one " +
+      "plan. The same arithmetic renders in the app at review_url.",
+    inputSchema: {
+      plan_id: z.string(),
+      run_id: z.string(),
+      with_run: z.string().describe("the run to compare against"),
+      with_plan: z
+        .string()
+        .optional()
+        .describe("with_run's plan when it lives on another plan"),
+    },
+  },
+  ({ plan_id, run_id, with_run, with_plan }) =>
+    run(() => compareRuns(config, plan_id, run_id, with_run, with_plan)),
 );
 
 server.registerTool(
@@ -338,16 +412,33 @@ server.registerTool(
       "(sha256-stamped) to dest_dir and returns the file path — the " +
       "canonical container comes back out. Re-ingesting the export " +
       "answers 'already built' (it IS the source). Refuses BY NAME " +
-      "when the plan wasn't built from a workbook.",
+      "when the plan wasn't built from a workbook. When the plan has " +
+      "in-app edits made AFTER the build, the result carries a " +
+      "warning: those edits are NOT in the exported bytes, so a plan " +
+      "built from this file will not include them. Pass state: " +
+      "'current' for the same container REWRITTEN to the live plan " +
+      "state (tracked factor-table cells + gates!value cells carry " +
+      "the in-app edits; untouched sheets stay byte-identical; the " +
+      "filename gains a '-current' suffix). A current export is NOT " +
+      "the build identity — re-ingesting it registers as a revision — " +
+      "and any in-app change the rewriter could not place in the " +
+      "workbook comes back NAMED in the warning.",
     inputSchema: {
       plan_id: z.string(),
       dest_dir: z
         .string()
         .describe("Directory to write the .xlsx into (created if absent)."),
+      state: z
+        .enum(["build", "current"])
+        .optional()
+        .describe(
+          "'build' (default): the exact build-time bytes. 'current': " +
+            "the live plan state written into the tracked cells.",
+        ),
     },
   },
-  ({ plan_id, dest_dir }) =>
-    run(() => exportPlanWorkbook(config, plan_id, dest_dir)),
+  ({ plan_id, dest_dir, state }) =>
+    run(() => exportPlanWorkbook(config, plan_id, dest_dir, state ?? "build")),
 );
 
 server.registerTool(

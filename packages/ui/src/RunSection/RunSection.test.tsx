@@ -54,6 +54,76 @@ describe("<RunSection>", () => {
     expect(onRun).toHaveBeenCalledTimes(1);
   });
 
+  // FCA #10 — a gate-only declared bool renders a REAL control: a
+  // Yes/No radiogroup, unset until the user answers (no fabricated
+  // eligibility default), never a free-text field.
+  it("renders a boolean field as an unset Yes/No toggle and reports the answer", () => {
+    const onFieldChange = vi.fn();
+    render(
+      <RunSection
+        ready
+        fields={[
+          ...FIELDS,
+          {
+            key: "work_above_three_stories",
+            label: "Work above three stories",
+            value: "",
+            control: "boolean",
+          },
+        ]}
+        onFieldChange={onFieldChange}
+        onRun={() => {}}
+        result={null}
+      />,
+    );
+    const group = screen.getByRole("radiogroup", {
+      name: "Work above three stories",
+    });
+    expect(group).toBeInTheDocument();
+    const yes = screen.getByRole("radio", { name: "Yes" });
+    const no = screen.getByRole("radio", { name: "No" });
+    // Unset: neither answer pre-chosen.
+    expect(yes).toHaveAttribute("aria-checked", "false");
+    expect(no).toHaveAttribute("aria-checked", "false");
+    fireEvent.click(yes);
+    expect(onFieldChange).toHaveBeenCalledWith(
+      "work_above_three_stories",
+      "true",
+    );
+    fireEvent.click(no);
+    expect(onFieldChange).toHaveBeenCalledWith(
+      "work_above_three_stories",
+      "false",
+    );
+  });
+
+  it("a boolean field with a value shows the chosen side", () => {
+    render(
+      <RunSection
+        ready
+        fields={[
+          {
+            key: "hydrant_within_1000ft",
+            label: "Hydrant within 1000 ft",
+            value: "true",
+            control: "boolean",
+          },
+        ]}
+        onFieldChange={() => {}}
+        onRun={() => {}}
+        result={null}
+      />,
+    );
+    expect(screen.getByRole("radio", { name: "Yes" })).toHaveAttribute(
+      "aria-checked",
+      "true",
+    );
+    expect(screen.getByRole("radio", { name: "No" })).toHaveAttribute(
+      "aria-checked",
+      "false",
+    );
+  });
+
   it("shows the premium + outputs + the Algorithm link", () => {
     const onOpenAlgorithm = vi.fn();
     render(
@@ -138,7 +208,7 @@ const OK_ENVELOPE: ServerRunResultLike = {
       kindId: "lookup.direct",
       inputs: {},
       outputs: { value: 1.32 },
-      explanation: "Classified c101 → 1.32",
+      explanation: "Classified 73912 → 1.32",
     },
     chain_c: {
       kindId: "chain.mult",
@@ -178,12 +248,12 @@ describe("<RunSection> §14 — the evaluated trace renders in place (FB-1)", ()
       />,
     );
     expect(
-      screen.getByText("How this was computed · 4 steps"),
+      screen.getByText("How this was computed · 4 computed steps"),
     ).toBeInTheDocument();
     // FB-1: each step's evaluated math + the final premium are IN the
     // region (native <details> keeps content in the DOM).
     expect(screen.getByText("850 × 1.6 (LCM) = 1360")).toBeInTheDocument();
-    expect(screen.getByText("Classified c101 → 1.32")).toBeInTheDocument();
+    expect(screen.getByText("Classified 73912 → 1.32")).toBeInTheDocument();
     // The mined lookup label renders instead of the runtime node id.
     expect(screen.getByText("Class factor")).toBeInTheDocument();
   });
@@ -230,7 +300,7 @@ describe("<RunSection> §14 — the evaluated trace renders in place (FB-1)", ()
     );
     expect(screen.getByRole("alert")).toBeInTheDocument();
     expect(
-      screen.getByText("How this was computed · 4 steps"),
+      screen.getByText("How this was computed · 4 computed steps"),
     ).toBeInTheDocument();
     // ADR-0056 — the declared output renders withheld, never a number.
     expect(screen.getByText("— withheld")).toBeInTheDocument();
@@ -264,7 +334,7 @@ describe("<RunSection> Brief 95 — submitter ergonomics", () => {
         onFieldChange={() => {}}
         onRun={() => {}}
         result={null}
-        seedHint="Seeded from IT-01 — the filing's own verified example. Edit any field, then press Enter or Rate sample."
+        seedHint="Seeded from IT-01 — a test case verified at build. Edit any field, then press Enter or Rate sample."
       />,
     );
     expect(screen.getByText(/Seeded from IT-01/)).toBeInTheDocument();

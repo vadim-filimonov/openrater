@@ -294,8 +294,8 @@ const TERRITORY: DimensionRow = {
     { kind: "geographic", id: "67001", label: "67001" },
   ],
   geo_territories: [
-    { id: "t1", label: "Territory t1", members: ["66002", "66006"] },
-    { id: "t2", label: "Territory t2", members: ["67001"] },
+    { id: "701", label: "Territory 701", members: ["66002", "66006"] },
+    { id: "702", label: "Territory 702", members: ["67001"] },
   ],
 };
 
@@ -305,26 +305,26 @@ describe("matchCsv2D — geographic keying domain (E10a)", () => {
       fileName: "base_lc.csv",
       colLabels: ["building", "bpp"],
       rows: [
-        { keyLabel: "t1", cells: { building: 0.4, bpp: 0.199 } },
-        { keyLabel: "t2", cells: { building: 0.4, bpp: 0.18 } },
+        { keyLabel: "701", cells: { building: 0.389, bpp: 0.199 } },
+        { keyLabel: "702", cells: { building: 0.389, bpp: 0.18 } },
       ],
     };
     const preview = matchCsv2D(csv, TERRITORY, OWNERSHIP2COL, new Map());
     expect(preview.unmatchedRows).toEqual([]);
     expect(preview.matchedRows.map((r) => r.rowId).sort()).toEqual([
-      "t1",
-      "t2",
+      "701",
+      "702",
     ]);
     // Cells key on TERRITORY ids — the same keys the grid renders.
-    expect(preview.resolvedChanges.get("t1::building")).toBe(0.4);
-    expect(preview.resolvedChanges.get("t2::bpp")).toBe(0.18);
+    expect(preview.resolvedChanges.get("701::building")).toBe(0.389);
+    expect(preview.resolvedChanges.get("702::bpp")).toBe(0.18);
   });
 
   it("does NOT match raw member ZIPs once territories group them", () => {
     const csv: CsvImport2D = {
       fileName: "base_lc.csv",
       colLabels: ["factor"],
-      rows: [{ keyLabel: "66002", cells: { factor: 0.4 } }],
+      rows: [{ keyLabel: "66002", cells: { factor: 0.389 } }],
     };
     const preview = matchCsv2D(csv, TERRITORY, undefined, new Map());
     // A ZIP row would target a grid row that doesn't exist — it must
@@ -338,7 +338,7 @@ describe("matchCsv2D — geographic keying domain (E10a)", () => {
     const csv: CsvImport2D = {
       fileName: "base_lc.csv",
       colLabels: ["factor"],
-      rows: [{ keyLabel: "66002", cells: { factor: 0.4 } }],
+      rows: [{ keyLabel: "66002", cells: { factor: 0.389 } }],
     };
     const preview = matchCsv2D(csv, ungrouped, undefined, new Map());
     expect(preview.matchedRows.map((r) => r.rowId)).toEqual(["66002"]);

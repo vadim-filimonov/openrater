@@ -7,7 +7,7 @@
 #     http://www.apache.org/licenses/LICENSE-2.0
 """The market-events LEDGER — claim-then-judge idempotency + the fences.
 
-Ledger-only since the Exhibits re-founding (current Exhibits design
+Ledger-only since the Exhibits re-founding (Brief: portfolio-redesign v2
 §6): OpenRater keeps no book of record, so an accepted event is exactly
 one `integration_events` row and its ack — nothing else. These tests pin:
 

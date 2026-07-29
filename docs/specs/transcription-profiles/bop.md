@@ -3,8 +3,8 @@
 **Status:** informative cookbook (never normative — the grammar is
 [`filing-transcription-spec.md`](../filing-transcription-spec.md);
 this profile teaches how BOP filings map onto it). Registry: r5.
-Exercised end to end with the fictional Meridian Shopfront BOP
-reference program and its deterministic worked examples.
+Proven against a real SERFF-filed ISO BOP program (Kansas, 2026-07 —
+37/38 filing vectors within ±$2).
 
 ## What a BOP filing looks like
 
@@ -31,7 +31,7 @@ value actually came from.
 | Construction class, protection class, sprinkler | Categorical dimensions + 1-D `ft.*` tables; matrices in the filing (construction × protection) become one 2-D table. |
 | Territory pages (ZIP → territory → factor) | A `geographic` dimension (`geo_granularity=zip`), territory levels in `dimension_levels`, the ZIP detail in `geo.<slug>` (never one level per ZIP — AP-10), factors in a `ft.*` keyed by territory. |
 | Territory pages that only NAME territories (codes, no ZIP/county list) | A **plain categorical** dimension — the codes as levels, factors in a `ft.*` keyed by them. Geography engages only with a geographic indicator (AP-11, R-086). |
-| ILFs / limit factors, deductible credits | **Banded 1-D tables at the filing's breakpoints.** Set `interpolation` per the filing's stated method. With `linear`, a 2-D table interpolates along its declared banded axis and a 1-D banded table interpolates between lower-bound breakpoints; ends clamp. Compute test-vector expectations using those semantics. R-111 names each interpolating table. |
+| ILFs / limit factors, deductible credits | **Banded 1-D tables at the filing's breakpoints.** Set `interpolation` per the filing's stated method — ISO limit tables often interpolate; `linear` is registry-`partial` with **split behavior** (ADR-0063): a 2-D table interpolates along its row dimension's axis (the Kansas test's TV-16 now reproduces exactly this way); a 1-D banded table rates stepped until range-lookup interpolation ships. Compute your test vectors per the R-111 warning's statement for each table. |
 | LCM | The `lcm` stage on each chain (or one plan-wide `lcm` field). Cite `(carrier-set)` when the carrier chooses it. |
 | Eligibility section ("do not write…", "refer…") | `gates` rows, first match wins; up to 3 AND-ed conditions per rule. |
 | IRPM / schedule rating table | `modifiers` — categories + per-category range + total cap. Structure only; per-risk credits are runtime inputs. |
@@ -54,9 +54,10 @@ value actually came from.
 3. **"All other classes" rows** in filed tables are real filed
    defaults — transcribe them as the table's `__default__` row. Do
    not invent a `__default__` the filing doesn't publish.
-4. **Interpolated limit tables** — see the ILF row above. Set
-   `interpolation=linear` only when the filing calls for interpolation;
-   both supported table shapes then interpolate and R-111 names the table.
+4. **Interpolated limit tables** — see ILF row above; keep
+   `interpolation=linear`. 2-D tables interpolate (ADR-0063); 1-D
+   banded tables rate stepped for now — the R-111 warning states which
+   per table.
 5. **Per-coverage LCMs.** Carriers sometimes file different LCMs for
    property vs liability. One `lcm` stage per chain handles it; don't
    average them.
@@ -71,18 +72,18 @@ value actually came from.
 `sprinklered`, `territory`, `building_limit_band`, `deductible_band`,
 `bop_tenure_band`. Never `table_5a` (§7.1).
 
-## Recipe: verifying against two-column filing PDFs
+## Recipe: verifying against two-column ISO PDFs
 
-Many rating manuals print in two columns; `pdftotext -layout`
-interleaves them, so **line numbers are not stable anchors** — a
-table's rows can share line numbers with unrelated text from the
-other column, and page footers shift everything a page later.
-Recommended pattern:
+ISO CLM pages print in two columns; `pdftotext -layout` interleaves
+them, so **line numbers are not stable anchors** — a table's rows can
+share line numbers with unrelated text from the other column, and
+page footers shift everything a page later. Proven pattern (the WI
+BOP fidelity gate):
 
 1. Extract layout-preserving text once; treat it as the transcription
    source of record alongside the PDF.
-2. **Anchor verification windows on section-title lines** (each
-   rule page may repeat its title, e.g. `RATE NUMBER RELATIVITIES`), a
+2. **Anchor verification windows on section-title lines** (each ISO
+   rule page repeats its title, e.g. `RATE NUMBER RELATIVITIES`), a
    window running to the next *different* title — multi-page tables
    concatenate naturally and pagination drift cannot clip a table.
 3. **Machine-diff every hand-typed literal against its window** before
@@ -91,7 +92,7 @@ Recommended pattern:
    generator.
 4. For `citation_page` when the extraction has no form feeds, count
    per-page footer lines (e.g. `Edition MM-YY` in company packets)
-   to derive source PDF page numbers.
+   to derive real PDF page numbers.
 
 ## Recipe: one filing family, several plans
 
@@ -116,7 +117,7 @@ BOP occupant liability rates per $100 of LOI **or** per $1,000 of
 sales **or** per $1,000 of payroll depending on the class (plus the
 lessors basis per Rule 23.B.5) — and a chain has ONE exposure divisor
 (registry: `class_conditional_exposure`). Until derived inputs /
-class-conditional exposure ships, the supported interim shape is
+class-conditional exposure ship (Brief 95 C2/C3), the proven shape is
 **one liability tower**:
 
 - a categorical `liab_exposure_base` dimension

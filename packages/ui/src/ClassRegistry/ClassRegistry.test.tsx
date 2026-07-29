@@ -5,19 +5,19 @@ import type { ClassRegistryRecord } from "./types";
 
 const CLASSES: ClassRegistryRecord[] = [
   {
-    class_code: "c101",
-    display_name: "Meridian Neighborhood Bakery",
-    family: "Food services",
+    class_code: "09015",
+    display_name: "Bagelry",
+    family: "Restaurants",
     eligible_for: ["bop"],
-    attributes: { prop_rate_number: "07", liab_class_group: "mg_02" },
-    source: "custom",
+    attributes: { prop_rate_number: "18", liab_class_group: "cg_40" },
+    source: "iso",
   },
   {
-    class_code: "c102",
-    display_name: "Meridian General Merchandise",
+    class_code: "53983",
+    display_name: "Army/Navy Retail",
     family: "Retail",
     eligible_for: ["bop"],
-    attributes: { prop_rate_number: "11" },
+    attributes: { prop_rate_number: "09" },
     source: "custom",
   },
 ];
@@ -38,8 +38,8 @@ function setup(overrides: Partial<Parameters<typeof ClassRegistry>[0]> = {}) {
 describe("<ClassRegistry>", () => {
   it("lists the plan's classes", () => {
     setup();
-    expect(screen.getByText("Meridian Neighborhood Bakery")).toBeInTheDocument();
-    expect(screen.getByText("Meridian General Merchandise")).toBeInTheDocument();
+    expect(screen.getByText("Bagelry")).toBeInTheDocument();
+    expect(screen.getByText("Army/Navy Retail")).toBeInTheDocument();
   });
 
   it("renders an honest empty state (not fake rows) with import + new CTAs", () => {
@@ -50,23 +50,23 @@ describe("<ClassRegistry>", () => {
 
   it("shows the derived attributes in the detail pane on row click", () => {
     setup();
-    fireEvent.click(screen.getByText("Meridian Neighborhood Bakery"));
+    fireEvent.click(screen.getByText("Bagelry"));
     expect(screen.getByText("prop_rate_number")).toBeInTheDocument();
     expect(screen.getByText("liab_class_group")).toBeInTheDocument();
   });
 
   it("multi-selects and calls onAddToPlan with the selected codes", () => {
     const props = setup();
-    fireEvent.click(screen.getByTestId("rater-class-registry-check-c101"));
-    fireEvent.click(screen.getByTestId("rater-class-registry-check-c102"));
+    fireEvent.click(screen.getByTestId("rater-class-registry-check-09015"));
+    fireEvent.click(screen.getByTestId("rater-class-registry-check-53983"));
     expect(screen.getByTestId("rater-class-registry-addbar")).toBeInTheDocument();
     fireEvent.click(screen.getByTestId("rater-class-registry-addtoplan"));
-    expect(props.onAddToPlan).toHaveBeenCalledWith(["c101", "c102"]);
+    expect(props.onAddToPlan).toHaveBeenCalledWith(["09015", "53983"]);
   });
 
   it("CTA reads 'Update plan dimension' when the class dimension exists", () => {
     setup({ classDimensionExists: true });
-    fireEvent.click(screen.getByTestId("rater-class-registry-check-c101"));
+    fireEvent.click(screen.getByTestId("rater-class-registry-check-09015"));
     expect(screen.getByText(/Update plan dimension/)).toBeInTheDocument();
   });
 });

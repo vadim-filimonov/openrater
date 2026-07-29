@@ -1,6 +1,9 @@
 /**
  * Plan validation — authoring-time error surfacing.
  *
+ * V.22.A5 commit #1 (per the design brief at
+ * plan-builder/docs/design-briefs/authoring-time-error-surfacing.md).
+ *
  * Pure-logic validation pass that walks a PlanEntitiesSnapshot and
  * returns a structured list of issues. The UI layer
  * (PlanSurfaceIssueBanner, queued for V.22.A5 commit #2) consumes

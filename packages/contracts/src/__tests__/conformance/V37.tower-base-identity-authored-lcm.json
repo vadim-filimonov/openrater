@@ -1,17 +1,17 @@
 {
   "name": "V37.tower-base-identity-authored-lcm",
-  "description": "A fictional Meridian multiplicative tower with an identity base (1.0), class factor (1.25), and authored LCM constant (1.4) resolves to 1.75 rather than a silent zero.",
+  "description": "Brief 54 — a multiplicative tower with an identity base (1.0) x class factor (1.32) x authored carrier LCM constant (1.401) resolves to the product (1.84932), never a silent $0. Pins the LCM-as-authored-constant runtime path + the base-1.0 identity the projector falls back to.",
   "plan": {
     "id": "v37.base-identity",
     "version": "1.0.0",
-    "name": "Meridian tower base identity + authored LCM",
+    "name": "Tower base identity + authored LCM",
     "line": "bop",
     "effective": "2026-01-01",
     "nodes": [
       { "id": "in_cls", "kind": "input", "params": { "fieldName": "class_code", "fieldType": "string" }, "position": { "x": 0, "y": 0 } },
-      { "id": "cls_lkp", "kind": "lookup.direct", "params": { "table": { "c201": 1.25 }, "defaultValue": 1.0, "tableName": "Meridian synthetic class factor" }, "position": { "x": 200, "y": 0 } },
+      { "id": "cls_lkp", "kind": "lookup.direct", "params": { "table": { "73912": 1.32 }, "defaultValue": 1.0 }, "position": { "x": 200, "y": 0 } },
       { "id": "base", "kind": "constant", "params": { "value": 1.0, "type": "money" }, "position": { "x": 200, "y": 80 } },
-      { "id": "lcm", "kind": "constant", "params": { "value": 1.4, "type": "factor" }, "position": { "x": 200, "y": 160 } },
+      { "id": "lcm", "kind": "constant", "params": { "value": 1.401, "type": "factor" }, "position": { "x": 200, "y": 160 } },
       { "id": "mul", "kind": "chain.mult", "params": { "stopOnZero": false }, "position": { "x": 400, "y": 80 } },
       { "id": "out_p", "kind": "output", "params": { "fieldName": "premium", "fieldType": "money" }, "position": { "x": 600, "y": 80 } }
     ],
@@ -23,6 +23,6 @@
       { "from": { "node": "mul", "port": "result" }, "to": { "node": "out_p", "port": "value" } }
     ]
   },
-  "externalInputs": { "class_code": "c201" },
-  "expectedOutputs": { "premium": 1.75 }
+  "externalInputs": { "class_code": "73912" },
+  "expectedOutputs": { "premium": 1.84932 }
 }

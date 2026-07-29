@@ -5,9 +5,9 @@
  *
  *   ⊖ compile · Rating Chains
  *   Chain factor 'class_factor' expects a class exposure, but
- *   class c103 has no declared exposure. Declare in Classification
- *   → Class c103.
- *   [ Go to Classification → Class c103 ]  [→]
+ *   class 91342 has no declared exposure. Declare in Classification
+ *   → Class 91342.
+ *   [ Go to Classification → Class 91342 ]  [→]
  *
  * Receives an `Issue` from @openrater/contracts directly. Renders:
  *   - Severity icon + source chip + location breadcrumb (top line)

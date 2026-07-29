@@ -11,6 +11,11 @@
  * block's params (not wired ports) — they're "small parts" that
  * don't need their own constant nodes.
  *
+ * Ported from `<prototype>/plan-builder/src/blocks/kinds/
+ * math-op.tsx` (Phase A.1 PR 4). PURE half only — params + execute
+ * + jacobian + validate. React renderBody/renderInspector live in
+ * the rate-lab frontend in the original port plan.
+ *
  * Per P-N1: pure execute(). The runtime errors (division by zero,
  * missing y for binary ops, missing lo/hi for clamp) are thrown as
  * regular Error so the runner can catch + categorize them.

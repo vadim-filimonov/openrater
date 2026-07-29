@@ -31,7 +31,7 @@ const MIN_ONLY: ClampDraft = {
   max_value: "",
   max_pct_of_input: "",
   apply_as_multiplier: false,
-  citation_rule: "Meridian BOP §6.A.1",
+  citation_rule: "ISO BOP §6.A.1",
   citation_page: "p. 47",
 };
 

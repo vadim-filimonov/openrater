@@ -1,6 +1,6 @@
 /**
- * format tests — pins  (one absolute date rendering, local
- * components, date-only strings pass through) and  (the
+ * format tests — pins MVP-019 (one absolute date rendering, local
+ * components, date-only strings pass through) and MVP-017 (the
  * title-caser's acronym allowlist).
  */
 

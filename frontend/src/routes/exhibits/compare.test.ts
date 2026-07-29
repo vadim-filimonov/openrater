@@ -1,5 +1,5 @@
 /**
- * Exhibits comparison — derivation tests (current Exhibits design).
+ * Exhibits comparison — derivation tests (Brief: portfolio-redesign v2, P2).
  *
  * Side A mirrors the seeded Meridian values; side B is the brief's
  * fictional "2027 rev": t3 buys rate, the sprinkler credit deepens,
@@ -154,6 +154,9 @@ describe("territoryVerdict", () => {
       identical: 2, // t1 pair
       cheaperInB: 0,
       costlierInB: 2, // the two t3 ZIPs
+      // FCA #24 — membership reassignments ride the verdict now;
+      // none in this fixture (the ZIPs kept their territories).
+      reassigned: [],
       largest: {
         member: "68502",
         from: 1.12,

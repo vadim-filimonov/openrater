@@ -6,30 +6,45 @@ import type {
 } from "./lookup-territory";
 
 const RATES_A: TerritoryRates = {
-  property_factor: 0.94,
-  liability_factor: 1.02,
+  building_per_100: 0.85,
+  bpp_per_100: 0.95,
+  occupant_liab_per_100: 0.42,
+  occupant_liab_per_1k_sales: 0.18,
+  occupant_liab_per_1k_payroll: 0.22,
+  lessors_per_100: 0.31,
 };
 
 const RATES_B: TerritoryRates = {
-  property_factor: 1.0,
-  liability_factor: 1.0,
+  building_per_100: 1.1,
+  bpp_per_100: 1.2,
+  occupant_liab_per_100: 0.55,
+  occupant_liab_per_1k_sales: 0.24,
+  occupant_liab_per_1k_payroll: 0.28,
+  lessors_per_100: 0.4,
 };
 
-const EMPTY_RATES: TerritoryRates = {};
+const ZERO_RATES: TerritoryRates = {
+  building_per_100: 0,
+  bpp_per_100: 0,
+  occupant_liab_per_100: 0,
+  occupant_liab_per_1k_sales: 0,
+  occupant_liab_per_1k_payroll: 0,
+  lessors_per_100: 0,
+};
 
 const TERRITORIES: readonly SnapshottedTerritory[] = [
   {
-    territory_id: "meridian-t1",
-    territory_code: "t1",
-    state_code: "NE",
-    zips: ["68001", "68002"],
+    territory_id: "ca-001",
+    territory_code: "001",
+    state_code: "CA",
+    zips: ["94101", "94102"],
     base_rates: RATES_A,
   },
   {
-    territory_id: "meridian-t2",
-    territory_code: "t2",
-    state_code: "NE",
-    zips: ["68102", "68104"],
+    territory_id: "ny-002",
+    territory_code: "002",
+    state_code: "NY",
+    zips: ["10001", "10002"],
     base_rates: RATES_B,
   },
 ];
@@ -46,27 +61,27 @@ describe("TerritoryLookupKind", () => {
 
   it("returns the territory's rates when (state, zip5) matches", () => {
     const r = TerritoryLookupKind.execute(
-      { state: "NE", zip5: "68001" },
+      { state: "CA", zip5: "94101" },
       {
         territories: TERRITORIES,
-        fallbackRates: EMPTY_RATES,
-        fallbackCode: "t0",
+        fallbackRates: ZERO_RATES,
+        fallbackCode: "704",
       },
     );
-    expect(r.territory_code).toBe("t1");
+    expect(r.territory_code).toBe("001");
     expect(r.rates).toBe(RATES_A);
   });
 
   it("upper-cases the input state for matching", () => {
     const r = TerritoryLookupKind.execute(
-      { state: "ne", zip5: "68001" },
+      { state: "ca", zip5: "94101" },
       {
         territories: TERRITORIES,
-        fallbackRates: EMPTY_RATES,
-        fallbackCode: "t0",
+        fallbackRates: ZERO_RATES,
+        fallbackCode: "704",
       },
     );
-    expect(r.territory_code).toBe("t1");
+    expect(r.territory_code).toBe("001");
   });
 
   it("falls back to fallbackCode + fallbackRates when no match", () => {
@@ -74,35 +89,35 @@ describe("TerritoryLookupKind", () => {
       { state: "TX", zip5: "75001" },
       {
         territories: TERRITORIES,
-        fallbackRates: EMPTY_RATES,
-        fallbackCode: "t0",
+        fallbackRates: ZERO_RATES,
+        fallbackCode: "704",
       },
     );
-    expect(r.territory_code).toBe("t0");
-    expect(r.rates).toBe(EMPTY_RATES);
+    expect(r.territory_code).toBe("704");
+    expect(r.rates).toBe(ZERO_RATES);
   });
 
-  it("uses fictional Meridian 't0' as the neutral fallback id", () => {
+  it("uses '704' as the fallbackCode default when none configured", () => {
     const r = TerritoryLookupKind.execute(
       { state: "XX", zip5: "00000" },
       {
         territories: [],
-        fallbackRates: EMPTY_RATES,
+        fallbackRates: ZERO_RATES,
       },
     );
-    expect(r.territory_code).toBe("t0");
+    expect(r.territory_code).toBe("704");
   });
 
   it("requires exact ZIP membership — partial ZIPs don't match", () => {
     const r = TerritoryLookupKind.execute(
-      { state: "NE", zip5: "68003" }, // not in Meridian t1's zips
+      { state: "CA", zip5: "94109" }, // not in CA-001's zips
       {
         territories: TERRITORIES,
-        fallbackRates: EMPTY_RATES,
-        fallbackCode: "t0",
+        fallbackRates: ZERO_RATES,
+        fallbackCode: "704",
       },
     );
-    expect(r.territory_code).toBe("t0");
+    expect(r.territory_code).toBe("704");
   });
 
   it("validate flags missing fallbackRates", () => {
@@ -118,7 +133,7 @@ describe("TerritoryLookupKind", () => {
   it("validate warns on empty territories", () => {
     const r = TerritoryLookupKind.validate!({
       territories: [],
-      fallbackRates: EMPTY_RATES,
+      fallbackRates: ZERO_RATES,
     });
     expect(r.valid).toBe(true);
     expect(r.issues[0]?.severity).toBe("warning");
@@ -127,7 +142,7 @@ describe("TerritoryLookupKind", () => {
   it("validate accepts snapshotted territories", () => {
     const r = TerritoryLookupKind.validate!({
       territories: TERRITORIES,
-      fallbackRates: EMPTY_RATES,
+      fallbackRates: ZERO_RATES,
     });
     expect(r.valid).toBe(true);
   });

@@ -1,88 +1,113 @@
-# Signing and notarization
+# Signing + notarization runbook (D14)
 
-The `desktop-build` workflow builds macOS Apple Silicon, macOS Intel,
-and Windows extension artifacts. macOS release artifacts are signed
-with an Apple Developer ID certificate and submitted to Apple's
-notarization service. Windows release artifacts are signed with an
-Azure Artifact Signing Public Trust certificate.
+**Owner decision (2026-07-19): Apple-only for now.** The macOS path
+below is WIRED — `sign-macos.sh` runs as a secrets-gated CI step in
+`desktop-build.yml` (no-op until the secrets exist, so unsigned dev
+builds never block). Remaining owner action: buy the Apple Developer
+Program membership ($99/yr), export the Developer ID Application cert
+as .p12, and set the six `MACOS_*`/`NOTARY_*` secrets named below on
+the GitHub repo. Windows signing stays a future addition.
 
-Local builds remain convenient: when the Apple secrets are absent,
-`packaging/desktop/sign-macos.sh` exits successfully and leaves the
-artifact unsigned. An unsigned artifact is for development only and
-must not be published as a release.
+Unsigned builds throw OS malware-style warnings that end a
+non-technical actuary's session on the spot. The beta ships SIGNED
+builds on both platforms. This is the owner's checklist — the
+certificates are purchases only the owner can make (~$400/yr
+combined, recurring because certs expire annually).
 
-## Required GitHub Actions secrets
+## What to buy (owner actions)
 
-| Secret | Value |
-| --- | --- |
-| `MACOS_CERT_P12_BASE64` | Base64-encoded Developer ID Application certificate (`.p12`) |
-| `MACOS_CERT_PASSWORD` | Password used when exporting the `.p12` |
-| `MACOS_SIGN_IDENTITY` | Full certificate identity, such as `Developer ID Application: Name (TEAMID)` |
-| `NOTARY_APPLE_ID` | Apple ID used for notarization |
-| `NOTARY_TEAM_ID` | Ten-character Apple Developer team ID |
-| `NOTARY_PASSWORD` | App-specific password for the Apple ID |
+| Platform | What | Where | Cost | Notes |
+| --- | --- | --- | --- | --- |
+| macOS | Apple Developer Program membership → a **Developer ID Application** certificate | developer.apple.com | $99/yr | Also enables notarization (required on modern macOS) |
+| Windows | Code-signing. Two routes: **Azure Trusted Signing** (subscription, ~$10/mo, individual/org validation) or a classic **OV certificate** from a CA (Sectigo/DigiCert resellers, ~$250–350/yr, ships on a hardware key or cloud HSM) | Azure portal / a CA | ~$120–350/yr | Trusted Signing is the cheaper modern route; classic OV builds SmartScreen reputation over time either way |
 
-Store these values only as repository secrets. Never commit a
-certificate, password, or decoded signing file.
+## macOS pipeline (per release)
 
-## Windows signing identity
+1. **Sign every Mach-O inside the one-dir bundle**, inner-first —
+   `server/_internal/**/*.so|*.dylib`, then the `openrater-server`
+   executable — with the Developer ID cert, hardened runtime on:
 
-Windows signing uses GitHub's passwordless OpenID Connect exchange with
-Azure. There is no downloadable certificate, client secret, or private key
-in the repository or in GitHub.
+   ```sh
+   codesign --force --options runtime --timestamp \
+     --sign "Developer ID Application: <NAME> (<TEAMID>)" <file>
+   ```
 
-The `windows-signing` GitHub environment holds three identifiers as secrets:
-`AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, and `AZURE_SUBSCRIPTION_ID`. It also
-holds the Artifact Signing endpoint, account name, and certificate profile
-as environment variables. The environment accepts only `main` and version
-tags.
+   (Script this as a walk over `packaging/desktop/dist/mcpb-root/server`;
+   PyInstaller one-dir is signable file-by-file — that is why we build
+   one-dir, not one-file.)
 
-The Azure identity has only the **Artifact Signing Certificate Profile
-Signer** role on the OpenRater signing account. Its federated credential is
-bound to this repository and the `windows-signing` environment.
+   **`runtime/node` is the exception — it MUST carry JIT entitlements**
+   (`packaging/desktop/node.entitlements.plist`: `allow-jit`,
+   `allow-unsigned-executable-memory`, `disable-library-validation`):
 
-## What the release workflow does
+   ```sh
+   codesign --force --options runtime --timestamp \
+     --entitlements packaging/desktop/node.entitlements.plist \
+     --sign "Developer ID Application: <NAME> (<TEAMID>)" \
+     packaging/desktop/dist/mcpb-root/runtime/node
+   ```
 
-After `build-mcpb.sh` assembles the extension,
-`sign-macos.sh` performs these steps:
+   Hardened runtime without `allow-jit` forbids the MAP_JIT mapping V8
+   needs, so the signed node dies on ANY real script — while
+   `node --version` still exits 0. v0.1.0 shipped exactly that way
+   (FCA finding PRE-1): a dead scoring sidecar blaming the user's
+   environment. **Neither codesign nor notarization catches this** —
+   only executing real JS through the signed binary does, which is what
+   `packaging/desktop/verify-node-runtime.sh` gates (pre-sign in
+   `build-mcpb.sh`, post-sign in `sign-macos.sh`, and on the unpacked
+   artifact in the CI smoke). The entitlements are scoped to the one
+   binary that JITs — never the PyInstaller server (CPython doesn't
+   JIT and its dylibs are same-identity signed).
 
-1. Imports the certificate into a temporary CI keychain.
-2. Finds every Mach-O file in the bundle by inspecting file contents,
-   signs the deepest files first, and enables hardened runtime and a
-   trusted timestamp.
-3. Re-packs the `.mcpb` with the signed binaries.
-4. Submits a zip of the signed bundle to Apple, then polls the
-   submission. Transient polling errors are retried because Apple's
-   queue can take time.
-5. Continues only when Apple returns `Accepted`. Any rejection or
-   timeout fails the build and prints Apple's notarization log.
+   Keep the plist comment-free: AMFI's parser rejects XML comments
+   ("AMFIUnserializeXML: syntax error"), and codesign still exits 0
+   after that parse failure — you'd ship the broken shape again with a
+   green codesign step. The verify gate is what actually catches it.
+2. **Pack** the bundle (`build-mcpb.sh` step 5–6 re-run, or pack the
+   already-signed root).
+3. **Notarize + staple** the archive's payload: notarization operates
+   on the signed binaries; submit a zip of the bundle root:
 
-The ticket is held by Apple's service. The executables nested inside an
-`.mcpb` are not containers that can receive a stapled ticket, so
-Gatekeeper verifies the notarization online when they first launch.
+   ```sh
+   xcrun notarytool submit bundle.zip \
+     --apple-id <APPLE_ID> --team-id <TEAMID> \
+     --password <APP_SPECIFIC_PASSWORD> --wait
+   ```
 
-On Windows, the workflow performs a similarly strict sequence:
+   Gatekeeper's first-launch scan of a large UNSIGNED binary is also
+   why cold first boot is slow today; signing + notarization removes
+   both the warning and most of that stall.
 
-1. Finds every `.exe`, `.dll`, and `.pyd` file in the assembled extension.
-2. Rejects any existing broken signature and preserves every valid vendor
-   signature.
-3. Sends only unsigned files to Azure Artifact Signing, with SHA-256 and a
-   trusted timestamp.
-4. Requires every Windows binary to report a valid Authenticode signature.
-5. Re-packs the `.mcpb` and runs the complete seeded MCP smoke test against
-   that exact signed package.
+## Windows pipeline (per release)
 
-The `.mcpb` file itself is a zip-format container; the executable files
-inside it are what receive Authenticode signatures.
+Sign `openrater-server.exe` (and any bundled DLLs the toolchain
+flags) before packing:
 
-## Release verification
+```powershell
+signtool sign /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 `
+  /a packaging\desktop\dist\mcpb-root\server\openrater-server.exe
+```
 
-A successful macOS release job must show both the code-signing step and
-`notarization: Accepted`. A successful Windows job must show that every PE
-file was verified. A green unsigned build is not a release. Test the exact
-resulting artifact using
-[`TESTING.md`](./TESTING.md) before publishing it.
+(With Azure Trusted Signing, use its `signtool` dlib integration per
+their docs; in CI it authenticates via the federated GitHub OIDC
+identity — no cert file secrets at all.)
 
-When the Developer ID certificate or app-specific password changes,
-replace the corresponding GitHub secrets and run the complete release
-test again.
+## CI wiring (when the repo has a remote + secrets)
+
+- macOS: `MACOS_CERT_P12_BASE64`, `MACOS_CERT_PASSWORD`,
+  `NOTARY_APPLE_ID`, `NOTARY_TEAM_ID`, `NOTARY_PASSWORD` — import the
+  cert into a throwaway keychain on the runner, sign, notarize, then
+  pack + upload.
+- Windows: Trusted Signing via OIDC (preferred; zero secret files) or
+  `WIN_CERT_PFX_BASE64` + `WIN_CERT_PASSWORD`.
+- The `desktop-build.yml` lane stays green WITHOUT any of these —
+  signing is an additive, secrets-gated step so unsigned dev builds
+  never block.
+
+## The .mcpb itself
+
+The mcpb toolchain supports signing the archive; the load-bearing
+trust for the OS, though, lives on the BINARIES inside (that is what
+Gatekeeper/SmartScreen inspect at spawn time). Sign binaries first,
+always; add archive signing when the toolchain path is confirmed
+during the beta.

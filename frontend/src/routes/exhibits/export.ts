@@ -1,5 +1,5 @@
 /**
- * Exhibits — table rows + CSV export (current Exhibits design,
+ * Exhibits — table rows + CSV export (Brief: portfolio-redesign v2,
  * P4 polish).
  *
  * The expanded tile shows the exact numbers the drawing summarizes —

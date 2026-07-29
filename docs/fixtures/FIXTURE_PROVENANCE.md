@@ -52,8 +52,8 @@ Two sample datasets live outside this directory, in `server/data/`
 | `server/data/hazard_nri_sample.csv` | FEMA National Risk Index (public domain, a U.S. government work) | Public-domain hazard scores; not rating content |
 | `server/data/geo_crosswalk_sample.csv` | U.S. Census / HUD geographic crosswalk data (public domain) | Public-domain geography; not rating content |
 
-Neither derives from any bureau or carrier rating material; both are
-public-data enrichment inputs documented here for completeness.
+Neither derives from any bureau or carrier rating material — they are
+enrichment *inputs*, recorded here per the Detachment Brief §3.3.
 
 ## How the fixtures are consumed
 

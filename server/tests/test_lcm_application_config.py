@@ -23,8 +23,8 @@ from openrater.rates.plans.configs import LcmApplication
 
 def test_authored_value_needs_no_input_path() -> None:
     """The carrier LCM scalar lives on the chain; no submission column."""
-    lcm = LcmApplication(value=1.4, citation_rule="Meridian Filing Rule R.4")
-    assert lcm.value == 1.4
+    lcm = LcmApplication(value=1.401, citation_rule="SERFF BMUT-134648356-4")
+    assert lcm.value == 1.401
     assert lcm.input_path is None
     assert lcm.overridable is False
 
@@ -41,10 +41,10 @@ def test_legacy_input_path_only_still_valid() -> None:
 def test_overridable_value_plus_input() -> None:
     """D3 escape hatch — a carrier default value AND a per-risk override."""
     lcm = LcmApplication(
-        value=1.4, input_path="form_input.lcm", overridable=True
+        value=1.401, input_path="form_input.lcm", overridable=True
     )
     assert lcm.overridable is True
-    assert lcm.value == 1.4
+    assert lcm.value == 1.401
 
 
 def test_rejects_neither_value_nor_input_path() -> None:

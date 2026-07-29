@@ -5,7 +5,7 @@
   "asserts": "Every quote-set member carries the pins that make its premium replayable forever: version kind + snapshot + content hash, as_of, and valid_until.",
   "contract_version": "1.0",
   "world": {
-    "integration": { "name": "Example Integrator — fixture", "paired": true },
+    "integration": { "name": "OpenRater Front — fixture", "paired": true },
     "plans": ["plan-alpha", "plan-beta"]
   },
   "steps": [

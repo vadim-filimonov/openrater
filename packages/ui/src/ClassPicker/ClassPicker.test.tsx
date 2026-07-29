@@ -7,7 +7,7 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { ClassPicker, type ClassPickerOption } from "./ClassPicker";
 
 const CLASSES: ClassPickerOption[] = [
-  { class_code: "c101", display_name: "Meridian Recreation", family: "Recreation" },
+  { class_code: "73912", display_name: "Bowling Centers", family: "Recreation" },
   { class_code: "10103", display_name: "Lumber Yards", family: "Wholesale Trade" },
   { class_code: "60311", display_name: "Lawyers — Offices", family: "Office" },
 ];
@@ -24,8 +24,8 @@ describe("<ClassPicker> — rendering", () => {
   });
 
   it("renders the current value's display_name when set", () => {
-    render(<ClassPicker classes={CLASSES} value="c101" onChange={() => {}} />);
-    expect(screen.getByDisplayValue(/Meridian Recreation/)).toBeInTheDocument();
+    render(<ClassPicker classes={CLASSES} value="73912" onChange={() => {}} />);
+    expect(screen.getByDisplayValue(/Bowling Centers/)).toBeInTheDocument();
   });
 
   it("accepts an aria-label override", () => {
@@ -62,8 +62,8 @@ describe("<ClassPicker> — options projection", () => {
     render(<ClassPicker classes={CLASSES} value="" onChange={() => {}} />);
     const input = screen.getByRole("combobox");
     fireEvent.focus(input);
-    expect(screen.getByText("Meridian Recreation")).toBeInTheDocument();
-    expect(screen.getByText("c101 · Recreation")).toBeInTheDocument();
+    expect(screen.getByText("Bowling Centers")).toBeInTheDocument();
+    expect(screen.getByText("73912 · Recreation")).toBeInTheDocument();
     expect(screen.getByText("Lumber Yards")).toBeInTheDocument();
     expect(screen.getByText("10103 · Wholesale Trade")).toBeInTheDocument();
   });
@@ -81,8 +81,8 @@ describe("<ClassPicker> — selection", () => {
     render(<ClassPicker classes={CLASSES} value="" onChange={onChange} />);
     const input = screen.getByRole("combobox");
     fireEvent.focus(input);
-    fireEvent.mouseDown(screen.getByText("Meridian Recreation"));
-    expect(onChange).toHaveBeenCalledWith("c101");
+    fireEvent.mouseDown(screen.getByText("Bowling Centers"));
+    expect(onChange).toHaveBeenCalledWith("73912");
   });
 });
 

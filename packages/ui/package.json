@@ -2,7 +2,7 @@
   "name": "@openrater/ui",
   "version": "0.0.0",
   "private": true,
-  "description": "OpenRater components for insurance-rating concepts, composed from @openrater/contracts and @openrater/design-system. No HTTP, app state, or routing.",
+  "description": "Labs-specific components \u2014 the layer above @openrater/design-system that knows about insurance rating concepts. Owns EntityRefPicker, ClassPicker, BindingRefPicker, PlanSurfaceIssueBanner, SectionCard, SectionIssueDot, the block-kind UI components, PlanCanvas chrome, drawer chrome. Composes against @openrater/contracts for types and @openrater/design-system for primitives. No HTTP, no app state, no routing.",
   "license": "Apache-2.0",
   "type": "module",
   "main": "./src/index.ts",

@@ -5,7 +5,12 @@
  * algorithm can bind to as one source of factor values (alongside
  * direct values, curves, factor tables).
  *
- * Models may be supplied by third-party systems in industry formats:
+ * Models come from two source-buckets:
+ *
+ *   1. Model Lab — OpenRater's internal model registry (post-detachment
+ *      per VISION.md). One source per ModelExport with source="model-lab".
+ *
+ *   2. External — third-party models exported in industry formats:
  *      - PMML (Predictive Model Markup Language; XML)
  *      - ONNX (Open Neural Network Exchange; binary)
  *      - JSON coefficients (the simple case — flat GLM weights)
@@ -19,8 +24,12 @@
  * regular factor values. The engine doesn't see "model" — it sees
  * a factor table with values that happen to come from a model.
  *
- * External formats are first-class; the engine consumes only their
- * deterministic factor outputs.
+ * Per Brief 24 §3.2 (ModelExport contract). OSS-positive framing:
+ * external formats are first-class, Model Lab is one source.
+ *
+ * Cross-references:
+ *   docs/design-briefs/24a-substrate-prep.md — sub-brief
+ *   docs/design-briefs/plan-builder-flow.md §3.2 — parent brief
  */
 
 import type { PlanCitation } from "./plan-types";

@@ -65,7 +65,7 @@ export interface ClassPickerProps {
  *   subLabel = "{class_code} · {family}"
  *
  * The subLabel pattern matches the Brief 8 example
- * ("c101 · Recreation") and renders in mono font per
+ * ("73912 · Recreation") and renders in mono font per
  * EntityRefPicker's defaults.
  */
 function toEntityRefOption(c: ClassPickerOption): EntityRefOption {
@@ -105,5 +105,5 @@ export function ClassPicker(props: ClassPickerProps): JSX.Element {
 }
 
 // Re-export the empty-action shape so callers don't have to dual-
-// import EntityRefPicker just to build the empty CTA.
+// import from labs-ui/EntityRefPicker just to build the empty CTA.
 export type { EntityRefPickerEmptyAction } from "../EntityRefPicker";

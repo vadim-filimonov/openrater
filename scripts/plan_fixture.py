@@ -54,7 +54,8 @@ def _cols(conn: sqlite3.Connection, table: str) -> list[str]:
 
 
 def encode_cell(v):
-    """JSON-safe cell: BLOBs such as build-report workbook bytes travel as {"$b64": "..."}. Mirrored by `decode_cell`
+    """JSON-safe cell: BLOBs (the build report's workbook bytes,
+    Brief 95 A1) travel as {"$b64": "..."}. Mirrored by `decode_cell`
     here and in deploy/overlay/openrater_deploy/seed.py — keep in sync."""
     if isinstance(v, (bytes, bytearray)):
         import base64

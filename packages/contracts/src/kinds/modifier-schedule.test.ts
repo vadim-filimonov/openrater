@@ -43,8 +43,8 @@ const SCHEDULE: Schedule = {
       reasoning_required: true,
     },
   ],
-  citation: "Meridian Rule MS-R4.2",
-  reasoning: "Meridian filed schedule rating.",
+  citation: "ISO BOP §4.2",
+  reasoning: "ISO filed schedule rating.",
 };
 
 describe("ModifierScheduleKind — contract surface", () => {
@@ -399,5 +399,92 @@ describe("modifier.schedule — runtime integration", () => {
     };
     const result = executePlan(plan, {});
     expect(result.outputs.factor).toBeCloseTo(0.97, 4);
+  });
+});
+
+// ══════════════════════════════════════════════════════════════════
+// FCA fca-2026-07-25 #23 (finding 13) — a real extract's IRPM column
+// is a BARE PERCENTAGE, not the JSON envelope. It used to fail the
+// {values} shape test and silently default to zero: six audited
+// rows' filed schedule credits/debits (-25% … +20%) unapplied with
+// no message.
+// ══════════════════════════════════════════════════════════════════
+describe("ModifierScheduleKind — bare-percentage application (FCA #23)", () => {
+  const SINGLE_CAT: Schedule = {
+    schedule_id: "psm_schedule",
+    display_name: "Schedule rating",
+    scope: "per_coverage",
+    total_cap_pct: 40,
+    categories: [
+      {
+        category_id: "overall",
+        name: "Overall risk judgment",
+        range_pct: 40,
+        reasoning_required: false,
+      },
+    ],
+    citation: "PSM Rule 9",
+    reasoning: "Filed IRPM.",
+  };
+
+  it("a bare number on a SINGLE-category schedule applies (the unambiguous case)", () => {
+    const result = ModifierScheduleKind.execute(
+      { application: -15 as unknown as ScheduleApplication },
+      { schedule: SINGLE_CAT },
+    );
+    expect(result.applied_pct).toBe(-15);
+    expect(result.factor).toBeCloseTo(0.85, 10);
+    expect(result.applied_categories[0]!.value_pct).toBe(-15);
+  });
+
+  it("a bare numeric STRING (the raw CSV cell) applies the same way", () => {
+    const result = ModifierScheduleKind.execute(
+      { application: "-15" as unknown as ScheduleApplication },
+      { schedule: SINGLE_CAT },
+    );
+    expect(result.applied_pct).toBe(-15);
+    expect(result.factor).toBeCloseTo(0.85, 10);
+  });
+
+  it("a bare number on a MULTI-category schedule stays neutral but SAYS SO", () => {
+    const result = ModifierScheduleKind.execute(
+      { application: -15 as unknown as ScheduleApplication },
+      { schedule: SCHEDULE },
+    );
+    expect(result.factor).toBe(1); // unattributable — neutral, not guessed
+    const issues = ModifierScheduleKind.collectRowIssues!(
+      { application: -15 as unknown as ScheduleApplication },
+      { schedule: SCHEDULE },
+      result,
+    );
+    expect(issues).toHaveLength(1);
+    expect(issues![0]!.code).toBe("schedule_application_unattributable");
+    expect(issues![0]!.message).toContain("3");
+    expect(issues![0]!.severity).toBe("warning");
+  });
+
+  it("the JSON envelope keeps working unchanged, and no issue fires for it", () => {
+    const app: ScheduleApplication = {
+      schedule_id: "psm_schedule",
+      values: {
+        overall: {
+          value_pct: 10,
+          reasoning: "poor housekeeping",
+          source: "underwriter",
+        },
+      },
+    };
+    const result = ModifierScheduleKind.execute(
+      { application: app },
+      { schedule: SINGLE_CAT },
+    );
+    expect(result.applied_pct).toBe(10);
+    expect(
+      ModifierScheduleKind.collectRowIssues!(
+        { application: app },
+        { schedule: SINGLE_CAT },
+        result,
+      ),
+    ).toBeUndefined();
   });
 });

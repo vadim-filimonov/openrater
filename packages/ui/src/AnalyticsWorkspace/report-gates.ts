@@ -11,6 +11,7 @@
 import type { EligibilityTier } from "@openrater/contracts";
 import {
   fmtAppetiteValue,
+  isBoolDtype,
   isNumericDtype,
   opPhrase,
 } from "../AppetiteStatement/appetitePhrases";
@@ -50,7 +51,7 @@ export function buildGateRows(
       .map((c) => {
         const meta = metaFor(c.variable);
         const numeric = isNumericDtype(meta?.dtype);
-        return `${meta?.label || c.variable} ${opPhrase(c.op, numeric)} ${fmtAppetiteValue(c.value, meta?.dtype)}`;
+        return `${meta?.label || c.variable} ${opPhrase(c.op, numeric, isBoolDtype(meta?.dtype))} ${fmtAppetiteValue(c.value, meta?.dtype)}`;
       })
       .join(" and ");
     return { id: rule.id, text, tier: rule.tier };

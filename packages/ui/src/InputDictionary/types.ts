@@ -181,7 +181,7 @@ export function isEnumTypeWord(raw: string | undefined): boolean {
  * known to be an enum (`allowCommas`), because dictionary prose in a
  * non-enum cell uses commas ("limit combos, see table") — splitting
  * those would manufacture bogus options. So a comma-delimited list like
- * `"t1, t2, t3"` parses iff its `data_type` is enum/select, which is
+ * `"701, 702, 703"` parses iff its `data_type` is enum/select, which is
  * exactly the column the filing marks as constrained.
  */
 export function splitAllowedValues(
@@ -205,7 +205,7 @@ export function humanizeFieldName(fieldName: string): string {
     .replace(/([a-z0-9])([A-Z])/g, "$1 $2")
     .trim();
   if (spaced === "") return fieldName;
-  //  — the title-caser honors the acronym allowlist
+  // MVP-017 — the title-caser honors the acronym allowlist
   // ("bpp_limit" → "BPP limit", never "Bpp limit").
   return fixAcronymCase(spaced.charAt(0).toUpperCase() + spaced.slice(1));
 }

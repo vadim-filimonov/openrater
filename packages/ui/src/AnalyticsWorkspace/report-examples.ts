@@ -11,6 +11,7 @@
  */
 
 import { formatVectorDelta } from "../WorkbookBuild/vectorDelta";
+import { vectorChecksSummary } from "../WorkbookBuild/vectorChecksSummary";
 
 export type VectorStatus = "match" | "near" | "mismatch" | "not_run" | "error";
 
@@ -60,7 +61,14 @@ export interface VerifiedExamples {
 const ROW_CAP = 8;
 
 function fmtNum(v: number): string {
-  return v.toLocaleString("en-US", { maximumFractionDigits: 2 });
+  // FCA #35 (finding 125) — the min was 0, so one column mixed
+  // "519.4" with "340.26" and "0.00"; ragged decimals read as
+  // sloppiness in exactly the table built for trust. Money-magnitude
+  // expectations print a steady 2dp.
+  return v.toLocaleString("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
 }
 
 function fmtVal(v: number | string | null): string {
@@ -93,22 +101,14 @@ export function buildVerifiedExamples(
     return null;
   }
   const cap = opts?.cap ?? ROW_CAP;
-  const total = v.total_cases;
 
-  // The verdict sentence — honest tone ladder: any mismatch is an
-  // error headline; rounding-tolerance nears get named; else exact.
-  let verdict: string;
-  let tone: VerifiedExamples["tone"];
-  if (v.mismatched > 0) {
-    verdict = `${v.matched + v.near} of ${total} match the filing — ${v.mismatched} ${v.mismatched === 1 ? "does" : "do"} not`;
-    tone = "error";
-  } else if (v.near > 0) {
-    verdict = `${total} of ${total} reproduce the filing (${v.near} within rounding)`;
-    tone = "warn";
-  } else {
-    verdict = `${total} of ${total} reproduce the filing exactly`;
-    tone = "success";
-  }
+  // FCA #19 — ONE verdict vocabulary, one unit (CHECKS). This chip
+  // used to count CASES beside a parenthetical counting CHECKS ("5 of
+  // 5 reproduce the filing (20 within rounding)") while Exhibits and
+  // the build report told the same data two other ways.
+  const summary = vectorChecksSummary(v);
+  const verdict = summary.label;
+  const tone: VerifiedExamples["tone"] = summary.tone;
 
   // Disambiguate labels only when the checks span multiple fields.
   const fields = new Set(v.checks.map((c) => c.field));

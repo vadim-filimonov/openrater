@@ -1,7 +1,7 @@
 /**
  * stagesToTowerPlan + buildInventory — load-converter unit tests.
  *
- * Pure projection logic; no React.
+ * Per Brief 25 §10.1. Pure logic; no React.
  */
 
 import { describe, expect, it } from "vitest";
@@ -207,7 +207,7 @@ describe("stagesToTowerPlan", () => {
     expect(lcmNode.subtype).toBe("constant");
   });
 
-  // An authored carrier LCM (`lcm.value`) loads onto the
+  // ADR-0047 — an authored carrier LCM (`lcm.value`) loads onto the
   // constant node's ref (so a load → edit → save cycle preserves it) and the
   // chip shows the real number instead of the "scalar" placeholder.
   it("loads an authored lcm.value onto the constant node ref", () => {
@@ -226,7 +226,7 @@ describe("stagesToTowerPlan", () => {
                 base_input: "literal.base_value",
                 base_value: 1,
                 factor_lookups: [],
-                lcm: { factor_kind: "lcm", value: 1.4 },
+                lcm: { factor_kind: "lcm", value: 1.401 },
                 exposure_input: "form_input.tiv",
                 exposure_unit_divisor: 100,
                 output_field: "premium",
@@ -242,12 +242,12 @@ describe("stagesToTowerPlan", () => {
     expect(lcmNode.ref).toMatchObject({
       kind: "constant",
       constantId: "LCM",
-      value: 1.4,
+      value: 1.401,
     });
-    expect(lcmNode.valueChip.primary).toBe("× 1.4");
+    expect(lcmNode.valueChip.primary).toBe("× 1.401");
   });
 
-  // A factor_lookups[].predicate loads onto the factor-table reference
+  // ADR-0047 — a factor_lookups[].predicate loads onto the factor-table ref
   // (so a load → save cycle preserves the gate).
   it("loads a factor predicate onto the factor-table node ref", () => {
     const plan = stagesToTowerPlan({
@@ -297,7 +297,7 @@ describe("stagesToTowerPlan", () => {
     });
   });
 
-  // Non-default axis bindings load onto the factor-table reference's
+  // ADR-0047 — non-default axis bindings load onto the factor-table ref's
   // axisSources; the trivial form_input default is skipped.
   it("loads non-default axis bindings onto the factor-table ref", () => {
     const plan = stagesToTowerPlan({
@@ -444,7 +444,7 @@ describe("stagesToTowerPlan", () => {
     expect(baseNode.category).toBe("input");
   });
 
-  it("categorizes a territory factor as a lookup (amber) with a MapPin glyph", () => {
+  it("categorizes a territory factor as a lookup (amber), MapPin glyph (Brief 48)", () => {
     const plan = stagesToTowerPlan({
       stages: [
         chainStage({
@@ -466,7 +466,7 @@ describe("stagesToTowerPlan", () => {
     const factorNode = plan.nodes.get(
       (factorEntry as { kind: "node"; nodeId: string }).nodeId,
     )!;
-    // Factors are LOOKUPs (amber), matching the rail. The
+    // Brief 48 — factors are LOOKUPs (amber), matching the rail. The
     // glyph (from iconForFactor) still differentiates; the cross-category
     // color hue-shift (geographic subtype) was dropped.
     expect(factorNode.category).toBe("lookup");
@@ -474,7 +474,7 @@ describe("stagesToTowerPlan", () => {
     expect(factorNode.icon).toBe("MapPin");
   });
 
-  it("categorizes a class factor as a lookup (amber) with a Tag glyph", () => {
+  it("categorizes a class factor as a lookup (amber), Tag glyph (Brief 48)", () => {
     const plan = stagesToTowerPlan({
       stages: [
         chainStage({
@@ -562,7 +562,8 @@ describe("stagesToTowerPlan", () => {
     // — never `input_field`. The `roundStage` helper above uses input_field,
     // so it masks this: without an input_path fallback in appendSidecarToTower
     // the sidecar resolves no tower and the floor vanishes from the Assemble
-    // preview. The explicit shape below guards that fallback.
+    // preview. Shape mirrors the committed cold-test fixture
+    // (docs/cold-tests/fixtures/sample-bop-cold-test.plan.json).
     const plan = stagesToTowerPlan({
       stages: [
         chainStage({
@@ -849,7 +850,7 @@ describe("buildInventory", () => {
   });
 });
 
-describe("tower exposure from chain", () => {
+describe("tower exposure ← chain (ADR-0047)", () => {
   it("loads apply_exposure + exposure_input/divisor onto the tower", () => {
     const plan = stagesToTowerPlan({
       stages: [

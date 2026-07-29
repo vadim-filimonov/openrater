@@ -6,6 +6,12 @@
  *
  * Tables are stored as `Record<string, number>`. v0 supports string
  * keys only; multi-dim lookups use `lookup.multi`.
+ *
+ * Ported from `<prototype>/plan-builder/src/blocks/kinds/
+ * lookup-direct.tsx` (Phase A.1 PR 6). PURE half only — params +
+ * execute + validate. React renderBody/renderInspector + the
+ * `actions: [{ key: 'E', ... }]` keybinding live in the rate-lab
+ * frontend in the original port plan.
  */
 
 import type { BlockKind, PortSpec } from "../block-types";
@@ -19,7 +25,7 @@ export interface DirectLookupParams {
   defaultValue: number;
   /** Human-readable name for the table (audit / inspector). */
   tableName?: string;
-  /** Citation reference (e.g., "Meridian Rule MS-R5.2"). */
+  /** Citation reference (e.g., 'ISO BP-2024-RLC pp.47'). */
   citation?: string;
   /**
    * ADR-0056 — the authored disposition for a key that doesn't

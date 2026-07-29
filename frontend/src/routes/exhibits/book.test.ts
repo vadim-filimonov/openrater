@@ -1,5 +1,5 @@
 /**
- * Exhibits book — derivation tests (current Exhibits design).
+ * Exhibits book — derivation tests (Brief: portfolio-redesign v2 §5.4, P3).
  */
 
 import { describe, expect, it } from "vitest";

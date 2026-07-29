@@ -2,12 +2,13 @@
 
 | Field | Value |
 | --- | --- |
-| **Version** | **1.0** |
+| **Version** | **1.0 — LOCKED** (2026-07-14) |
 | **Status** | Normative. The reference the linter (`R-###` rules, §8) and the ingester implement. Changes follow the §10 versioning policy. |
-| **Specification** | Normative contract for the "Build from workbook" workflow. |
+| **Supersedes** | `INPUT_XLSX_FORMAT_SPEC.md` (draft, 2026-07; that file is now a pointer stub). All 13 of the draft's open questions are resolved in §10.1. |
+| **Brief** | Brief 92 — "Build from workbook" (validated 2026-07-14; in the project's pre-detachment design archive — the normative content is in this document). |
 | **Companions** | `transcription-capability-registry.json` (machine-readable capability boundary, §6) · `transcription-profiles/` (per-product cookbooks) · `plan-format-v1.md` (the Plan the workbook becomes). |
 | **Audience** | (1) **The transcriber** — any AI (or person) handed this document plus a rate filing, producing the workbook. (2) **The ingester** — the deterministic platform code that reads the workbook. The same text binds both. |
-| **License** | Apache-2.0 — this document may be copied and adapted under the repository license. |
+| **License** | CC BY 4.0 — this document is meant to be copied out of the repo and handed around. |
 
 ---
 
@@ -102,12 +103,13 @@ read and correct. That is its entire reason to exist.
 | In scope | Out of scope |
 | --- | --- |
 | The workbook's sheets, columns, types, enums, and rules (`R-###`). | The filing analysis itself — acquiring the PDF, reading SERFF, choosing what to transcribe. That is the transcriber's work, guided by §7 and the product profiles. |
-| How each platform concept (inputs, dimensions, factor tables, chains, gates, loadings, outputs) is expressed in cells. | The ingester's implementation; this specification is its read contract. |
+| How each platform concept (inputs, dimensions, factor tables, chains, gates, loadings, outputs) is expressed in cells. | The ingester's implementation (Brief 92 Part 2; this spec is its read contract). |
 | The capability boundary (§6) and how to record what the platform can't express. | The Plan Format itself (owned by `plan-format-v1.md`; this spec serializes a subset of it). |
 | Citation / provenance columns and the two honesty sheets. | Model-backed factors, Data Lab, integrations. |
 
-> **Relationship to CSV import/export.** This specification uses the
-> same exchange conventions: UTF-8 text, `snake_case`
+> **Relationship to ADR-0017 (CSV import/export).** This spec is the
+> XLSX import direction ADR-0017 deferred to "Phase C / V2." It
+> reuses ADR-0017's conventions wholesale: UTF-8 text, `snake_case`
 > headers, `citation_rule` + `citation_page`, deterministic ordering,
 > no silent imports.
 
@@ -262,13 +264,13 @@ missing/unknown `spec_version`.
 | `field` | Required | Type | Allowed values / format |
 | --- | --- | --- | --- |
 | `spec_version` | yes | string | The spec version this workbook targets. `1.0` for this document. |
-| `rating_plan_id` | yes | slug | e.g. `meridian-bop-ne-2026`. Convention: `{carrier}-{product}-{state}-{effective-year}`. **This becomes the built plan's id** (same workbook → same plan id on any box). Building against a taken id refuses: identical bytes ⇒ "already built"; different bytes ⇒ the re-ingest door (`POST /plans/{id}/reingest/check`) or a new id — never a silent duplicate. |
-| `display_name` | yes | string | 1–200 chars, e.g. `Meridian Shopfront BOP — Nebraska — 2026`. |
+| `rating_plan_id` | yes | slug | e.g. `meridian-bop-ks-2025`. Convention: `{carrier}-{product}-{state}-{effective-year}`. **This becomes the built plan's id** (same workbook → same plan id on any box). Building against a taken id refuses: identical bytes ⇒ "already built"; different bytes ⇒ the re-ingest door (`POST /plans/{id}/reingest/check`) or a new id — never a silent duplicate. |
+| `display_name` | yes | string | 1–200 chars, e.g. `Meridian BOP — Kansas — 2025`. |
 | `version` | yes | string | Workbook revision, semver, e.g. `1.0.0`. Bump when re-issuing a corrected workbook. |
 | `carrier` | yes | string | The filing carrier's name as filed, e.g. `Meridian Mutual Insurance`. |
 | `product` | yes | enum | One of the platform product codes: `bop` \| `cgl` \| `do` \| `eo` \| `wc` \| `auto` \| `umbrella` \| `excess` \| `marine` \| `inland_marine` \| `homeowners` \| `dwelling` \| `other`. `homeowners` = HO forms; `dwelling` = dwelling fire (DP forms). Other personal lines (renters-only programs etc.) use `other` with the line named in `description`. |
 | `jurisdiction_country` | yes | string | ISO country, e.g. `US`. |
-| `state` | no | string | 2-letter state code, e.g. `NE`. Empty = multistate/countrywide. |
+| `state` | no | string | 2-letter state code, e.g. `KS`. Empty = multistate/countrywide. |
 | `effective_date` | yes | date | `YYYY-MM-DD` — the filing's rate effective date. |
 | `coverages` | yes | string (CSV) | The coverage ids the plan rates, e.g. `building,bpp,liability`. Each becomes a chain block (§4.6). A trailing `?` marks a coverage **electable** (`building?,bpp?,liability`): a risk with an **explicit 0** exposure on that coverage elects it out — its tower contributes $0 with a "not elected" trace line — while an absent exposure still withholds (§12.4). At least one coverage must stay required, and an electable coverage's chain needs an exposure stage **[R-048]**. Every other consumer of coverage names (chains `coverage`, `applies_to`, endorsements) uses the id WITHOUT the marker. |
 | `serff_tracking_number` | no | string | e.g. `CNNA-134648356`. Strongly encouraged when the source is a SERFF filing. |
@@ -289,13 +291,13 @@ missing/unknown `spec_version`.
 | field | value |
 | --- | --- |
 | spec_version | 1.0 |
-| rating_plan_id | meridian-bop-ne-2026 |
-| display_name | Meridian Shopfront BOP — Nebraska — 2026 |
+| rating_plan_id | meridian-bop-ks-2025 |
+| display_name | Meridian BOP — Kansas — 2025 |
 | version | 1.0.0 |
 | carrier | Meridian Mutual Insurance |
 | product | bop |
 | jurisdiction_country | US |
-| state | NE |
+| state | KS |
 | effective_date | 2025-07-01 |
 | coverages | building,bpp,liability |
 | serff_tracking_number | CNNA-134648356 |
@@ -376,7 +378,7 @@ Declares the *header* of each dimension; levels live in
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | construction_class | Construction class | categorical | both | enum | standard | | | |
 | building_age | Building age (yrs) | banded | rating-input | number | standard | | | |
-| territory | Territory | geographic | rating-input | string | geographic | zip | subset:NE | |
+| territory | Territory | geographic | rating-input | string | geographic | zip | subset:KS | |
 | class_code | Class code | categorical | rating-input | string | classification | | | |
 | constr_x_class | Construction × Class | composite | structural | string | standard | | | construction_class,class_code |
 
@@ -453,7 +455,7 @@ sheet-name slug · **[R-102]** invalid `dimensionality` /
 | `row_dimension` | yes | slug of the dimension indexing the rows |
 | `col_dimension` | `2d` only | slug of the dimension indexing the columns |
 | `lookup_method` | yes | `direct` \| `binned` \| `bracketed` \| `classification` |
-| `interpolation` | no | `stepped` (default) \| `linear`. For banded tables discretizing a curve (ILFs): `stepped` applies the band's factor flat; `linear` interpolates between breakpoints = band **lower bounds**, clamped ends (§12.3: 2-D along the row axis, 1-D banded as a curve). The check emits a notice **[R-111]** naming each interpolating table. Compute `test_cases` expectations interpolated. |
+| `interpolation` | no | `stepped` (default) \| `linear`. For banded tables discretizing a curve (ILFs): `stepped` applies the band's factor flat; `linear` interpolates between breakpoints = band **lower bounds**, clamped ends (§12.3 — **both** table shapes since Brief 95 C5: 2-D along the row axis, 1-D banded as a curve). The check emits a notice **[R-111]** naming each interpolating table. Compute `test_cases` expectations interpolated. |
 | `default_value` | no | factor used when a key misses. **Omit it to keep the refuse-on-unknown posture** (recommended unless the filing itself publishes an "all other" row). The reserved row key `__default__` is the row-form equivalent. |
 | `citation_rule` / `citation_page` | no | table-level citation (rows may override) |
 | `citation_note` | no | free text for cell-level exceptions a matrix can't cite individually |
@@ -467,6 +469,11 @@ After the metadata block + blank row:
 
 - Every `level_id` is a declared level of `row_dimension` (or
   `__default__`). **[R-104]**
+- The inverse checks too: a **declared** level with no factor row is
+  named at check time (both axes of a matrix) — a notice when the
+  miss refuses honestly at runtime, a **warning** when a
+  `__default__` row would silently price it. Geographic dimensions
+  are exempt (territory tables key by group). **[R-174]**
 - `factor` is finite and `> 0`. **[R-107]**
 - Keys unique **[R-106]**; at most one `__default__` **[R-108]**.
 - A **banded** 1-D table (over a `banded` dimension) is the curve
@@ -586,7 +593,15 @@ match wins gives OR-of-ANDs, the standard filed-eligibility shape.
 **[R-162]** invalid `tier` · **[R-163]** duplicate `rule_id` ·
 **[R-169]** a `_2`/`_3` condition present but incomplete (all three
 of `variable_N`/`op_N`/`value_N` or none) · **[R-044]** applies
-(every `variable*` must be a declared input).
+(every `variable*` must be a declared input) · **[R-171]** warning
+when a `value*` literal can never match the bound input's declared
+`data_type` (a type-impossible literal doesn't error at runtime —
+the rule is silently disarmed) · **[R-172]** warning when an
+`eq`/`ne`/`in`/`nin` literal (including each `in`/`nin` CSV entry)
+bound to an `enum` input is not among that input's `allowed_values`
+(the runtime value never leaves the closed set, so the rule is
+silently disarmed the same way; ordering ops are exempt — a numeric
+threshold need not be a member).
 
 | Column | Required | Type | Allowed values |
 | --- | --- | --- | --- |
@@ -631,7 +646,7 @@ additive ⇒ `amount`; sublimit ⇒ `coverage` + `sublimit > 0`) ·
 | --- | --- | --- | --- |
 | `endorsement_id` | yes | slug | unique |
 | `kind` | yes | enum | `factor` \| `additive` \| `sublimit`. **`additive` is registry-`unsupported` on multi-coverage plans** (r3 `endorsement_additive_multi_coverage` — a once-per-policy amount has no single tower to attach to until package-level layering ships); factor endorsements work everywhere. |
-| `form_number` | yes | string | e.g. fictional reference form `MS 10 01` |
+| `form_number` | yes | string | e.g. `BP 04 17` |
 | `display_name` | yes | string | |
 | `factor` / `amount` / `coverage` + `sublimit` | conditionally | | per `kind` |
 | `trigger` | no | string | auto-attach predicate; empty = always |
@@ -695,6 +710,12 @@ column names an unknown output · **[R-145]** fewer than 1 row.
 Layout: `case_id`, optional `name`, one column per input key, then
 `expected_<field_name>` per output, then optional
 `tolerance_<field_name>` (absolute; default = cent-exact, 0.005).
+When the filing rounds **each coverage** before summing, exact
+expectations cannot reproduce — the engine rounds ONCE, at the
+package level (registry: `per_coverage_rounding`). Two or more
+`expected_*` columns with no `tolerance_*` columns therefore draw a
+notice quoting the registry's recipe (`tolerance_<field>` = 0.5 and
+a `gaps_and_assumptions` row). **[R-175]**
 When the workbook has a `gates` sheet, the reserved column
 **`expected_tier`** (a tier enum value) additionally checks the gate
 verdict per case.
@@ -708,7 +729,7 @@ verdict per case.
 
 | case_id | name | class_code | construction_class | building_age | tiv | expected_total_premium |
 | --- | --- | --- | --- | --- | --- | --- |
-| TC-001 | Filing example 1 (p.88) | c104 | frame | 8 | 350000 | 1834.00 |
+| TC-001 | Filing example 1 (p.88) | 71641 | frame | 8 | 350000 | 1834.00 |
 
 ### 4.14 Sheet `gaps_and_assumptions` — REQUIRED (rows may be zero)
 
@@ -717,7 +738,7 @@ default, or construct the platform can't express. Rows flow
 **verbatim** into the build report, so nothing flagged upstream is
 lost. An empty sheet asserts "the filing transcribed completely, with
 no assumptions" — a strong claim; make it deliberately.
-**[R-180]** invalid `kind`.
+**[R-180]** invalid `kind` · **[R-173]** warning when a gap row declares a construct out of reach (kind `gap`/`unsupported`, or inability wording) that the capability registry marks supported — the ledger and the registry must not tell opposite stories.
 
 | Column | Required | Type | Meaning |
 | --- | --- | --- | --- |
@@ -738,9 +759,16 @@ no assumptions" — a strong claim; make it deliberately.
 ### 4.15 Sheets `geo.<slug>` (ZIP/county → territory detail)
 
 One sheet per geographic dimension needing sub-state detail; name =
-`geo.` + the dimension slug. Flat columns: `zip` (or `county`),
-`territory_code`, `citation_rule`,
-`citation_page`. Per-geography **factors never live on this sheet** —
+`geo.` + the dimension slug. Flat columns (the ADR-0017 territory-CSV
+shape): `zip` (or `county`), `territory_code`, `citation_rule`,
+`citation_page`. **Key vocabulary (FCA #25):** the platform joins
+geography by Census codes — `zip` keys are 5-digit ZCTA codes and
+`county` keys are 5-digit Census FIPS codes. Filings name counties;
+to make the manual's own vocabulary quotable, add an ALIAS row per
+county (the name, same `territory_code`) beside its FIPS row — the
+dual-key convention. Alias rows are recognized (they don't flag as
+typo suspects) as long as their territory group carries an
+in-universe key. Per-geography **factors never live on this sheet** —
 they live in `ft.*` tables keyed by the geographic dimension's levels
 (one mechanism, not two; when the filing prices per ZIP, the ZIP *is*
 the territory — one level per ZIP with an identity mapping here).
@@ -750,13 +778,17 @@ the dimension's `territory_ref`s.
 
 The sheet is also checked against the **Census geographic universe**
 (the packaged `geo-universe.json` — 2024 Gazetteer ZCTAs by SCF
-range + counties, public domain): **[R-083]** (notice) in-scope
-keys the sheet never maps — they refuse at rating time; a partial
-program is legitimate, a transcription hole is not, and the notice
-names the counts either way · **[R-084]** (warning) keys outside
-the declared `geo_scope` (a typo, or the wrong scope) · **[R-085]**
-(notice) keys the universe doesn't know (PO-box ZIPs have no ZCTA;
-typos look like this too).
+range + counties, public domain): **[R-083]** (notice; WARNING when
+0% of the declared scope is mapped — a sheet that maps nothing
+almost always keys the wrong vocabulary, and every quote will
+refuse) in-scope keys the sheet never maps — they refuse at rating
+time; a partial program is legitimate, a transcription hole is not,
+and the notice names the counts either way · **[R-084]** (warning)
+keys outside the declared `geo_scope` (a typo, or the wrong scope) ·
+**[R-085]** (notice) keys the universe doesn't know (PO-box ZIPs
+have no ZCTA; typos look like this too) — dual-key ALIAS rows are
+exempt: a name-shaped key whose territory group carries an
+in-universe key is the sanctioned convention, never a suspect.
 
 ---
 
@@ -796,11 +828,11 @@ silently drift from enforcement. **[R-190]** a workbook declaring an
 **[R-191]** a `partial` construct passes with a warning that rides
 into the build report.
 
-Summary as of registry r9:
+Summary as of registry r2 (2026-07-14):
 
 | Construct | Status | What the transcriber does |
 | --- | --- | --- |
-| Linear interpolation between table breakpoints | **supported** | Set `interpolation=linear`. Both shapes interpolate: 2-D along the row dimension's axis, 1-D banded as a curve — breakpoints at band lower bounds, clamped ends. The R-111 notice names each interpolating table. |
+| Linear interpolation between table breakpoints | **supported** | Set `interpolation=linear`. Both shapes interpolate (ADR-0063 + Brief 95 C5): 2-D along the row dimension's axis, 1-D banded as a curve — breakpoints at band lower bounds, clamped ends. The R-111 notice names each interpolating table. |
 | Per-coverage rounding (round each tower, then sum) | **unsupported** | One package-level `round` row; per-coverage filed premiums carry `tolerance_<field> = 0.5` in `test_cases`; record the source's rounding order in gaps. Per-coverage **clamps** still work. |
 | Multi-location policies | **partial** | The platform rates one risk unit per row and aggregates locations at the policy seam. Transcribe per-location rating normally; note policy-level combination rules in gaps. |
 | Per-vehicle / per-driver rating (personal & commercial auto) | **unsupported** | Record in gaps (`unsupported`). Decompose to one row per vehicle where the book allows; driver-assignment algorithms cannot be expressed. |
@@ -1017,9 +1049,9 @@ v1.0" iff it triggers zero errors.
 | R-080 | error | Every `geo.<slug>` sheet matches a declared geographic dimension. |
 | R-081 | error | `geo.*` keys (`zip`/`county`) unique within the sheet. |
 | R-082 | error | Every `geo.*.territory_code` matches a level's `territory_ref`. |
-| R-083 | notice | In-scope Census keys the `geo.*` sheet never maps (they refuse at rating time — a consequence, not a defect; partial programs are legitimate). |
+| R-083 | notice / warning | In-scope Census keys the `geo.*` sheet never maps (they refuse at rating time — a consequence, not a defect; partial programs are legitimate). Escalates to a WARNING at 0% mapped coverage — a sheet mapping nothing almost always keys the wrong vocabulary (FCA #25). |
 | R-084 | warning | `geo.*` keys outside the declared `geo_scope` (typo or wrong scope). |
-| R-085 | notice | `geo.*` keys unknown to the Census universe (PO-box ZIPs have no ZCTA; typos look like this). |
+| R-085 | notice | `geo.*` keys unknown to the Census universe (PO-box ZIPs have no ZCTA; typos look like this). Dual-key ALIAS rows are exempt: a name-shaped key whose territory group carries an in-universe key is the sanctioned convention (FCA #25). |
 | R-086 | warning | `geographic` declared with no geographic indicator (no `geo.*` sheet, no `territory_members`) — a bare territory list is categorical (AP-11). |
 | R-100 | error | `ft.*` metadata block carries every required key. |
 | R-101 | error | `table_id` equals the sheet-name suffix. |
@@ -1031,7 +1063,7 @@ v1.0" iff it triggers zero errors.
 | R-107 | error | Every factor finite and `> 0`. |
 | R-108 | error | At most one `__default__` per table. |
 | R-109 | error | The grid has ≥ 1 factor row/cell. |
-| R-111 | notice | `interpolation=linear` — the table interpolates in both supported shapes: breakpoints at band lower bounds, clamped ends; named per table and announced in the build report. |
+| R-111 | notice | `interpolation=linear` — the table interpolates (both shapes, ADR-0063 + Brief 95 C5): breakpoints at band lower bounds, clamped ends; named per table and announced in the build report. |
 | R-120 | error | `chains.coverage` ∈ `plan.coverages`. |
 | R-121 | error | Lookup rows reference an existing `ft.*` sheet. |
 | R-122 | error | Lookup rows reference a declared dimension. |
@@ -1059,7 +1091,12 @@ v1.0" iff it triggers zero errors.
 | R-168 | error | Final-adjustment conditional fields present per `kind`. |
 | R-169 | error | Gate `_2`/`_3` conditions are complete triples (`variable_N` + `op_N` + `value_N`) or absent. |
 | R-170 | error | `final_adjustments.applies_to` names only declared coverages. |
+| R-171 | warning | A gate `value*` literal that can never match its bound input's declared `data_type` (e.g. `banana` against a `boolean`, non-numeric text against a `number`/`currency`) — the runtime comparator never equates the two, so the rule is silently disarmed (eq/in) or fires on every risk (ne/nin). |
+| R-172 | warning | A gate `eq`/`ne`/`in`/`nin` literal (including each `in`/`nin` CSV entry) bound to an `enum` input that is not among the input's `allowed_values` — the runtime value never leaves the closed set, so the rule is silently disarmed exactly as in R-171. Ordering ops (`lt`/`le`/`gt`/`ge`) are exempt: they compare numerically and a threshold need not be a member. |
 | R-180 | error | `gaps_and_assumptions.kind` in its enum; `description` + `impact` non-empty. |
+| R-173 | warning | A `gaps_and_assumptions` row that claims a capability is out of reach (kind `gap`/`unsupported`, or inability wording such as “unsupported”/“cannot”) while the capability registry marks the named construct supported (or partially supported) — the registry’s guidance is quoted so the transcriber re-checks before shipping a false gap. |
+| R-174 | notice / warning | The inverse of R-104: a **declared** level has no row in a factor table keyed by its dimension (both axes of a matrix). A notice when the miss refuses honestly at runtime; a **warning** when the table carries a `__default__` row, which silently prices the missing level instead. Geographic dimensions are exempt — territory tables key by group, with member levels riding under them. |
+| R-175 | notice | `test_cases` carries two or more `expected_*` columns and no `tolerance_*` columns. If the filing rounds per coverage before summing, exact matches miss by cents — the engine rounds once, at the package level (registry: `per_coverage_rounding`) — so the notice quotes the registry's tolerance recipe before ingestion instead of after failing vectors. |
 | R-190 | error | No `unsupported` registry construct is declared/required by the workbook (message from the registry, with the gaps-sheet convention). |
 | R-191 | warning | **Umbrella:** every machine-detectable `partial` registry construct passes with the registry's warning — via a construct-specific rule id where one exists; R-191 itself fires for any detectable partial construct that has no dedicated rule. A checker self-test enforces the coverage (vacuously satisfied while no detectable partial construct exists — `linear_interpolation` graduated to supported in r9). |
 | R-201 | warning | Filed-value rows without `citation_rule` (provenance recommended). |
@@ -1185,9 +1222,38 @@ transcribed completely):
 
 ---
 
-## 10. Versioning
+## 10. Resolved decisions + versioning
 
-### 10.1 Versioning policy
+### 10.1 The draft's open questions, resolved (locked 2026-07-14)
+
+| OQ | Resolution |
+| --- | --- |
+| OQ-1 multi-plan workbooks | One plan per workbook. One filing = one workbook = one plan. |
+| OQ-2 level layout | Single long-format `dimension_levels`. |
+| OQ-3 factors on dimension sheets | Separate `ft.*` sheets; dimensions never carry factors. |
+| OQ-4 coverage axis | Factors varying by coverage = a 2-D `dim × coverage` table (or separate 1-D tables when the filing prints them separately; profiles advise per product). |
+| OQ-5 LCM placement | Per-chain, optional plan-wide `lcm` default. |
+| OQ-6 geo detail | `geo.<slug>` sheets; `dimension_levels` stays at territory granularity. |
+| OQ-7 2-D citations | Table-level + free-text `citation_note` for exceptions. |
+| OQ-8 3-D+ tables | Capped at 2-D; composites fuse axes. |
+| OQ-9 curves | Banded 1-D tables at the filing's breakpoints + the `interpolation` flag (`linear` interpolates — supported since registry r9). |
+| OQ-10 `ft.*` metadata | In-sheet block above the grid (self-contained, auditable sheets). |
+| OQ-11 inputs | Explicit `inputs` sheet, REQUIRED — the home of authored defaults. |
+| OQ-12 predicates | §4.6.1 grammar locked. |
+| OQ-13 machine-checkable schema | Yes — the §8 rule table IS the linter's contract (Brief 92 Part 2). |
+
+Beyond the draft: `gaps_and_assumptions` + `test_cases` required
+(the honesty sheets); the `plan` provenance block (carrier, product
+per the platform's 11-code axis — the draft's `lines_of_business`
+vocabulary was retired with the product-axis cleanup); `coverage_value`
+on chains; up-to-3-AND conditions on gates (the platform's gate
+builder shape — single-condition rules couldn't express real filed
+eligibility); `applies_to` on loadings AND final adjustments
+(per-coverage rounding is how filed programs actually round); the
+reserved `expected_tier` test-case column; `interpolation` on tables;
+the capability registry + R-190/R-191.
+
+### 10.2 Versioning policy
 
 - Workbooks pin `spec_version`; readers reject unknown versions
   (R-032) rather than guessing.
@@ -1200,11 +1266,24 @@ transcribed completely):
   independently (r1, r2, …) — constructs move `unsupported →
   partial → supported` as the platform grows, without spec churn.
 
-### 10.2 Release history
+### 10.3 Changelog
 
-| Version | Summary |
-| --- | --- |
-| 1.0 / registry r9 | Initial public contract. Includes workbook validation rules, deterministic build semantics, capability status, derived inputs, coverage election, and linear interpolation. The registry is the machine-readable source of current support. |
+| Date | Version | Change |
+| --- | --- | --- |
+| 2026-07-14 | 1.0 | Locked. Supersedes the `INPUT_XLSX_FORMAT_SPEC.md` draft per Brief 92 §1: OQ-1..13 resolved; `inputs` + `gaps_and_assumptions` required; provenance block; product-axis vocabulary; predicate grammar; `interpolation` / `coverage_value` / `applies_to`; the R-### rule table; the capability registry + profiles split; CSV-bundle appendix. |
+| 2026-07-14 | 1.0 (registry r2) | Live-run finding (92.3): the engine's `round` is the plan-tail total-rounder — per-coverage rounding is registry-`unsupported` (`per_coverage_rounding`); §4.11 `applies_to` narrowed to clamps. The spec text is unchanged in shape — this is the registry mechanism working as designed. |
+| 2026-07-14 | 1.0 (registry r3) | All-constructs live run (92.5): `chain_flat_factor` unsupported (the projector cannot key an unkeyed constant — use a 1-D yes/no table or a loading) and `endorsement_additive_multi_coverage` unsupported (a once-per-policy amount has no single tower until package-level layering ships). Factor endorsements now apply per tower tip in the engine (the shared-node bug fixed alongside). |
+| 2026-07-15 | 1.0 (registry r4) | Filing-digitization review finding: the check accepted the full §4.6.1 operator set on `chains.predicate`/`loadings.predicate` while the platform's factor gate is equality-only, so the build refused workbooks the check passed. `predicate_beyond_equality` is registry-`unsupported` there (R-190). `endorsements.trigger` now executes real `in`/`not-in` (the builder previously mis-built them as `==` — silent wrong semantics); an inexpressible trigger operator is refused, never rewritten. Builder refusals surface as structured 422 `ingest_unbuildable` with the builder's message, never a generic 500. |
+| 2026-07-16 | 1.0 (registry r5) | Brief 94.1 truth pass. `linear_interpolation`'s message stated a pre-ADR-0063 world ("the engine applies stepped bands until table interpolation ships") — since 2026-07-13, 2-D tables DO interpolate along the row dimension's axis; only 1-D banded curves still step. r5 states the split; §4.5/§6/R-111 follow the registry. R-191 documented as the umbrella rule for `partial` constructs (R-111 is `linear_interpolation`'s specific id; a checker self-test enforces that every machine-detectable partial construct warns). §0 + §7.5 now name the self-check loop (drop panel / `POST /plans/ingest/check` / CLI). §4.1 records the personal-lines interim (`other` + `description`) pending phase 94.6. |
+| 2026-07-16 | 1.0 | Brief 94.5 hardening. NEW **R-002** (§2.1): merged cells in data sheets are refused with the range cited — openpyxl reads every cell but a merged range's top-left as blank, which previously became silent absences. The gates `__default__` row's citation now lands (`default_citation` on the gate config — it was silently dropped). The build response gains an envelope-level `verification` verdict (`all_match` \| `near` \| `mismatches` \| `none` \| `unavailable`) so API callers need not dig into the report. |
+| 2026-07-16 | 1.0 | Brief 94.6 (owner-gated, confirmed). The product axis gains personal lines: `homeowners` (HO forms) + `dwelling` (dwelling fire, DP forms) join §4.1's enum — ADR-0033 §0's "one entry + one SQL CHECK value" exercised end to end (ProductCode, migration 048, `@openrater/contracts`, this spec). The 94.1 interim (`other` + `description`) retires for these two lines; an HO transcription profile follows with its first proven program (Brief 92's profile rule). |
+| 2026-07-15 | 1.0 | The last check=build parity gap closed: **[R-146]** — `outputs.source = coverage:total` with no package-level `round` row in `final_adjustments` now refuses check-side (the plan-tail round is what produces the total; this workbook was never buildable, so no passing workbook changes status). The builder's raise stays as the backstop. |
+| 2026-07-16 | 1.0 | Brief 95.1 truth pass (C1). NEW **§12** — the engine-execution-semantics appendix (rounding order and placement, the LCM outside the rounded chain product, interpolation anchors at band lower bounds with clamped ends per ADR-0063, zero/absent-exposure withholding, blank-cell refusal, gate triage, the test-case recipe). Until now transcribers recovered these from platform source; the WI BOP acceptance builds (40/40 ×3) pinned every statement live. §0 and §4.13 point at it. Additive — no grammar change. |
+| 2026-07-16 | 1.0 | Brief 95.1 truth pass (C6). §4.15's optional `factor` column REMOVED — the builder never consumed it (per-geography factors live in `ft.*` tables keyed by the geographic dimension, as every shipped example and the WI Risk Analyzer plan do). One mechanism, not two; a workbook still carrying the column gets the R-202 unknown-trailing-column warning and the value is preserved, never rated. |
+| 2026-07-17 | 1.0 (registry r6) | Brief 95.2 (A2) — **the workbook's `rating_plan_id` IS the built plan's id** (previously the platform minted `bop_wi_blank_<uuid8>`-style slugs and the workbook id was capture-only). Same workbook → same plan id on any box, which is what lets seeded reference plans recognize their own revisions. A taken id refuses (409): identical bytes ⇒ `ingest_already_built`; different bytes ⇒ `ingest_plan_id_taken` pointing at the re-ingest door — never a silent duplicate. Registry r6 records `workbook_pinned_plan_id` as supported. Additive per §10.2: no workbook grammar change. |
+| 2026-07-17 | 1.0 (registry r7) | Brief 95.4 (C2) — NEW `inputs.derived_from` column: `sum(<input>,…)` makes an input **platform-computed** instead of submitter-supplied (the WI convention "supply building + BPP as total_property_limit" retired — the derived input keys the deductible-band lookup while books and quote requests carry only the operands). **[R-045]** grammar + operand contract, **[R-046]** never row-supplied, **[R-047]** lookup-axes-only. `div(…)` recognized and named-deferred to `class_conditional_exposure`. Registry r7 records `derived_input` as supported. Additive per §10.2: workbooks without the column are untouched. Alongside (D1/D2, platform-side): per-plan `GET /plans/{id}/book-template.csv` (headers = declared inputs, derived excluded, one verified example row) and test-case inputs persisted on the build report (`vectors.cases`) so the Run zone replays a verified filed example. |
+| 2026-07-17 | 1.0 (registry r8) | Brief 95.5 (C4) — **coverage election**: a trailing `?` on a §4.1 `coverages` entry marks it electable. A risk with an **explicit 0** exposure on an electable coverage elects it out — the tower's nodes skip (its factor-axis inputs are not demanded), it contributes **$0**, and the trace says "not elected". Absence still withholds; an explicit 0 on a required coverage prices the arithmetic and warns (`zero_exposure_required`). **[R-048]**: ≥1 coverage stays required; an electable coverage's chain carries an exposure stage. §12.4 corrected en route: the earlier "absent — or ZERO — ⇒ withheld" line overstated zero (the engine has always priced an explicit zero; the audited KS oracle's TV-28 floors a zero-limit tower's book to the $500 minimum — refusing would contradict it). Unblocks tenant/BPP-only and building-only risks on the WI plans (their gaps row retires). Registry r8 records `coverage_election` as supported. Additive per §10.2: unmarked coverage lists behave exactly as before. |
+| 2026-07-17 | 1.0 (registry r9) | Brief 95.6 (C5) — **1-D banded curves interpolate**: the remaining half of ADR-0063 (engine gap F14). A 1-D table flagged `interpolation=linear` now reads the RAW value through the engine's `interpolate` kind — breakpoints at band LOWER bounds, clamped ends, on-anchor values byte-exact — the same anchors the 2-D `interpolateOn` has used since r5. `linear_interpolation` graduates partial → **supported**; **R-111 downgrades warning → notice** (an FYI naming each interpolating table, no longer a caveat); the R-191 umbrella self-test rests vacuously until the next partial construct. §4.5/§6/§12.3 updated. The WI BPP LOI curve becomes filed-exact (mid-band values previously overstated ≤ ~4%; its gaps row retires — a deliberate, filed-correct rate improvement on mid-band risks). Unflagged tables step, byte-stable. |
 
 ---
 
@@ -1237,7 +1316,9 @@ expectations without reading platform source. **Normative for
 computing `test_cases`.** When platform capability changes, the change
 rides the capability registry and this spec's changelog, never a
 silent drift. (Enforcing code, informative: `kinds/interpolate.ts`,
-`kinds/lookup-multi.ts`, and the projector's exposure mode.)
+`kinds/lookup-multi.ts`, the projector's exposure mode; ADR-0063;
+ADR-0056. Every behavior below was pinned by live golden runs —
+Brief 92.5 and the 2026-07-16 WI acceptance builds.)
 
 Throughout: **ROUND_HALF_UP** (0.0005 → 0.001, 0.5 → 1) — never
 banker's rounding. `r3(x)` = ROUND_HALF_UP to 3 decimals; `r0(x)` = to
@@ -1282,17 +1363,17 @@ the towers' own `r0` (registry: `per_coverage_rounding`,
 unsupported). `outputs.source = coverage:total` names this round's
 output.
 
-### 12.3 Interpolation
+### 12.3 Interpolation (ADR-0063, both halves)
 
 For a table with `interpolation = linear` — 2-D **and** 1-D banded
-(supported by registry r9):
+(Brief 95 C5 closed the split):
 
 - **The breakpoints are each banded level's lower bound** (`min`); the
   factor "sits at" its band's lower bound. The raw numeric input feeds
   the axis: a value exactly on a breakpoint returns that band's factor
   byte-exact; a value between two breakpoints interpolates linearly; a
   value beyond either end **clamps** to the end band's factor. Example
-  (illustrative curve): bands `[300k,325k) → 0.840` and
+  (ISO Rule 23.A.2.d shape): bands `[300k,325k) → 0.840` and
   `[325k,350k) → 0.812` give `f(310k) = 0.840 − (10/25)(0.028) =
   0.8288` — entering the chain product unrounded (12.1 rounds the
   product, not the factor).
@@ -1303,7 +1384,7 @@ For a table with `interpolation = linear` — 2-D **and** 1-D banded
 - Without the flag, every banded table steps, bands half-open
   `[min, max)`.
 
-### 12.4 Absence, zero, election, and refusal
+### 12.4 Absence, zero, election, and refusal (ADR-0056 + Brief 95 C4)
 
 - A **required input with no `default_value`, absent at runtime** ⇒
   the row refuses (premium withheld, loudly).
@@ -1317,7 +1398,7 @@ For a table with `interpolation = linear` — 2-D **and** 1-D banded
     other inputs (factor axes) are NOT demanded — a tenant risk
     legitimately omits the building axis columns.
   - on a **required** coverage ⇒ the arithmetic prices the $0 tower
-    (for example, a zero-limit tower floored to
+    (the audited filed behavior — e.g. a zero-limit tower floored to
     the book minimum) and a **warning** (`zero_exposure_required`)
     names the ambiguity: if "no coverage" was meant, mark the
     coverage electable.

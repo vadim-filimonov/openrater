@@ -7,14 +7,22 @@
    * a 24px gutter (12px below 1366px) that the plan header, the tab
    * strip, and every section body share — one left edge. Top gutter
    * stays 0: the header band IS the top of the page. */
+  /* FCA #33 (finding 16) — the gutter as a VAR so bleed-into-gutter
+   * effects (the tab strip's hover fills) can never exceed it. The
+   * fixed 16px bleed overhung the 12px small-viewport gutter by 4px
+   * per side — a permanent page-level horizontal scrollbar on every
+   * plan screen. overflow-x: clip is the belt: nothing on this page
+   * scrolls the PAGE sideways; wide content owns its own scroller. */
+  --rater-page-gutter: var(--rater-s-24);
   max-width: 1700px;
   margin: 0 auto;
-  padding: 0 var(--rater-s-24) var(--rater-s-48);
+  padding: 0 var(--rater-page-gutter) var(--rater-s-48);
+  overflow-x: clip;
 }
 
 @media (max-width: 1366px) {
   .plan-detail-page {
-    padding: 0 var(--rater-s-12) var(--rater-s-48);
+    --rater-page-gutter: var(--rater-s-12);
   }
 }
 
@@ -931,7 +939,7 @@
   border-top: 1px solid var(--rater-border-subtle);
 }
 
-/* book intake — a done book/probe row IS a door (it always looked
+/* Book-intake §3 — a done book/probe row IS a door (it always looked
  * like one); the affordance says where it goes. */
 .rater-runhist__row.is-door {
   cursor: pointer;
@@ -947,7 +955,7 @@
   white-space: nowrap;
 }
 
-/* ── The run detail (book intake): rows get a home ─────────── */
+/* ── The run detail (book-intake §3): rows get a home ─────────── */
 .rater-rundetail__head {
   display: flex;
   align-items: center;
@@ -972,6 +980,27 @@
 .rater-rundetail__filter.is-on {
   border-color: var(--rater-accent-warning);
   color: var(--rater-accent-warning);
+}
+/* FCA #28 — the two-run compare affordance + change list. */
+.rater-rundetail__cmp {
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-muted);
+  margin-left: var(--rater-s-10);
+}
+.rater-rundetail__cmp select {
+  font-size: var(--rater-t-12);
+  color: var(--rater-text-default);
+  background: var(--rater-surface-2);
+  border: 1px solid var(--rater-border-default);
+  border-radius: var(--rater-r-6);
+  padding: var(--rater-s-2) var(--rater-s-6);
+}
+.rater-runcmp__changes {
+  list-style: none;
+  margin: 0 0 var(--rater-s-10);
+  padding: 0;
+  display: grid;
+  gap: var(--rater-s-2);
 }
 .rater-rundetail__tablewrap {
   overflow-x: auto;
@@ -1008,6 +1037,14 @@
 }
 .rater-rundetail__issue {
   max-width: 360px;
+}
+/* FCA #26 — the caller's identifier column (PolicyNbr). */
+.rater-rundetail__srcid {
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--rater-text-muted);
 }
 .rater-runhist__kind {
   flex: none;

@@ -11,6 +11,9 @@
  *
  * Optional `stopOnZero` short-circuits to 0 when any factor is zero
  * (useful for binary kill-switches encoded as 0/1 factors).
+ *
+ * Ported from `<prototype>/plan-builder/src/blocks/kinds/
+ * chain-mult.tsx` (Phase A.1 PR 7). PURE half only.
  */
 
 import type { BlockKind, PortSpec } from "../block-types";
@@ -95,10 +98,23 @@ export const ChainMultKind: BlockKind<
     }
     const names = params.factorNames ?? [];
     const parts: string[] = [String(inputs.base)];
+    // FCA #34 — a missing factor used to narrate as "× undefined
+    // (name) = NaN", which reads as breakage. Name the culprit and
+    // end honestly instead of doing NaN arithmetic at the reader.
+    const unresolved: string[] = [];
     for (let i = 0; i < inputs.factors.length; i++) {
       const v = inputs.factors[i];
       const name = names[i];
+      if (typeof v !== "number" || !Number.isFinite(v)) {
+        unresolved.push(name ?? `factor ${i + 1}`);
+        continue;
+      }
       parts.push(name ? `${v} (${name})` : String(v));
+    }
+    if (unresolved.length > 0) {
+      return `${parts.join(" × ")} — unresolved: ${unresolved.join(
+        ", ",
+      )} (see this row's issues)`;
     }
     return `${parts.join(" × ")} = ${outputs.result}`;
   },

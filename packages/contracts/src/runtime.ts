@@ -9,6 +9,11 @@
  * The runtime is intentionally simple. Optimization (vectorization,
  * memoization, JIT) is layered on top later.
  *
+ * Ported verbatim from `<prototype>/plan-builder/src/canvas/
+ * plan-runtime.ts` (Phase A.1 PR 2 of the original port plan). Renamed to
+ * `runtime.ts` to match the port plan's destination mapping. The
+ * registry import (`@/blocks` → `./registry`) is the only path change.
+ *
  * Per node-design-principle P-N1: every block kind's `execute()`
  * called from here MUST be pure. The runtime enforces that
  * `ctx.as_of` is resolved ONCE per `runPlan` call so kinds reading
@@ -178,6 +183,24 @@ function resolveCitation(
  * MUST NOT throw from explainStep, but if one does, the run keeps
  * going — we just drop the explanation rather than crashing.
  */
+/**
+ * FCA fca-2026-07-25 #34 — kinds interpolate raw doubles into prose,
+ * so traces read "128 × 1.18 = 115.54560000000001" on every product
+ * surface (the app drawer and chat both relay these lines). Rewrite
+ * embedded float literals with 7+ decimal digits to their intended
+ * reading (shortest form within 6 dp). The VALUES are untouched —
+ * outputs carry them exactly; only the narration cleans up. Dotted
+ * identifiers (v1.2.3, Rule 5.A) never match: the pattern requires a
+ * single long fraction part.
+ */
+export function cleanExplanationNoise(text: string): string {
+  return text.replace(/(^|[^\d.])(\d+\.\d{7,})(?![.\d])/g, (_m, pre: string, num: string) => {
+    const n = Number(num);
+    if (!Number.isFinite(n)) return `${pre}${num}`;
+    return `${pre}${parseFloat(n.toFixed(6))}`;
+  });
+}
+
 function safeExplain(
   kind: BlockKind,
   inputs: Record<string, unknown>,
@@ -186,7 +209,8 @@ function safeExplain(
 ): string | undefined {
   if (!kind.explainStep) return undefined;
   try {
-    return kind.explainStep(inputs, params, outputs);
+    const line = kind.explainStep(inputs, params, outputs);
+    return line === undefined ? undefined : cleanExplanationNoise(line);
   } catch {
     return undefined;
   }
@@ -393,18 +417,19 @@ function coerceInputToFieldType(value: unknown, fieldType?: string): unknown {
  * ONLY the appetite gate reads gets no input node — and this helper
  * had no port to key from, so the boolean wire spelling "true"
  * strictly missed an `eq true` rule (numeric strings survive via the
- * comparator's E3 widening; booleans have no widening — by design the
- * comparator never coerces them). For a variable NO port declares,
- * a row-scope gate rule's RHS is the one type declaration the
- * compiled plan still carries, so it types the record here — at the
- * same seam, under the same conservatism: only the unambiguous case
- * applies (EVERY reference boolean-RHS ⇒ boolean; any non-boolean
- * reference cancels), a port of ANY kind — even untyped — always
- * wins (an untyped port rates the raw value, so the gate must read
- * the raw value), and policy-scope gates (their rules read rolled
- * totals, not this record) and model-sourced variables (Brief 87 P5
- * `variable_sources` — resolved at the gate, not from the wire)
- * don't participate.
+ * comparator's E3 widening; booleans since gained the same widening
+ * for their LITERAL spellings — FCA fca-2026-07-25, dead knock-out
+ * gates). For a variable NO port declares, a row-scope gate rule's
+ * RHS is the one type declaration the compiled plan still carries, so
+ * it types the record here — at the same seam, under the same
+ * conservatism: only the unambiguous case applies (EVERY reference
+ * boolean-RHS — a typed boolean or its literal 'true'/'false' string,
+ * the workbook spelling — ⇒ boolean; any other reference cancels), a
+ * port of ANY kind — even untyped — always wins (an untyped port
+ * rates the raw value, so the gate must read the raw value), and
+ * policy-scope gates (their rules read rolled totals, not this
+ * record) and model-sourced variables (Brief 87 P5 `variable_sources`
+ * — resolved at the gate, not from the wire) don't participate.
  */
 export function coercePlanExternalInputs(
   compiled: CompiledPlan,
@@ -465,13 +490,26 @@ export function coercePlanExternalInputs(
         if (typeof c.variable !== "string" || c.variable === "") continue;
         if (ported.has(c.variable)) continue;
         if (c.variable in sourced) continue;
+        // FCA fca-2026-07-25 — a boolean-LITERAL string RHS ('true' /
+        // 'false', the workbook gates-sheet spelling; spec §2.1 makes
+        // it a legal boolean form) is the same boolean evidence a
+        // typed RHS is. Without this, a workbook-built plan's gate
+        // never typed its variable, so wire spellings ('yes', 'Y')
+        // reached the walk raw — while the identical rule re-saved in
+        // the app (boolean RHS) coerced them. Same rule, two verdicts.
+        const isBoolEvidence = (v: unknown): boolean => {
+          if (typeof v === "boolean") return true;
+          if (typeof v !== "string") return false;
+          const s = v.trim().toLowerCase();
+          return s === "true" || s === "false";
+        };
         const boolRhs =
           c.op === "eq" || c.op === "ne"
-            ? typeof c.value === "boolean"
+            ? isBoolEvidence(c.value)
             : (c.op === "in" || c.op === "nin") &&
               Array.isArray(c.value) &&
               c.value.length > 0 &&
-              c.value.every((entry: unknown) => typeof entry === "boolean");
+              c.value.every(isBoolEvidence);
         if (!boolRhs) gateTypes.set(c.variable, null);
         else if (!gateTypes.has(c.variable)) gateTypes.set(c.variable, "boolean");
       }
@@ -1032,9 +1070,15 @@ export function runPlanBatch(
   // captured at batch start). Each row sees the same temporal anchor
   // — without this the per-row default resolution could drift across
   // a midnight crossing during a long-running batch.
+  //
+  // Every OTHER option threads through untouched (FCA review 2026-07-26:
+  // `{ as_of }` alone silently dropped `classLibrary`, so any batch-path
+  // re-run — evaluatePolicyBook's composition included — rated class-
+  // exposure rows against an unbound library while the single-risk path
+  // rated them correctly).
   const as_of = resolveAsOf(options);
   return externalInputsArr.map((record) =>
-    runPlan(compiled, record, { as_of }),
+    runPlan(compiled, record, { ...options, as_of }),
   );
 }
 

@@ -5,7 +5,7 @@
  * Re-homed here when the `<DimensionsTable>` component was deleted (dead
  * since the v2 BuildUpSheet / ParametrizeCanvas cutover — no JSX mount).
  * The component went; the row type outlived it. `DimensionRow` is the
- * canonical dimension shape consumed across @openrater/ui (FactorTableNode,
+ * canonical dimension shape consumed across labs-ui (FactorTableNode,
  * ParametrizeCanvas, BuildUpSheet, CsvImportPreview2D, DimensionEditor,
  * DimensionsWorkspace, dimensionMeta, shapeIcon, keying, coverageDimension,
  * inferCsvAxes) and rate-lab (dimensionsSync, PlanDetailRoute, fixtures).
@@ -68,7 +68,7 @@ export interface DimensionRow {
   /**
    * For `dimension_type: "classification"`, the proprietary
    * input → canonical mapping rules. See `ClassMappingRule` in
-   * `@openrater/contracts`; kept structural here to avoid the UI package
+   * `@openrater/contracts`; kept structural here to avoid the labs-ui
    * primitive pulling on the contracts package's `unknown`-shaped
    * subtype detail.
    */
@@ -162,7 +162,7 @@ export interface DimensionRow {
     /**
      * Brief 83 / TV-19 — optional DECLARED override: the submission
      * field whose non-empty value supersedes the class-derived value
-     * (Meridian BOP's `liab_exposure_basis_override`). Must ride every
+     * (ISO BOP's `liab_exposure_basis_override`). Must ride every
      * round-trip or the sync clobbers it (the Brief-60 lesson).
      */
     readonly override_field?: string | null;

@@ -36,7 +36,7 @@
   cursor: pointer;
   transition: border-color var(--rater-d-80) var(--rater-ease-snap);
 }
-.rater-composer__slot:hover:not(disabled) {
+.rater-composer__slot:hover:not(:disabled) {
   border-color: var(--rater-hairline-strong);
 }
 .rater-composer__slot:focus-visible {

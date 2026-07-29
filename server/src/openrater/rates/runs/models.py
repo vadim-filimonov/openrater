@@ -80,7 +80,7 @@ class CreateRunRequest(BaseModel):
     book` with no payload scores the plan's connected book (Brief 75
     D-D: Inputs owns intake, Run owns execution), and with `rows` an
     AD-HOC book — the chat door's CSV, input-keyed, capped at 5,000
-    (book intake: a caller's CSV is a real book, never a probe);
+    (book-intake §3: a caller's CSV is a real book, never a probe);
     `kind: probe` requires `rows` — the client-built sweep of the
     plan's own variable space (Brief 89 §3.2 B3)."""
 

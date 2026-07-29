@@ -77,12 +77,15 @@ function requestFor(v: JsonVector): unknown {
 
 describe("scoring service · vector discovery", () => {
   it("loads exactly the 50 wired conformance vectors", () => {
+    // 51 = 50 + V64 (FCA fca-2026-07-25 — the knock-out-true vector:
+    // a workbook gate's TEXT 'true' RHS must match a schema-typed
+    // boolean input, or filed hard-declines silently rate Standard).
     // 50 = 49 + V63 (Phase F residual — a gate-ONLY variable has no
     // input port to key the V62 record coercion from; the rule's own
     // boolean RHS types it at the same seam).
-    // V15 (chain-from-report-acceptance) is intentionally absent; add a
-    // replacement only alongside a new acceptance-flow golden vector.
-    expect(VECTORS).toHaveLength(50);
+    // V15 (chain-from-report-acceptance) left with Detachment Brief 1
+    // §3.2; TODO(S3): a Meridian-derived acceptance golden restores it.
+    expect(VECTORS).toHaveLength(51);
   });
 
   it("vector names are unique", () => {

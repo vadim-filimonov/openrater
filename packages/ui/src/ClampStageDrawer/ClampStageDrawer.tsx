@@ -291,7 +291,7 @@ export function ClampStageDrawer(props: ClampStageDrawerProps): JSX.Element {
               onChange={(e) =>
                 onDraftChange({ ...draft, citation_rule: e.target.value })
               }
-              placeholder="e.g., Meridian BOP §6.A.1"
+              placeholder="e.g., ISO BOP §6.A.1"
               aria-label="Citation rule"
             />
           </div>

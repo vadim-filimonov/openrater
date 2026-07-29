@@ -2,7 +2,8 @@
  * <WorkspaceShell> — the consistent chrome wrapping every Brief 24
  * workspace (sub-brief 24.F).
  *
- * The shell provides the 3-slot layout every workspace inherits:
+ * Per docs/design-briefs/24f-workspace-shell.md. The shell provides
+ * the 3-slot layout every workspace inherits:
  *
  *   ┌─────────────────────────────────────────────────────┐
  *   │  HEADER STRIP                                       │

@@ -27,8 +27,8 @@
  * move: this test still pins $3,844,254. The composer is product-blind
  * (ADR-0033 §0) — the SAME composePolicy would compose a bop+auto policy.
  *
- * Ground truth (recomputed independently from the example workbook
- * `docs/specs/examples/nonprofit-do-gl/nonprofit_do_gl.workbook.xlsx`):
+ * Ground truth (recomputed independently from the xlsx spec
+ * `docs/rating-algorithms/nonprofit_990_do_gl_rating_v1.xlsx`):
  *   D&O book  = $2,279,163
  *   GL  book  = $1,565,091
  *   Total     = $3,844,254

@@ -90,7 +90,7 @@ describe("validateDictionary", () => {
     const issues = validateDictionary([
       entry({
         fieldName: "territory",
-        allowedValues: ["t1", "t2"],
+        allowedValues: ["701", "702"],
         defaultValue: "999",
       }),
     ]);
@@ -101,8 +101,8 @@ describe("validateDictionary", () => {
     const issues = validateDictionary([
       entry({
         fieldName: "territory",
-        allowedValues: ["t1", "t2"],
-        defaultValue: "t1",
+        allowedValues: ["701", "702"],
+        defaultValue: "701",
       }),
     ]);
     expect(issues).toEqual([]);

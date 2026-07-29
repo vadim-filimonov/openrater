@@ -1,5 +1,5 @@
 /**
- * public-counts tests — pins : THE public counting (chains ·
+ * public-counts tests — pins MVP-013: THE public counting (chains ·
  * steps) equals what the Rating tab renders — per-chain build-up rows
  * (base + factors + lcm, output rows excluded) plus Final-adjustment
  * stage rows — and never the wire stage count.

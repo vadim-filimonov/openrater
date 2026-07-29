@@ -9,8 +9,8 @@
 
 The codebase has grown up speaking SQLite: `?` placeholders,
 `json_extract(col, '$.path')`, `INSERT OR REPLACE`, `strftime`,
-`PRAGMA`, etc. When a Postgres deployment is used, those constructs
-need to translate.
+`PRAGMA`, etc. When Aurora Postgres swaps in (post-detachment
+production target), those constructs need to translate.
 
 This module is the single funnel for that translation. Two
 patterns:
@@ -23,11 +23,11 @@ patterns:
         )
       Reads on any backend.
 
-  2.  **Existing migrations** may contain SQLite-specific syntax (e.g.
-      `strftime`, `INSERT OR IGNORE`). The migration runner can apply
-      best-effort `translate_sql()` for a non-SQLite target; production
-      migrations should use backend-appropriate SQL when translation is
-      not exact.
+  2.  **Existing migrations** still contain SQLite-isms (e.g.
+      `strftime`, `INSERT OR IGNORE`). The migration runner can
+      apply best-effort `translate_sql()` when run against a
+      non-SQLite target — but the plan is to write Postgres-native
+      versions of the migrations rather than rely on translation.
 
 Two dialects supported:
 
@@ -37,9 +37,14 @@ Two dialects supported:
 Selection: env var `RATER_DB_DIALECT` (`sqlite` | `postgres`).
 Defaults to `sqlite`. The Database class picks at construction.
 
-Analytical stores such as Athena are intentionally unsupported: this service
-requires transactional database semantics. Add another dialect only when a
-supported deployment needs it.
+Port note (M3.5.3): an `AthenaDialect` lived here through
+2026-05-20 alongside SQLite + Postgres. It was speculative — no
+known carrier or integrator runs a P&C rating engine against
+Athena (an S3 Parquet analytical store, not an OLTP DB). The
+extra surface area + the `MERGE`/`INSERT OR REPLACE` impedance
+mismatch were carrying cost without a real demand signal, so it
+came out. If an analytics-only read replica becomes a real
+requirement later, a per-need dialect can land then.
 """
 
 from __future__ import annotations

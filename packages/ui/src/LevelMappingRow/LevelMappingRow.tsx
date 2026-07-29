@@ -5,7 +5,7 @@
  * affordances based on the level's `kind`:
  *
  *   • categorical → id + label + <ChipInput> alias list
- *                   ("Meridian Cafe", "Meridian Cafe - dine-in" → c102)
+ *                   ("Restaurant", "Restaurant - dine-in" → 71641)
  *   • banded      → id + label + lo/hi numeric inputs
  *   • geographic  → id + label + territory_ref (read-only chip)
  *

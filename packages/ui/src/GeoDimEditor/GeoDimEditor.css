@@ -334,10 +334,10 @@
 }
 .rater-geo-editor__levels-row {
   display: grid;
-  /* B1 — four tracks for four children (key · label · badge · delete). The
-     label is minmax(0,1fr) so a long name truncates instead of forcing the
-     delete to wrap. */
-  grid-template-columns: 96px minmax(0, 1fr) auto auto;
+  /* B1 — one track per child (key · label · territory · badge · delete);
+     the label is minmax(0,1fr) so a long name truncates instead of
+     forcing the delete to wrap. FCA #26 added the territory chip. */
+  grid-template-columns: 96px minmax(0, 1fr) auto auto auto;
   gap: 12px;
   align-items: center;
   min-height: 40px;
@@ -365,6 +365,15 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+/* FCA #26 — the row's territory answer ("which territory is 68847
+   in?"). Quiet metadata, same register as the custom badge, but kept
+   readable: it IS the information the user came for. */
+.rater-geo-editor__levels-terr {
+  font-size: var(--rater-t-11);
+  color: var(--rater-text-muted);
+  white-space: nowrap;
+}
+
 .rater-geo-editor__levels-badge {
   /* A per-row "custom" mark — quiet neutral metadata, not a loud pill. The
      count is already summarized in the list header, so across 100+ rows this

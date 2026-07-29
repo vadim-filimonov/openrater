@@ -3,7 +3,7 @@
   "compilerOptions": {
     "outDir": "dist",
     "rootDir": "src",
-    // Use the workspace's Bundler resolution (from the
+    // Book-intake §2 — the workspace's Bundler resolution (from the
     // base config), so the shared @openrater/contracts SOURCE
     // typechecks here the way it does in services/scoring. Runtime is
     // unaffected: dev runs tsx and the .mcpb bundles via esbuild,

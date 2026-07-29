@@ -9,6 +9,9 @@
  * Note: the input port is named `else` (a reserved word in TS), but
  * it's only ever accessed as a property of the `inputs` object, never
  * as a bare identifier — so it works at runtime + compile-time.
+ *
+ * Ported from `<prototype>/plan-builder/src/blocks/kinds/
+ * branch.tsx` (Phase A.1 PR 8). PURE half only.
  */
 
 import type { BlockKind, PortSpec } from "../block-types";

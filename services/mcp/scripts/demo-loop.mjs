@@ -7,7 +7,7 @@
 //
 //     http://www.apache.org/licenses/LICENSE-2.0
 /**
- * End-to-end checkpoint driver: speaks MCP (JSON-RPC over stdio)
+ * The Brief 2 P1 checkpoint driver: speaks MCP (JSON-RPC over stdio)
  * to a freshly spawned @openrater/mcp server and walks the whole loop
  * against the Meridian example workbook — the same calls a Claude
  * client makes, minus the model.
@@ -33,8 +33,8 @@ const workbook =
   );
 
 // MCP_ENTRY overrides the dev entry with a BUILT artifact (the .mcpb
-// payload's mcp/index.mjs) so the test drives the exact bytes that ship
-// on plain Node.js, without tsx.
+// payload's mcp/index.mjs) — the P3 proof drives the exact bytes that
+// ship, on plain node, no tsx.
 const child = process.env.MCP_ENTRY
   ? spawn(process.execPath, [resolve(process.env.MCP_ENTRY)], {
       env: { ...process.env },

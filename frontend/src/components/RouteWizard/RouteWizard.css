@@ -408,7 +408,7 @@
   color: #fff;
   background: var(--rater-accent-primary);
 }
-.rtw__btn--primary:hover:not(disabled) {
+.rtw__btn--primary:hover:not(:disabled) {
   background: var(--rater-accent-primary-hover);
 }
 .rtw__btn--ghost {

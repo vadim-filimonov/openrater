@@ -1,9 +1,9 @@
 /**
- * Unified error-surface types.
+ * Unified error surface types — Brief 13.
  *
  * The Issue shape consolidates ALL diagnostic signals across the
- * plan into one common record. The status bar and drawer consume these
- * records verbatim.
+ * plan into one common record. The Brief 13 status bar + drawer
+ * primitives (which land in M2) consume these verbatim.
  *
  *   collectIssues(plan, run?, registry?) → readonly Issue[]
  *
@@ -15,19 +15,20 @@
  *   - reference    — broken refs (validatePlanReferences output)
  *   - conformance  — failing conformance vectors (M1.7+)
  *
- * Deterministic ranking:
+ * Deterministic ranking (Brief 13 P-UE3):
  *   1. severity:  error  >  warning  >  info
  *   2. source:    compile > runtime > authoring > reference > conformance
  *   3. section:   spine declaration order (Risk Inputs first, Outputs last)
  *   4. entity:    alphabetical
  *   5. field:     alphabetical
  *
- * Stable ids are deterministic from (source +
+ * Stable ids per Brief 13 P-UE8: deterministic from (source +
  * canonical-location + message_template). Same plan → same Issue
  * ids across sessions. Enables: audit linkage, CI regression
  * detection, persistent snooze state (V2).
  *
- * Pure types. No React, no DOM.
+ * Pure types. No React, no DOM. See `docs/design-briefs/unified-
+ * error-surface.md` §6 for the design rationale.
  */
 
 /** Three-level severity. Error > warning > info. */
@@ -75,9 +76,10 @@ export interface IssueLocation {
 
 /**
  * Optional fix hint — a one-click CTA pointing at the source.
+ * Brief 13 P-UE6.
  */
 export interface IssueFixHint {
-  /** Actuary-language CTA label (e.g., "Open Classification → Class c201"). */
+  /** Actuary-language CTA label (e.g., "Open Classification → Class 91342"). */
   readonly label: string;
   /** Where the CTA navigates to. May be the same as `issue.location`
    *  OR a different surface (e.g., a missing-input error in the
@@ -103,7 +105,7 @@ export interface Issue {
   /** Where the issue lives. */
   readonly location: IssueLocation;
   /** Whether the issue blocks filing. Driven by severity + source
-   *  according to the rule below.
+   *  per Brief 13 §6.
    *
    *  Rule (V1):
    *    - error + (compile | reference | runtime) → true
@@ -128,7 +130,8 @@ export interface IssueSeverityCounts {
 }
 
 /**
- * Aggregate filing-readiness verdict. Drives the drawer header chip.
+ * Aggregate filing-readiness verdict. Drives the drawer header
+ * chip per Brief 13 §3 Surface 5.
  */
 export type FilingReadiness =
   | "filing_ready" // zero issues OR only non-blocking warnings + info

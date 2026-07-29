@@ -364,13 +364,18 @@ describe("evaluatePolicyBook — wire-string inputs coerce at the seam (Phase F 
     expect(wire).toEqual(typed);
   });
 
-  it("mixed-type references to a port-less variable cancel — a string-authored rule keeps matching by strict spelling", () => {
+  it("mixed-type references to a port-less variable cancel — the record stays raw", () => {
     // The fallback's conservatism guard (the conflicting-ports rule,
     // applied to rule RHS evidence): when the SAME port-less variable
-    // is compared against a boolean in one rule and strings in another,
-    // the authoring is ambiguous — the seam refuses to guess and the
-    // record value stays raw, so the string-authored rule matches
-    // exactly what it always matched.
+    // is compared against a boolean in one rule and a mixed string
+    // list in another, the authoring is ambiguous — the seam refuses
+    // to guess and the record value stays raw. Since the FCA boolean
+    // widening, the comparator itself bridges the LITERAL spellings
+    // ('true' matches `eq true` raw or typed — that's the dead-knock-
+    // out fix), so the cancellation's observable effect lives in the
+    // NON-literal spellings: 'yes' would coerce to true under an
+    // unambiguous boolean gate, but stays raw — and matches nothing —
+    // here.
     const mixed: Plan = {
       id: "policy-book-mixed-rhs",
       version: "1.0.0",
@@ -418,8 +423,13 @@ describe("evaluatePolicyBook — wire-string inputs coerce at the seam (Phase F 
       );
     // Typed caller: the boolean rule fires first — byte-identical to before.
     expect(run(true)[0]!.appetite.tier).toBe("preferred");
-    // Wire caller: the value stays raw (ambiguous evidence), so the
-    // string-authored rule matches — NOT the boolean one.
-    expect(run("true")[0]!.appetite.tier).toBe("submit");
+    // Wire caller, literal spelling: the comparator's boolean seam
+    // matches `eq true` against 'true' (first rule in walk order) —
+    // the workbook-built knock-out fires with or without coercion.
+    expect(run("true")[0]!.appetite.tier).toBe("preferred");
+    // Wire caller, NON-literal spelling: ambiguous evidence means no
+    // coercion — 'yes' stays raw and matches neither rule (under an
+    // unambiguous boolean gate it would coerce and match).
+    expect(run("yes")[0]!.appetite.tier).toBe("standard");
   });
 });

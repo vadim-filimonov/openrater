@@ -10,13 +10,13 @@
 The actuary types an API key in the Connector Studio; it's encrypted with the
 server master key (``RATER_SECRETS_KEY``, a Fernet key) and stored as ciphertext
 keyed by ``connector_id``. The plaintext key is decrypted ONLY at call time
-(func:`get_secret`) — never echoed back to the UI, never written to a snapshot.
+(:func:`get_secret`) — never echoed back to the UI, never written to a snapshot.
 
 Fail-safe posture (the chosen "encrypted at rest" policy):
 
-  * **Writes** (func:`set_secret`) RAISE :class:`SecretsVaultUnavailableError`
+  * **Writes** (:func:`set_secret`) RAISE :class:`SecretsVaultUnavailableError`
     when the master key is unset — a key is never persisted in the clear.
-  * **Reads** (func:`get_secret`) degrade to ``None`` — a connector with no
+  * **Reads** (:func:`get_secret`) degrade to ``None`` — a connector with no
     stored key (or an undecryptable row after a master-key rotation) simply
     falls back to its env var, so a missing/rotated key never crashes a call.
 

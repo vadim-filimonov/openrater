@@ -13,8 +13,8 @@
  *
  * `literal` + `column` resolve inline (62.1/62.2); `connector` resolves
  * via an INJECTED evaluator (62.6) — the resolver never holds the HTTP
- * client. The former `model` arm is retired; see
- * MODEL_SOURCE_RETIRED_MESSAGE below.
+ * client. The former `model` arm is retired (Detachment Brief 1 §4 S1);
+ * see MODEL_SOURCE_RETIRED_MESSAGE below.
  *
  * Pure data + a type guard + the pure per-row resolver. No React, no DOM,
  * no I/O. (Type-only imports of the resolver value shape from
@@ -25,8 +25,8 @@ import type { PolicyAdjustment } from "./policy-adjustments";
 import type { AdjustmentResolver, ResolvedAdjustmentValue } from "./policy-compose";
 
 /**
- * The `{from:"model"}` source arm is retired because OpenRater carries no
- * model registry. External scores enter a plan as
+ * Detachment Brief 1 §4 S1 — the `{from:"model"}` source arm is retired:
+ * OpenRater carries no model registry. External scores enter a plan as
  * TYPED INPUTS (declare the score in `inputs` and read it with a
  * `column` source); nothing probabilistic resolves at rating time. The
  * resolver refuses a legacy model source by name with this message.

@@ -273,7 +273,7 @@ class PlanConnectionsOut(BaseModel):
 class IntegrationPulse(BaseModel):
     """Step 6's strip — health, not analytics (the ADR-0049 fence).
     Quote counts deliberately absent: quoting writes nothing (D-A), so
-    OpenRater has no quote log to count. Events are the durable feed."""
+    Labs has no quote log to count. Events are the durable feed."""
 
     model_config = ConfigDict(extra="forbid")
 

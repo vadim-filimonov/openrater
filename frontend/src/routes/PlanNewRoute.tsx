@@ -93,7 +93,7 @@ export function buildStateOptions(): ComboboxOption[] {
 /**
  * Prefix filter for the State picker. The Combobox default is substring
  * on label/value/hint, which makes "kan" highlight ARkansas (alphabetical)
- * over Kansas — Enter then silently commits the wrong state (caught during use testing,
+ * over Kansas — Enter then silently commits the wrong state (walk-caught,
  * same class as Brief 89's "fr"→Frame trap). Prefix on the name or the
  * USPS code is what state typing means.
  */
@@ -359,7 +359,8 @@ export function PlanNewRoute() {
           </div>
         ) : (
           <>
-            {/* Automatic ingestion is a flagship capability, so it reads as a
+            {/* Brief 92's door, promoted (owner, 2026-07-15): automatic
+                ingestion is a flagship capability, so it reads as a
                 first-class door card — the PlanGenesis whole-card idiom —
                 not a footer text link. */}
             <button
@@ -377,7 +378,7 @@ export function PlanNewRoute() {
                 </span>
                 <span className="plan-new-page__ingest-what">
                   Drop a transcribed filing — the plan builds itself, verified
-                  against the filing's own examples.
+                  against the workbook's test cases.
                 </span>
               </span>
               <ChevronRight className="plan-new-page__ingest-go" aria-hidden />

@@ -51,12 +51,15 @@ describe("buildVerifiedExamples (Brief 93 §1.1.7)", () => {
       }),
     );
     expect(v).not.toBeNull();
-    expect(v!.verdict).toBe("2 of 2 reproduce the filing exactly");
+    // FCA #19 — the ONE shared vocabulary (vectorChecksSummary):
+    // counts CHECKS, same sentence as Exhibits and the build report.
+    expect(v!.verdict).toBe("2 of 2 checks reproduce the filing exactly");
     expect(v!.tone).toBe("success");
     expect(v!.rows[0]).toMatchObject({
       label: "Restaurant · territory 1",
-      expected: "4,112",
-      actual: "4,112",
+      // FCA #35 (finding 125) — steady 2dp in the trust table.
+      expected: "4,112.00",
+      actual: "4,112.00",
       delta: "0.00",
       status: "match",
     });
@@ -82,7 +85,9 @@ describe("buildVerifiedExamples (Brief 93 §1.1.7)", () => {
         mismatched: 1,
       }),
     );
-    expect(v!.verdict).toBe("1 of 2 match the filing — 1 does not");
+    expect(v!.verdict).toBe(
+      "1 of 2 checks reproduce the filing — 1 MISMATCHED",
+    );
     expect(v!.tone).toBe("error");
     expect(v!.rows[1]!.delta).toBe("+88.00");
   });
@@ -98,7 +103,9 @@ describe("buildVerifiedExamples (Brief 93 §1.1.7)", () => {
         near: 1,
       }),
     );
-    expect(v!.verdict).toBe("2 of 2 reproduce the filing (1 within rounding)");
+    expect(v!.verdict).toBe(
+      "2 of 2 checks reproduce the filing (1 within tolerance)",
+    );
     expect(v!.tone).toBe("warn");
     // Two distinct fields → the field rides the label.
     expect(v!.rows[0]!.label).toContain("— total_premium");

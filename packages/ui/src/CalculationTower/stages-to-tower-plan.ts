@@ -68,7 +68,7 @@ function cleanConfig(stage: StageInput): Record<string, unknown> {
 }
 
 /** Capitalize first letter, then restore allowlisted acronyms
- *  ("bpp premium" → "BPP premium", never "Bpp premium"). */
+ *  (MVP-017: "bpp premium" → "BPP premium", never "Bpp premium"). */
 function titleCase(s: string): string {
   if (!s) return s;
   return fixAcronymCase(s.charAt(0).toUpperCase() + s.slice(1));

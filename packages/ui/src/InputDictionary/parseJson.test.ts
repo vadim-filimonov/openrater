@@ -38,11 +38,11 @@ describe("parseInputDictJson", () => {
   it("tolerates snake_case + alternate keys (name, data_type, allowed_values)", () => {
     const { entries } = parseInputDictJson(
       JSON.stringify([
-        { name: "territory", data_type: "string", allowed_values: ["t1", "t2"], derived_from: "zip", source: "derived" },
+        { name: "territory", data_type: "string", allowed_values: ["701", "702"], derived_from: "zip", source: "derived" },
       ]),
     );
     expect(entries[0]?.fieldName).toBe("territory");
-    expect(entries[0]?.allowedValues).toEqual(["t1", "t2"]);
+    expect(entries[0]?.allowedValues).toEqual(["701", "702"]);
     expect(entries[0]?.derivedFrom).toBe("zip");
     expect(entries[0]?.source).toBe("derived");
   });
@@ -59,9 +59,9 @@ describe("parseInputDictJson", () => {
 
   it("E01 — accepts a delimited STRING allowed_values on an enum", () => {
     const { entries } = parseInputDictJson(
-      JSON.stringify([{ fieldName: "territory", data_type: "enum", allowed_values: "t1, t2, t3" }]),
+      JSON.stringify([{ fieldName: "territory", data_type: "enum", allowed_values: "701, 702, 703" }]),
     );
-    expect(entries[0]?.allowedValues).toEqual(["t1", "t2", "t3"]);
+    expect(entries[0]?.allowedValues).toEqual(["701", "702", "703"]);
   });
 
   it("E01 — does NOT turn a non-enum prose string into bogus options", () => {

@@ -49,7 +49,7 @@ def build_base() -> Workbook:
     ws = wb.create_sheet("endorsements")
     ws.append(["endorsement_id", "kind", "form_number", "display_name",
                "factor", "amount", "coverage", "sublimit", "trigger"])
-    ws.append(["equip_breakdown", "factor", "MS 10 01", "Equipment breakdown",
+    ws.append(["equip_breakdown", "factor", "BP 04 17", "Equipment breakdown",
                1.06, "", "", "", ""])
     return wb
 
@@ -106,7 +106,7 @@ def test_diff_states_and_cell_grain() -> None:
     # The removed endorsement names its form + trigger posture.
     endo = by_section["endorsements"]
     assert endo.removed == 1
-    assert "MS 10 01" in endo.items[0].summary
+    assert "BP 04 17" in endo.items[0].summary
     assert "always attached" in endo.items[0].summary
 
     # The filing's revised expectation speaks in those words, with %.
@@ -157,7 +157,7 @@ def test_diff_is_deterministic() -> None:
 
 
 def test_gate_diff_speaks_variables_and_pct_stays_rate_grammar() -> None:
-    """ — a gate move names its VARIABLE ("years_in_business
+    """MVP-022 — a gate move names its VARIABLE ("years_in_business
     threshold 3 → 5"), never the sheet column ("value_2 changed"); and
     pct is rate grammar: absent on thresholds, present on factor cells
     and revised expectations (pinned above)."""
@@ -174,14 +174,14 @@ def test_gate_diff_speaks_variables_and_pct_stays_rate_grammar() -> None:
                    "standard", "Standard appetite"])
         return wb
 
-    base, _ = parse_workbook(to_bytes(with_gates(4_000_000, 3)))
-    new, _ = parse_workbook(to_bytes(with_gates(7_000_000, 5)))
+    base, _ = parse_workbook(to_bytes(with_gates(5_000_000, 3)))
+    new, _ = parse_workbook(to_bytes(with_gates(6_000_000, 5)))
     gates = next(
         s for s in diff_workbooks(base, new).sections if s.section == "gates"
     )
     item = next(i for i in gates.items if i.state == "changed")
     assert item.summary == (
-        "Rule decline_big_young: tiv threshold 4000000 → 7000000; "
+        "Rule decline_big_young: tiv threshold 5000000 → 6000000; "
         "years_in_business threshold 3 → 5."
     )
     assert "value_2" not in item.summary
@@ -306,7 +306,7 @@ def test_reingest_check_refusals_and_fallbacks(client, monkeypatch) -> None:  # 
 
     # Hand-edited-since-build flag (CT-4's data half).
     conn = db.connection()
-    # A REAL edit (drift tracking: with the as-built hash stored, a bare
+    # A REAL edit (drift-honesty: with the as-built hash stored, a bare
     # timestamp touch that changed no content is no longer an edit).
     resp_edit = client.put(
         f"/api/v1/plans/{plan_id}/factor-tables/construction_class/cells",

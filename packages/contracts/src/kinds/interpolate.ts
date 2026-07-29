@@ -1,15 +1,19 @@
 /**
  * `interpolate` kind — linear interpolation between breakpoints.
  *
- * A relativity the filing interpolates (Meridian Rule MS-R23.2 — a
+ * A relativity the filing INTERPOLATES (ISO BOP Rule 23.A.2.d — a
  * building-limit factor read off a curve between breakpoints) can't be
  * expressed by a banded factor table, which STEPS at the band's lower
  * bound. `derive.band` discards the continuous value, so nothing
  * downstream has both the actual `x` and the two bracketing factors —
- * exactly what interpolation needs.
+ * exactly what interpolation needs (audit A-2026-07-12 P5-01, the F14
+ * gap; ADR-0063).
  *
- * The projector wires this from a factor table flagged
- * `interpolation: "linear"`, reusing the table's breakpoints as `points`.
+ * This is the ~60-line interpolation MATH only. It restores what Brief
+ * 34 PR 34.7 removed alongside the (rightly-cut) 2.5k-line Curve
+ * authoring surface — none of that surface returns; the projector wires
+ * this from a factor table flagged `interpolation: "linear"`, reusing
+ * the table's breakpoints as `points`.
  *
  * Given ascending `points` [(x₀,y₀)…(xₙ,yₙ)] and an input `x`:
  *   - x on a breakpoint → that point's y, byte-exact (so a plan sitting
@@ -18,7 +22,7 @@
  *   - x outside [x₀, xₙ] → the nearest endpoint y when `clamp` (default),
  *     else linear extrapolation off the end segment;
  *   - non-finite x (or no points) → NaN, which the output backstop
- *     withholds the output rather than inventing a premium.
+ *     WITHHOLDS (ADR-0056; never improvise a premium, audit P1-01).
  *
  * Pure: same (x, points) → same y forever (reproducibility §6).
  */
@@ -163,6 +167,15 @@ export const InterpolateKind: BlockKind<
     const x = toFiniteNumber(inputs.x);
     const pts = params.points ?? [];
     const axis = params.axisLabel ? `${params.axisLabel}=` : "x=";
+    // FCA #34 (findings 40/47) — an exactly-on-anchor lookup was
+    // narrated as interpolation ("between (600000, …) and
+    // (1000000, …)"), describing a boundary hit as inside a segment.
+    // An anchor hit says what it is.
+    for (const p of pts) {
+      if (toFiniteNumber(p.x) === x) {
+        return `${axis}${x} at the (${p.x}, ${p.y}) anchor → ${outputs.y}`;
+      }
+    }
     for (let i = 0; i < pts.length - 1; i++) {
       const xi = toFiniteNumber(pts[i]!.x);
       const xj = toFiniteNumber(pts[i + 1]!.x);

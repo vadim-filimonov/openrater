@@ -21,7 +21,7 @@
  * No floating-point suppression (Brief 12 P-CP10 #3 — show all
  * deltas including epsilon). No reordering for "clarity" (P-CP10 #4).
  *
- * Pure.
+ * Pure. See `docs/design-briefs/comparison-primitive.md` §6.
  */
 
 import type { Plan, PlanEdge, PlanNode } from "../plan-types";

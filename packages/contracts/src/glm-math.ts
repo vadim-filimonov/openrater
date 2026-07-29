@@ -2,9 +2,10 @@
  * Pure GLM math — the deterministic core the `model.glm` kind evaluates
  * inline coefficients through (Plan Format Spec v1 §4.5).
  *
- * OpenRater keeps this small mathematical core without registry, format-adapter,
- * or external evaluator machinery: a coefficient table is the model. Zero
- * binary dependencies, pure and total.
+ * Extracted from the retired model-artifact module (Detachment Brief 1
+ * §4 S1): the registry, format adapters, and evaluator machinery left
+ * with the Model Lab cut; a coefficient table IS a model, and this math
+ * is all the engine ever needed. Zero binary deps, pure + total.
  */
 
 /** The PURE prediction an adapter computes — no clock, no cache. */

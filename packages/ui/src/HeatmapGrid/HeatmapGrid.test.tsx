@@ -19,7 +19,7 @@ import { cellKey, type FactorTableGrid2DAxis } from "../FactorTableGrid2D";
 const ROW_AXIS: FactorTableGrid2DAxis = {
   dimSlug: "class",
   values: [
-    { id: "c103", label: "c103 · Concrete" },
+    { id: "91342", label: "91342 · Concrete" },
     { id: "91560", label: "91560 · Electrical" },
     { id: "91585", label: "91585 · Plumbing" },
   ],
@@ -34,8 +34,8 @@ const COL_AXIS: FactorTableGrid2DAxis = {
 };
 
 const CELLS = new Map<string, number>([
-  [cellKey("c103", "owner"), 1.35],
-  [cellKey("c103", "tenant"), 1.42],
+  [cellKey("91342", "owner"), 1.35],
+  [cellKey("91342", "tenant"), 1.42],
   [cellKey("91560", "owner"), 1.18],
   [cellKey("91560", "tenant"), 1.0],
   [cellKey("91585", "owner"), 0.78],
@@ -68,10 +68,10 @@ describe("<HeatmapGrid> heat encoding", () => {
     // 1.35 → 6 (deep surcharge), 1.42 → 6, 1.18 → 5 (15–30% band),
     // 1.0 → 3 (baseline), 0.78 → 2.
     expect(
-      screen.getByTestId("rater-heatmap-grid-cell-c103-owner"),
+      screen.getByTestId("rater-heatmap-grid-cell-91342-owner"),
     ).toHaveAttribute("data-bucket", "6");
     expect(
-      screen.getByTestId("rater-heatmap-grid-cell-c103-tenant"),
+      screen.getByTestId("rater-heatmap-grid-cell-91342-tenant"),
     ).toHaveAttribute("data-bucket", "6");
     expect(
       screen.getByTestId("rater-heatmap-grid-cell-91560-owner"),
@@ -96,7 +96,7 @@ describe("<HeatmapGrid> heat encoding", () => {
   it("cell content shows the formatted value (or · for empty)", () => {
     render(<HeatmapGrid rowAxis={ROW_AXIS} colAxis={COL_AXIS} cells={CELLS} />);
     expect(
-      screen.getByTestId("rater-heatmap-grid-cell-c103-owner"),
+      screen.getByTestId("rater-heatmap-grid-cell-91342-owner"),
     ).toHaveTextContent("1.35");
     expect(
       screen.getByTestId("rater-heatmap-grid-cell-91585-tenant"),
@@ -139,14 +139,14 @@ describe("<HeatmapGrid> focus + hover", () => {
         onHoverChange={onHover}
       />,
     );
-    const cell = screen.getByTestId("rater-heatmap-grid-cell-c103-tenant");
+    const cell = screen.getByTestId("rater-heatmap-grid-cell-91342-tenant");
     fireEvent.mouseEnter(cell);
-    expect(onHover).toHaveBeenCalledWith("c103", "tenant");
+    expect(onHover).toHaveBeenCalledWith("91342", "tenant");
   });
 
   it("local hover applies the focus highlight without a parent round-trip", () => {
     render(<HeatmapGrid rowAxis={ROW_AXIS} colAxis={COL_AXIS} cells={CELLS} />);
-    const cell = screen.getByTestId("rater-heatmap-grid-cell-c103-tenant");
+    const cell = screen.getByTestId("rater-heatmap-grid-cell-91342-tenant");
     fireEvent.mouseEnter(cell);
     expect(cell).toHaveAttribute("data-focused", "true");
     fireEvent.mouseLeave(cell);
@@ -157,7 +157,7 @@ describe("<HeatmapGrid> focus + hover", () => {
 describe("<HeatmapGrid> title tooltip", () => {
   it("title carries the deviation percentage", () => {
     render(<HeatmapGrid rowAxis={ROW_AXIS} colAxis={COL_AXIS} cells={CELLS} />);
-    const cell = screen.getByTestId("rater-heatmap-grid-cell-c103-owner");
+    const cell = screen.getByTestId("rater-heatmap-grid-cell-91342-owner");
     expect(cell.getAttribute("title")).toContain("+35.0%");
   });
 
@@ -204,13 +204,13 @@ describe("<HeatmapGrid> filed overlay (Brief 34 PR 34.6)", () => {
         colAxis={COL_AXIS}
         cells={CELLS}
         filedCells={
-          new Map<string, number>([[cellKey("c103", "owner"), 1.25]])
+          new Map<string, number>([[cellKey("91342", "owner"), 1.25]])
         }
       />,
     );
     // 1.35 vs 1.25 → +8.0%
     const delta = screen.getByTestId(
-      "rater-heatmap-grid-cell-delta-c103-owner",
+      "rater-heatmap-grid-cell-delta-91342-owner",
     );
     expect(delta).toBeInTheDocument();
     expect(delta.textContent).toMatch(/\+?8\.0%/);
@@ -223,12 +223,12 @@ describe("<HeatmapGrid> filed overlay (Brief 34 PR 34.6)", () => {
         colAxis={COL_AXIS}
         cells={CELLS}
         filedCells={
-          new Map<string, number>([[cellKey("c103", "owner"), 1.35]])
+          new Map<string, number>([[cellKey("91342", "owner"), 1.35]])
         }
       />,
     );
     expect(
-      screen.queryByTestId("rater-heatmap-grid-cell-delta-c103-owner"),
+      screen.queryByTestId("rater-heatmap-grid-cell-delta-91342-owner"),
     ).not.toBeInTheDocument();
   });
 });

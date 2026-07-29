@@ -131,7 +131,7 @@ describe("planStagesToAppetite (Brief 70 §3)", () => {
         vmRule({
           id: "r1",
           tier: "decline",
-          variable: "risk_score",
+          variable: "protection_class",
           op: "in",
           value: "9, 10",
           }),

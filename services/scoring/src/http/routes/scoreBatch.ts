@@ -20,7 +20,7 @@ import type { FastifyPluginAsync } from "fastify";
 import { badRequest, notFound } from "../../core/errors";
 import { toJobSpec } from "../../core/jobSpec";
 import { parseScoreBatchRequest } from "../../core/schema";
-import type { JobQueue } from "../../ports/jobQueue";
+import type { JobQueue, JobRecord } from "../../ports/jobQueue";
 import type { ResultStore } from "../../ports/resultStore";
 
 export interface BatchDeps {
@@ -32,6 +32,68 @@ export interface BatchDeps {
 
 function todayUtc(): string {
   return new Date().toISOString().slice(0, 10);
+}
+
+async function loadSummaryOf(
+  store: ResultStore,
+  jobId: string,
+): Promise<unknown | null> {
+  if (!("loadSummary" in store)) return null;
+  return (
+    store as { loadSummary(id: string): Promise<unknown | null> }
+  ).loadSummary(jobId);
+}
+
+/**
+ * FCA fca-2026-07-25 #22 — the queue record is process memory; the
+ * artifacts are durable. A sidecar restart used to orphan every
+ * finished job ("the rows aren't available anymore" the same day the
+ * run was made) because these routes 404'd on the queue miss without
+ * ever consulting the store. Rebuild the lifecycle record from what's
+ * on disk: a summary (written once, post-composition) or a complete
+ * results file proves the job finished; artifacts without either mean
+ * the restart interrupted it — say so, never a phantom 404.
+ */
+async function recordOrReconstruct(
+  deps: BatchDeps,
+  jobId: string,
+): Promise<JobRecord | null> {
+  const live = await deps.queue.get(jobId);
+  if (live) return live;
+  const spec = await deps.store.loadSpec(jobId);
+  if (spec === null) return null;
+
+  const results = await deps.store.readResults(jobId, 0, 1);
+  const summary = await loadSummaryOf(deps.store, jobId);
+  if (summary !== null) {
+    return {
+      jobId,
+      status: "succeeded",
+      progress: { done: results.total, total: results.total },
+      // The queue held the timestamps; they died with it. Blank is
+      // honest — never invent a time.
+      createdAt: "",
+    };
+  }
+  const input = await deps.store.loadInput(jobId);
+  if (input.length > 0 && results.total >= input.length) {
+    return {
+      jobId,
+      status: "succeeded",
+      progress: { done: results.total, total: input.length },
+      createdAt: "",
+    };
+  }
+  return {
+    jobId,
+    status: "failed",
+    progress: { done: results.total, total: input.length },
+    createdAt: "",
+    error:
+      `a scoring-service restart interrupted this job after ` +
+      `${results.total} of ${input.length} rows — re-run it to ` +
+      `regenerate the results`,
+  };
 }
 
 export function scoreBatchRoutes(deps: BatchDeps): FastifyPluginAsync {
@@ -70,7 +132,7 @@ export function scoreBatchRoutes(deps: BatchDeps): FastifyPluginAsync {
     app.get<{ Params: { id: string } }>(
       "/score-batch/:id",
       async (request, reply) => {
-        const record = await deps.queue.get(request.params.id);
+        const record = await recordOrReconstruct(deps, request.params.id);
         if (!record) throw notFound(`job ${request.params.id} not found`);
         void reply.send(record);
       },
@@ -80,7 +142,7 @@ export function scoreBatchRoutes(deps: BatchDeps): FastifyPluginAsync {
       Params: { id: string };
       Querystring: { offset?: string; limit?: string };
     }>("/score-batch/:id/result", async (request, reply) => {
-      const record = await deps.queue.get(request.params.id);
+      const record = await recordOrReconstruct(deps, request.params.id);
       if (!record) throw notFound(`job ${request.params.id} not found`);
 
       const offset = Math.max(0, Number(request.query.offset ?? "0") || 0);

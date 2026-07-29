@@ -10,7 +10,7 @@
  * modal is the "show me the receipt" affordance: the build-up's `snapshot`
  * button opens it.
  *
- * App-local (not a `@openrater/ui` primitive) because it FETCHES — the UI package
+ * App-local (not a `@openrater/ui` primitive) because it FETCHES — labs-ui
  * stays HTTP-free. Reuses the design-system <Modal>; secrets are never in a
  * snapshot (the backend excludes them at capture), so the raw request is safe
  * to show.

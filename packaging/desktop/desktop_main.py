@@ -5,7 +5,7 @@
 # You may obtain a copy of the License at
 #
 #     http://www.apache.org/licenses/LICENSE-2.0
-"""The desktop runtime's server entrypoint.
+"""The desktop runtime's server entrypoint (Brief 2 §6, D12).
 
 This is what PyInstaller freezes into `openrater-server`. It honors
 the SERVER COMMAND CONTRACT the MCP supervisor spawns it under

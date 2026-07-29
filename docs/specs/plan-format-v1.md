@@ -6,7 +6,7 @@
 | **Status**       | Draft                                       |
 | **Created**      | 2026-05-17                                  |
 | **Editor**       | Vadim Filimonov ([@vadim-filimonov](https://github.com/vadim-filimonov)) |
-| **License**      | Apache-2.0                                  |
+| **License**      | CC BY 4.0                                   |
 | **Tracks**       | Reference impl: `packages/contracts` (types + runtime) and `server/` (persistence + API) in this repo |
 
 ---
@@ -311,16 +311,18 @@ The following BlockKinds are part of spec v1. A compatible implementation MUST s
 | `lookup-direct` | lookup | `key: string` | `factor` | Direct key → factor lookup in a referenced Factor Table. |
 | `lookup-range` | lookup | `value: float` | `factor` | Range-based bucket lookup. |
 | `lookup-classification` | lookup | `class_code: class_code` | `factor` | Class-code-driven base-rate lookup. |
-| `lookup-territory` | lookup | `state: string`, `zip5: string` | `record<string, float>` | Territory resolver. Returns the filing-defined numeric factor record on the Territory entity. |
+| `lookup-territory` | lookup | `state: string`, `zip5: string` | `record<...>` | Territory resolver. Returns the 6-base-rate record defined by the Territory entity. |
 | `lookup-multi` | lookup | varies | `factor` | Multi-key lookup. `params.keys` defines the input ports. |
 
 **Interpolation**
 
-> `curve-evaluate` was removed because 1-D banded factor tables are the
-> canonical 1-D relativity representation; the Curve authoring surface is
-> gone. The interpolation *math* — a relativity read **between** breakpoints
-> rather than stepped at them — remains as the lean `interpolate` kind. Its
-> breakpoints are inline `params`, with no separate entity to reference.
+> `curve-evaluate` was removed in Brief 34 PR 34.7 (1-D banded factor
+> tables are the canonical 1-D relativity representation; the Curve
+> authoring surface is gone). The interpolation *math* — a relativity
+> read **between** breakpoints rather than stepped at them, e.g. ISO
+> BOP Rule 23.A.2.d — returns as the lean `interpolate` kind
+> (ADR-0063; audit A-2026-07-12 P5-01/F14). Its breakpoints are
+> inline `params` — no separate entity to reference.
 
 | kind | category | inputs | output | purpose |
 | ---- | -------- | ------ | ------ | ------- |
@@ -484,7 +486,7 @@ The reference implementation enforces all of the above.
 
 A `subplan` node references another Plan by `{id, content_hash}`. The referenced Plan is executed as a callable: its declared `input` nodes receive values from the subplan node's input ports (matched by name), and its declared `output` nodes' values become the subplan node's output ports.
 
-Subplans MUST reference the inner Plan by **both** id and content hash. Resolving a subplan by id alone is forbidden because it would allow the meaning of a Plan to drift when the inner Plan is updated, breaking reproducibility.
+Subplans MUST reference the inner Plan by **both** id and content hash. Resolving a subplan by id alone is forbidden — it would allow the meaning of a Plan to drift when the inner Plan is updated, breaking the reproducibility guarantee (ADR-0015).
 
 Recursive subplans (a Plan that transitively references itself) are forbidden and MUST be rejected at compile time as a `cycle` error.
 
@@ -548,9 +550,9 @@ Dimension {
 
 Dimensions are referenced by Block params (e.g., a `lookup-direct` block's `input_binding`) and by Coverage Chains.
 
-#### 6.2.1 Geographic dimension lookup domain
+#### 6.2.1 Geographic dimension lookup domain (ADR-0038)
 
-A Dimension MAY be **geographic** (`dimension_type: "geographic"`), in which case it carries three optional fields persisted by the registry and treated by the engine as a substitutable variable:
+A Dimension MAY be **geographic** (`dimension_type: "geographic"`), in which case it carries three optional fields (the Brief 44 substrate; persisted by the registry, treated by the engine as a substitutable variable):
 
 ```
 geo_granularity:  "state" | "county" | "zip"   // the unit of the dim's levels; locked at creation
@@ -567,7 +569,7 @@ A geographic dim's **lookup domain** — the single key space the factor grid ke
 
 The **acceptance domain** a conforming input validator MUST accept without flagging a mismatch is exactly the set of values that resolve to a non-null key: `{ all level ids } ∪ { active territory ids } ∪ { their member ids }`. An unmapped geographic value is a *diagnostic*, not a hard error — it scores at the lookup's default (see the engine contract §"derive.territory").
 
-The runtime mechanism that performs this resolution is the `derive.territory` block kind (engine-contract §8; conformance vectors V22–V25). Note this is **orthogonal** to the legacy standalone `Territory` entity (§6.5), which is a separate `(state, zip5) → factor-record` resolver for the `lookup-territory` block; a geographic *dimension* resolves *grouping of already-known levels*, not address geocoding.
+The runtime mechanism that performs this resolution is the `derive.territory` block kind (engine-contract §8; conformance vectors V22–V25). Note this is **orthogonal** to the legacy standalone `Territory` entity (§6.5), which is a separate `(state, zip5) → 6-base-rate-record` resolver for the `lookup-territory` block; a geographic *dimension* resolves *grouping of already-known levels*, not address geocoding.
 
 ### 6.3 Factor Table
 
@@ -625,27 +627,30 @@ Control points MUST be supplied in sorted-by-x order in canonical-JSON serializa
 
 ### 6.5 Territory
 
-A named geographic region defined by ZIP5s plus a filing-defined set of
-numeric factors. Factor keys are plan data; the platform does not prescribe
-a line of business or coverage set.
+A named geographic region defined by ZIP5s plus six base loss costs.
 
 ```
 Territory {
   territory_id:      string
   display_name:      string
   state_code:        string (2)
-  territory_code:    string         // filing-defined code, e.g. fictional "t1"
+  territory_code:    string         // ISO-style territory code
   zips:              string[]       // ZIP5 strings, sorted ascending in canonical form
-  base_rates:        record<string, float>
+  base_rates: {
+    building_per_100:                float
+    bpp_per_100:                     float
+    occupant_liab_per_100:           float
+    occupant_liab_per_1k_sales:      float
+    occupant_liab_per_1k_payroll:    float
+    lessors_per_100:                 float
+  }
   status, created_at, last_edited_at, content_hash
 }
 ```
 
 A `lookup-territory` block takes `(state, zip5)`, finds the Territory whose `state_code` matches and whose `zips` list contains the ZIP5, and returns the `base_rates` record.
 
-A caller-defined fallback record provides the values when no Territory
-matches. The neutral built-in id is the fictional Meridian reference id `t0`;
-published plans should set the code and factors stated by their own source.
+A deployment-wide fallback Territory (territory_code `704`, "rural baseline") provides the values when no Territory matches.
 
 ### 6.6 Source / SourceUpdate
 
@@ -677,7 +682,7 @@ SourceUpdate {
 }
 ```
 
-A Plan that references vendor data at runtime MUST resolve that reference to a specific SourceUpdate at publish time and snapshot the data into the Plan body. The Plan retains the `{source_id, source_update_id, sha256}` triple for audit.
+A Plan that references vendor data at runtime MUST resolve that reference to a specific SourceUpdate at publish time and snapshot the data into the Plan body (per ADR-0015 invariant 3). The Plan retains the `{source_id, source_update_id, sha256}` triple for audit.
 
 ---
 
@@ -699,7 +704,7 @@ The choice of form is determined by the **status of the referencing entity**:
 | `active` | id+hash REQUIRED |
 | `archived` | id+hash REQUIRED (inherited from the active form) |
 
-Once a Plan is `active`, every reference it makes to another entity MUST be a pinned id+hash reference. This makes the reproducibility guarantee provable: re-evaluating an active Plan with the same external inputs and `as_of` MUST produce byte-identical outputs forever.
+Once a Plan is `active`, every reference it makes to another entity MUST be a pinned id+hash reference. This is what makes the reproducibility guarantee (ADR-0015 invariant 2) provable: re-evaluating an active Plan with the same external inputs and `as_of` MUST produce byte-identical outputs forever.
 
 Subplan references (§5.5) are always id+hash, regardless of status.
 
@@ -800,7 +805,7 @@ An `active` Plan is byte-frozen (§3.3). The combination of:
 - vendor data being snapshotted at publish time,
 - the explicit `as_of` parameter at runtime,
 
-guarantees that re-running an active Plan with the same external inputs and `as_of` produces byte-identical outputs forever.
+guarantees that re-running an active Plan with the same external inputs and `as_of` produces byte-identical outputs forever. This is the reproducibility guarantee (ADR-0015).
 
 ### 9.3 Migration strategy
 
@@ -943,7 +948,7 @@ The following items are intentionally unresolved in this draft. Each is tracked 
 3. **Multi-jurisdictional Plan ergonomics.** Plans with `jurisdiction: null` work today via per-state stacked Blocks. Open question: is this the right ergonomic for the long tail of 50-state filings, or do we introduce a first-class "state amendment" entity?
 4. **Block kind versioning.** A Block kind's `execute` semantics might evolve subtly (e.g., a new corner case in `chain-mult` when one factor is null). Open question: do we add a `kind_version` field to the Block schema and bind a Plan to a specific kind version at publish time?
 5. **Streaming evaluation for very large batches.** The current spec requires loading all external inputs before a run starts. A backend rating a million-row reinsurance treaty cession needs streaming. Open question: do we add a streaming variant of the run protocol, or push that into the REST layer?
-6. **Vendor data snapshotting limits.** Vendor data is snapshotted into the Plan body at publish time. For very large datasets (full state ZIP tables), this bloats the Plan. Open question: do we permit referenced-by-hash external blobs (content-addressed BLOBs in object storage) instead of inline snapshots?
+6. **Vendor data snapshotting limits.** ADR-0015 invariant 3 says vendor data is snapshotted into the Plan body at publish time. For very large datasets (full state ZIP tables), this bloats the Plan. Open question: do we permit referenced-by-hash external blobs (content-addressed BLOBs in object storage) instead of inline snapshots?
 7. **Cross-Lab references.** This spec covers Plans referencing Models, Sources, and Datasets. Once Model Lab and Data Lab are real, those entities will have their own format specs. Open question: do we extend `LineageNodeKind` now to reserve the future kinds, or wait?
 8. **Internationalization of display fields.** `display_name` and `description` are plain strings today. Open question: do we add `display_name_i18n: { [locale: string]: string }` for non-English deployments?
 
@@ -989,7 +994,7 @@ A summary of the cross-cutting invariants stated throughout this spec:
 | I4 | All cross-entity references in an `active` Plan are pinned by id+hash. | §7.1 |
 | I5 | Money values never flow into factor or pct ports. | §4.3 |
 | I6 | The runtime is a pure function of `(externalInputs, asOf)`. | §5.6 |
-| I7 | Vendor data is snapshotted into the Plan at publish time. | §6.6 |
+| I7 | Vendor data is snapshotted into the Plan at publish time. | §6.6, ADR-0015 |
 | I8 | Every executed node contributes to the trace. | §5.3, §10.3 |
 | I9 | The 14-section spine ordering is fixed; no Plan reorders or renames sections. | §3.2 |
 | I10 | Subplan references are always id+hash regardless of status. | §5.5 |

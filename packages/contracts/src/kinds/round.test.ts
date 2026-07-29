@@ -9,8 +9,8 @@ describe("RoundKind", () => {
     expect(RoundKind.outputs[0]?.name).toBe("value");
   });
 
-  it("rounds a filed rate to 3 decimals", () => {
-    // round(0.615890…, 3) = 0.616 before × exposure × LCM.
+  it("rounds to 3 decimals (the ISO rate rounding)", () => {
+    // The reference build: round(0.615890…, 3) = 0.616 before ×exposure×LCM.
     expect(RoundKind.execute({ value: 0.6158901 }, { decimals: 3 }).value).toBe(
       0.616,
     );

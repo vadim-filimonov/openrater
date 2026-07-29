@@ -16,6 +16,9 @@
  * `clampLo` / `clampHi` apply to the stub's output too, so a chain
  * that wraps the model factor with a [0.5, 2.0] guardrail still
  * sees the guardrail respected even when the model is mocked.
+ *
+ * Ported from `<prototype>/plan-builder/src/blocks/kinds/
+ * model-rating.tsx` (Phase A.1 PR 9). PURE half only.
  */
 
 import type { BlockKind, PortSpec } from "../block-types";

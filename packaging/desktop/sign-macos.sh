@@ -1,5 +1,6 @@
 #!/bin/sh
-# Sign and notarize the assembled macOS bundle root, then re-pack it.
+# Sign + notarize the assembled macOS bundle root, then re-pack (D14,
+# per SIGNING.md — the Apple-only path the owner chose 2026-07-19).
 #
 # Runs AFTER build-mcpb.sh (the unsigned root + artifact exist) and
 # expects these env vars, all supplied by CI secrets:
@@ -11,11 +12,12 @@
 #   NOTARY_TEAM_ID          the 10-char team id
 #   NOTARY_PASSWORD         an app-specific password
 #
-# Missing secrets exit successfully so local development builds remain
-# available. Release builds find and sign every Mach-O file before
-# submitting a zip of the signed root for notarization. Bare executables
-# cannot be stapled, so Gatekeeper verifies the ticket online at first
-# launch.
+# Missing secrets → exit 0 with a note (unsigned dev builds never
+# block; the CI step is additive). Signing walks INNER-FIRST per the
+# runbook: every Mach-O inside the PyInstaller one-dir, then the
+# frozen executable, then the bundled Node runtime. Notarization
+# submits a zip of the signed root; bare executables can't be stapled,
+# so Gatekeeper verifies the ticket online at first launch.
 set -e
 cd "$(dirname "$0")/../.."
 ROOT="$PWD/packaging/desktop/dist/mcpb-root"
@@ -41,80 +43,40 @@ security set-key-partition-list -S apple-tool:,apple: -s \
 security list-keychains -d user -s "$KEYCHAIN" login.keychain-db
 rm -f "$RUNNER_TEMP/cert.p12"
 
+# sign <file> [entitlements.plist] — hardened runtime always; the
+# optional plist is for the ONE binary that JITs (runtime/node).
 sign() {
-  codesign --force --options runtime --timestamp \
-    --keychain "$KEYCHAIN" --sign "$MACOS_SIGN_IDENTITY" "$1"
+  if [ -n "${2:-}" ]; then
+    codesign --force --options runtime --timestamp --entitlements "$2" \
+      --keychain "$KEYCHAIN" --sign "$MACOS_SIGN_IDENTITY" "$1"
+  else
+    codesign --force --options runtime --timestamp \
+      --keychain "$KEYCHAIN" --sign "$MACOS_SIGN_IDENTITY" "$1"
+  fi
 }
 
-echo "── sign every Mach-O in the bundle, deepest-first"
-# Apple rejects any unsigned Mach-O, including helper binaries without a
-# conventional extension. Inspect file contents and sign nested code first.
-MACHO_LIST="$RUNNER_TEMP/macho.list"
-: > "$MACHO_LIST"
-find "$ROOT" -type f | while IFS= read -r f; do
-  if file -b "$f" 2>/dev/null | grep -q 'Mach-O'; then
-    printf '%s\t%s\n' "$(printf '%s' "$f" | tr -cd '/' | wc -c)" "$f" \
-      >> "$MACHO_LIST"
-  fi
-done
-COUNT=$(wc -l < "$MACHO_LIST" | tr -d ' ')
-echo "   $COUNT Mach-O files to sign"
-sort -rn "$MACHO_LIST" | cut -f2- | while IFS= read -r f; do sign "$f"; done
+echo "── sign inner Mach-Os (PyInstaller one-dir), inner-first"
+find "$ROOT/server" -type f \( -name '*.so' -o -name '*.dylib' \) \
+  -print0 | while IFS= read -r -d '' f; do sign "$f"; done
+sign "$ROOT/server/openrater-server"
 
-# PyInstaller links _internal/Python into Python.framework, and codesign
-# gives the framework binary a bundle-context signature that leans on its
-# _CodeSignature sidecar. Zip packing materializes symlinks into copies,
-# orphaning that signature — the shipped copy then fails dyld validation.
-# Materialize Mach-O symlinks now and give each copy its own flat,
-# self-contained signature.
-find "$ROOT" -type l | while IFS= read -r l; do
-  # Framework-internal symlinks are bundle plumbing; their materialized
-  # copies are never loaded, and codesign refuses paths like
-  # Foo.framework/Foo as "bundle format is ambiguous". Leave them be.
-  case "$l" in *.framework/*) continue ;; esac
-  t="$(readlink -f "$l" 2>/dev/null)" || continue
-  [ -f "$t" ] || continue
-  if file -b "$t" 2>/dev/null | grep -q 'Mach-O'; then
-    rm "$l" && cp "$t" "$l" && sign "$l"
-    echo "   materialized + flat-signed: $l"
-  fi
+echo "── sign the bundled Node runtime (JIT entitlements — PRE-1)"
+# Hardened runtime WITHOUT allow-jit kills V8's code-range reservation:
+# the signed node then dies on any real script while `node --version`
+# still passes — exactly how v0.1.0 shipped with a dead scoring
+# sidecar. The entitlements ride the main executable only; dylibs are
+# signed plain.
+sign "$ROOT/runtime/node" "$PWD/packaging/desktop/node.entitlements.plist"
+for lib in "$ROOT"/lib/libnode*.dylib; do
+  [ -e "$lib" ] || continue
+  sign "$lib"
 done
 
-# V8 needs JIT memory. The official Node binary ships with allow-jit
-# entitlements, and the bare re-sign above strips them — newer macOS then
-# kills the runtime at startup ("Failed to reserve virtual memory for
-# CodeRange", SIGTRAP). Give the bundled runtime its entitlements back;
-# notarization accepts these.
-if [ -f "$ROOT/runtime/node" ]; then
-  ENTITLEMENTS="$RUNNER_TEMP/node.entitlements"
-  cat > "$ENTITLEMENTS" <<'PLIST'
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-  <key>com.apple.security.cs.allow-jit</key><true/>
-  <key>com.apple.security.cs.allow-unsigned-executable-memory</key><true/>
-</dict>
-</plist>
-PLIST
-  codesign --force --options runtime --timestamp \
-    --entitlements "$ENTITLEMENTS" \
-    --keychain "$KEYCHAIN" --sign "$MACOS_SIGN_IDENTITY" "$ROOT/runtime/node"
-fi
-
-# Forensics: prove the signatures are valid at each stage, so a runtime
-# "code signature invalid" can be pinned to the stage that broke it.
-echo "── verify signed root (spot-check)"
-for f in "$ROOT/server/_internal/Python" "$ROOT/server/openrater-server" \
-  "$ROOT/runtime/node"; do
-  [ -f "$f" ] || { echo "   missing: $f"; continue; }
-  codesign -dvv "$f" 2>&1 | grep -E 'CodeDirectory|Signature size' | head -2
-  codesign --verify --verbose=2 "$f" && echo "   OK: $f" \
-    || echo "   VERIFY FAILED IN ROOT: $f"
-done
-codesign -d --entitlements :- "$ROOT/runtime/node" 2>/dev/null | grep -q allow-jit \
-  && echo "   OK: runtime keeps its allow-jit entitlement" \
-  || { echo "   FATAL: runtime/node lost its JIT entitlements"; exit 1; }
+echo "── prove the SIGNED runtime still executes real JS (PRE-1 gate)"
+# Runs before re-pack + notarize, so a bad signature fails the build —
+# never the actuary. Notarization does NOT catch a missing JIT
+# entitlement; only executing real JS does.
+"$PWD/packaging/desktop/verify-node-runtime.sh" "$ROOT/runtime/node"
 
 echo "── re-pack the signed root"
 VERSION=$(node -p "require('./services/mcp/package.json').version")
@@ -122,72 +84,10 @@ PLATFORM=$(node -p "process.platform + '-' + process.arch")
 ARTIFACT="$OUT/openrater-$VERSION-$PLATFORM.mcpb"
 npx --yes @anthropic-ai/mcpb pack "$ROOT" "$ARTIFACT"
 
-echo "── verify the packed artifact roundtrip"
-RT="$RUNNER_TEMP/rt-extract"
-rm -rf "$RT" && mkdir -p "$RT"
-unzip -q "$ARTIFACT" -d "$RT"
-if cmp -s "$ROOT/server/_internal/Python" "$RT/server/_internal/Python"; then
-  echo "   python bytes identical root vs artifact"
-else
-  echo "   PYTHON BYTES DIFFER root vs artifact"
-fi
-codesign --verify --verbose=2 "$RT/server/_internal/Python" \
-  && echo "   OK: artifact python" || echo "   VERIFY FAILED IN ARTIFACT: python"
-# The kernel-grade check: static verify can pass where dyld refuses.
-python3 -c "import ctypes; ctypes.CDLL('$RT/server/_internal/Python')" \
-  && echo "   dlopen OK: artifact python" || echo "   DLOPEN FAILED IN ARTIFACT: python"
-
-if [ "${NOTARY_SKIP:-0}" = "1" ]; then
-  echo "── NOTARY_SKIP=1 — diagnostic build; not submitting to Apple"
-  echo "sign-macos: signed (not submitted) $ARTIFACT"
-  exit 0
-fi
-
-echo "── notarize: submit, then poll (ticket is server-side)"
-# Polling uses short, independent requests so a transient network error or
-# a slow Apple queue does not discard an otherwise valid submission.
+echo "── notarize (ticket is server-side; bare binaries aren't stapled)"
 ditto -c -k --keepParent "$ROOT" "$RUNNER_TEMP/notarize.zip"
-SUBMIT_JSON=$(xcrun notarytool submit "$RUNNER_TEMP/notarize.zip" \
+xcrun notarytool submit "$RUNNER_TEMP/notarize.zip" \
   --apple-id "$NOTARY_APPLE_ID" --team-id "$NOTARY_TEAM_ID" \
-  --password "$NOTARY_PASSWORD" --output-format json --no-wait)
-echo "$SUBMIT_JSON"
-SUBMIT_ID=$(printf '%s' "$SUBMIT_JSON" | python3 -c "import json,sys;print(json.load(sys.stdin).get('id',''))")
-[ -n "$SUBMIT_ID" ] || { echo "notarize: submit returned no id"; exit 1; }
-echo "── submission $SUBMIT_ID — polling for up to ~5 hours"
+  --password "$NOTARY_PASSWORD" --wait
 
-NOTARY_STATUS="In Progress"
-i=0
-while [ "$i" -lt 550 ]; do
-  i=$((i + 1))
-  sleep 30
-  INFO=$(xcrun notarytool info "$SUBMIT_ID" \
-    --apple-id "$NOTARY_APPLE_ID" --team-id "$NOTARY_TEAM_ID" \
-    --password "$NOTARY_PASSWORD" --output-format json 2>/dev/null) || {
-      echo "   poll $i: transient error — retrying"; continue; }
-  NOTARY_STATUS=$(printf '%s' "$INFO" | python3 -c "import json,sys;print(json.load(sys.stdin).get('status',''))" 2>/dev/null)
-  echo "   poll $i: $NOTARY_STATUS"
-  case "$NOTARY_STATUS" in Accepted | Invalid | Rejected) break ;; esac
-done
-
-echo "── notarization: $NOTARY_STATUS (submission $SUBMIT_ID)"
-case "$NOTARY_STATUS" in
-  Accepted)
-    echo "sign-macos: signed + notarized $ARTIFACT"
-    ;;
-  Invalid | Rejected)
-    echo "── Not accepted — Apple's detailed findings:"
-    xcrun notarytool log "$SUBMIT_ID" \
-      --apple-id "$NOTARY_APPLE_ID" --team-id "$NOTARY_TEAM_ID" \
-      --password "$NOTARY_PASSWORD" || true
-    exit 1
-    ;;
-  *)
-    # Apple's queue outlasted the wait. The ticket attaches server-side to
-    # these exact bytes whenever acceptance lands, so a timeout must never
-    # discard the signed artifact — keep it and verify out-of-band.
-    echo "── WARNING: still '$NOTARY_STATUS' after the full wait."
-    echo "── Keeping the signed artifact; acceptance attaches retroactively."
-    echo "── Verify later: xcrun notarytool info $SUBMIT_ID"
-    echo "sign-macos: signed (notarization pending) $ARTIFACT"
-    ;;
-esac
+echo "sign-macos: signed + notarized $ARTIFACT"

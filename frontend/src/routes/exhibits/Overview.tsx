@@ -31,6 +31,10 @@ export interface LedgerRow {
   readonly status: LedgerStatus;
   /** Cells (or levels) moved / total, for changed rows. */
   readonly moved: { readonly changed: number; readonly total: number } | null;
+  /** FCA #24 — members reassigned between this row's territories
+   *  (aliases collapsed). A membership move is a change even when
+   *  every factor cell is identical. */
+  readonly reassigned: number | null;
   /** The row's largest single move, labeled in plan language. */
   readonly biggest: {
     readonly label: string;
@@ -75,20 +79,40 @@ export function Overview({
   readonly bMeta: { readonly inputs: number; readonly tables: number };
   readonly facts: CompareFacts;
   readonly groups: readonly LedgerGroup[];
-  /**  — the UNDERWRITING group (rules · modifiers ·
+  /** MVP-009 — the UNDERWRITING group (rules · modifiers ·
    *  endorsements · loadings), same row grammar. */
   readonly underwriting?: readonly UnderwritingRow[];
   readonly onSelect: (id: string) => void;
 }): JSX.Element {
   const uwChanged = underwriting.filter((r) => r.status !== "same").length;
+  const reassignedTotal = facts.territoryReassignments.reduce(
+    (sum, t) => sum + t.count,
+    0,
+  );
   const bits: string[] = [
     `${facts.changedTables} of ${facts.sharedTables} shared tables change`,
   ];
+  // FCA #24 (findings 74/102) — membership movement leads the story;
+  // the pre-fix lede could read "0 tables change" over real premium
+  // movement when counties swapped territories.
+  if (reassignedTotal > 0) {
+    bits.push(
+      `${reassignedTotal} member${reassignedTotal === 1 ? "" : "s"} reassigned between territories`,
+    );
+  }
   if (uwChanged > 0) {
     bits.push(
       `${uwChanged} underwriting change${uwChanged === 1 ? "" : "s"}`,
     );
   }
+  if (facts.onlyACoverages.length > 0)
+    bits.push(
+      `${facts.onlyACoverages.length} coverage tower${facts.onlyACoverages.length === 1 ? "" : "s"} only in A`,
+    );
+  if (facts.onlyBCoverages.length > 0)
+    bits.push(
+      `${facts.onlyBCoverages.length} coverage tower${facts.onlyBCoverages.length === 1 ? "" : "s"} only in B`,
+    );
   if (facts.newDims.length > 0)
     bits.push(
       `${facts.newDims.length} new question${facts.newDims.length === 1 ? "" : "s"}`,
@@ -109,7 +133,10 @@ export function Overview({
     facts.newDims.length > 0 ||
     facts.removedDims.length > 0 ||
     facts.addedLevels.length > 0 ||
-    facts.removedLevels.length > 0;
+    facts.removedLevels.length > 0 ||
+    facts.territoryReassignments.length > 0 ||
+    facts.onlyACoverages.length > 0 ||
+    facts.onlyBCoverages.length > 0;
 
   return (
     <section className="rater-exh__stage" aria-label="What changed">
@@ -157,11 +184,19 @@ export function Overview({
                     ) : null}
                   </span>
                   <span className="rater-exh__ledger-moved">
-                    {row.moved !== null && row.moved.changed > 0
-                      ? `${row.moved.changed}/${row.moved.total} move`
-                      : row.status === "same"
-                        ? "unchanged"
-                        : ""}
+                    {[
+                      row.moved !== null && row.moved.changed > 0
+                        ? `${row.moved.changed}/${row.moved.total} move`
+                        : "",
+                      // FCA #24 — a moved county is a CHANGE even
+                      // when the factor cells are byte-identical.
+                      row.reassigned !== null && row.reassigned > 0
+                        ? `${row.reassigned} reassigned`
+                        : "",
+                    ]
+                      .filter(Boolean)
+                      .join(" · ") ||
+                      (row.status === "same" ? "unchanged" : "")}
                   </span>
                   <span className="rater-exh__ledger-big">
                     {row.biggest !== null ? (
@@ -188,7 +223,7 @@ export function Overview({
             </div>
           ))}
 
-          {/*  — the compare sees underwriting: rules, modifiers,
+          {/* MVP-009 — the compare sees underwriting: rules, modifiers,
               endorsements, loadings, one terse line each. Not doors —
               their home is the plan's Eligibility/Rating tabs. */}
           {underwriting.length > 0 ? (
@@ -258,6 +293,38 @@ export function Overview({
                 level{entry.ids.length === 1 ? "" : "s"} leave {entry.dim} (
                 {entry.ids.slice(0, 3).join(", ")}
                 {entry.ids.length > 3 ? "…" : ""})
+              </p>
+            ))}
+            {/* FCA #24 (findings 74/102) — moved members, named and
+                deduplicated. The committee summary can no longer say
+                "unchanged" over a territorial redraw. */}
+            {facts.territoryReassignments.map((entry) => (
+              <p key={`tr-${entry.dimSlug}`}>
+                <span className="rater-exh__ledger-mv">⇄</span>{" "}
+                <span className="rater-exh__num">{entry.count}</span> member
+                {entry.count === 1 ? "" : "s"} reassigned in {entry.dim} (
+                {entry.moves
+                  .slice(0, 3)
+                  .map(
+                    (m) => `${m.member} ${m.fromTerritory}→${m.toTerritory}`,
+                  )
+                  .join(", ")}
+                {entry.moves.length > 3 ? "…" : ""})
+              </p>
+            ))}
+            {/* FCA #24 (finding 76) — a retired tower is a plan
+                change; it used to appear nowhere on this page. */}
+            {facts.onlyACoverages.map((name) => (
+              <p key={`ca-${name}`}>
+                <span className="rater-exh__ledger-rm">−</span> {name} — a
+                coverage tower only A rates
+              </p>
+            ))}
+            {facts.onlyBCoverages.map((name) => (
+              <p key={`cb-${name}`}>
+                <span className="rater-exh__ledger-add">＋</span>{" "}
+                <span className="rater-exh__b">{name}</span> — a coverage tower
+                only B rates
               </p>
             ))}
           </div>

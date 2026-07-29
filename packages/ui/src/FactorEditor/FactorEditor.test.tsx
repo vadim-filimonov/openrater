@@ -20,7 +20,7 @@ import type { DimensionRefOption } from "../DimensionRefPicker";
 import type { FactorTableRefOption } from "../FactorTableRefPicker";
 
 const CLASSES: ClassPickerOption[] = [
-  { class_code: "c101", display_name: "Meridian Recreation", family: "Recreation" },
+  { class_code: "73912", display_name: "Bowling Centers", family: "Recreation" },
   { class_code: "60311", display_name: "Lawyers — Offices", family: "Office" },
 ];
 
@@ -61,7 +61,7 @@ describe("isFactorDraftComplete", () => {
     expect(
       isFactorDraftComplete({
         kind: "lookup.classification",
-        class_code: "c101",
+        class_code: "73912",
       }),
     ).toBe(true);
   });
@@ -250,7 +250,7 @@ describe("<FactorEditor> — classification kind", () => {
       />,
     );
     fireEvent.focus(screen.getByRole("combobox", { name: /class/i }));
-    expect(screen.getByText("Meridian Recreation")).toBeInTheDocument();
+    expect(screen.getByText("Bowling Centers")).toBeInTheDocument();
     expect(screen.getByText("Lawyers — Offices")).toBeInTheDocument();
   });
 
@@ -264,10 +264,10 @@ describe("<FactorEditor> — classification kind", () => {
       />,
     );
     fireEvent.focus(screen.getByRole("combobox", { name: /class/i }));
-    fireEvent.mouseDown(screen.getByText("Meridian Recreation"));
+    fireEvent.mouseDown(screen.getByText("Bowling Centers"));
     expect(onChange).toHaveBeenCalledWith({
       kind: "lookup.classification",
-      class_code: "c101",
+      class_code: "73912",
     });
   });
 

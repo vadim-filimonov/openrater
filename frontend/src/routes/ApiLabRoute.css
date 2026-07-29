@@ -112,7 +112,7 @@
   color: #fff;
   background: var(--rater-accent-primary);
 }
-.apilab__btn--primary:hover:not(disabled) {
+.apilab__btn--primary:hover:not(:disabled) {
   background: var(--rater-accent-primary-hover);
 }
 .apilab__btn--ghost {
@@ -120,7 +120,7 @@
   background: var(--rater-surface-2);
   border-color: var(--rater-border-subtle);
 }
-.apilab__btn--ghost:hover:not(disabled) {
+.apilab__btn--ghost:hover:not(:disabled) {
   border-color: var(--rater-accent-primary);
   color: var(--rater-text-strong);
 }

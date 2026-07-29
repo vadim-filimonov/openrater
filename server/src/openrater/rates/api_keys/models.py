@@ -11,7 +11,7 @@ A key gates the quote endpoint for external callers (D-D). The SECRET is
 returned exactly once — at mint — and stored only as a SHA-256 hash;
 every read after that is metadata (a recognizable prefix, never the
 secret). The gate is optional (`RATER_QUOTE_REQUIRE_KEY`), so OpenRater
-OpenRater ships open and a carrier locks it down without forking.
+Labs ships open and a carrier locks it down without forking.
 """
 
 from __future__ import annotations

@@ -29,7 +29,7 @@ const COMPLETE: FlatFactorDraft = {
   display_name: "Expense loading",
   factor_kind: "expense_loading",
   factor: 1.35,
-  citation_rule: "Meridian BOP §5.A.2",
+  citation_rule: "ISO BOP §5.A.2",
   citation_page: "p. 31",
   description_template: "{factor_kind}: ×{value}",
   predicate_path: "",

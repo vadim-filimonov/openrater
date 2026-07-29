@@ -1,6 +1,6 @@
 {
   "name": "P5.policy-package-factor-guarded-miss",
-  "description": "A guarded package factor that does not apply remains visible in the trace. The synthetic Meridian policy has a $3,205 subtotal and a 0.90 first-term factor, but is_first_term is false, so the premium remains $3,205.",
+  "description": "A guarded package_factor that does NOT apply is a VISIBLE no-op, never a silent skip (Brief 62.3 §3 / 62.1 §2.1). Single-line BOP, subtotal $3,205; policy_tail has Pioneer (× 0.90) guarded on is_first_term == true, but the row's is_first_term is false → the step is recorded applied:false, the premium is unchanged ($3,205). (P2 proves the guard-MATCH case; this proves the MISS.)",
   "policy": {
     "policy_id": "P5",
     "lines": [
@@ -8,7 +8,7 @@
     ]
   },
   "policy_tail": [
-    { "kind": "package_factor", "id": "first_term_credit", "display_name": "Meridian first-term credit", "factor": 0.9, "when": { "field": "is_first_term", "op": "eq", "value": true } }
+    { "kind": "package_factor", "id": "pioneer", "display_name": "Pioneer credit", "factor": 0.9, "when": { "field": "is_first_term", "op": "eq", "value": true } }
   ],
   "adjustmentInputs": { "is_first_term": false },
   "plans": {
@@ -43,7 +43,7 @@
       { "product": "bop", "plan_id": "bop-plan", "premium": 3205 }
     ],
     "adjustments": [
-      { "id": "first_term_credit", "kind": "package_factor", "applied": false, "before": 3205, "after": 3205, "detail": "not applied — guard is_first_term eq true not met" }
+      { "id": "pioneer", "kind": "package_factor", "applied": false, "before": 3205, "after": 3205, "detail": "not applied — guard is_first_term eq true not met" }
     ]
   }
 }

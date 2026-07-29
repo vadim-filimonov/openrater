@@ -1,5 +1,5 @@
 /**
- * acronyms — the title-caser's allowlist (presentation consistency
+ * acronyms — the title-caser's allowlist (MVP-017, mvp-tightness
  * §3.4). Mechanical casing turns insurance acronyms into words
  * ("Bpp premium", a "Bpp" product chip); this post-pass restores
  * them wherever a titleizer ran. Closed list, additive on evidence.

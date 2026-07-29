@@ -8,7 +8,7 @@
 /**
  * The OpenRater REST client + response shaping for the MCP tools.
  *
- * Design rules:
+ * Design rules (Brief 2 §3):
  *  - Rule 2 — bulk data stays out of the chat context: files travel as
  *    PATHS, responses are SUMMARIES (counts, verdicts, artifact
  *    pointers), never row dumps.
@@ -21,8 +21,19 @@
 
 import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { resolve, join } from "node:path";
-// Use the same header preflight that the app runs on upload.
-import { preflightBook, type PreflightInput } from "@openrater/contracts";
+// Book-intake §2 — the SAME header pre-flight the app runs on upload.
+import {
+  cellDelta,
+  compareFacts,
+  pairTables,
+  preflightBook,
+  tableName,
+  territoryVerdict,
+  type CompareDimLike,
+  type CompareStageLike,
+  type CompareTableLike,
+  type PreflightInput,
+} from "@openrater/contracts";
 
 export interface ApiConfig {
   /** The OpenRater server, e.g. http://127.0.0.1:8001 (RATER_API_URL). */
@@ -103,33 +114,213 @@ export async function getTranscriptionSpec(config: ApiConfig): Promise<string> {
   return (await request(config, "GET", "/api/v1/plans/ingest/assets/spec")).text();
 }
 
+// ── FCA #29 (finding 52) — the spec reads in PIECES ─────────────────
+//
+// The whole spec (~87k chars) exceeds MCP output limits: the
+// "mandatory first step of the transcribe-my-filing door" returned an
+// overflow error instead of content. The spec is §-structured, so the
+// tool serves a TABLE OF CONTENTS by default and any one section on
+// request — never a truncated blob.
+
+export interface SpecSection {
+  /** The heading line, verbatim ("### 4.15 Sheets `geo.<slug>` …"). */
+  readonly heading: string;
+  /** The §-number-ish key to request it by ("4.15", "12", "intro"). */
+  readonly key: string;
+  readonly chars: number;
+}
+
+/** Split the spec markdown on its ##/### headings. The preamble
+ *  before the first heading is section "intro". */
+export function splitSpecSections(
+  text: string,
+): { readonly key: string; readonly heading: string; readonly body: string }[] {
+  const lines = text.split("\n");
+  const out: { key: string; heading: string; body: string[] }[] = [
+    { key: "intro", heading: "(preamble)", body: [] },
+  ];
+  for (const line of lines) {
+    const m = line.match(/^(#{2,3})\s+(.*)$/);
+    if (m) {
+      const title = m[2]!.trim();
+      const num = title.match(/^([0-9]+(?:\.[0-9]+)?)\b/);
+      const key = num
+        ? num[1]!
+        : title
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, "-")
+            .replace(/^-+|-+$/g, "")
+            .slice(0, 40);
+      out.push({ key, heading: line, body: [] });
+    } else {
+      out[out.length - 1]!.body.push(line);
+    }
+  }
+  return out.map((s) => ({
+    key: s.key,
+    heading: s.heading,
+    body: s.body.join("\n"),
+  }));
+}
+
+export async function getTranscriptionSpecSectioned(
+  config: ApiConfig,
+  section?: string,
+): Promise<unknown> {
+  const text = await getTranscriptionSpec(config);
+  const sections = splitSpecSections(text);
+  if (section !== undefined && section !== "") {
+    const want = section.trim();
+    const hit = sections.filter(
+      (s) =>
+        s.key === want ||
+        s.key.startsWith(`${want}.`) ||
+        s.heading.toLowerCase().includes(want.toLowerCase()),
+    );
+    if (hit.length === 0) {
+      return {
+        error: `No spec section matches ${JSON.stringify(section)}.`,
+        sections: sections.map((s) => s.key),
+      };
+    }
+    return hit
+      .map((s) => `${s.heading}\n${s.body}`)
+      .join("\n\n")
+      .trim();
+  }
+  // No section → the TOC + how to read on: content arrives sized for
+  // one call, never a truncated blob.
+  return {
+    total_chars: text.length,
+    note:
+      "The full spec exceeds one tool call. Request a section with " +
+      "`section` (e.g. \"4.15\", \"12\", or a heading fragment); " +
+      "request several by prefix (\"4\" returns every §4.x).",
+    sections: sections.map((s) => ({
+      key: s.key,
+      heading: s.heading.replace(/^#+\s*/, ""),
+      chars: s.heading.length + s.body.length,
+    })),
+  };
+}
+
 export async function getCapabilityRegistry(config: ApiConfig): Promise<unknown> {
   return getJson(config, "/api/v1/plans/ingest/capability-registry");
 }
 
-/** Workbook-back export: the EXACT bytes that built the plan, written
- *  to disk with the recorded hash. The
- *  chat answer to "export this plan" is this file path. */
+/** MVP-023 (owner O1) — the workbook-back export: the EXACT bytes
+ *  that built the plan, written to disk with the recorded hash. The
+ *  chat answer to "export this plan" is this file path.
+ *
+ *  FCA #16 follow-up — `state: "current"` asks the server for the
+ *  same container REWRITTEN to the live plan state (tracked
+ *  factor-table cells + gates!value cells), so in-app repairs
+ *  physically travel. The file gains a '-current' suffix, the hash is
+ *  the content hash of what was served (never the build identity),
+ *  and anything the rewriter could not place comes back NAMED in the
+ *  warning. */
 export async function exportPlanWorkbook(
   config: ApiConfig,
   planId: string,
   destDir: string,
-): Promise<{ path: string; sha256: string; filename: string }> {
+  state: "build" | "current" = "build",
+): Promise<{
+  path: string;
+  sha256: string;
+  filename: string;
+  state: "build" | "current";
+  rewrites_applied?: number;
+  warning?: string;
+}> {
+  const wantCurrent = state === "current";
   const res = await request(
     config,
     "GET",
-    `/api/v1/plans/${encodeURIComponent(planId)}/workbook`,
+    `/api/v1/plans/${encodeURIComponent(planId)}/workbook${
+      wantCurrent ? "?current=true" : ""
+    }`,
   );
   const bytes = new Uint8Array(await res.arrayBuffer());
-  const hash = res.headers.get("X-Workbook-Hash") ?? "";
+  // The build export's hash is the recorded build identity; a current
+  // export hashes the bytes actually served (X-Workbook-Sha256) and
+  // never claims to be the build container.
+  const hash = wantCurrent
+    ? (res.headers.get("X-Workbook-Sha256") ??
+      res.headers.get("X-Workbook-Hash") ??
+      "")
+    : (res.headers.get("X-Workbook-Hash") ?? "");
   const disposition = res.headers.get("Content-Disposition") ?? "";
   const nameMatch = disposition.match(/filename="([^"]+)"/);
-  const filename = nameMatch?.[1] ?? `${planId}.workbook.xlsx`;
+  const filename =
+    nameMatch?.[1] ??
+    `${planId}.workbook${wantCurrent ? "-current" : ""}.xlsx`;
   const dir = resolve(destDir);
   await mkdir(dir, { recursive: true });
   const dest = join(dir, filename);
   await writeFile(dest, bytes);
-  return { path: dest, sha256: hash, filename };
+  // FCA fca-2026-07-25 #16 — the divergence stamp. These are the
+  // BUILD-TIME bytes; when the plan carries in-app edits made after
+  // the build, a what-if built from this file silently resurrects
+  // whatever those edits repaired. Say so, every time.
+  const edited = res.headers.get("X-Edited-Since-Build") === "true";
+  const editCount = Number(
+    res.headers.get("X-Edits-Since-Build-Count") ?? "0",
+  );
+  if (!wantCurrent) {
+    return {
+      path: dest,
+      sha256: hash,
+      filename,
+      state: "build",
+      ...(edited
+        ? {
+            warning:
+              `This export is the plan's BUILD-TIME workbook, and the ` +
+              `plan has been edited in-app since (${
+                Number.isFinite(editCount) && editCount > 0
+                  ? `${editCount} tracked edit${editCount === 1 ? "" : "s"}`
+                  : "changes detected"
+              }). A plan built from this file will NOT include those ` +
+              `edits — run reingest_diff against it to see exactly what ` +
+              `would be lost, or re-export with state: "current" to ` +
+              `carry the tracked edits in the file itself.`,
+          }
+        : {}),
+    };
+  }
+  const rewriteCount = Number(
+    res.headers.get("X-Current-Rewrite-Count") ?? "0",
+  );
+  const unappliedCount = Number(
+    res.headers.get("X-Current-Unapplied-Count") ?? "0",
+  );
+  const unappliedNames = res.headers.get("X-Current-Unapplied") ?? "";
+  const warnings: string[] = [];
+  if (unappliedCount > 0) {
+    // Honest degrade: what could not be written into the workbook's
+    // structure is NAMED, never silently dropped.
+    warnings.push(
+      `${unappliedCount} in-app change${unappliedCount === 1 ? "" : "s"} ` +
+        `could NOT be written into the workbook's structure and live ` +
+        `ONLY in the app${unappliedNames ? `: ${unappliedNames}` : "."}`,
+    );
+  }
+  if (rewriteCount > 0) {
+    warnings.push(
+      `This file reflects the LIVE plan (${rewriteCount} tracked ` +
+        `cell${rewriteCount === 1 ? "" : "s"} rewritten), not the build ` +
+        `identity — re-ingesting it registers as a plan REVISION, ` +
+        `never as already_built.`,
+    );
+  }
+  return {
+    path: dest,
+    sha256: hash,
+    filename,
+    state: "current",
+    rewrites_applied: Number.isFinite(rewriteCount) ? rewriteCount : 0,
+    ...(warnings.length > 0 ? { warning: warnings.join(" ") } : {}),
+  };
 }
 
 export async function downloadWorkbookTemplate(
@@ -175,8 +366,8 @@ export async function buildFromWorkbook(
   config: ApiConfig,
   xlsxPath: string,
 ): Promise<unknown> {
-  // The build report records the filename on this path too, matching
-  // the check endpoint.
+  // MVP-031a — the build report records the filename on this path
+  // too (the check twin always did; builds said `filename: null`).
   const name = encodeURIComponent(xlsxPath.split("/").pop() ?? "workbook.xlsx");
   return postWorkbook(config, `/api/v1/plans/ingest?filename=${name}`, xlsxPath);
 }
@@ -225,6 +416,157 @@ export async function listPlans(
 
 export async function getPlan(config: ApiConfig, planId: string): Promise<unknown> {
   return getJson(config, `/api/v1/plans/${encodeURIComponent(planId)}`);
+}
+
+// ── FCA #24 (finding 75) — plan-to-plan compare, chat-side ──────────
+//
+// The audit's only structured diff was the re-ingest revision preview,
+// which refuses any workbook naming a different plan — comparing two
+// existing plans meant masquerading one under the other's id, fifty
+// manual loops at portfolio scale. This tool answers "what changed
+// between A and B" with the SAME @openrater/contracts arithmetic the
+// app's Exhibits → Compare renders: membership reassignments
+// first-class, dual-keyed counties deduplicated, coverage towers
+// enumerated.
+
+interface SideSubstrateWire {
+  readonly dims: readonly CompareDimLike[];
+  readonly tables: readonly CompareTableLike[];
+  readonly stages: readonly CompareStageLike[];
+  readonly displayName: string;
+}
+
+async function fetchCompareSide(
+  config: ApiConfig,
+  planId: string,
+): Promise<SideSubstrateWire> {
+  const [dimsRes, tablesRes, detailRes] = await Promise.all([
+    getJson(config, `/api/v1/plans/${encodeURIComponent(planId)}/dimensions`),
+    getJson(
+      config,
+      `/api/v1/plans/${encodeURIComponent(planId)}/factor-tables`,
+    ),
+    getJson(config, `/api/v1/plans/${encodeURIComponent(planId)}`),
+  ]);
+  const dims = (dimsRes as { dimensions?: unknown }).dimensions;
+  const tables = (tablesRes as { factor_tables?: unknown }).factor_tables;
+  const detail = detailRes as {
+    stages?: unknown;
+    display_name?: unknown;
+  };
+  return {
+    dims: (Array.isArray(dims) ? dims : []) as readonly CompareDimLike[],
+    tables: (Array.isArray(tables)
+      ? tables
+      : []) as readonly CompareTableLike[],
+    stages: (Array.isArray(detail.stages)
+      ? detail.stages
+      : []) as readonly CompareStageLike[],
+    displayName:
+      typeof detail.display_name === "string" ? detail.display_name : planId,
+  };
+}
+
+export async function comparePlans(
+  config: ApiConfig,
+  planA: string,
+  planB: string,
+): Promise<unknown> {
+  const [a, b] = await Promise.all([
+    fetchCompareSide(config, planA),
+    fetchCompareSide(config, planB),
+  ]);
+  const facts = compareFacts(
+    a.dims,
+    a.tables,
+    b.dims,
+    b.tables,
+    a.stages,
+    b.stages,
+  );
+
+  // Per-changed-table cell deltas, one summary row each.
+  const { pairs } = pairTables(a.tables, b.tables);
+  const changedTables = pairs
+    .map((pair) => ({ pair, delta: cellDelta(pair.a.cells, pair.b.cells) }))
+    .filter(({ delta }) => delta.changed > 0)
+    .map(({ pair, delta }) => ({
+      table: tableName(pair.a),
+      cells_changed: delta.changed,
+      cells_total: delta.total,
+      largest: delta.largest,
+    }));
+
+  // The member-level territory verdicts for paired geographic tables.
+  const bDimBySlug = new Map(b.dims.map((d) => [d.slug, d]));
+  const bTableByKey = new Map(
+    b.tables.map((t) => [t.slug || t.table_id, t] as const),
+  );
+  const territory = a.dims
+    .filter(
+      (d) =>
+        d.dimension_type === "geographic" &&
+        (d.geo_territories?.length ?? 0) > 0,
+    )
+    .flatMap((aDim) => {
+      const bDim = bDimBySlug.get(aDim.slug);
+      if (bDim === undefined) return [];
+      const aTable = a.tables.find((t) =>
+        ((t as { key_dimensions?: readonly string[] }).key_dimensions ?? []).includes(
+          aDim.slug,
+        ),
+      );
+      const bTable =
+        aTable === undefined
+          ? undefined
+          : bTableByKey.get(aTable.slug || aTable.table_id);
+      if (aTable === undefined || bTable === undefined) return [];
+      const v = territoryVerdict(aDim, aTable, bDim, bTable);
+      if (v === null) return [];
+      return [
+        {
+          dim: aDim.display_name ?? aDim.slug,
+          shared_members: v.shared,
+          identical: v.identical,
+          cheaper_in_b: v.cheaperInB,
+          costlier_in_b: v.costlierInB,
+          reassigned: v.reassigned,
+          largest_swing: v.largest,
+        },
+      ];
+    });
+
+  return {
+    plan_a: { rating_plan_id: planA, display_name: a.displayName },
+    plan_b: { rating_plan_id: planB, display_name: b.displayName },
+    // FCA #28 (finding 80) — the visual twin of this answer, ready to
+    // open or send: Exhibits renders the same compare at this URL.
+    open_in_exhibits: exhibitsLink(config, planA, planB),
+    summary: {
+      shared_tables: facts.sharedTables,
+      changed_tables: facts.changedTables,
+      tables_only_in_a: facts.onlyATables,
+      tables_only_in_b: facts.onlyBTables,
+      inputs_only_in_a: facts.removedDims,
+      inputs_only_in_b: facts.newDims,
+      members_reassigned: facts.territoryReassignments.reduce(
+        (sum, t) => sum + t.count,
+        0,
+      ),
+      coverage_towers_only_in_a: facts.onlyACoverages,
+      coverage_towers_only_in_b: facts.onlyBCoverages,
+      biggest_cell_move: facts.biggest,
+    },
+    territory_reassignments: facts.territoryReassignments,
+    territory_verdicts: territory,
+    changed_tables: changedTables,
+    levels: { added: facts.addedLevels, removed: facts.removedLevels },
+    note:
+      "Same arithmetic as the app's Exhibits → Compare. Counts are " +
+      "canonical: dual-keyed geo members (county name + FIPS) collapse " +
+      "to one. Present this as a reconstruction — the filed documents " +
+      "govern.",
+  };
 }
 
 export async function getInputSchema(
@@ -277,12 +619,12 @@ export interface QuoteArgs {
   readonly asOf?: string;
   /** Quote the working draft (pre-publish review loop). */
   readonly draft?: boolean;
-  /** Pin the quote to a frozen version. */
+  /** MVP-026 — pin the quote to a frozen version. */
   readonly snapshotId?: string;
 }
 
-/** The trace kinds whose one-line explanations are the story a chat
- *  reader needs: the chains (factor
+/** The trace kinds whose one-line explanations ARE the story a chat
+ *  reader needs (mvp-tightness §5.4 / MVP-021): the chains (factor
  *  names × values), the gate verdict, geography, curves, and the
  *  tail. Inputs/constants restate the request; math.op is exposure
  *  arithmetic; output is the result already in `premium`. */
@@ -336,8 +678,17 @@ export async function quoteRisk(config: ApiConfig, args: QuoteArgs): Promise<unk
     { body: JSON.stringify(body), contentType: "application/json", headers },
   );
   const payload = (await res.json()) as Record<string, unknown>;
-  // The chat answer carries the summary, one line per step; the full
-  // node trace stays on the API for the review UI.
+  // FCA #27 (finding 83) — the quote lands in the app's run history
+  // now (the server records it and names the run); the review link is
+  // the RUN's own drawer, not the bare plan page that used to read
+  // "Not run yet" about a quote the user just watched happen.
+  if (typeof payload.run_id === "string" && payload.run_id !== "") {
+    payload.review_url =
+      `${config.appUrl}/rate-lab/${encodeURIComponent(args.planId)}` +
+      `/workspace/verify?run=${encodeURIComponent(payload.run_id)}`;
+  }
+  // MVP-021 — the chat answer carries the SUMMARY (one line per
+  // step); the full node trace stays on the API for the review UI.
   if (payload.trace && typeof payload.trace === "object") {
     const { trace, ...rest } = payload;
     return {
@@ -350,6 +701,52 @@ export async function quoteRisk(config: ApiConfig, args: QuoteArgs): Promise<unk
 
 export function planLink(config: ApiConfig, planId: string): string {
   return `${config.appUrl}/rate-lab/${encodeURIComponent(planId)}`;
+}
+
+/** FCA #28 (finding 80) — Exhibits is the app's visual plan surface
+ *  (draw one plan, compare two), and nothing in chat ever named it.
+ *  The link IS the state: ?a= exhibits a plan, ?b= arms the compare,
+ *  so a configured compare can be bookmarked or sent to a colleague. */
+export function exhibitsLink(
+  config: ApiConfig,
+  planA: string,
+  planB?: string,
+): string {
+  const b = planB === undefined ? "" : `&b=${encodeURIComponent(planB)}`;
+  return `${config.appUrl}/exhibits?a=${encodeURIComponent(planA)}${b}`;
+}
+
+// ── Two-run compare (FCA #28, finding 78) ───────────────────────────
+
+/** Relay the server's run-compare arithmetic (ONE code path — the app
+ *  drawer reads the same endpoint). Returns totals, counts, refusal
+ *  changes, and the top movers, plus the drawer deep link. */
+export async function compareRuns(
+  config: ApiConfig,
+  planId: string,
+  runId: string,
+  withRun: string,
+  withPlan?: string,
+): Promise<unknown> {
+  const params = new URLSearchParams({ with_run: withRun });
+  if (withPlan !== undefined) params.set("with_plan", withPlan);
+  const cmp = (await getJson(
+    config,
+    `/api/v1/plans/${encodeURIComponent(planId)}/runs/${encodeURIComponent(
+      runId,
+    )}/compare?${params.toString()}`,
+  )) as Record<string, unknown>;
+  const vsPlan =
+    withPlan === undefined || withPlan === planId
+      ? ""
+      : `&vsPlan=${encodeURIComponent(withPlan)}`;
+  return {
+    ...cmp,
+    review_url:
+      `${config.appUrl}/rate-lab/${encodeURIComponent(planId)}` +
+      `/workspace/verify?run=${encodeURIComponent(runId)}` +
+      `&vs=${encodeURIComponent(withRun)}${vsPlan}`,
+  };
 }
 
 // ── Book re-rate (CSV → probe-kind run) ──────────────────────────────
@@ -437,12 +834,18 @@ export interface RerateResult {
   /** ADR-0056 accounting from the run summary — counts, never rows. */
   readonly totals?: Record<string, unknown>;
   readonly row_count?: number;
-  /** The first ≤3 problem rows, named for diagnosis. */
+  /** FCA #15 — book-level plausibility signals from the run summary
+   *  ("one row is 99.8% of the written total"). */
+  readonly warnings?: readonly string[];
+  /** The first ≤3 problem rows, NAMED (book-intake §3). */
   readonly first_issues?: readonly RerateRowIssue[];
   /** Pre-flight leftovers worth knowing (ignored columns), when any. */
   readonly header_note?: string;
   /** The run detail — rows live here, not in the chat. */
   readonly run_detail_url: string;
+  /** FCA #S2 — the whole run as one CSV (caller's source identifier
+   *  columns included). Bulk data travels as files, never chat rows. */
+  readonly rows_csv_url: string;
   readonly note: string;
 }
 
@@ -461,21 +864,31 @@ export function stripRowDumps(run: Record<string, unknown>): Record<string, unkn
   return out;
 }
 
-/** The declared-input dictionary, shaped for the header pre-flight. */
+/** The declared-input dictionary, shaped for the header pre-flight —
+ *  plus the structure-consumed vocabulary (FCA #13: fields the
+ *  runtime reads with no declaration — schedule hooks, predicate
+ *  fields — must never be labeled 'ignored'). */
 async function preflightInputsOf(
   config: ApiConfig,
   planId: string,
-): Promise<PreflightInput[]> {
+): Promise<{ inputs: PreflightInput[]; consumed: string[] }> {
   const schema = (await getJson(
     config,
     `/api/v1/plans/${encodeURIComponent(planId)}/input-schema`,
-  )) as { inputs?: readonly Record<string, unknown>[] };
-  return (schema.inputs ?? []).map((e) => ({
-    name: String(e.name ?? ""),
-    display_name: typeof e.display_name === "string" ? e.display_name : null,
-    // Derived inputs are produced by the plan, never demanded of the CSV.
-    required: e.required === true && e.expected_from_caller !== false,
-  }));
+  )) as {
+    inputs?: readonly Record<string, unknown>[];
+    consumed_fields?: readonly unknown[];
+  };
+  return {
+    inputs: (schema.inputs ?? []).map((e) => ({
+      name: String(e.name ?? ""),
+      display_name: typeof e.display_name === "string" ? e.display_name : null,
+      // Derived inputs are produced by the plan, never demanded of the CSV.
+      required: e.required === true && e.expected_from_caller !== false,
+    })),
+    consumed: (schema.consumed_fields ?? [])
+      .filter((f): f is string => typeof f === "string" && f !== ""),
+  };
 }
 
 export async function rerateBook(
@@ -486,11 +899,23 @@ export async function rerateBook(
 ): Promise<RerateResult> {
   const text = await readFile(resolve(csvPath), "utf8");
 
-  // The header meets the dictionary BEFORE any row
+  // FCA #17 — an EMPTY file used to fall into the header preflight
+  // and refuse as a header mismatch ('Missing: class_code, …'),
+  // sending a non-engineer to fix a header that does not exist. Name
+  // the actual disease first.
+  if (text.trim() === "") {
+    throw new ApiError(
+      `${csvPath} is empty — export the book again (a header row + ` +
+        `one risk row per line) and retry.`,
+      400,
+    );
+  }
+
+  // Book-intake §2 — the header meets the dictionary BEFORE any row
   // rates. Header problems refuse with the culprit named, never the
   // per-row lookup error. Same derivation the app runs on upload.
-  const inputs = await preflightInputsOf(config, planId);
-  const preflight = preflightBook(text, inputs);
+  const { inputs, consumed } = await preflightInputsOf(config, planId);
+  const preflight = preflightBook(text, inputs, consumed);
   if (!preflight.ok) {
     throw new ApiError(
       `The book's header doesn't fit this plan. ${preflight.sentence ?? ""} ` +
@@ -519,7 +944,7 @@ export async function rerateBook(
     "POST",
     `/api/v1/plans/${encodeURIComponent(planId)}/runs`,
     {
-      // A caller's CSV is a real BOOK (it lands in
+      // Book-intake §3 — a caller's CSV is a real BOOK (it lands in
       // run history under the Book chip), never a probe.
       body: JSON.stringify({ kind: "book", rows, ...(asOf ? { as_of: asOf } : {}) }),
       contentType: "application/json",
@@ -541,7 +966,7 @@ export async function rerateBook(
     )) as Record<string, unknown>;
   }
 
-  // The chat contract returns counts, totals, and the first
+  // The chat contract (book-intake §3): counts + totals + the first
   // three row issues, NAMED — the payload is BUILT, never a stripped
   // run record, so a row dump can't ride along in a nested field.
   const result =
@@ -578,11 +1003,20 @@ export async function rerateBook(
       ? { row_count: result.row_count }
       : {}),
     ...(totals ? { totals } : {}),
+    ...(Array.isArray(result.warnings) && result.warnings.length > 0
+      ? {
+          warnings: result.warnings.filter(
+            (w): w is string => typeof w === "string",
+          ),
+        }
+      : {}),
     ...(firstIssues.length > 0 ? { first_issues: firstIssues } : {}),
     ...(preflight.sentence ? { header_note: preflight.sentence } : {}),
     run_detail_url: `${config.appUrl}/rate-lab/${encodeURIComponent(planId)}/workspace/verify?run=${encodeURIComponent(runId)}`,
+    rows_csv_url: `${config.baseUrl}/api/v1/plans/${encodeURIComponent(planId)}/runs/${encodeURIComponent(runId)}/rows.csv`,
     note:
       "Row-level results stay out of the chat — open the run detail " +
-      "for the full row table.",
+      "for the full row table, or download rows_csv_url for the " +
+      "spreadsheet deliverable.",
   };
 }

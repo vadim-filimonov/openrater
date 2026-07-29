@@ -1,9 +1,10 @@
 /**
- * name-similarity — the identifier-matching core shared by the app's
- * book intake and the MCP header preflight.
+ * name-similarity — the identifier-matching core the book intake
+ * shares across BOTH doors (book-intake brief §2 / MVP-004 · MVP-010).
  *
  * Re-homed VERBATIM from `@openrater/ui` InputsWorkspace/autoMatch
- * so the app's Auto-recognize and the chat door's header pre-flight judge "does
+ * (Brief 38 §7 + Brief 57 + PR 11f history lives there) so the app's
+ * Auto-recognize and the chat door's header pre-flight judge "does
  * this column name mean that input" with ONE algorithm. `autoMatch`
  * re-exports these; no consumer semantics changed.
  */

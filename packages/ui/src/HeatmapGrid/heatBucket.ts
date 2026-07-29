@@ -40,7 +40,7 @@ export function heatBucket(
 ): HeatBucket {
   if (value === undefined) return 0;
   const delta = (value - baseline) / baseline;
-  // Bands (chosen empirically against Meridian BOP rate-table ranges).
+  // Bands (chosen empirically against ISO BOP rate-table ranges).
   if (delta <= -0.3) return 1;
   if (delta <= -0.05) return 2;
   if (delta < 0.05) return 3;

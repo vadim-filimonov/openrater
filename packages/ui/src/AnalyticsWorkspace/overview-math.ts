@@ -3,7 +3,7 @@
  * "Rate Drivers" list.
  *
  * Plan-agnostic (§−1.Q8): the caller maps whatever `plan.dimensions`
- * contains into `OverviewVariableSpec[]` — Meridian BOP, E&S GL, anything. This
+ * contains into `OverviewVariableSpec[]` — ISO BOP, E&S GL, anything. This
  * module assumes no variable names. For each variable it groups the scored
  * rows into levels (categorical/geographic → defined or discovered levels;
  * numeric → equal-count bins), computes the active KPI per level over

@@ -1,7 +1,7 @@
 /**
  * computePlanReadiness — the ONE "can this plan rate yet?" selector.
  *
- * P2 G13 (ADR-0056): readiness
+ * P2 G13 (ADR-0056, owner decision D1 ruled 2026-07-06): readiness
  * gates on **"compiles to a runnable chain, issue-free"** — the dry
  * projector compile — NOT on stage-bucket accounting or a factor-table
  * count. The pre-G13 selector read `section_layout` buckets nothing

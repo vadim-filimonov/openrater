@@ -269,7 +269,7 @@ describe("composePolicy — genericity (ADR-0033 §0 / ADR-0034 §0)", () => {
       ],
       adjustments: [
         { kind: "schedule_rating", id: "irpm", display_name: "IRPM", cap_pct: 25, source: { from: "literal", total: -10 } },
-        { kind: "endorsement", id: "service_fee", display_name: "Meridian service endorsement", effect: { kind: "flat", amount: 18 } },
+        { kind: "endorsement", id: "terror", display_name: "Terrorism", effect: { kind: "flat", amount: 18 } },
         { kind: "minimum_premium", id: "min", floor: 500 },
       ],
     };
@@ -295,7 +295,7 @@ describe("composePolicy — genericity (ADR-0033 §0 / ADR-0034 §0)", () => {
     // WITHOUT one run the same composePolicy.
     const c = compilePlan(passthroughPlan("p", "in", "prem"));
     const planTail: PolicyAdjustment[] = [
-      { kind: "package_factor", id: "first_term_credit", display_name: "Meridian first-term credit", factor: 0.9 },
+      { kind: "package_factor", id: "pioneer", display_name: "Pioneer", factor: 0.9 },
       { kind: "minimum_premium", id: "min", floor: 500 },
     ];
     const bopTail = effectivePolicyTail({ policy_tail: planTail }, {}); // inherits planTail
@@ -425,7 +425,7 @@ describe("composePolicy — adjustments tail (Brief 62.1)", () => {
   it("package_factor applies only when its guard matches (visible no-op otherwise)", () => {
     const applied = withTail(
       1000,
-      [{ kind: "package_factor", id: "first_term_credit", display_name: "Meridian first-term credit", factor: 0.9, when: { field: "is_first_term", op: "eq", value: true } }],
+      [{ kind: "package_factor", id: "pioneer", display_name: "Pioneer", factor: 0.9, when: { field: "is_first_term", op: "eq", value: true } }],
       { adjustmentInputs: { is_first_term: true } },
     );
     expect(applied.total).toBe(900);
@@ -433,7 +433,7 @@ describe("composePolicy — adjustments tail (Brief 62.1)", () => {
 
     const skipped = withTail(
       1000,
-      [{ kind: "package_factor", id: "first_term_credit", display_name: "Meridian first-term credit", factor: 0.9, when: { field: "is_first_term", op: "eq", value: true } }],
+      [{ kind: "package_factor", id: "pioneer", display_name: "Pioneer", factor: 0.9, when: { field: "is_first_term", op: "eq", value: true } }],
       { adjustmentInputs: { is_first_term: false } },
     );
     expect(skipped.total).toBe(1000); // unchanged
@@ -445,7 +445,7 @@ describe("composePolicy — adjustments tail (Brief 62.1)", () => {
 
   it("endorsement applies a flat charge or a factor", () => {
     const flat = withTail(1000, [
-      { kind: "endorsement", id: "service_fee", display_name: "Meridian service endorsement", effect: { kind: "flat", amount: 18 } },
+      { kind: "endorsement", id: "terror", display_name: "Terrorism", effect: { kind: "flat", amount: 18 } },
     ]);
     expect(flat.total).toBe(1018);
     expect(flat.adjustments[0]!.factor_or_delta).toBe(18);
@@ -487,16 +487,16 @@ describe("composePolicy — adjustments tail (Brief 62.1)", () => {
       1000,
       [
         { kind: "schedule_rating", id: "sr", display_name: "IRPM", cap_pct: 25, source: { from: "literal", total: -10 } },
-        { kind: "package_factor", id: "first_term_credit", display_name: "Meridian first-term credit", factor: 0.9, when: { field: "is_first_term", op: "eq", value: true } },
-        { kind: "endorsement", id: "service_fee", display_name: "Meridian service endorsement", effect: { kind: "flat", amount: 18 } },
+        { kind: "package_factor", id: "pioneer", display_name: "Pioneer", factor: 0.9, when: { field: "is_first_term", op: "eq", value: true } },
+        { kind: "endorsement", id: "terror", display_name: "Terrorism", effect: { kind: "flat", amount: 18 } },
         { kind: "minimum_premium", id: "min", floor: 500 },
       ],
       { adjustmentInputs: { is_first_term: true } },
     );
     expect(r.adjustments.map((s) => [s.before, s.after])).toEqual([
       [1000, 900], // ×0.9 IRPM
-      [900, 810], // ×0.9 first-term factor
-      [810, 828], // +18 service endorsement
+      [900, 810], //  ×0.9 Pioneer
+      [810, 828], //  +18 terrorism
       [828, 828], //  $500 floor not binding
     ]);
     expect(r.total).toBe(828);
@@ -605,8 +605,8 @@ describe("evaluatePolicyTail — the pure tail core (Brief 62.3, the cohort-path
       1000,
       [
         { kind: "schedule_rating", id: "irpm", display_name: "IRPM", cap_pct: 25, source: { from: "literal", total: -10 } },
-        { kind: "package_factor", id: "first_term_credit", display_name: "Meridian first-term credit", factor: 0.9, when: { field: "is_first_term", op: "eq", value: true } },
-        { kind: "endorsement", id: "service_fee", display_name: "Meridian service endorsement", effect: { kind: "flat", amount: 18 } },
+        { kind: "package_factor", id: "pioneer", display_name: "Pioneer", factor: 0.9, when: { field: "is_first_term", op: "eq", value: true } },
+        { kind: "endorsement", id: "terror", display_name: "Terrorism", effect: { kind: "flat", amount: 18 } },
         { kind: "minimum_premium", id: "min", floor: 500 },
       ],
       { externalInputs: { is_first_term: true }, lines: [] },

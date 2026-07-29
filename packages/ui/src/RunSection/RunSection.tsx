@@ -25,7 +25,7 @@ import {
   Play,
   RotateCcw,
 } from "lucide-react";
-import { Button, EmptyState, Input } from "@openrater/design-system";
+import { Button, EmptyState, Input, Segmented } from "@openrater/design-system";
 import { TracePanel } from "../TracePanel/TracePanel";
 import type { ServerRunTraceView } from "../TracePanel/serverRunTrace";
 import "./run-section.css";
@@ -36,6 +36,12 @@ export interface RunField {
   readonly value: string;
   /** The representative default (shown as the reset target). */
   readonly placeholder?: string | undefined;
+  /**
+   * FCA #10 — the control the declared dtype earns. "boolean" renders
+   * a Yes/No toggle ("true"/"false" values; "" = unset, so a required
+   * gate answer is CHOSEN, never silently defaulted). Absent = text.
+   */
+  readonly control?: "text" | "boolean" | undefined;
 }
 
 export interface RunOutput {
@@ -118,8 +124,14 @@ function RunTraceDisclosure({
           className="rater-run__trace-disclosure-icon"
           aria-hidden
         />
-        <span>
-          How this was computed · {traceView.nodeOrder.length} steps
+        {/* FCA #30 (finding 49) — name the UNIT: this counts EXECUTED
+            nodes, which fan out per coverage; the Overview counts
+            authored steps. Three bare numbers for one plan read as
+            incoherence without the legend. */}
+        <span
+          title="Executed engine nodes — shared derivations fan out per coverage, so this exceeds the authored step count."
+        >
+          How this was computed · {traceView.nodeOrder.length} computed steps
         </span>
       </summary>
       <div className="rater-run__trace-body">
@@ -218,22 +230,47 @@ export function RunSection({
         {fields.length === 0 ? (
           <p className="rater-run__waiting">
             This plan's inputs all carry defaults — run as-is. Declared
-            inputs with dimension bindings appear here as editable fields.
+            inputs appear here as editable fields.
           </p>
         ) : null}
         <div className="rater-run__fields">
-          {fields.map((f) => (
-            <label key={f.key} className="rater-run__field">
-              <span className="rater-run__field-label">{f.label}</span>
-              <Input
-                inputSize="sm"
-                value={f.value}
-                placeholder={f.placeholder}
-                onChange={(e) => onFieldChange(f.key, e.target.value)}
-                aria-label={f.label}
-              />
-            </label>
-          ))}
+          {fields.map((f) =>
+            f.control === "boolean" ? (
+              // FCA #10 — a declared bool gets a real Yes/No control.
+              // "" (unset) selects neither: an eligibility answer is
+              // the user's to give, never a fabricated default.
+              <div key={f.key} className="rater-run__field">
+                <span className="rater-run__field-label">{f.label}</span>
+                <Segmented
+                  size="md"
+                  ariaLabel={f.label}
+                  value={
+                    f.value === "true" || f.value === "yes"
+                      ? "true"
+                      : f.value === "false" || f.value === "no"
+                        ? "false"
+                        : ""
+                  }
+                  onChange={(v) => onFieldChange(f.key, v)}
+                  items={[
+                    { value: "true", label: "Yes" },
+                    { value: "false", label: "No" },
+                  ]}
+                />
+              </div>
+            ) : (
+              <label key={f.key} className="rater-run__field">
+                <span className="rater-run__field-label">{f.label}</span>
+                <Input
+                  inputSize="sm"
+                  value={f.value}
+                  placeholder={f.placeholder}
+                  onChange={(e) => onFieldChange(f.key, e.target.value)}
+                  aria-label={f.label}
+                />
+              </label>
+            ),
+          )}
         </div>
         {/* Enter submits; the visible run trigger is the page primary. */}
         <button type="submit" hidden aria-hidden tabIndex={-1} />

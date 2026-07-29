@@ -162,7 +162,7 @@
     border-color var(--rater-d-80) var(--rater-ease-soft);
 }
 
-.plan-new-page__copy-row:hover:not(disabled) {
+.plan-new-page__copy-row:hover:not(:disabled) {
   background: var(--rater-surface-2);
   border-color: var(--rater-border-subtle);
 }

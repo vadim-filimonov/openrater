@@ -11,6 +11,11 @@
  * ~288): after gathering the node's `value` input, it copies that
  * value into `result.outputs[params.fieldName]` so the caller sees
  * it in the run's outputs map.
+ *
+ * Ported from `<prototype>/plan-builder/src/blocks/kinds/
+ * output.tsx` (Phase A.1 PR 5). PURE half only — params + execute +
+ * validate. React renderBody/renderInspector live in the rate-lab
+ * frontend in the original port plan.
  */
 
 import type { BlockKind, PortSpec, PrimitiveType } from "../block-types";

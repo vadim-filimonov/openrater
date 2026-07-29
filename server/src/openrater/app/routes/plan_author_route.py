@@ -37,13 +37,19 @@ Every error response uses the structured envelope:
       }
     }
 
-See `openrater.errors` for the error-code contract.
+See `openrater.errors` for the codes; they're documented (eventually) in
+`docs/api/errors.md`.
 
-## Scope
+## Slice-2 port note
 
-This router exposes plan creation, copying, draft editing, promotion,
-discard, rollback, audit reads, sign-off reads, and wire editing. Preview,
-filing-readiness, and sign-off creation are not exposed by this router.
+This is a subset of the original prototype's route. Endpoints that depend on the
+cascade engine (preview, plan-flow analytics) or plan_flow_filing
+(sign-off CREATE, filing-readiness) are deferred to their respective
+port slices. The state machine + audit + sign-off READ + wires
+endpoints are present. MVP-028 cut (owner-approved): the caller-less
+stage-positions PATCH, stage-kinds GET, and revoke-signoff POST are
+deleted — each was a whole write/read path with no first-party
+consumer; git history keeps them.
 """
 
 from __future__ import annotations
@@ -247,15 +253,15 @@ class PlanSummary(BaseModel):
         extra="forbid",
         json_schema_extra={
             "example": {
-                "rating_plan_id": "bop_ne_2026_5feb8c63",
-                "display_name": "Meridian BOP NE 2026-H2",
+                "rating_plan_id": "bop_wi_2026_5feb8c63",
+                "display_name": "ISO BOP WI 2026-H2",
                 "line_of_business": "bop",
                 "product": "bop",
                 "jurisdiction": "WI",
                 "effective_date": "2026-07-01",
                 "status": "active",
                 "created_at": "2026-05-20T14:32:11Z",
-                "description": "Nebraska BOP rate revision for H2 2026.",
+                "description": "Wisconsin BOP rate revision for H2 2026.",
                 "template_id": None,
                 "coverages": ["bpp", "bi", "liability"],
                 "last_edited_at": "2026-05-20T14:32:11Z",
@@ -266,11 +272,11 @@ class PlanSummary(BaseModel):
 
     rating_plan_id: str = Field(
         description="Stable, opaque plan identifier. Used as the path parameter.",
-        examples=["bop_ne_2026_5feb8c63"],
+        examples=["bop_wi_2026_5feb8c63"],
     )
     display_name: str = Field(
         description="Human-readable plan name shown in the UI.",
-        examples=["Meridian BOP NE 2026-H2"],
+        examples=["ISO BOP WI 2026-H2"],
     )
     product: str | None = Field(
         default=None,
@@ -297,14 +303,19 @@ class PlanSummary(BaseModel):
         description="One of: draft, proposed, active, archived.",
         examples=["active"],
     )
-    # Lineage stays in the database and audit events; draft-session details
-    # are server-internal and are not part of this response.
+    # MVP-029 cut (owner-approved): parent_plan_id, source_filing_id,
+    # and draft_session_id left this wire — no first-party surface read
+    # them (lineage stays in the DB + audit events; the draft session is
+    # server-internal). Removing them deletes a per-request draft-session
+    # SQL lookup and three fields of every plans payload.
     created_at: str | None
     description: str | None = Field(
         default=None,
         description=(
-            "Optional long-form note captured at create time. None when the "
-            "author skipped it; serialized on subsequent reads."
+            "Optional long-form note captured at create time "
+            "('+ Add a note', Brief 91). None when the author skipped it. "
+            "Serialized on every read — the note must stay visible after "
+            "create (it was write-only before the Brief 91 follow-up)."
         ),
     )
     template_id: str | None = None
@@ -355,10 +366,9 @@ class StageSummary(BaseModel):
 
 
 class PlanDetail(PlanSummary):
-    """Full plan view with stages.
-
-    `section_layout` remains storage-only for hashing continuity.
-    """
+    """Full plan view with stages. (MVP-029: `section_layout` left this
+    wire — the G13 rework deleted its last reader; the column stays in
+    storage for hashing continuity.)"""
 
     stages: list[StageSummary]
 
@@ -367,7 +377,7 @@ class ForkRequest(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
         json_schema_extra={
-            "example": {"new_display_name": "Meridian BOP NE — 3% LCM bump"}
+            "example": {"new_display_name": "ISO BOP WI — 3% LCM bump"}
         },
     )
 
@@ -379,7 +389,7 @@ class ForkRequest(BaseModel):
             "Optional override for the new draft's display name. If omitted, "
             "the service uses '<source name> — Draft (<operator>)'."
         ),
-        examples=["Meridian BOP NE — 3% LCM bump"],
+        examples=["ISO BOP WI — 3% LCM bump"],
     )
 
 
@@ -396,7 +406,7 @@ class DuplicateRequest(BaseModel):
     model_config = ConfigDict(
         extra="forbid",
         json_schema_extra={
-            "example": {"new_display_name": "Sample BOP → Missouri copy"}
+            "example": {"new_display_name": "Sample BOP → MO port"}
         },
     )
 
@@ -408,7 +418,7 @@ class DuplicateRequest(BaseModel):
             "Optional display name for the copy. If omitted, the service "
             "uses '<source name> (copy)'."
         ),
-        examples=["Sample BOP → Missouri copy"],
+        examples=["Sample BOP → MO port"],
     )
 
 
@@ -531,12 +541,11 @@ def _plan_to_summary(
     db: Database | None = None,
     publish_facts: PlanPublishFacts | None = None,
 ) -> PlanSummary:
-    """Build the wire summary.
-
-    When `publish_facts` is passed, fill `published_version`, `diverged`,
-    and `live_integration_count`. `db` remains in the signature for call-site
-    compatibility and is not read.
-    """
+    """Build the wire summary. When `publish_facts` is passed (Brief 84
+    D-F — the list endpoint batches them, the detail endpoint fetches
+    one), fills the derived-status substrate: published_version,
+    diverged, live_integration_count. (`db` stays in the signature for
+    call-site stability; nothing reads it since the MVP-029 trim.)"""
     _ = db
     published_version: PublishedVersionInfo | None = None
     diverged = False
@@ -705,13 +714,13 @@ class CreatePlanRequest(BaseModel):
         extra="forbid",
         json_schema_extra={
             "example": {
-                "display_name": "Meridian BOP NE 2026-H2",
+                "display_name": "ISO BOP WI 2026-H2",
                 "line_of_business": "bop",
                 "product": "bop",
                 "jurisdiction": "WI",
                 "effective_date": "2026-07-01",
                 "template": "blank",
-                "description": "Nebraska BOP rate revision for H2 2026.",
+                "description": "Wisconsin BOP rate revision for H2 2026.",
             }
         },
     )
@@ -721,7 +730,7 @@ class CreatePlanRequest(BaseModel):
         min_length=1,
         max_length=200,
         description="Human-readable plan name. Shown in the index + drawer header.",
-        examples=["Meridian BOP NE 2026-H2"],
+        examples=["ISO BOP WI 2026-H2"],
     )
     product: str | None = Field(
         default=None,
@@ -1619,8 +1628,10 @@ async def get_plan_audit_endpoint(
 
 
 # ---------------------------------------------------------------------------
-# Sign-off — read-only. Creation and revoke are not exposed by this router;
-# the read endpoint supports sign-off records authored at the data layer.
+# Sign-off — READ only (MVP-028 cut): CREATE was never exposed, so the
+# revoke endpoint had no reachable state to revoke. Removing it deletes
+# a whole write path (route + body model + operator plumbing) from the
+# API surface; the read stays for data-layer-authored sign-offs.
 # ---------------------------------------------------------------------------
 
 
@@ -1713,3 +1724,5 @@ async def disconnect_wire_endpoint(
             "to_input_name": to_input_name,
         },
     }
+
+

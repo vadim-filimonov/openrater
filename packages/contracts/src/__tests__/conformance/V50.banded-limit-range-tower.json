@@ -1,10 +1,10 @@
 {
   "name": "V50.banded-limit-range-tower",
-  "description": "A fictional Meridian BPP tower selects a 0.94 relativity for the [60,000,70,000) band, applies 600 exposure units and a 1.4 LCM, then rounds the premium to 790.",
+  "description": "ADR-0044 PR4: BPP tower with a banded limit relativity via lookup.range, keyed on the raw bpp_limit, then the exposure close-out. bpp_limit 60000 -> band [60000,70000) factor 0.938 -> ×(60000/100=600) ×1.401 -> 788.",
   "plan": {
     "id": "v50.bpp-range-tower",
     "version": "1.0.0",
-    "name": "Meridian BPP tower (synthetic banded limit)",
+    "name": "BPP tower (banded limit -> lookup.range)",
     "line": "bop",
     "effective": "2026-01-01",
     "nodes": [
@@ -15,11 +15,11 @@
           "buckets": [
             { "lo": 0, "hi": 50000, "factor": 1.0 },
             { "lo": 50000, "hi": 60000, "factor": 1.0 },
-            { "lo": 60000, "hi": 70000, "factor": 0.94 },
-            { "lo": 70000, "hi": 1e308, "factor": 0.88 }
+            { "lo": 60000, "hi": 70000, "factor": 0.938 },
+            { "lo": 70000, "hi": 1e308, "factor": 0.888 }
           ],
           "defaultValue": 1.0,
-          "tableName": "Meridian synthetic BPP limit relativity"
+          "tableName": "bpp_limit_rel"
         },
         "position": { "x": 200, "y": 0 } },
       { "id": "mul", "kind": "chain.mult", "params": { "factorNames": ["bpp_limit_rel"], "stopOnZero": false }, "position": { "x": 400, "y": 40 } },
@@ -27,7 +27,7 @@
       { "id": "divisor", "kind": "constant", "params": { "value": 100, "type": "number" }, "position": { "x": 400, "y": 140 } },
       { "id": "expdiv", "kind": "math.op", "params": { "op": "div" }, "position": { "x": 540, "y": 120 } },
       { "id": "mulexp", "kind": "math.op", "params": { "op": "mul" }, "position": { "x": 680, "y": 80 } },
-      { "id": "lcm", "kind": "constant", "params": { "value": 1.4, "type": "factor" }, "position": { "x": 680, "y": 160 } },
+      { "id": "lcm", "kind": "constant", "params": { "value": 1.401, "type": "factor" }, "position": { "x": 680, "y": 160 } },
       { "id": "mullcm", "kind": "math.op", "params": { "op": "mul" }, "position": { "x": 820, "y": 100 } },
       { "id": "prem", "kind": "round", "params": { "decimals": 0 }, "position": { "x": 960, "y": 100 } },
       { "id": "out", "kind": "output", "params": { "fieldName": "bpp_premium", "fieldType": "money" }, "position": { "x": 1100, "y": 100 } }
@@ -48,5 +48,5 @@
     ]
   },
   "externalInputs": { "bpp_limit": 60000 },
-  "expectedOutputs": { "bpp_premium": 790 }
+  "expectedOutputs": { "bpp_premium": 788 }
 }

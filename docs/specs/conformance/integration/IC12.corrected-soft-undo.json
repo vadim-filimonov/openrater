@@ -6,7 +6,7 @@
  "contract_version": "1.0",
  "world": {
   "integration": {
-   "name": "Example Integrator — fixture",
+   "name": "OpenRater Front — fixture",
    "paired": true
   },
   "plans": [

@@ -28,6 +28,11 @@ import {
 } from "@openrater/ui/InputsWorkspace/policyBookConfig";
 
 import { ensureEngineReady } from "./engine";
+import {
+  declaredInputsFromStages,
+  preflightInputs,
+  withDeclaredGateDefaults,
+} from "./inputsPreflight";
 import { resolvePlanBundle, type PlanBundleDeps } from "./planSource";
 import {
   declaredPremiumRollup,
@@ -95,10 +100,18 @@ export async function scorePolicy(
     throw err;
   }
 
+  // FCA — declared gate-only defaults reach every location's inputs
+  // (supplied values win); the declared dictionary also powers the
+  // §12.4 required-input refusal below.
+  const declared = declaredInputsFromStages(bundle.stages);
+  const locInputs = req.locations.map((loc) =>
+    withDeclaredGateDefaults(bundle.plan, declared, loc),
+  );
+
   // Rate each location once — for the per-location breakdown + the premium
   // field (the composition re-rates internally; the engine is pure, so the
   // two passes agree byte-for-byte).
-  const perLoc = runPlanBatch(compiled, req.locations, runOptions);
+  const perLoc = runPlanBatch(compiled, locInputs, runOptions);
   const planPremium = resolvePlanPremiumContext(bundle.plan, bundle.stages);
   // A declared premium roll-up is an explicit basis; only without one do
   // the plan's own declarations drive — and a total-less multi-coverage
@@ -179,8 +192,68 @@ export async function scorePolicy(
     };
   }
 
+  // FCA fca-2026-07-25 — spec §12.4 on the policy-quote path too: a
+  // DECLARED-required no-default input absent from any location
+  // refuses the POLICY (Law 2 — one unrateable location makes the
+  // roll-up unrateable; partial premiums would reconstruct the
+  // withheld number). Without this, the multi-location arm still
+  // priced gate-only-missing risks the /score and book paths refuse.
+  const refusedPerLoc = locInputs.map(
+    (loc) => preflightInputs(bundle.plan, loc, declared).refused_inputs,
+  );
+  if (refusedPerLoc.some((m) => m.length > 0)) {
+    const allMissing = [...new Set(refusedPerLoc.flat())].sort();
+    return {
+      premium: null,
+      tier: null,
+      row_status: "error",
+      locations: perLoc.map((r, i): PolicyLocationResult => {
+        const missing = refusedPerLoc[i]!;
+        const missingIssue: RowIssue | null =
+          missing.length > 0
+            ? {
+                severity: "error",
+                code: "missing_input",
+                nodeId: "inputs_preflight",
+                message:
+                  `Required input(s) missing (no default): ` +
+                  `${missing.join(", ")} — premium and eligibility ` +
+                  `verdict withheld.`,
+              }
+            : null;
+        const issues: RowIssue[] = [
+          ...(r.issues ?? []),
+          ...(missingIssue ? [missingIssue] : []),
+        ];
+        return {
+          location_id: `L${i + 1}`,
+          premium: null,
+          tier: missing.length > 0 ? null : (r.eligibility_tier ?? null),
+          row_status:
+            missing.length > 0 ? ("error" as const) : r.row_status,
+          ...(issues.length > 0 ? { rowIssues: issues } : {}),
+        };
+      }),
+      location_count: req.locations.length,
+      ...(bundle.planIssues.length > 0
+        ? { planIssues: bundle.planIssues }
+        : {}),
+      rowIssues: [
+        {
+          severity: "error",
+          code: "missing_input",
+          nodeId: "inputs_preflight",
+          message:
+            `Required input(s) missing (no default): ` +
+            `${allMissing.join(", ")} — the policy premium is withheld.`,
+        },
+      ],
+      as_of: asOf,
+    };
+  }
+
   const resolveAdjustment = buildTailResolver(composedTail);
-  const keyed = req.locations.map((inputs, i) => ({
+  const keyed = locInputs.map((inputs, i) => ({
     policy_id: "quote",
     location_id: `L${i + 1}`,
     inputs,

@@ -55,6 +55,13 @@ plus the app link (from `runtime_status`'s `app_url`, or
 > from here, and everything I build appears there instantly. If it
 > didn't open, here's the door: [link]."
 
+When the user asks about coming back tomorrow — or an app link they
+kept looks dead — relay `runtime_status`'s `app_lifecycle` sentence
+verbatim (FCA #18): in the installed desktop bundle the app lives
+only while the chat host runs, and sending any OpenRater message in
+a chat is what relights it. The chat is the reliable door; never
+leave a dead bookmark unexplained.
+
 1. **"See it work"** — the guided sample below, on bundled content.
 2. **"Transcribe my filing"** — the procedure below, starting with the
    review-stop preamble: drop in the PDF (or pages), review the
@@ -191,6 +198,12 @@ whole verification story; hunt for them).
   summary, and any NAMED missing/unknown inputs verbatim.
 - `rerate_book <plan_id> <csv_path>` for books — the CSV header row
   uses the declared input names; report the run summary only.
+- `compare_runs` for "same book, what changed" across two runs (two
+  plans via `with_plan`) — totals, top movers, newly-refused rows;
+  share its `review_url` (the drawer renders the same numbers).
+- For a *visual* plan-vs-plan compare, `compare_plans` returns
+  `open_in_exhibits` — the app's Exhibits tab at a URL that carries
+  the whole compare (bookmarkable, sendable to a colleague).
 
 ### 6. Revisions (rate changes)
 For an amended filing: update the workbook, then `reingest_diff` —

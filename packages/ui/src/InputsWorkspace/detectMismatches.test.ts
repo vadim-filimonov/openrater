@@ -424,11 +424,11 @@ describe("detectMismatches — edge cases", () => {
   });
 
   it("validates geographic dims against the canonical acceptance domain (ADR-0038, the F3 fix)", () => {
-    // The KS cold-test shape: ZIP levels rolled into territories t1/t2.
+    // The KS cold-test shape: ZIP levels rolled into territories 701/702.
     // NOTE the live-bug `shape: "categorical"` — inferDimensionShape still
     // routes it as geographic (the misroute is exactly what F3 was). The
     // acceptance domain = the ZIPs ∪ the active territory ids, so a policy
-    // CSV carrying EITHER the territory (t1/t2) OR a raw ZIP resolves with
+    // CSV carrying EITHER the territory (701/702) OR a raw ZIP resolves with
     // no mismatch — zero "add custom level" workaround.
     const geoDim: Dimension = {
       id: "zip", // identity frozen to granularity (the leak; fixed in P3/P4)
@@ -443,8 +443,8 @@ describe("detectMismatches — edge cases", () => {
         { kind: "categorical", id: "67201", label: "Wichita 67201", aliases: [] },
       ],
       geo_territories: [
-        { id: "t1", label: "Kansas City metro", members: ["66101"] },
-        { id: "t2", label: "Rest of state", members: ["67201"] },
+        { id: "701", label: "Kansas City metro", members: ["66101"] },
+        { id: "702", label: "Rest of state", members: ["67201"] },
       ],
     };
     const input: RequiredInputEntry = {
@@ -453,13 +453,13 @@ describe("detectMismatches — edge cases", () => {
       category: "dimensions",
       dimSlug: "zip",
     };
-    // Territory ids (t1/t2) AND a raw ZIP (66101) all resolve → NO mismatch,
+    // Territory ids (701/702) AND a raw ZIP (66101) all resolve → NO mismatch,
     // NO "not in the dim's levels — Score blocked".
     expect(
       detectMismatches(
         [input],
         { territory: "TERR" },
-        [{ TERR: "t1" }, { TERR: "t2" }, { TERR: "66101" }],
+        [{ TERR: "701" }, { TERR: "702" }, { TERR: "66101" }],
         [geoDim],
       ),
     ).toEqual([]);
@@ -509,10 +509,10 @@ describe("applyAliasOverride", () => {
   it("preserves other dims' overrides untouched", () => {
     const input: AliasOverrides = {
       construction: { WOOD: "frame" },
-      quality_grade: { raw_q1: "q1" },
+      protection_class: { "0": "pc_1" },
     };
     const out = applyAliasOverride(input, "construction", "BRICK", "masonry");
-    expect(out.quality_grade).toBe(input.quality_grade);
+    expect(out.protection_class).toBe(input.protection_class);
   });
 });
 

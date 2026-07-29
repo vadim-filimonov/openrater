@@ -2,7 +2,8 @@
  * Issue helpers — id derivation, ranking, severity counting,
  * filing-readiness verdict.
  *
- * Pure functions. No React, no DOM.
+ * Pure functions. No React, no DOM. Brief 13 §6 + §−1 Q3 / Q4 / Q11
+ * / Q16 / Q19.
  */
 
 import { PLAN_SECTIONS } from "../spine";
@@ -31,7 +32,7 @@ import type {
  *
  * Note: this function takes the message TEMPLATE, not the formatted
  * message. Two issues with the same template but different format
- * args (e.g., "Class X has no exposure" with X=c201 vs X=c101)
+ * args (e.g., "Class X has no exposure" with X=91342 vs X=71641)
  * get DIFFERENT ids. Two re-collections of the SAME plan produce
  * the SAME ids for the SAME issues — that's the invariant.
  */
@@ -129,7 +130,7 @@ export function countSeverities(issues: readonly Issue[]): IssueSeverityCounts {
 
 /**
  * Aggregate filing-readiness from an issue list. Drives the drawer
- * header chip.
+ * header chip per Brief 13 §3 Surface 5.
  *
  *   any filing_blocking issue → "blocked"
  *   else any warning           → "filing_ready_with_warnings"
@@ -151,7 +152,7 @@ export function filingReadiness(
 // ── filing_blocking decision ────────────────────────────────────────
 
 /**
- * Default `filing_blocking` decision.
+ * Default `filing_blocking` decision per Brief 13 §6 rule.
  *
  *   - severity = "error" AND source ∈ {compile, reference, runtime}
  *     → true (these block filing by default)

@@ -17,6 +17,9 @@
  *   · the entity compiler emits this kind (not `input`)
  *   · its output port type is DERIVED from `params.fieldType` so the
  *     declared port type matches the runtime-substituted value
+ *
+ * Ported from `<prototype>/plan-builder/src/blocks/kinds/
+ * input-source.tsx` (Phase A.1 PR 5). PURE half only.
  */
 
 import type {

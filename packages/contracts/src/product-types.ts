@@ -23,7 +23,7 @@
  * for arbitrary `products × coverages × policies × locations` (the
  * VISION north star), not for D&O/E&O.
  *
- * Closed enum + `other` escape hatch.
+ * Closed enum + `other` escape hatch (owner decision O-1, 2026-05-29).
  * A registry MAY supersede the enum later WITHOUT re-keying — because
  * the value is already just a tag, widening its domain is not a breaking
  * change to anything that consumes it.
@@ -32,7 +32,9 @@
  *   - `Plan.product` (the product a plan is scoped to)
  *   - `Coverage.product` (`coverage-types.ts`)
  *   - `PlanRef.product` (`policy-types.ts`)
- *   - UI badges
+ *   - UI badges (replacing <LobBadge>, lands with the axis-cleanup brief)
+ *
+ * See `docs/adr/0033-line-coverage-product-axis-cleanup.md`.
  */
 
 /**
@@ -48,7 +50,7 @@ export type ProductCode =
   | "do" // Directors & Officers            (split from "professional")
   | "eo" // Errors & Omissions              (split from "professional")
   | "wc" // Workers Compensation
-  | "auto" // Commercial Auto
+  | "auto" // Auto (commercial fleets AND private passenger — FCA #30)
   | "umbrella" // Umbrella over a primary
   | "excess" // Excess & Surplus (non-admitted)
   | "marine" // Ocean marine
@@ -93,7 +95,12 @@ export const PRODUCT_LABELS: Readonly<Record<ProductCode, string>> =
     do: "Directors & Officers",
     eo: "Errors & Omissions",
     wc: "Workers Comp",
-    auto: "Commercial Auto",
+    // FCA fca-2026-07-25 #30 (finding 22) — the ONE auto code spans
+    // commercial fleets and private-passenger programs; labeling it
+    // "Commercial Auto" put that title on a filing named "Private
+    // Passenger Automobile Program" on every surface. The label says
+    // what the code actually covers, no more.
+    auto: "Auto",
     umbrella: "Umbrella",
     excess: "Excess & Surplus",
     marine: "Marine",
@@ -116,7 +123,7 @@ export const PRODUCT_DESCRIPTIONS: Readonly<Record<ProductCode, string>> =
     do: "Directors & officers / management liability for the insured's leadership.",
     eo: "Professional errors & omissions for service providers' negligence claims.",
     wc: "Workplace injury + occupational illness coverage for employees.",
-    auto: "Commercial vehicle liability + physical damage.",
+    auto: "Vehicle liability + physical damage (commercial or private passenger).",
     umbrella: "Excess liability above an underlying primary policy (CGL/Auto/EL).",
     excess:
       "Non-admitted carrier coverage for risks outside standard market appetite.",

@@ -19,6 +19,8 @@
  * Deterministic ranking via `rankIssues`. Stable ids via
  * `deriveIssueId`. Pure + reproducible per Brief 13 P-UE8 — same
  * inputs → byte-identical output (verified by tests).
+ *
+ * See `docs/design-briefs/unified-error-surface.md`.
  */
 
 import type { CompileError, Plan, RunResult } from "../plan-types";

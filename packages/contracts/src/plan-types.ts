@@ -2,12 +2,16 @@
  * Plan JSON schema — v0.
  *
  * A Plan is a typed DAG of blocks. The canvas reads a Plan; the runtime
- * compiles and executes it. The format is specified in
+ * (lands in a follow-up port of `plan-runtime.ts`) compiles + executes
+ * it. The format is the open-source artifact specified in
  * `docs/specs/plan-format-v1.md`.
  *
  * Pure types only. No React, no DOM, no I/O. Consumed by the runtime,
  * the validator, the conformance vectors, and (via the UI layer) the
  * canvas — all from opposite sides.
+ *
+ * Ported verbatim from `<prototype>/plan-builder/src/canvas/
+ * plan-types.ts` in the original port plan (Phase A.1).
  */
 
 import type { BlockSize } from "./block-types";
@@ -59,7 +63,7 @@ export interface PlanTestCase {
   tolerance?: Record<string, number>;
 }
 
-/** Citation reference to a filed manual or source page. */
+/** Citation reference (e.g., to an ISO filing PDF + page). */
 export interface PlanCitation {
   id: string;
   ref: string;

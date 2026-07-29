@@ -6,7 +6,7 @@
  * anti-goal), the actuary imports an authoritative ZIP→territory map (e.g. the
  * 747-row KS `geo.territory` sheet). ONE import seeds the granular ZIP
  * `levels[]` AND the `geo_territories[]` grouping — which the canonical
- * `geoLookupKeys` then collapses to the territory key space (t1/t2).
+ * `geoLookupKeys` then collapses to the territory key space (701/702).
  *
  * Pure: CSV text in → `{ levels, territories, report }` out. No DOM, no I/O.
  * Reuses the workspace `parseCsv` tokenizer (quoting / BOM / line endings).

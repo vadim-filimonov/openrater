@@ -8,6 +8,9 @@
  * of multiplication. `base` is optional with a default of 0 so this
  * kind cleanly handles "pure summation" use cases where no starting
  * value is wired.
+ *
+ * Ported from `<prototype>/plan-builder/src/blocks/kinds/
+ * chain-add.tsx` (Phase A.1 PR 7). PURE half only.
  */
 
 import type { BlockKind, PortSpec } from "../block-types";
@@ -59,7 +62,8 @@ export const ChainAddKind: BlockKind<
     // input arrives as a string — e.g. a raw form/CSV value. A computed sum
     // like `building_limit + bpp_limit` would become "080000050000" → the
     // downstream derive.band buckets nothing → every row clamps out-of-range →
-    // the factor silently resolves to 1.0 and misprices the row. Number() makes the additive chain robust to
+    // the factor silently resolves to 1.0 (the Sample BOP deductible mispriced
+    // $880 vs the oracle $1,210). Number() makes the additive chain robust to
     // string inputs, matching chain.mult's effective coercion.
     const base = Number(inputs.base ?? 0);
     let acc = base;
@@ -77,13 +81,32 @@ export const ChainAddKind: BlockKind<
       return `${base} (no addends) → ${outputs.result}`;
     }
     const names = params.addendNames ?? [];
-    const parts: string[] = [String(base)];
+    // FCA #34 (findings 25/53) — the zero accumulator seed opened
+    // every package line ("0 + 822 + 211 = 1033"); it's an
+    // implementation detail, not arithmetic the manual shows. And a
+    // NaN addend drew a MINUS sign (NaN >= 0 is false), so failed
+    // rows read "0 − NaN − NaN = NaN". Drop the empty seed; name
+    // unresolved addends and end honestly.
+    const parts: string[] = base === 0 ? [] : [String(base)];
+    const unresolved: string[] = [];
     for (let i = 0; i < inputs.addends.length; i++) {
       const v = inputs.addends[i]!;
+      const name = names[i];
+      if (typeof v !== "number" || !Number.isFinite(v)) {
+        unresolved.push(name ?? `addend ${i + 1}`);
+        continue;
+      }
       const sign = v >= 0 ? "+" : "−";
       const abs = Math.abs(v);
-      const name = names[i];
-      parts.push(name ? `${sign} ${abs} (${name})` : `${sign} ${abs}`);
+      const first = parts.length === 0;
+      const term = first && v >= 0 ? String(abs) : `${sign} ${abs}`;
+      parts.push(name ? `${term} (${name})` : term);
+    }
+    if (parts.length === 0) parts.push("0");
+    if (unresolved.length > 0) {
+      return `${parts.join(" ")} — unresolved: ${unresolved.join(
+        ", ",
+      )} (see this row's issues)`;
     }
     return `${parts.join(" ")} = ${outputs.result}`;
   },

@@ -29,6 +29,8 @@
  * Pure execute. No runtime special-casing. Per Brief 7 design
  * (UW Report data is just data; the chain rendering it into a
  * factor is the same as any other multiplicative factor).
+ *
+ * See `docs/design-briefs/uw-report-integration.md` for the design.
  */
 
 import type { BlockKind, PortSpec } from "../block-types";

@@ -34,7 +34,7 @@ import type { Policy, PolicyResult } from "../policy-types";
 import type { PolicyAdjustment } from "../policy-adjustments";
 
 import P1 from "./conformance/P1.policy-compose-do-cgl.json";
-import P2 from "./conformance/P2.policy-irpm-package-min.json";
+import P2 from "./conformance/P2.policy-irpm-pioneer-min.json";
 import P3 from "./conformance/P3.policy-irpm-sections.json";
 import P4 from "./conformance/P4.policy-minimum-floor-binds.json";
 import P5 from "./conformance/P5.policy-package-factor-guarded-miss.json";
@@ -47,8 +47,8 @@ import P6 from "./conformance/P6.policy-full-tail-order.json";
 import V44 from "./conformance/V44.schedule-column-net.json";
 import V45 from "./conformance/V45.schedule-column-percategory.json";
 import V46 from "./conformance/V46.schedule-column-net-clamped.json";
-// P7 (model-sourced IRPM) is retired: the model arm refuses by name;
-// scores travel as typed input columns (P2's
+// P7 (model-sourced IRPM) retired with Detachment Brief 1 §4 S1 — the
+// model arm refuses by name; scores travel as typed input columns (P2's
 // pattern). The refusal itself is pinned in irpm-source.test.ts +
 // policy-book-tail.test.ts.
 // P8 — connector-sourced IRPM (Brief 62.6): the schedule_rating net comes

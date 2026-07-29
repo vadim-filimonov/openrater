@@ -10,7 +10,7 @@
  * Plan-truth, not book-truth: the card stays available after a real
  * book connects (R11) — it describes the PLAN.
  *
- * Scoring inside an @openrater/ui component follows the InputsPanelV2
+ * Scoring inside a labs-ui component follows the InputsPanelV2
  * precedent (the premium preview); everything else is pure probe-math.
  */
 
@@ -295,7 +295,7 @@ export function RateCardExhibit(props: RateCardExhibitProps): JSX.Element {
       .map((k) => [k, pins[k]] as const);
   }, [pinSeats, pins, rowAxis, colAxis]);
 
-  //  — the row variable's driving table, cited ("cited p. 6 —
+  // MVP-016 — the row variable's driving table, cited ("cited p. 6 —
   // Rule C.5"); rides every premium cell's tooltip. Declared with the
   // other hooks (before the honest-degrade early returns) so the hook
   // order never changes across renders (rules-of-hooks).
@@ -360,7 +360,7 @@ export function RateCardExhibit(props: RateCardExhibitProps): JSX.Element {
       );
     }
     if (c.premium !== null) {
-      //  — the cell answers "where did this number come from":
+      // MVP-016 — the cell answers "where did this number come from":
       // the row variable's driving table, cited from the filing.
       return (
         <span {...(rowCitation ? { title: rowCitation } : {})}>

@@ -2,8 +2,8 @@
  * Zod schemas for the plan-scoped factor tables endpoint group (D6.3 /
  * ADR-0027).
  *
- * Mirrors the Pydantic models in
- * server/src/openrater/rates/factor_tables/models.py. Cells are inlined on the parent
+ * Mirrors the Pydantic models in api-lab/backend's
+ * rates/factor_tables/models.py. Cells are inlined on the parent
  * factor table as `cells: Record<string, number>` — the storage layer
  * splits them into a sidecar table, but the API contract hides that.
  *
@@ -28,7 +28,8 @@ export type DraftStatus = z.infer<typeof draftStatusSchema>;
  * between adjacent banded levels, instead of the default stepping. The
  * `axis` is the slug of a banded key dimension; the runtime builds
  * breakpoints from that dimension's level `lo` bounds and interpolates
- * the raw numeric input across them, clamped at the ends.
+ * the raw numeric input across them (clamped at the ends). See
+ * `docs/adr/0063-linear-interpolation-primitive.md`.
  */
 export const factorTableInterpolationSchema = z.object({
   mode: z.literal("linear"),

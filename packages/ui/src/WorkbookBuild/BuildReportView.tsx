@@ -2,8 +2,8 @@
  * BuildReportView — Brief 92 scene 5, and the Overview drawer's body.
  *
  * Pure presentation over a persisted `BuildReport`: the built-in-Ns
- * line, the verdict tiles, the verification table (the filing's own
- * examples vs the engine), the plan checks that rode along, and the
+ * line, the verdict tiles, the verification table (the workbook's
+ * test cases vs the engine), the plan checks that rode along, and the
  * transcriber's gaps_and_assumptions echoed verbatim. The same
  * component renders at the end of the build flow and a month later
  * from "View build report" — one voice for "where did this plan come
@@ -12,6 +12,7 @@
 
 import type { BuildReportLike, WorkbookVectorResult } from "./types";
 import { VECTOR_DELTA_NOTE, formatVectorDelta } from "./vectorDelta";
+import { vectorChecksSummary } from "./vectorChecksSummary";
 
 const GAP_KIND_LABEL: Record<string, string> = {
   assumption: "Assumption",
@@ -25,14 +26,12 @@ export function vectorsVerdictLine(report: BuildReportLike): string {
   if (v.status !== "ran") {
     return `Verification didn't run — ${v.detail ?? "the scoring service was unreachable"}.`;
   }
-  const total = v.checks.length;
-  if (v.mismatched === 0 && v.near === 0) {
-    return `All ${total} checks across ${v.total_cases} filing examples match.`;
-  }
-  const parts = [`${v.matched} of ${total} checks match`];
-  if (v.near > 0) parts.push(`${v.near} within $1`);
-  if (v.mismatched > 0) parts.push(`${v.mismatched} mismatched`);
-  return parts.join(" · ") + ".";
+  // FCA #19 — ONE verdict vocabulary (vectorChecksSummary): the same
+  // checks used to read three different ways on three surfaces, and
+  // "filing examples" overclaimed provenance the test_cases sheet
+  // (transcriber-authored) doesn't carry.
+  const n = v.total_cases;
+  return `${vectorChecksSummary(v).label} (${n} test case${n === 1 ? "" : "s"}).`;
 }
 
 export function builtLine(report: BuildReportLike): string {
@@ -92,7 +91,7 @@ export function BuildReportView({ report }: BuildReportViewProps) {
           className={`rater-build-report__stat rater-build-report__stat--${vectorsTone}`}
         >
           <span className="rater-build-report__stat-value">
-            {v.status === "ran" ? `${v.matched} of ${v.checks.length}` : "—"}
+            {v.status === "ran" ? vectorChecksSummary(v).fraction : "—"}
           </span>
           <span className="rater-build-report__stat-label">
             {vectorsVerdictLine(report)}
@@ -178,17 +177,38 @@ export function BuildReportView({ report }: BuildReportViewProps) {
         </section>
       ) : null}
 
+      {v.status === "ran" && (v.unexercised_gate_rules?.length ?? 0) > 0 ? (
+        // FCA #19 — an all-green scorecard proves nothing about a rule
+        // no case fires (the audited plan reported 25/25 over a DEAD
+        // knock-out). The runner counts rule exercise from the real
+        // engine traces; unexercised rules are named HERE, beside the
+        // verdict they would otherwise hide behind.
+        <p className="rater-build-report__fold" role="status">
+          ⚠ {v.gate_rules_exercised ?? 0} of {v.gate_rules_total ?? 0}{" "}
+          eligibility rules exercised — no test case fires{" "}
+          {v.unexercised_gate_rules!.join(", ")}. An all-green scorecard
+          proves nothing about an unexercised rule; add a case that
+          triggers each.
+        </p>
+      ) : null}
+
       {v.status === "ran" && v.checks.length > 0 ? (
         <section className="rater-build-report__section">
+          {/* FCA #19/#20 — the test_cases sheet is transcriber-
+              authored; 'the filing's own examples' overclaimed, and a
+              fee-stripped expected total wore a 'Filing says' banner
+              the filing does not print. */}
           <h4 className="rater-build-report__eyebrow">
-            Verification — the filing's own examples
+            Verification — the workbook's test cases
           </h4>
           <table className="rater-build-report__vec">
             <thead>
               <tr>
                 <th>Case</th>
                 <th>Field</th>
-                <th className="rater-build-report__num">Filing says</th>
+                <th className="rater-build-report__num">
+                  Expected (test case)
+                </th>
                 <th className="rater-build-report__num">Plan says</th>
                 <th className="rater-build-report__num" title={VECTOR_DELTA_NOTE}>
                   Δ
@@ -201,7 +221,21 @@ export function BuildReportView({ report }: BuildReportViewProps) {
                   key={`${c.case_id}-${c.field}`}
                   className={`rater-build-report__vec-row${vectorRowTone(c.status)}`}
                 >
-                  <td className="rater-build-report__mono">{c.case_id}</td>
+                  {/* The case NAME often carries the disclosure a
+                      reviewer needs ('$463 = $439 + $24 fee') — it
+                      must reach the table, not just the JSON. */}
+                  <td
+                    className="rater-build-report__mono"
+                    title={c.name ?? undefined}
+                  >
+                    {c.case_id}
+                    {c.name ? (
+                      <span className="rater-build-report__fold">
+                        {" "}
+                        · {c.name}
+                      </span>
+                    ) : null}
+                  </td>
                   <td>{c.field}</td>
                   <td className="rater-build-report__num rater-build-report__mono">
                     {formatValue(c.expected)}
@@ -250,7 +284,7 @@ export function BuildReportView({ report }: BuildReportViewProps) {
         </section>
       ) : null}
 
-      {/* A re-ingested build carries its applied diff; the
+      {/* MVP-025 — a re-ingested build carries its applied diff; the
           drawer's history pager makes every yesterday's diff reachable
           (it was API-only). The summaries are the server's own diff
           voice — one line per changed construct. */}

@@ -468,7 +468,7 @@ export function ModifierEditor(props: ModifierEditorProps): JSX.Element {
             value={draft.citation}
             placeholder={
               draft.kind === "schedule"
-                ? "Meridian BOP 2024 · Rule 47.2"
+                ? "ISO BOP 2024 · Rule 47.2"
                 : draft.kind === "flat"
                   ? "TRIA 2024"
                   : "Company filing §B"

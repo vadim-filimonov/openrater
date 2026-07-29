@@ -34,7 +34,7 @@ export interface AttentionSummary {
   readonly failedConnectorCount: number;
 }
 
-/**  — the plan facts the status line leads with (arrival order:
+/** MVP-005 — the plan facts the status line leads with (arrival order:
  *  the line is about PLANS; connector setup is at most a suffix). */
 export interface PlansSummary {
   readonly count: number;
@@ -62,7 +62,7 @@ function plansClause(p: PlansSummary): string | null {
 
 /** Brief 88 §6 status rows. The "Checking…" and "Can't reach your services"
  *  states stay with the route — they're query states, not attention states.
- *   — with `plans` supplied, the ok-tone line leads with the
+ *  MVP-005 — with `plans` supplied, the ok-tone line leads with the
  *  plans clause (the thing the actuary came for); connector setup
  *  demotes to a suffix. Alarms keep the line. */
 export function statusLineFor(
@@ -91,7 +91,7 @@ export function statusLineFor(
     };
   }
   if (s.setupGroupCount > 0) {
-    //  — "connector" is the API Lab's domain word; the front
+    // MVP-006 — "connector" is the API Lab's domain word; the front
     // door speaks the room's name.
     const k = s.keylessConnectorCount;
     const f = s.failedConnectorCount;
@@ -133,7 +133,7 @@ function midSentence(hint: string): string {
  *  get no doors: their content blocks ARE the doors. Order mirrors the nav
  *  (P1 — one map of the building). */
 export const doorCopy = {
-  //  — an eyebrow states the group, it doesn't riff.
+  // MVP-031d — an eyebrow states the group, it doesn't riff.
   heading: "Supporting",
   integrations: {
     name: "Integrations",
@@ -150,7 +150,7 @@ export const firstRunCopy = {
 } as const;
 
 /** Brief 88 §3.2 Block 4 — Your book (88.2). */
-// current Exhibits design — the book of record is gone; the second
+// Brief: portfolio-redesign v2 — the book of record is gone; the second
 // core is Exhibits, where plans are drawn and compared.
 export const exhibitsCopy = {
   heading: "Exhibits",
@@ -226,7 +226,7 @@ export const attentionCopy = {
       actionLabel: "Open Ship",
     };
   },
-  //  — "connector" is the API Lab's domain word and stays
+  // MVP-006 — "connector" is the API Lab's domain word and stays
   // inside that room; Home speaks the room's name.
   connectorsKeyless(count: number): { text: string; actionLabel: string } {
     return {
@@ -248,9 +248,9 @@ export const attentionCopy = {
   },
 } as const;
 
-/** Label the seeded reference program in every plan list so a fresh
- *  install reads as "sample content, safe to poke", not "someone's
- *  real book". Keyed by the fixture's stable
+/** First-run brief §5.5 — the seeded reference program is labeled in
+ *  every plan list so a fresh install reads as "sample content, safe
+ *  to poke", not "someone's real book". Keyed by the fixture's stable
  *  plan id (seed.py: plan ids are the workbooks' own rating_plan_ids,
  *  identical on every box). One entry today; additional bundled
  *  reference programs add rows here, nowhere else. */

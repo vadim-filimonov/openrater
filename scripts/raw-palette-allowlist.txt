@@ -1,11 +1,44 @@
-# Raw-palette reference allowlist.
+# Polish PR 9 — raw-palette references allowlist.
 #
-# Files listed here bypass the `pnpm raw-palette:check` CI guard. Components
-# should consume the semantic alias layer (`--rater-text-*`,
-# `--rater-surface-*`, `--rater-cat-*`, `--rater-accent-*`, and
-# `--rater-feedback-*`); raw palette hues exist only to define that layer.
+# Files in this list bypass the `pnpm raw-palette:check` CI guard.
+# Two flavors:
 #
-# Format: one project-root-relative path per line. Blank lines and lines
-# beginning with `#` are ignored.
+# 1) **Sweep in progress** (PR 9b/9c/9d/9e migrations) — files mid-port
+#    from raw-palette to semantic aliases. Each follow-up PR sweeps a
+#    batch and removes lines from this section. Goal is to empty it.
 #
-# No exemptions are currently required.
+# 2) **Permanent exemptions** — files that LEGITIMATELY need raw refs
+#    (e.g., the palette showcase route documents the raw palette by
+#    rendering swatches of every hue+step combination). These never
+#    move out of the allowlist.
+#
+# The audit's north-star (UI_AUDIT.md §C): components consume the
+# semantic alias layer (`--rater-text-*`, `--rater-surface-*`,
+# `--rater-cat-*`, `--rater-accent-*`, `--rater-feedback-*`). The 7
+# raw-palette hues exist ONLY to redefine the semantic layer in
+# tokens.css — components must not reach past it.
+#
+# Sweep history:
+#   PR 9   — Button, IconButton, ProgressBar, Toast (DS layer)         −14 refs
+#   PR 9b  — DimensionEditor.css                                        −43
+#   PR 9c  — InputsWorkspace cluster (6 files)                         −108
+#   PR 9d  — CalculationTower cluster (6 files)                         −31
+#   PR 9e  — Long-tail (24 CSS files)                                   −61
+#   PR 9f  — LineMultiples.tsx → categorical alias                       −6
+#           TerritoryMap.tsx (false positive from JSDoc) → guard fix
+#   ────────────────────────────────────────────────────────────────
+#   Total swept                                                        −263 refs
+#
+# Format: one project-root-relative path per line. Lines starting with
+# `#` are comments, blank lines are skipped. Trailing whitespace
+# ignored.
+
+# ── Sweep in progress (target: zero entries) ────────────────────
+#
+# (none — the sweepable surface is fully migrated as of PR 9f)
+
+# ── Permanent exemptions (legitimate raw-palette use) ───────────
+#
+# (none — the TokensRoute palette showcase was the only permanent
+#  exemption; it was removed when the /tokens route was retired, so
+#  no surface legitimately enumerates the raw palette anymore.)

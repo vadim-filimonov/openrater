@@ -153,7 +153,7 @@ STAGE_KIND_SPECS: list[StageKindSpec] = [
             "chains": [
                 {
                     "chain_id": "building",
-                    "base_input": "stage_3.territory.property_factor",
+                    "base_input": "stage_3.territory.building_per_100",
                     "exposure_input": "form_input.coverages.building_limit_usd",
                     "factor_lookups": [
                         {
@@ -161,8 +161,8 @@ STAGE_KIND_SPECS: list[StageKindSpec] = [
                             "dimension_inputs": ["form_input.location.construction_class"],
                         },
                         {
-                            "factor_kind": "protection_factor",
-                            "dimension_inputs": ["form_input.location.protection_class"],
+                            "factor_kind": "ppc_factor",
+                            "dimension_inputs": ["form_input.location.ppc_class"],
                         },
                     ],
                     "output_field": "building_premium_usd",

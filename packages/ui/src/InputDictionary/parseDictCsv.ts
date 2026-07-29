@@ -56,7 +56,7 @@ function normalizeSource(raw: string | undefined): InputSourceKindValue {
  * depend on whether the row's `data_type` marks the field as an enum:
  *
  * - enum/select: commas count as delimiters (the filing's natural list
- *   format, e.g. `"t1, t2, t3"`), and even a single token is a valid
+ *   format, e.g. `"701, 702, 703"`), and even a single token is a valid
  *   one-option enum. Previously a comma-delimited enum was silently
  *   dropped — the bug E01 reports.
  * - non-enum: only `/ | ;` split, and a lone token is treated as prose

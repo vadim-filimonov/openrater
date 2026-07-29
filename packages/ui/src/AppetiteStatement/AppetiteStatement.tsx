@@ -39,9 +39,12 @@ import {
 } from "../StatementComposer";
 import { ImpactDeletePrompt } from "../ImpactDeletePrompt";
 import {
+  BOOL_OPS,
   NUMERIC_OPS,
   STRING_OPS,
+  boolValueLabel,
   fmtAppetiteValue,
+  isBoolDtype,
   isNumericDtype,
   opPhrase,
 } from "./appetitePhrases";
@@ -207,7 +210,8 @@ export function AppetiteStatement(props: AppetiteStatementProps): JSX.Element {
           return (
             <span key={`${c.variable}_${i}`}>
               {i > 0 ? <> and </> : null}
-              <b>{meta?.label || c.variable}</b> {opPhrase(c.op, numeric)}{" "}
+              <b>{meta?.label || c.variable}</b>{" "}
+              {opPhrase(c.op, numeric, isBoolDtype(meta?.dtype))}{" "}
               <span className="rater-appetite__val">
                 {fmtValue(c.value, meta?.dtype)}
               </span>
@@ -310,7 +314,8 @@ export function AppetiteStatement(props: AppetiteStatementProps): JSX.Element {
     const clauseSlots: ComposerSlot[] = composer.clauses.flatMap((c, i) => {
       const meta = fieldMeta(composer.scope, c.field);
       const numeric = isNumericDtype(meta?.dtype);
-      const ops = numeric ? NUMERIC_OPS : STRING_OPS;
+      const bool = isBoolDtype(meta?.dtype);
+      const ops = numeric ? NUMERIC_OPS : bool ? BOOL_OPS : STRING_OPS;
       // Brief 89.3 follow-up — a dimension-backed field's value seat
       // offers the AUTHORED levels (the only values the gate can ever
       // match) instead of free text; the seat echoes labels, not ids.
@@ -341,7 +346,8 @@ export function AppetiteStatement(props: AppetiteStatementProps): JSX.Element {
           id: `value_${i}`,
           kind: "value" as const,
           value: c.value,
-          placeholder: levels.length > 0 ? "choose a value…" : "value",
+          placeholder:
+            levels.length > 0 || bool ? "choose a value…" : "value",
           dtype: numeric ? ("number" as const) : ("text" as const),
           ...(levels.length > 0
             ? {
@@ -353,7 +359,23 @@ export function AppetiteStatement(props: AppetiteStatementProps): JSX.Element {
                 freeTextHint: "matches no authored level",
                 ...(c.value !== "" ? { display: valueDisplay } : {}),
               }
-            : {}),
+            : bool
+              ? {
+                  // FCA S2 — the free-text box here was "the affordance
+                  // that invites the type mismatch": a typed 'banana'
+                  // authored a rule the runtime comparator could never
+                  // match. The seat is a strict yes/no picker (no
+                  // freeTextHint → no escape row); the stored literals
+                  // stay the spec §2.1 'true'/'false'.
+                  options: [
+                    { value: "true", label: "Yes" },
+                    { value: "false", label: "No" },
+                  ],
+                  ...(c.value !== ""
+                    ? { display: boolValueLabel(c.value) ?? c.value }
+                    : {}),
+                }
+              : {}),
         },
       ];
     });
@@ -479,14 +501,19 @@ export function AppetiteStatement(props: AppetiteStatementProps): JSX.Element {
   // Brief 89.3 follow-up — the silent-no-match trap: a value typed (or
   // carried in from an older rule) against a dimension-backed field
   // that matches no authored level can never fire — the gate compares
-  // raw level ids. Say so while the rule is still open, per clause.
+  // raw level ids. Same trap for a boolean field carrying a literal
+  // the comparator can never read as true/false (FCA S2 — the picker
+  // stops NEW mismatches; this catches the ones already stored). Say
+  // so while the rule is still open, per clause.
   const levelMismatches =
     composer === null
       ? []
       : composer.clauses.flatMap((c) => {
           const meta = fieldMeta(composer.scope, c.field);
           const levels = meta?.levels ?? [];
-          if (levels.length === 0 || c.value.trim() === "") return [];
+          const bool = levels.length === 0 && isBoolDtype(meta?.dtype);
+          if ((levels.length === 0 && !bool) || c.value.trim() === "")
+            return [];
           const op = clauseOp(composer.scope, c);
           const entries =
             op === "in" || op === "nin"
@@ -496,9 +523,11 @@ export function AppetiteStatement(props: AppetiteStatementProps): JSX.Element {
                   .filter((s) => s !== "")
               : [c.value.trim()];
           const ids = new Set(levels.map((l) => l.id));
-          const unmatched = entries.filter((e) => !ids.has(e));
+          const unmatched = entries.filter((e) =>
+            bool ? boolValueLabel(e) === null : !ids.has(e),
+          );
           return unmatched.length > 0
-            ? [{ field: meta?.label || c.field, unmatched }]
+            ? [{ field: meta?.label || c.field, unmatched, bool }]
             : [];
         });
 
@@ -610,11 +639,15 @@ export function AppetiteStatement(props: AppetiteStatementProps): JSX.Element {
             {levelMismatches.map((mm, idx) => (
               <span key={`${mm.field}_${idx}`}>
                 {mm.unmatched.map((u) => `“${u}”`).join(", ")}{" "}
-                {mm.unmatched.length > 1
-                  ? "aren't authored levels"
-                  : "isn't an authored level"}{" "}
-                of <strong>{mm.field}</strong> — this rule would never
-                match.{" "}
+                {mm.bool
+                  ? mm.unmatched.length > 1
+                    ? "aren't yes/no answers"
+                    : "isn't a yes/no answer"
+                  : mm.unmatched.length > 1
+                    ? "aren't authored levels"
+                    : "isn't an authored level"}{" "}
+                {mm.bool ? "for" : "of"} <strong>{mm.field}</strong> — this
+                rule would never match.{" "}
               </span>
             ))}
             Pick from the value menu.
@@ -752,7 +785,7 @@ export function AppetiteStatement(props: AppetiteStatementProps): JSX.Element {
                   const meta = fieldMeta(scope, c.variable);
                   const numeric =
                     scope === "policy" || isNumericDtype(meta?.dtype);
-                  return `${meta?.label || c.variable} ${opPhrase(c.op, numeric)} ${fmtValue(c.value, scope === "policy" ? "number" : meta?.dtype)}`;
+                  return `${meta?.label || c.variable} ${opPhrase(c.op, numeric, isBoolDtype(meta?.dtype))} ${fmtValue(c.value, scope === "policy" ? "number" : meta?.dtype)}`;
                 })
                 .join(" and ");
             };
@@ -898,7 +931,7 @@ export function AppetiteStatement(props: AppetiteStatementProps): JSX.Element {
               )
                 .map((c) => {
                   const meta = fieldMeta(deleting.scope, c.variable);
-                  return `${meta?.label || c.variable} ${opPhrase(c.op, isNumericDtype(meta?.dtype))} ${fmtValue(c.value, meta?.dtype)}`;
+                  return `${meta?.label || c.variable} ${opPhrase(c.op, isNumericDtype(meta?.dtype), isBoolDtype(meta?.dtype))} ${fmtValue(c.value, meta?.dtype)}`;
                 })
                 .join(" and ")}`
             : ""

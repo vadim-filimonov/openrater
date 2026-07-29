@@ -6,14 +6,17 @@
  * `config_json.chains[]`. A single chain stage typically carries 1–3
  * `ChainSpec`s (Building / BPP / Liability for BOP).
  *
- * Current behavior:
+ * For M4.3.8b (the route-wiring slice):
  *   · Read-only display of existing chain factors
  *   · "+ Add factor" opens the ChainFactorDrawer in add mode
- *   · Edit and remove callbacks identify the exact factor row
+ *   · onEdit / onRemove toast "Editor lands next PR" (the reverse
+ *     adapter from FactorLookup → FactorDraft is a follow-up)
  *
  * Defensive against malformed config_json: a parse failure renders a
  * card-level error state per stage; the rest of the section keeps
  * rendering.
+ *
+ * Implements the M4.3.8b route wiring per [ADR-0016](../../../../../docs/adr/0016-factor-draft-to-chain-spec-mapping.md).
  */
 
 import { Button } from "@openrater/design-system";
@@ -45,7 +48,7 @@ export interface ChainContext {
 
 /**
  * Identifies one specific factor row in a chain — stage + chainIndex
- * + factorIndex. Used by edit and remove flows.
+ * + factorIndex. Used by edit + remove flows (M4.3.9).
  */
 export interface FactorContext extends ChainContext {
   readonly factorIndex: number;
@@ -200,7 +203,7 @@ type ParseResult =
 function safeParseChainConfig(
   raw: Record<string, unknown> | null,
 ): ParseResult {
-  // User-facing copy carries no schema or field-name jargon; the raw parse
+  // PR-D — user-facing copy carries no schema/field-name jargon; the raw parse
   // error is logged for developers, not shown.
   if (raw === null || raw === undefined) {
     return { ok: false, error: "This coverage chain couldn't load." };
@@ -234,9 +237,9 @@ function chainSpecToCardFactors(
     id: `${stageId}__${chainIndex}__lcm`,
     label: "Carrier LCM",
     kind: "lcm",
-    // `input_path` is optional: an authored-constant
+    // ADR-0047 — `input_path` is now optional/nullable (an authored-constant
     // LCM carries `value` instead). Coalesce to undefined; surfacing the
-    // authored value in the card is handled by the inspector.
+    // authored value in the card is the inspector-editor PR (brief PR-4).
     resolves_to: chain.lcm.input_path ?? undefined,
   });
   return rows;
@@ -251,8 +254,9 @@ function factorLookupToChainFactor(
   return {
     id: encodeFactorId(stageId, chainIndex, factorIndex),
     label: fl.name,
-    // `interpolated` (the legacy curve wire shape) maps to
-    // "lookup.range" (a banded factor table, the closest UI label).
+    // Brief 34 PR 34.7: `interpolated` (legacy curve wire shape) now
+    // maps to "lookup.range" (banded factor table — the closest UI
+    // label). Brief 19's curve.evaluate was hard-removed.
     kind: fl.lookup_method === "interpolated" ? "lookup.range" : "lookup.direct",
     resolves_to: describeResolution(fl),
   };
@@ -280,7 +284,7 @@ function StageParseErrorCard({
 }): JSX.Element {
   return (
     <div className="rating-chains-section__parse-error" role="alert">
-      {/* Keep raw errors and "stage JSON" jargon off the user surface. */}
+      {/* PR-D — no raw error / "stage JSON" jargon on a user surface. */}
       <strong>{stageDisplayName}</strong> — {error} Try removing and
       re-adding this coverage.
     </div>

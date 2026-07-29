@@ -5,9 +5,10 @@
 # You may obtain a copy of the License at
 #
 #     http://www.apache.org/licenses/LICENSE-2.0
-"""Regression tests for publishing, version pinning, and plan deletion.
+"""The 2026-07-11 production-audit remainder, pinned.
 
-These related behaviors share lifecycle setup and are pinned together:
+Five behaviors landed together after the audit's chip PRs (#411/#413/#414
+/#416) and Brief 84 (#410); each gets its regression pin here:
 
   · Active-slot re-key (migration 039): promotes evict same-PRODUCT
     siblings only — never a different product that shims to the same LOB.
@@ -52,7 +53,7 @@ def _publish(client: TestClient, plan_id: str, snapshot_id: str) -> dict[str, An
     return r.json()
 
 
-def _integration(client: TestClient, name: str = "Lifecycle test") -> str:
+def _integration(client: TestClient, name: str = "Audit world") -> str:
     r = client.post("/api/v1/integrations", json={"name": name})
     assert r.status_code in (200, 201), r.text
     return r.json()["integration_id"]

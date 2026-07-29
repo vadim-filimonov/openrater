@@ -4,13 +4,14 @@
  * `cp deploy/.env.example deploy/.env`, and an OPTIONAL profile must never
  * block a box that didn't opt into it.
  *
- * The failure this locks out: a profile-gated service declared
+ * The bug this locks out (hit on the live demo box, 2026-07-14): the
+ * profile-gated `spine` service (Brief 85) declared
  *
  *     SPINE_DATABASE_URL: ${SPINE_DATABASE_URL:?set in deploy/.env — …}
  *
  * Compose interpolates the WHOLE file before it filters by profile, so that
  * `:?` (error when unset OR empty) hard-failed `docker compose up` for every
- * deployment that never opted into the service — breaking its stated
+ * deployment that never opted into spine — breaking the service's own stated
  * promise ("PROFILE-GATED: a box that never opts in deploys byte-identically")
  * and even rejecting the repo's shipped `.env.example`, which ships the key
  * blank. A box mid-upgrade could not deploy at all.

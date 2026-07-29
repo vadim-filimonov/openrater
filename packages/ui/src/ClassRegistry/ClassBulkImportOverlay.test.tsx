@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { ClassBulkImportOverlay } from "./ClassBulkImportOverlay";
 
-const CSV = "class_code,description,prop_rate_number\nc101,Meridian Neighborhood Bakery,07\nc102,Meridian General Merchandise,11";
+const CSV = "class_code,description,prop_rate_number\n53983,Army/Navy,09\n09033,Catering,19";
 
 describe("<ClassBulkImportOverlay>", () => {
   it("parses pasted CSV and previews the valid count", () => {
@@ -23,8 +23,8 @@ describe("<ClassBulkImportOverlay>", () => {
     expect(onImport).toHaveBeenCalledOnce();
     const [rows, mode] = onImport.mock.calls[0]!;
     expect(rows).toHaveLength(2);
-    expect(rows[0].class_code).toBe("c101");
-    expect(rows[0].attributes.prop_rate_number).toBe("07");
+    expect(rows[0].class_code).toBe("53983");
+    expect(rows[0].attributes.prop_rate_number).toBe("09");
     expect(rows[0].source).toBe("iso");
     expect(mode).toBe("merge");
   });

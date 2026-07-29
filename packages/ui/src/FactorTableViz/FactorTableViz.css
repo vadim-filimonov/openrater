@@ -47,7 +47,7 @@
   font-family: inherit;
   transition: background var(--rater-d-80) var(--rater-ease-snap), color var(--rater-d-80) var(--rater-ease-snap);
 }
-.rater-ft-viz-pill:hover:not(disabled) {
+.rater-ft-viz-pill:hover:not(:disabled) {
   color: var(--rater-text-default);
 }
 .rater-ft-viz-pill.is-active {

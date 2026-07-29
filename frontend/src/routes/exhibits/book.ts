@@ -1,5 +1,5 @@
 /**
- * Exhibits — the book's derivations (current Exhibits design).
+ * Exhibits — the book's derivations (Brief: portfolio-redesign v2 §5.4, P3).
  *
  * A book is a CSV of risks, one row per risk, columns = the plan's
  * inputs (the Walk-4 recipe). It exists only inside this page: parsed

@@ -26,6 +26,8 @@
 
 import { useCallback, useMemo, useState } from "react";
 
+import { compareNatural } from "@openrater/contracts";
+
 import type { SeedLevel } from "../GeoDimWizard";
 import {
   addLevelToTerritory,
@@ -207,7 +209,14 @@ export function TerritoryGrouping({
           <span className="rater-terr-grouping__col-spacer" />
         </div>
         <div className="rater-terr-grouping__buckets">
-          {territories.map((t) => (
+          {/* FCA #26 (finding 119) — buckets in natural order
+              (T1…T10), never workbook source order. Display-only:
+              onChange still rebuilds from ids. */}
+          {[...territories]
+            .sort((a, b) =>
+              compareNatural(a.label || a.id, b.label || b.id),
+            )
+            .map((t) => (
             <Bucket
               key={t.id}
               territory={t}

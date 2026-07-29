@@ -53,13 +53,7 @@ own goldens, not by softening this one.
 
 ## Recording runs
 
-Write reports to a local or CI artifact directory, for example:
-
-```sh
-server/.venv/bin/python evals/score_transcription.py ATTEMPT.xlsx \
-  --json /tmp/openrater-eval.json
-```
-
-Do not commit model transcripts, raw attempts, or run-by-run reports.
-When an eval informs a change, record only the aggregate result and the
-synthetic reproducer in the pull request.
+Score real attempts with `--json evals/runs/<date>-<model>.json` and
+commit the report (never the attempt's raw workbook if it came from a
+non-reference document). `runs/` is the eval history the extension's
+model-version bumps get judged against.

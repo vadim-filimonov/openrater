@@ -23,7 +23,7 @@ import {
 const TS = "2026-05-31T00:00:00.000Z";
 
 const propRateNumberDim: PlanDimension = {
-  rating_plan_id: "meridian_bop_ne_demo",
+  rating_plan_id: "bop_ks_blank_x",
   dim_id: "prop_rate_number",
   display_name: "Property rate number",
   slug: "prop_rate_number",
@@ -33,15 +33,15 @@ const propRateNumberDim: PlanDimension = {
   shape: "categorical",
   derived_from: { source_dim: "class_code", attribute: "prop_rate_number" },
   levels: [
-    { kind: "categorical", id: "07", label: "07", aliases: [] },
-    { kind: "categorical", id: "11", label: "11", aliases: [] },
+    { kind: "categorical", id: "09", label: "09", aliases: [] },
+    { kind: "categorical", id: "18", label: "18", aliases: [] },
   ],
   created_at: TS,
   updated_at: TS,
 };
 
 const classCodeDim: PlanDimension = {
-  rating_plan_id: "meridian_bop_ne_demo",
+  rating_plan_id: "bop_ks_blank_x",
   dim_id: "class_code",
   display_name: "Class code",
   slug: "class_code",
@@ -49,14 +49,14 @@ const classCodeDim: PlanDimension = {
   role: "rating-input",
   dimension_type: "classification",
   shape: "categorical",
-  class_library_id: "meridian_bop_ne_demo",
+  class_library_id: "bop_ks_blank_x",
   levels: [
     {
       kind: "categorical",
-      id: "c101",
-      label: "Meridian Neighborhood Bakery",
+      id: "53983",
+      label: "Army and Navy Retail",
       aliases: [],
-      attributes: { prop_rate_number: "07" },
+      attributes: { prop_rate_number: "09" },
     },
   ],
   created_at: TS,
@@ -74,7 +74,7 @@ describe("dimensionsSync — derived_from / class_library_id round-trip (Brief 6
 
   it("planDimensionToRow carries class_library_id for a classification dim", () => {
     const row = planDimensionToRow(classCodeDim);
-    expect(row.class_library_id).toBe("meridian_bop_ne_demo");
+    expect(row.class_library_id).toBe("bop_ks_blank_x");
   });
 
   it("dimensionRowToUpsertRequest carries derived_from (UI → API)", () => {
@@ -87,7 +87,7 @@ describe("dimensionsSync — derived_from / class_library_id round-trip (Brief 6
 
   it("dimensionRowToUpsertRequest carries class_library_id", () => {
     const req = dimensionRowToUpsertRequest(planDimensionToRow(classCodeDim));
-    expect(req.class_library_id).toBe("meridian_bop_ne_demo");
+    expect(req.class_library_id).toBe("bop_ks_blank_x");
   });
 
   it("the full bulk round-trip (the workspace's replace-all write path) preserves the wire", () => {
@@ -101,7 +101,7 @@ describe("dimensionsSync — derived_from / class_library_id round-trip (Brief 6
       attribute: "prop_rate_number",
     });
     const cc = bulk.dimensions.find((d) => d.slug === "class_code");
-    expect(cc?.class_library_id).toBe("meridian_bop_ne_demo");
+    expect(cc?.class_library_id).toBe("bop_ks_blank_x");
   });
 
   it("planDimensionToRow backfills lo/hi from min/max on banded levels", () => {
@@ -111,7 +111,7 @@ describe("dimensionsSync — derived_from / class_library_id round-trip (Brief 6
     // backfill every value falls outside every band → the deductible /
     // limit relativity prices at 1.0 (oracle $1,210 → $880).
     const bandedDim: PlanDimension = {
-      rating_plan_id: "meridian_bop_ne_demo",
+      rating_plan_id: "bop_ks_blank_x",
       dim_id: "prop_limit_band",
       display_name: "Total property limit band",
       slug: "prop_limit_band",
@@ -142,7 +142,7 @@ describe("dimensionsSync — derived_from / class_library_id round-trip (Brief 6
 
   it("planDimensionToRow does NOT clobber an existing lo/hi (lo/hi wins)", () => {
     const bandedDim: PlanDimension = {
-      rating_plan_id: "meridian_bop_ne_demo",
+      rating_plan_id: "bop_ks_blank_x",
       dim_id: "rev_band",
       display_name: "Revenue band",
       slug: "rev_band",
@@ -167,7 +167,7 @@ describe("dimensionsSync — derived_from / class_library_id round-trip (Brief 6
     // level back to the API — otherwise the next API-wins hydration reads it
     // bare again and derive.band re-breaks. Backfill is symmetric.
     const bandedDim: PlanDimension = {
-      rating_plan_id: "meridian_bop_ne_demo",
+      rating_plan_id: "bop_ks_blank_x",
       dim_id: "prop_limit_band",
       display_name: "Total property limit band",
       slug: "prop_limit_band",
@@ -196,7 +196,7 @@ describe("dimensionsSync — derived_from / class_library_id round-trip (Brief 6
 
   it("a non-derived dim round-trips with the fields absent (no false positives)", () => {
     const territory: PlanDimension = {
-      rating_plan_id: "meridian_bop_ne_demo",
+      rating_plan_id: "bop_ks_blank_x",
       dim_id: "territory",
       display_name: "Territory",
       slug: "territory",
@@ -220,7 +220,7 @@ describe("dimensionsSync — source_field round-trip (Brief 60 follow-up)", () =
   // replace-all write dropped it → the next hydration read a geo dim with no
   // source column → `derive.territory` lost its input.
   const territoryGeoDim: PlanDimension = {
-    rating_plan_id: "meridian_bop_ne_demo",
+    rating_plan_id: "bop_ks_blank_x",
     dim_id: "territory",
     display_name: "Territory",
     slug: "territory",
@@ -229,7 +229,7 @@ describe("dimensionsSync — source_field round-trip (Brief 60 follow-up)", () =
     dimension_type: "geographic",
     shape: "geographic",
     source_field: "zip",
-    geo_territories: [{ id: "t1", label: "t1", members: ["66101", "66102"] }],
+    geo_territories: [{ id: "701", label: "701", members: ["66101", "66102"] }],
     levels: [],
     created_at: TS,
     updated_at: TS,

@@ -100,7 +100,7 @@ export function ClassBulkImportOverlay(
           value={text}
           onChange={(e) => setText(e.target.value)}
           placeholder={
-            "class_code,description,naics_code,prop_rate_number,liab_class_group,liab_exposure_base\nc101,Meridian Neighborhood Bakery,DEMO-NAICS-102,07,mg_02,sales"
+            "class_code,description,naics_code,prop_rate_number,liab_class_group,liab_exposure_base\n53983,Army/Navy Retail,452990,09,cg_07,sales"
           }
           aria-label="Paste CSV"
           rows={6}

@@ -1,14 +1,14 @@
 {
-  "name": "P2.policy-irpm-package-min",
-  "description": "Synthetic Meridian policy tail: subtotal 3205, schedule rating at net 0%, a guarded first-term factor of 0.90, and a $500 floor that does not bind. The exact product is $2,884.50.",
+  "name": "P2.policy-irpm-pioneer-min",
+  "description": "Sample BOP Lakeshore-style policy tail: subtotal 3205, IRPM elected at net 0%, first-term Pioneer -10% (guarded on is_first_term), $500 floor not binding. NOTE: the filing rounds the Pioneer credit to a flat -$321 -> $2,884; the rounding-free 62.1 engine yields the exact product $2,884.50 (a rounding/quantization step is a future ADR-0042 addition, not part of 62.1).",
   "policy": {
     "policy_id": "P2",
     "lines": [
       { "plan_ref": { "plan_id": "bop-plan", "content_hash": "h-bop", "product": "bop" }, "premium_output": "bop_premium" }
     ],
     "adjustments": [
-      { "kind": "schedule_rating", "id": "irpm", "display_name": "Schedule rating (IRPM)", "cap_pct": 25, "source": { "from": "literal", "total": 0 }, "citation": "Meridian Rule MS-R6.1" },
-      { "kind": "package_factor", "id": "first_term_credit", "display_name": "Meridian first-term credit", "factor": 0.9, "when": { "field": "is_first_term", "op": "eq", "value": true }, "citation": "Meridian Rule MS-R6.2" },
+      { "kind": "schedule_rating", "id": "irpm", "display_name": "Schedule rating (IRPM)", "cap_pct": 25, "source": { "from": "literal", "total": 0 }, "citation": "Sample BOP 2025 §schedule-rating" },
+      { "kind": "package_factor", "id": "pioneer", "display_name": "Pioneer credit", "factor": 0.9, "when": { "field": "is_first_term", "op": "eq", "value": true }, "citation": "Sample BOP 2025 §pioneer" },
       { "kind": "minimum_premium", "id": "min", "floor": 500 }
     ]
   },
@@ -45,8 +45,8 @@
       { "product": "bop", "plan_id": "bop-plan", "premium": 3205 }
     ],
     "adjustments": [
-      { "id": "irpm", "kind": "schedule_rating", "applied": true, "before": 3205, "after": 3205, "detail": "0.0% (cap ±25%)", "provenance": { "source": "literal" }, "citation": "Meridian Rule MS-R6.1" },
-      { "id": "first_term_credit", "kind": "package_factor", "applied": true, "before": 3205, "after": 2884.5, "detail": "× 0.9", "citation": "Meridian Rule MS-R6.2" },
+      { "id": "irpm", "kind": "schedule_rating", "applied": true, "before": 3205, "after": 3205, "detail": "0.0% (cap ±25%)", "provenance": { "source": "literal" }, "citation": "Sample BOP 2025 §schedule-rating" },
+      { "id": "pioneer", "kind": "package_factor", "applied": true, "before": 3205, "after": 2884.5, "detail": "× 0.9", "citation": "Sample BOP 2025 §pioneer" },
       { "id": "min", "kind": "minimum_premium", "applied": false, "before": 2884.5, "after": 2884.5, "detail": "floor $500 not binding" }
     ]
   }

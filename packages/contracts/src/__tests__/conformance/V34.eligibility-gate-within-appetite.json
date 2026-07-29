@@ -1,10 +1,10 @@
 {
   "name": "V34.eligibility-gate-within-appetite",
-  "description": "A fictional Meridian risk (12,000 sq ft, $300k sales) stays below both synthetic thresholds and receives the default preferred tier.",
+  "description": "Brief 52 acceptance (negative case): a within-limits ISO BOP risk (9,000 sq ft, $250k sales) trips NEITHER eligibility gate → default preferred tier. Confirms the floor-area + gross-sales gates only fire when the declared inputs exceed their thresholds.",
   "plan": {
     "id": "v34.eligibility_gate_within_appetite",
     "version": "1.0.0",
-    "name": "Meridian fictional eligibility — floor area + gross sales",
+    "name": "BOP eligibility — floor area + gross sales",
     "lines": ["bop"],
     "effective": "2025-10-01",
     "nodes": [
@@ -13,11 +13,11 @@
         "kind": "eligibility.gate",
         "params": {
           "rules": [
-            { "rule_id": "floor_area_cap", "variable": "total_floor_area_sqft", "op": "gt", "value": 40000, "tier": "submit", "reasoning": "Floor area exceeds the fictional Meridian 40,000 sq ft referral threshold." },
-            { "rule_id": "gross_sales_cap", "variable": "annual_gross_sales", "op": "gt", "value": 5000000, "tier": "submit", "reasoning": "Annual gross sales exceed the fictional Meridian $5M referral threshold." }
+            { "rule_id": "floor_area_cap", "variable": "total_floor_area_sqft", "op": "gt", "value": 35000, "tier": "submit", "reasoning": "Floor area exceeds the 35,000 sq ft BOP eligibility limit (Sample BOP Rule 22.A) — refer to underwriting." },
+            { "rule_id": "gross_sales_cap", "variable": "annual_gross_sales", "op": "gt", "value": 6000000, "tier": "submit", "reasoning": "Annual gross sales exceed the $6M referral threshold." }
           ],
           "default_tier": "preferred",
-          "default_reasoning": "Within the fictional Meridian eligibility rules."
+          "default_reasoning": "Within BOP eligibility."
         },
         "position": { "x": 0, "y": 0 }
       },
@@ -27,6 +27,6 @@
       { "from": { "node": "gate", "port": "tier" }, "to": { "node": "out_tier", "port": "value" } }
     ]
   },
-  "externalInputs": { "total_floor_area_sqft": 12000, "annual_gross_sales": 300000 },
+  "externalInputs": { "total_floor_area_sqft": 9000, "annual_gross_sales": 250000 },
   "expectedOutputs": { "tier": "preferred" }
 }

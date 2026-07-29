@@ -40,8 +40,8 @@ const FIELDS: readonly EndorsementFieldRef[] = Object.freeze([
 function withFactor(): EndorsementDraft {
   return {
     ...emptyEndorsementDraft(),
-    endorsement_id: "MS-10-03",
-    form_number: "MS 10 03",
+    endorsement_id: "BP-04-39",
+    form_number: "BP 04 39",
     display_name: "Liquor liability",
     effect_kind: "factor",
     factor: 1.15,
@@ -52,8 +52,8 @@ function withFactor(): EndorsementDraft {
 function withSublimit(): EndorsementDraft {
   return {
     ...emptyEndorsementDraft(),
-    endorsement_id: "MS-10-02",
-    form_number: "MS 10 02",
+    endorsement_id: "BP-04-30",
+    form_number: "BP 04 30",
     display_name: "Peak-limit endorsement",
     effect_kind: "sublimit",
     sublimit_coverage: "peak_items",
@@ -65,8 +65,8 @@ function withSublimit(): EndorsementDraft {
 function withAdditive(): EndorsementDraft {
   return {
     ...emptyEndorsementDraft(),
-    endorsement_id: "MS-10-06",
-    form_number: "MS 10 06",
+    endorsement_id: "BP-14-87",
+    form_number: "BP 14 87",
     display_name: "Water back-up",
     effect_kind: "additive",
     amount: 250,
@@ -202,7 +202,7 @@ describe("getReferencedFields", () => {
 });
 
 describe("DEFAULT_FORM_SUGGESTIONS", () => {
-  it("ships ≥10 Meridian BOP form suggestions", () => {
+  it("ships ≥10 ISO BOP form suggestions", () => {
     expect(DEFAULT_FORM_SUGGESTIONS.length).toBeGreaterThanOrEqual(10);
   });
   it("each suggestion has form_number + display_name", () => {
@@ -211,11 +211,11 @@ describe("DEFAULT_FORM_SUGGESTIONS", () => {
       expect(s.display_name.length).toBeGreaterThan(0);
     }
   });
-  it("includes the fictional Meridian reference forms", () => {
+  it("includes well-known forms (BP 04 30, BP 14 87, BP 04 39)", () => {
     const numbers = DEFAULT_FORM_SUGGESTIONS.map((s) => s.form_number);
-    expect(numbers).toContain("MS 10 01");
-    expect(numbers).toContain("MS 10 02");
-    expect(numbers).toContain("MS 10 03");
+    expect(numbers).toContain("BP 04 30");
+    expect(numbers).toContain("BP 14 87");
+    expect(numbers).toContain("BP 04 39");
   });
 });
 
@@ -231,7 +231,7 @@ describe("<EndorsementEditor> render", () => {
       />,
     );
     expect(
-      screen.getByText(/MS 10 02 — Peak-limit endorsement/),
+      screen.getByText(/BP 04 30 — Peak-limit endorsement/),
     ).toBeInTheDocument();
     expect(screen.getByText(/endorsement · sublimit/)).toBeInTheDocument();
   });
@@ -409,10 +409,10 @@ describe("<EndorsementEditor> interactions", () => {
     );
     fireEvent.change(
       screen.getByTestId("rater-endorsement-editor-form-number"),
-      { target: { value: "MS 99 99" } },
+      { target: { value: "BP 99 99" } },
     );
     expect(onChange).toHaveBeenCalledWith(
-      expect.objectContaining({ form_number: "MS 99 99" }),
+      expect.objectContaining({ form_number: "BP 99 99" }),
     );
   });
 
@@ -495,11 +495,11 @@ describe("<EndorsementEditor> interactions", () => {
     ).toBeInTheDocument();
 
     fireEvent.click(
-      screen.getByTestId("rater-endorsement-editor-suggest-MS-10-02"),
+      screen.getByTestId("rater-endorsement-editor-suggest-BP-04-30"),
     );
     expect(onChange).toHaveBeenCalledWith(
       expect.objectContaining({
-        form_number: "MS 10 02",
+        form_number: "BP 04 30",
         display_name: "Peak-limit endorsement",
         effect_kind: "sublimit",
       }),

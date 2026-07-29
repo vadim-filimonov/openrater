@@ -1,22 +1,25 @@
 /**
- * Canonical Dimension contract.
+ * Canonical Dimension contract — sub-brief 24.A + 24.A2.
  *
  * A Dimension is the substrate's concept of a rate-plan variable —
  * BOTH the inputs a policy supplies (class_code, deductible, limit)
  * AND the structural axes used to expand multi-dimensional tables
  * (peril, coverage, sub-coverage). The `role` field discriminates.
  *
- * Dimensions also have a *subtype*
+ * **24.A2 extension:** Dimensions also have a *subtype*
  * (`dimension_type`) that says what KIND of dimension this is —
  * a plain Standard variable, a Geographic territory, or a
  * Classification with proprietary input-string mapping. The subtype
  * drives which editor pane the UI opens; the engine ignores it.
  *
- * Both `role` and `dimension_type` are UI hints. The engine treats every
+ * Per Brief 24 v3 §3.1 (Dimension umbrella with subtypes). Both
+ * `role` and `dimension_type` are UI hints. The engine treats every
  * dimension as a substitutable variable; chained lookups operate
  * the same regardless of subtype.
  *
- * Related contracts:
+ * Cross-references:
+ *   docs/design-briefs/24a-substrate-prep.md — original 24.A sub-brief
+ *   docs/design-briefs/plan-builder-flow.md §3.1 — v3 Dimension umbrella
  *   packages/contracts/src/class-record-types.ts — ClassRecord (used by classification subtype)
  *   packages/contracts/src/class-vocab.ts — ClassVocab + translateClass (used by Classification mapping)
  */
@@ -83,7 +86,7 @@ export interface Dimension {
   /**
    * What this dimension is FOR. See DimensionRole jsdoc.
    *
-   * Defaults to DEFAULT_DIMENSION_ROLE for older dimensions
+   * Defaults to DEFAULT_DIMENSION_ROLE for pre-24.A dimensions
    * that don't ship a role. New code should always set this
    * explicitly.
    */
@@ -97,9 +100,10 @@ export interface Dimension {
    */
   readonly options?: readonly string[];
 
-  // ── Dimension subtype ──────
+  // ── 24.A2 — Dimension subtype (the umbrella concept) ──────
+  // See DimensionType jsdoc + Brief 24 v3 §2.2.1.
   //
-  // Optional only for backwards compatibility: older dimensions get
+  // Optional only for backwards-compat: pre-24.A2 dimensions get
   // DEFAULT_DIMENSION_TYPE via normalizeDimension(). New code
   // should always set this explicitly.
 
@@ -124,7 +128,7 @@ export interface Dimension {
    */
   readonly classification_mapping?: readonly ClassMappingRule[];
 
-  // ── Class-derived structural dimension ────
+  // ── ADR-0035 (Brief 51) — class-derived structural dimension ────
   /**
    * For a `structural` dim whose value is DERIVED from another
    * dimension's class attribute (e.g. `prop_rate_number` derived from
@@ -141,21 +145,21 @@ export interface Dimension {
   };
 
   /**
-   * @deprecated The standalone /territories route is retired; new
-   * geographic dimensions persist their
+   * @deprecated Brief 20 carry-over. Brief 44 PR 44.9 deprecates the
+   * standalone /territories route; new geographic dims persist their
    * structure via `geo_granularity` + `geo_scope` + `geo_territories`
-   * below. Kept for backward compatibility with older plans.
+   * below. Kept here for backwards-compat with pre-Brief-44 plans.
    */
   readonly territory_schema_id?: string;
 
-  // ── Geographic rating substrate ───────────
+  // ── Brief 44 — Geographic rating substrate (PR 44.1) ───────────
   // The trio is set IFF `dimension_type === "geographic"`. The
   // backend CHECK constraint (011_*.sql) + the Pydantic validator
   // enforce the coupling; the frontend treats them as joint optionals.
 
   /**
-   * Granularity of a geographic dimension. Switching requires delete
-   * and recreate.
+   * Granularity of a geographic dim. Locked at creation per Brief 44
+   * Q1 — switching requires delete + recreate.
    */
   readonly geo_granularity?: "state" | "county" | "zip";
 
@@ -163,7 +167,7 @@ export interface Dimension {
    * Scope of a geographic dim — either whole-country or an explicit
    * subset of states (USPS 2-letter codes). National plans set
    * `{ kind: "national" }`; bounded plans set
-   * `{ kind: "subset", states: [...] }`.
+   * `{ kind: "subset", states: [...] }` per Brief 44 Q3.
    */
   readonly geo_scope?:
     | { readonly kind: "national" }
@@ -173,7 +177,7 @@ export interface Dimension {
    * Optional grouping layer on top of the geographic levels. Empty
    * array == "rate directly on the levels"; missing/undefined == not
    * a geographic dim. Each territory references levels of the parent
-   * dimension via `members`.
+   * dim via `members`. See Brief 44 Q2 + Q9.
    */
   readonly geo_territories?: ReadonlyArray<{
     readonly id: string;
@@ -181,7 +185,7 @@ export interface Dimension {
     readonly members: readonly string[];
   }>;
 
-  // ── Dimension shape fields ──────────────────
+  // ── 26.P0 — Brief 26 (Dimensions v2) fields ──────────────────
   // Orthogonal to `data_type` + `dimension_type`. See the type
   // definitions below for full semantics. All optional; existing
   // dimensions render unchanged when these are absent.
@@ -206,8 +210,9 @@ export interface Dimension {
    */
   readonly levels?: readonly DimensionLevel[];
 
-  // ── PDF ingestion metadata ──────────
-  // Reserved fields persisted for document-ingestion workflows.
+  // ── 26.P0 — PDF ingestion future-proofing (Phase E) ──────────
+  // Reserved fields for the future Claude-driven PDF ingestion
+  // pipeline. No UI today; persisted by the future PDF brief.
 
   /** Lifecycle status of an ingestion draft. Default = "committed". */
   readonly draft_status?: "extracted" | "reviewed" | "committed";
@@ -218,7 +223,7 @@ export interface Dimension {
   /** Page within the source PDF (1-indexed). */
   readonly source_page?: number;
 
-  // ── Composite axes ───────────────────────
+  // ── ADR-0025 (Brief 27) — composite axes ───────────────────────
   // For shape="composite", the source dimension slugs that this
   // composite combines. Order matters — the resolved level id
   // concatenates axis-resolved levels in this order with "·".
@@ -299,11 +304,11 @@ export function normalizeDimension(
 }
 
 // ============================================================================
-// Dimension subtype discriminator
+// 24.A2 — Dimension subtype discriminator
 //
 // A Dimension can be one of three subtypes. Each subtype carries
 // different optional metadata + opens a different editor pane in
-// the DIMENSIONS workspace.
+// the DIMENSIONS workspace (per Brief 24 v3 §2.2.1).
 // ============================================================================
 
 /**
@@ -318,13 +323,13 @@ export function normalizeDimension(
  *   entity (which holds the boundary list — ZIP set / FIPS set /
  *   polygon — and the coverage diagnostics). The "value" of a
  *   geographic dimension for a risk is the territory ID the risk's
- *   address falls into. Editor: <TerritoryMapEditor>.
+ *   address falls into. Editor: <TerritoryMapEditor> (Brief 20).
  *
  * - "classification" — a class library. References a ClassLibrary
  *   entity (the canonical class codes). Carries proprietary
  *   `classification_mapping` rules that translate raw input
  *   strings (e.g., "restaurants", "bar & grill") into canonical
- *   class codes (e.g., "c101 — limited cooking"). Editor:
+ *   class codes (e.g., "71641 — limited cooking"). Editor:
  *   <ClassBrowser> + <ClassDetailPane> + the in-line mapping rules
  *   editor.
  */
@@ -434,7 +439,7 @@ export function resolveClassMapping(
 }
 
 // ============================================================================
-// Dimension shape extension
+// 26.P0 — Brief 26 (Dimensions v2) extension
 //
 // Adds the three-shape model on top of the existing 24.A2 subtype.
 // `shape` is orthogonal to `data_type` and to `dimension_type`:
@@ -452,6 +457,7 @@ export function resolveClassMapping(
 // gives consumers a single read path that derives the shape from
 // the dimension's data even when the field is absent.
 //
+// Cross-reference: docs/design-briefs/26-dimensions-v2.md §−1 + §6.
 // ============================================================================
 
 /**
@@ -467,7 +473,7 @@ export function resolveClassMapping(
  *   Construction Year. No v1 equivalent.
  *
  * - "geographic" — a territory-schema reference. Levels carry
- *   `territory_ref` pointing at a TerritorySchema entity.
+ *   `territory_ref` pointing at a TerritorySchema entity (Brief 20).
  *   The legacy `dimension_type: "geographic"` + `territory_schema_id`
  *   keeps working and is treated as geographic at read time.
  */
@@ -475,10 +481,11 @@ export type DimensionShape =
   | "categorical"
   | "banded"
   | "geographic"
-  // A composite dimension combines two or more source dimensions.
+  // ── ADR-0025 (Brief 27) — composite as first-class shape ─────
   // A composite dim combines 2+ source dims as axes. The resolved
   // level id concatenates the per-axis resolved ids with "·".
-  // See `Dimension.axes` and `resolveCompositeLevel`.
+  // Reverses Brief 26 §−1 Q1 ("composite is a FactorTable, not a
+  // Dimension"). See `Dimension.axes` + `resolveCompositeLevel`.
   | "composite";
 
 /** A categorical level. Many input aliases → one canonical level id. */
@@ -525,7 +532,7 @@ export function bandHi(l: { readonly hi: number | null }): number {
   return l.hi ?? Number.POSITIVE_INFINITY;
 }
 
-/** A geographic level. References a Territory entity. */
+/** A geographic level. References a Territory entity (Brief 20). */
 export interface GeographicLevel {
   readonly kind: "geographic";
   readonly id: string;
@@ -579,7 +586,20 @@ export function isBandedDimension(
   return inferDimensionShape(d) === "banded";
 }
 
-/** Helper: is this dimension a composite of two or more source dimensions? */
+/**
+ * FCA fca-2026-07-25 #26 (finding 119) — numeric-aware display
+ * ordering for territory/level identifiers. Every list surface used
+ * to present territories in workbook SOURCE order (T6, T8, T4, T5,
+ * T7, T1, T2, T3), so cross-referencing against the filing's own
+ * Exhibit T-1 meant hunting an arbitrary sequence. `localeCompare`
+ * with `numeric` sorts T1 < T2 < T10 (plain lexicographic puts T10
+ * before T2). Display-only: never reorders stored data.
+ */
+export function compareNatural(a: string, b: string): number {
+  return a.localeCompare(b, "en", { numeric: true, sensitivity: "base" });
+}
+
+/** Helper: ADR-0025 — is this dimension a composite of 2+ source dims? */
 export function isCompositeDimension(
   d: Pick<Dimension, "shape" | "dimension_type">,
 ): boolean {
@@ -743,10 +763,10 @@ export function resolveBandedLevel(
  * alias match) or `null` if no level claims the input.
  *
  * Engine code calls this when a chain factor needs to map a raw
- * input (e.g., `class = "Meridian Cafe"`) onto a
- * canonical level id (e.g., "c101"). The level's own id is
- * implicitly an alias — actuaries don't have to list "c102" in
- * the aliases of a level whose id is already "c102".
+ * input (e.g., `class = "Restaurant — full service"`) onto a
+ * canonical level id (e.g., "71641"). The level's own id is
+ * implicitly an alias — actuaries don't have to list "73911" in
+ * the aliases of a level whose id is already "73911".
  */
 export function resolveCategoricalLevel(
   levels: readonly DimensionLevel[],
@@ -764,7 +784,7 @@ export function resolveCategoricalLevel(
 }
 
 // ============================================================================
-// Canonical geographic-dimension lookup domain
+// ADR-0038 — Canonical geographic-dimension lookup domain
 //
 // A geographic dim is keyed on ONE canonical lookup domain that the factor
 // grid, the input validator, and the engine projector ALL read through, so
@@ -776,22 +796,23 @@ export function resolveCategoricalLevel(
 //     levels (the V21 "rate directly on the states/ZIPs" behavior).
 //   • ≥1 active territory → key space = { active territory ids } ∪
 //     { ungrouped level ids }. Grouped levels collapse to their territory;
-//     ungrouped levels stay rateable on their own. A fully grouped fictional
-//     dimension collapses to exactly its authored territory ids, e.g. { t1, t2 }.
+//     ungrouped levels stay rateable on their own. A fully-grouped dim (KS:
+//     every ZIP in 701 or 702) collapses to exactly { 701, 702 }.
 //
 // Resolution is idempotent on keys (a value that is already a key passes
 // through), so an input column may carry EITHER the granular level (a ZIP)
-// OR the rollup (t1/t2) and both resolve, matching `derive.territory`'s
-// "carries territory or granular level" runtime contract.
+// OR the rollup (701/702) and both resolve — matching `derive.territory`'s
+// runtime contract (ADR-0028) and the sample policies' "carries territory
+// or ZIP" shape.
 //
 // These joins the resolve*Level family above; pure + structural-typed so the
-// canonical `Dimension` and the lenient @openrater/ui `DimensionRow` both satisfy
-// the parameter.
+// canonical `Dimension` AND the lenient labs-ui `DimensionRow` both satisfy
+// the param. Cross-reference: docs/adr/0038-geographic-dimension-lookup-domain.md.
 // ============================================================================
 
 /**
  * Minimal structural view a geographic dim must expose for lookup-domain
- * resolution. Both `Dimension` and @openrater/ui's `DimensionRow` satisfy it.
+ * resolution. Both `Dimension` and labs-ui's `DimensionRow` satisfy it.
  */
 export interface GeoLookupDimLike {
   readonly levels?: ReadonlyArray<{ readonly id: string; readonly label: string }>;
@@ -827,7 +848,8 @@ export function isGeographicLookupDim(
  * Territories that actually claim ≥1 member. Empty-membership buckets are
  * metadata-only (a freshly-created, not-yet-populated bucket) and contribute
  * nothing to the lookup domain — they must NOT key the grid or the engine.
- * Empty buckets must not key the grid or engine.
+ * (The pre-ADR-0038 `levelsForKeying` ignored this filter while the projector
+ * applied it; that mismatch was the hidden third disagreement.)
  */
 export function activeGeoTerritories(
   dim: GeoLookupDimLike,
@@ -952,7 +974,7 @@ export function geoAcceptanceSet(dim: GeoLookupDimLike): ReadonlySet<string> {
  *
  * Returns `{}` when there are no active territories (the projector then keeps
  * the direct per-value lookup — V21 path, no `derive.territory`). The single
- * source of truth for the projector's map build.
+ * source of truth for the projector's map build (ADR-0038 §2).
  */
 export function geoValueToKeyMap(dim: GeoLookupDimLike): Record<string, string> {
   const active = activeGeoTerritories(dim);
@@ -972,12 +994,12 @@ export function geoValueToKeyMap(dim: GeoLookupDimLike): Record<string, string> 
 }
 
 // ============================================================================
-// Composite dimension resolution
+// ADR-0025 (Brief 27) — Composite dimension resolution
 // ============================================================================
 
 /**
  * Separator used to concatenate per-axis resolved level ids into a
- * single composite key. e.g. "band_15_30·c101". The "·" is a
+ * single composite key. e.g. "band_15_30·71641". The "·" is a
  * mid-dot (U+00B7), chosen because it doesn't appear in slugs or
  * class codes — collision-free in the substrate's existing id
  * vocabulary.
@@ -1012,9 +1034,9 @@ export const COMPOSITE_LEVEL_SEPARATOR = "·" as const; // "·"
  *       ["building_age", { … shape: "banded", levels: [...] }],
  *       ["class_code",   { … levels: [...categorical] }],
  *     ]),
- *     { building_age: 17, class_code: "Meridian Cafe" },
+ *     { building_age: 17, class_code: "Restaurant" },
  *   )
- *   // → "band_15_30·c101"
+ *   // → "band_15_30·71641"
  */
 export function resolveCompositeLevel(
   composite: Pick<Dimension, "shape" | "axes">,
@@ -1028,7 +1050,7 @@ export function resolveCompositeLevel(
   for (const axisSlug of composite.axes) {
     const axisDim = registry.get(axisSlug);
     if (!axisDim) return null;
-    // Nested composites are blocked in v1.
+    // Nested composites blocked in v1 (ADR-0025 constraint).
     if (inferDimensionShape(axisDim) === "composite") return null;
 
     const rawValue = rawInputs[axisSlug];
@@ -1048,7 +1070,8 @@ export function resolveCompositeLevel(
     } else if (axisShape === "geographic") {
       // Geographic axes resolve via the territory schema — for v1
       // we treat the raw input as the already-resolved territory
-      // id. A richer resolver may later map (state, zip5) to territory_id.
+      // id. Brief 28 will tighten this with proper (state, zip5)
+      // → territory_id resolution.
       levelId = String(rawValue);
     } else {
       // Unreachable — composite was filtered above; any other
@@ -1063,10 +1086,11 @@ export function resolveCompositeLevel(
 
 /**
  * Validates a composite dimension against the constraints declared
- * below. Returns the first violation as a human-readable
+ * in ADR-0025. Returns the first violation as a human-readable
  * message, or `null` when the composite is valid.
  *
- * UI consumers call this on every edit; the engine calls it at plan load.
+ * UI consumers (`<DimensionCompositePicker>` in Brief 27 PR 5) call
+ * this on every edit; the engine calls it at plan load.
  *
  * Constraints checked:
  *   • shape === "composite"

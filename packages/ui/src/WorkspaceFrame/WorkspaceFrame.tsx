@@ -1,7 +1,9 @@
 /**
  * <WorkspaceFrame> — the canonical 3-column shell for every workspace.
  *
- * It locks the shared workspace geometry:
+ * Polish PR 6. Closes the P0 "5 different inspector widths + 4 different
+ * rail widths" finding from `docs/design/UI_AUDIT.md` §I. Locks the
+ * north-star geometry:
  *
  *   ┌────────────────────────────────────────────────────────────┐
  *   │  RAIL 240   │       STAGE 1fr       │   INSPECTOR 320      │
@@ -11,15 +13,18 @@
  *   │             │                       │     preview / trace  │
  *   └─────────────┴───────────────────────┴──────────────────────┘
  *
- * The frame is pure geometry — no padding inside the slots and no inner
- * chrome. Each workspace owns its slot density:
+ * The frame is pure geometry — no padding inside the slots, no inner
+ * chrome. Each workspace owns its slot density. The audit prescribes:
  *
- *   - rail = 240px
- *   - inspector = 320px
+ *   - rail = 240px               (Dimensions = 240 ✓, Gate = 240 ✓,
+ *                                 Parametrize = 260 ✗, Assemble = 280 ✗)
+ *   - inspector = 320px          (Dimensions = 320 ✓, Parametrize = 320 ✓,
+ *                                 Gate = 280 ✗, Inputs = 340 ✗)
  *   - gap = 0                    (hairline column dividers do the work)
- *   - inspector bg = surface-1
- *   - root has no border or border radius because it is the route body,
- *     not a card
+ *   - inspector bg = surface-1   (Parametrize had canvas-zinc-950 ✗)
+ *   - root has no border-radius, no border  — it's the body of the
+ *     route, not a card (the 10px rounding currently on Gate/Dimensions/
+ *     Assemble is invisible behind the surrounding zinc-950 canvas).
  *
  * Optional slots: omit `rail` to render stage + inspector only (e.g.,
  * Inputs); omit `inspector` to render rail + stage only (e.g., canvases

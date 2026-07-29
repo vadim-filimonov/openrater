@@ -24,7 +24,7 @@ describe("<ClassEditDrawer>", () => {
       <ClassEditDrawer
         open
         mode="add"
-        draft={{ ...emptyDraft(), class_code: "c101", display_name: "Meridian Bakery" }}
+        draft={{ ...emptyDraft(), class_code: "53983", display_name: "Army/Navy" }}
         onDraftChange={() => {}}
         onSave={onSave}
         onCancel={() => {}}
@@ -54,11 +54,11 @@ describe("<ClassEditDrawer>", () => {
       <ClassEditDrawer
         open
         mode="add"
-        draft={{ ...emptyDraft(), class_code: "c102", display_name: "Dup" }}
+        draft={{ ...emptyDraft(), class_code: "09015", display_name: "Dup" }}
         onDraftChange={() => {}}
         onSave={() => {}}
         onCancel={() => {}}
-        existingCodes={new Set(["c102"])}
+        existingCodes={new Set(["09015"])}
       />,
     );
     expect(screen.getByText(/already exists/i)).toBeInTheDocument();

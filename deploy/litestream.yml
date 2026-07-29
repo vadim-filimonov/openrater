@@ -16,7 +16,7 @@
 # The WAL is streamed continuously, so the recovery point objective is
 # seconds. Restore with:
 #   litestream restore -config /etc/litestream.yml -o /data/openrater.db /data/openrater.db
-# See Litestream's restore documentation before a production recovery.
+# (see docs/DEMO_DEPLOYMENT_RUNBOOK.md → "Backups & recovery").
 
 # Access credentials are read globally from the environment
 # (LITESTREAM_ACCESS_KEY_ID / LITESTREAM_SECRET_ACCESS_KEY), so each
@@ -32,3 +32,4 @@ dbs:
         path: ${LITESTREAM_PATH}/openrater.db
         region: ${LITESTREAM_REGION}
         endpoint: ${LITESTREAM_ENDPOINT}
+

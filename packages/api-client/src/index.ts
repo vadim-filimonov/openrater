@@ -1,5 +1,5 @@
 /**
- * @openrater/api-client — typed SDK for the OpenRater server.
+ * @openrater/api-client — typed SDK for api-lab/backend.
  *
  * One function per endpoint; handles error normalization + Zod-
  * validated responses. Apps consume these through @openrater/hooks
@@ -255,6 +255,7 @@ export const PACKAGE_NAME = "@openrater/api-client" as const;
 export {
   createPlanRun,
   getPlanRun,
+  getPlanRunCompare,
   getPlanRunRows,
   listPlanRuns,
 } from "./runs";
@@ -265,6 +266,7 @@ export type {
   PlanRunRow,
   PlanRunRowsPage,
   PlanRunSummary,
+  RunCompare,
 } from "./runs";
 
 

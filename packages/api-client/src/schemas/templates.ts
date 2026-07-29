@@ -1,8 +1,8 @@
 /**
  * Zod schemas for the plan templates endpoint group (D6.4 / ADR-0027).
  *
- * Mirrors the Pydantic models in
- * server/src/openrater/rates/templates/models.py. The recipe is opaque to the API layer —
+ * Mirrors the Pydantic models in api-lab/backend's
+ * rates/templates/models.py. The recipe is opaque to the API layer —
  * the backend stores + walks it; the client just hands it back on
  * preview / display. Each substrate inside the recipe matches its
  * own typed shape (DimensionUpsertRequest, FactorTableUpsertRequest,

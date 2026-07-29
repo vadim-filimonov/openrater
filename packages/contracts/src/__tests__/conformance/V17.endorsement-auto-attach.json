@@ -1,10 +1,10 @@
 {
   "name": "V17.endorsement-auto-attach",
-  "description": "Fictional Meridian factor, additive, and sublimit endorsements compose through one chain. Triggers fire selectively from external inputs, while the sublimit also surfaces as metadata.",
+  "description": "endorsement.factor + endorsement.additive + endorsement.sublimit chained. Triggers fire selectively based on externalInputs. Verifies (a) trigger evaluation matches eligibility-comparator semantics, (b) effect math composes through the chain, (c) sublimit metadata surfaces even though premium passes through unchanged. (Brief 39 PR 39.1)",
   "plan": {
     "id": "v17.endorsement_auto_attach",
     "version": "1.0.0",
-    "name": "Meridian endorsement auto-attach",
+    "name": "Endorsement auto-attach",
     "lines": ["property"],
     "effective": "2026-01-01",
     "nodes": [
@@ -18,9 +18,9 @@
         "id": "end_factor",
         "kind": "endorsement.factor",
         "params": {
-          "form_number": "MS 10 03",
+          "form_number": "BP 04 39",
           "display_name": "Liquor liability",
-          "trigger": { "variable": "class_code", "op": "eq", "value": "c101" },
+          "trigger": { "variable": "class_code", "op": "eq", "value": "71641" },
           "factor": 1.15
         },
         "position": { "x": 200, "y": 0 }
@@ -29,7 +29,7 @@
         "id": "end_additive",
         "kind": "endorsement.additive",
         "params": {
-          "form_number": "MS 10 05",
+          "form_number": "BP 05 21",
           "display_name": "Wind / hail deductible",
           "trigger": { "variable": "state", "op": "in", "value": ["CA", "TX", "FL"] },
           "amount": 250
@@ -40,7 +40,7 @@
         "id": "end_sublimit",
         "kind": "endorsement.sublimit",
         "params": {
-          "form_number": "MS 10 02",
+          "form_number": "BP 04 30",
           "display_name": "Peak-limit endorsement",
           "trigger": { "variable": "tiv", "op": "gt", "value": 1000000 },
           "coverage": "peak_items",
@@ -84,7 +84,7 @@
     ]
   },
   "externalInputs": {
-    "class_code": "c101",
+    "class_code": "71641",
     "state": "CA",
     "tiv": 4200000
   },

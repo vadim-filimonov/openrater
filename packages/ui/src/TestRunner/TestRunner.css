@@ -60,7 +60,7 @@
     background var(--rater-d-80) var(--rater-ease-soft);
 }
 
-.rater-test-runner__inputs-textarea:hover:not(disabled):not(focus-visible) {
+.rater-test-runner__inputs-textarea:hover:not(:disabled):not(:focus-visible) {
   border-color: var(--rater-border-strong);
 }
 

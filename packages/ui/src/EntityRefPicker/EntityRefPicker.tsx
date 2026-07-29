@@ -15,7 +15,7 @@
  *     triggers section navigation (the actuary's intent: "let me see
  *     the full library").
  *   - Sub-label formatting: each option's `subLabel` (e.g.,
- *     "c101 · Recreation") renders in monospace below the label.
+ *     "73912 · Recreation") renders in monospace below the label.
  *
  *   <EntityRefPicker
  *     entityLabel="class"
@@ -63,13 +63,13 @@ import "./EntityRefPicker.css";
 /**
  * One option in the picker. Mirrors ComboboxOption but renames
  * `hint` → `subLabel` to match the insurance-domain convention
- * (e.g., "c101 · Recreation" as the sub-label under "Meridian Recreation").
+ * (e.g., "73912 · Recreation" as the sub-label under "Bowling Centers").
  */
 export interface EntityRefOption {
   readonly value: string;
   readonly label: string;
   /** Optional secondary text — typically the entity code + family
-   *  (e.g., "c101 · Recreation"). Rendered in monospace. */
+   *  (e.g., "73912 · Recreation"). Rendered in monospace. */
   readonly subLabel?: string;
   readonly disabled?: boolean;
 }

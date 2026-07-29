@@ -1,5 +1,5 @@
 /**
- * `input.class_exposure` kind tests.
+ * `input.class_exposure` kind tests (M1.2, Brief 16).
  *
  * Two layers:
  *
@@ -27,9 +27,9 @@ import { makeClassLibrary } from "../class-library-types";
 import type { ClassLibraryEntry } from "../class-library-types";
 import type { Plan } from "../plan-types";
 
-const CAFE: ClassLibraryEntry = {
-  class_code: "c101",
-  display_name: "Meridian Cafe",
+const RESTAURANTS: ClassLibraryEntry = {
+  class_code: "71641",
+  display_name: "Restaurants",
   exposure_bases: [
     {
       code: "sales",
@@ -39,9 +39,9 @@ const CAFE: ClassLibraryEntry = {
   ],
 };
 
-const WORKSHOP: ClassLibraryEntry = {
-  class_code: "c201",
-  display_name: "Meridian Workshop",
+const CONCRETE_CONTRACTORS: ClassLibraryEntry = {
+  class_code: "91342",
+  display_name: "Concrete contractors",
   exposure_bases: [
     {
       code: "payroll",
@@ -59,14 +59,14 @@ const WORKSHOP: ClassLibraryEntry = {
 };
 
 const EMPTY_CLASS: ClassLibraryEntry = {
-  class_code: "c999",
-  display_name: "Meridian Empty Class",
+  class_code: "99999",
+  display_name: "Empty class",
   exposure_bases: [],
 };
 
 const library = makeClassLibrary([
-  CAFE,
-  WORKSHOP,
+  RESTAURANTS,
+  CONCRETE_CONTRACTORS,
   EMPTY_CLASS,
 ]);
 
@@ -155,7 +155,7 @@ describe("input.class_exposure — runtime resolution path", () => {
     const result = executePlan(
       makePlan(),
       {
-        class_code: "c101", // Meridian Cafe → primary: sales
+        class_code: "71641", // Restaurants → primary: sales
         annual_sales: 1_500_000,
       },
       { classLibrary: library },
@@ -163,7 +163,7 @@ describe("input.class_exposure — runtime resolution path", () => {
     expect(result.outputs.exposure).toBe(1_500_000);
     const trace = result.trace["cls_exp"];
     expect(trace?.outputs.value).toBe(1_500_000);
-    expect(trace?.explanation).toMatch(/c101.*Meridian Cafe.*sales.*primary/);
+    expect(trace?.explanation).toMatch(/71641.*Restaurants.*sales.*primary/);
     expect(trace?.explanation).toMatch(/1500000 USD|1_?500_?000 USD/);
     expect(trace?.error).toBeUndefined();
   });
@@ -172,7 +172,7 @@ describe("input.class_exposure — runtime resolution path", () => {
     const result = executePlan(
       makePlan("property"),
       {
-        class_code: "c201", // Meridian Workshop → property: area
+        class_code: "91342", // Concrete contractors → property: area
         area_sqft: 5000,
         annual_payroll: 850_000, // Also present but ignored for property
       },
@@ -186,7 +186,7 @@ describe("input.class_exposure — runtime resolution path", () => {
     const result = executePlan(
       makePlan("auto"), // No declaration tagged "auto"; falls back to primary
       {
-        class_code: "c201",
+        class_code: "91342",
         annual_payroll: 850_000,
       },
       { classLibrary: library },
@@ -196,7 +196,7 @@ describe("input.class_exposure — runtime resolution path", () => {
 
   it("errors clearly when no classLibrary bound", () => {
     const result = executePlan(makePlan(), {
-      class_code: "c101",
+      class_code: "71641",
       annual_sales: 1_500_000,
     });
     // No classLibrary in RunOptions
@@ -231,18 +231,18 @@ describe("input.class_exposure — runtime resolution path", () => {
   it("errors clearly when class is not in the library", () => {
     const result = executePlan(
       makePlan(),
-      { class_code: "c404", annual_sales: 1_500_000 },
+      { class_code: "00000", annual_sales: 1_500_000 },
       { classLibrary: library },
     );
     expect(result.trace["cls_exp"]?.error?.message).toMatch(
-      /Class c404 not found/,
+      /Class 00000 not found/,
     );
   });
 
   it("errors clearly when class has no exposure_bases declared", () => {
     const result = executePlan(
       makePlan(),
-      { class_code: "c999", annual_sales: 1_500_000 },
+      { class_code: "99999", annual_sales: 1_500_000 },
       { classLibrary: library },
     );
     expect(result.trace["cls_exp"]?.error?.message).toMatch(
@@ -254,7 +254,7 @@ describe("input.class_exposure — runtime resolution path", () => {
   it("errors clearly when the resolved exposure value is missing", () => {
     const result = executePlan(
       makePlan(),
-      { class_code: "c101" }, // No annual_sales for the resolved declaration
+      { class_code: "71641" }, // No annual_sales for the resolved declaration
       { classLibrary: library },
     );
     expect(result.trace["cls_exp"]?.error?.message).toMatch(
@@ -265,7 +265,7 @@ describe("input.class_exposure — runtime resolution path", () => {
   it("errors clearly when the resolved exposure value is non-numeric", () => {
     const result = executePlan(
       makePlan(),
-      { class_code: "c101", annual_sales: "1.5M" }, // Not a number
+      { class_code: "71641", annual_sales: "1.5M" }, // Not a number
       { classLibrary: library },
     );
     expect(result.trace["cls_exp"]?.error?.message).toMatch(
@@ -299,7 +299,7 @@ describe("input.class_exposure — runtime resolution path", () => {
     };
     const result = executePlan(
       plan,
-      { primary_class: "c101", annual_sales: 2_000_000 },
+      { primary_class: "71641", annual_sales: 2_000_000 },
       { classLibrary: library },
     );
     expect(result.outputs.exposure).toBe(2_000_000);
@@ -313,7 +313,7 @@ describe("isolated KindRegistry honors input.class_exposure", () => {
     reg.register(OutputKind);
 
     const plan: Plan = {
-      id: "test.synthetic",
+      id: "test.iso",
       version: "0.1.0",
       name: "Test",
       nodes: [
@@ -337,7 +337,7 @@ describe("isolated KindRegistry honors input.class_exposure", () => {
     };
     const result = executePlan(
       plan,
-      { class_code: "c101", annual_sales: 1_500_000 },
+      { class_code: "71641", annual_sales: 1_500_000 },
       { classLibrary: library },
       reg,
     );

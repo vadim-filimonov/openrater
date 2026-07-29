@@ -37,7 +37,7 @@
  */
 
 import type { Dimension } from "@openrater/contracts";
-// The identifier-matching core lives in contracts so
+// Book-intake §2 — the identifier-matching core moved to contracts so
 // the chat door's header pre-flight judges names with the SAME
 // algorithm. Re-exported below; consumer imports are unchanged.
 import {

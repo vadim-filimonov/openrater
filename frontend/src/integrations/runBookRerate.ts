@@ -119,7 +119,7 @@ export type SideRun =
 
 /**
  * Rate ONE side of a book — exported for the Exhibit's book mode
- * (current Exhibits design), which rates the portrait's
+ * (Brief: portfolio-redesign v2 §5.4, P3), which rates the portrait's
  * single side and the comparison's two sides through the SAME
  * projection + policy pipeline this what-if always used. `body` is a
  * snapshot body, or a body-SHAPED record composed from the live

@@ -245,6 +245,100 @@ describe("eligibility.gate — runtime semantics", () => {
     expect(result.trace["gate"]?.outputs.matched_rule_id).toBe("high_revenue");
   });
 
+  // FCA fca-2026-07-25 S0 (the knock-out-true vector) — a workbook-
+  // built gate persists the rule value as the TEXT 'true'; every
+  // schema-typed caller sends a JSON boolean. The strict comparator
+  // never matched, so filed hard-declines (Rule 1.3.C 'work above
+  // three stories') silently rated Standard on quote AND book paths
+  // while the trace asserted 'No rule matched'.
+  it("knock-out fires when the workbook stores 'true' and the caller sends true", () => {
+    const plan = makePlan();
+    const gate = plan.nodes.find((n) => n.id === "gate")!;
+    gate.params = {
+      rules: [
+        {
+          rule_id: "decline_work_height",
+          variable: "work_above_three_stories",
+          op: "eq",
+          value: "true", // the workbook gates-sheet cell, verbatim
+          tier: "decline",
+          reasoning:
+            "Rule 1.3.C: any operations above three stories in height.",
+        },
+      ],
+      default_tier: "standard",
+      default_reasoning: "Rule 1.3 — no knock-out provision applies.",
+    };
+    const result = executePlan(plan, { work_above_three_stories: true });
+    expect(result.outputs.tier).toBe("decline");
+    expect(result.trace["gate"]?.outputs.matched_rule_id).toBe(
+      "decline_work_height",
+    );
+    // And the honest negative: false must NOT fire the knock-out.
+    const clean = executePlan(plan, { work_above_three_stories: false });
+    expect(clean.outputs.tier).toBe("standard");
+    expect(clean.trace["gate"]?.outputs.matched_rule_id).toBeNull();
+  });
+
+  it("workbook-string RHS types the port-less variable: wire spellings coerce", () => {
+    // Phase F residual, extended: a gate-ONLY variable's one type
+    // declaration is its rule's RHS. A boolean-LITERAL string RHS
+    // ('true' — the workbook spelling) is the same boolean evidence a
+    // typed RHS is, so wire spellings ('yes', 'Y', '1') coerce before
+    // the walk instead of silently missing the knock-out.
+    const plan = makePlan();
+    const gate = plan.nodes.find((n) => n.id === "gate")!;
+    gate.params = {
+      rules: [
+        {
+          rule_id: "decline_work_height",
+          variable: "work_above_three_stories",
+          op: "eq",
+          value: "true", // workbook cell, verbatim
+          tier: "decline",
+          reasoning:
+            "Rule 1.3.C: any operations above three stories in height.",
+        },
+      ],
+      default_tier: "standard",
+      default_reasoning: "Rule 1.3 — no knock-out provision applies.",
+    };
+    expect(
+      executePlan(plan, { work_above_three_stories: "yes" }).outputs.tier,
+    ).toBe("decline");
+    expect(
+      executePlan(plan, { work_above_three_stories: "no" }).outputs.tier,
+    ).toBe("standard");
+    // Junk stays junk — never a match, never a throw.
+    expect(
+      executePlan(plan, { work_above_three_stories: "banana" }).outputs.tier,
+    ).toBe("standard");
+  });
+
+  it("knock-out fires in the mirrored shape: boolean rule value, string input", () => {
+    // The app-repaired rule (RHS boolean true) against a CSV cell that
+    // arrives as the string 'true' — the other half of the same seam.
+    const plan = makePlan();
+    const gate = plan.nodes.find((n) => n.id === "gate")!;
+    gate.params = {
+      rules: [
+        {
+          rule_id: "decline_work_height",
+          variable: "work_above_three_stories",
+          op: "eq",
+          value: true,
+          tier: "decline",
+          reasoning:
+            "Rule 1.3.C: any operations above three stories in height.",
+        },
+      ],
+      default_tier: "standard",
+      default_reasoning: "Rule 1.3 — no knock-out provision applies.",
+    };
+    const result = executePlan(plan, { work_above_three_stories: "true" });
+    expect(result.outputs.tier).toBe("decline");
+  });
+
   it("explainStep produces an actuary-readable sentence", () => {
     const result = executePlan(makePlan(), {
       years_in_business: 10,

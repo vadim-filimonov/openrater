@@ -1,15 +1,18 @@
 /**
  * factorDraftToMutation — pure adapter from UI draft to backend mutation.
  *
- * Mapping rules:
+ * Encodes the policy decision recorded in
+ * [ADR-0016](../../../../docs/adr/0016-factor-draft-to-chain-spec-mapping.md):
+ *
  *   · `lookup.direct` / `lookup.classification`
  *     → row in `ChainSpec.factor_lookups` (target "chain_row")
  *   · `constant` / `flat_factor`
  *     → standalone sibling stage placed adjacent to the chain
  *     (target "sibling_stage"; stage_kind "flat_factor")
  *
- * The retired `curve.evaluate` kind is represented by 1-D banded
- * factor tables rendered via <FactorTableViz>.
+ * Brief 34 PR 34.7 removed the `curve.evaluate` kind. Brief 19's
+ * curve concept is superseded by 1-D banded factor tables
+ * rendered via <FactorTableViz>.
  *
  * Pure function. No HTTP, no state. The route wiring calls this at
  * `onSave` time and dispatches the returned mutation against
@@ -44,13 +47,13 @@ import type { FactorDraft } from "../FactorEditor";
 /**
  * The tagged-union mutation the route should dispatch.
  *
- * `chain_row` patches the chain stage's
+ * Per ADR-0016 §Decision: chain_row → PATCH the chain stage's
  * `config_json` to append/replace a row; sibling_stage → POST a
  * new stage adjacent to the chain.
  *
  * For sibling_stage, the adapter emits the *seed* fields — the
  * route wraps them in an AddStageRequest before dispatch (this is
- * the layering boundary that keeps @openrater/ui HTTP-free).
+ * the layering boundary that keeps labs-ui HTTP-free).
  */
 export type FactorDraftMutation =
   | {
@@ -143,7 +146,7 @@ function mapDirectLookup(
   ctx: FactorDraftAdapterContext,
 ): FactorDraftMutation {
   const factor_kind = ctx.factorKindSlug ?? draft.factor_table_id;
-  // Thread the authored unknown-key policy onto the wire
+  // ADR-0056 — thread the authored unknown-key policy onto the wire
   // shape. Absent/`error` writes nothing: error IS the schema default,
   // so configs stay lean and self-documenting.
   const p = draft.unknown_key_policy;
@@ -278,7 +281,7 @@ interface FactorLookupSeed {
   readonly lookup_method: FactorLookupMethod;
   readonly dimensions: Record<string, { source: "form_input"; path: string }>;
   readonly description_template: string;
-  /** Authored unknown-key policy (absent means the error default). */
+  /** ADR-0056 — authored unknown-key policy (absent ⇒ error default). */
   readonly unknown_key_policy?:
     | { readonly mode: "default"; readonly value: number }
     | { readonly mode: "refer" };

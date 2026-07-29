@@ -1,6 +1,6 @@
 {
   "name": "V56.unknown-key-refer-policy",
-  "description": "An unknown fictional class key with onMiss refer applies an indicative 1.0 factor and escalates eligibility to submit, even without a gate in the plan.",
+  "description": "ADR-0056 - unknown lookup key with onMiss refer rates 1.0 INDICATIVE and escalates eligibility to submit (most-restrictive-wins, even with no gate in the plan).",
   "plan": {
     "id": "v56.unknown-key-refer",
     "version": "1.0.0",
@@ -10,7 +10,7 @@
       { "id": "in_cls", "kind": "input", "params": { "fieldName": "class_code", "fieldType": "string" }, "position": { "x": 0, "y": 0 } },
       { "id": "const_base", "kind": "constant", "params": { "value": 100, "type": "money" }, "position": { "x": 0, "y": 100 } },
       { "id": "lkp", "kind": "lookup.direct",
-        "params": { "table": { "c102": 1.0, "c202": 1.25 }, "defaultValue": 1.0, "tableName": "Meridian synthetic class factor", "keySource": "class_code", "onMiss": { "mode": "refer" } },
+        "params": { "table": { "73911": 1.0, "73912": 1.32 }, "defaultValue": 1.0, "tableName": "class_rel", "keySource": "class_code", "onMiss": { "mode": "refer" } },
         "position": { "x": 200, "y": 0 } },
       { "id": "chain", "kind": "chain.mult", "params": { "factorNames": ["class_rel"], "stopOnZero": false }, "position": { "x": 400, "y": 0 } },
       { "id": "out_p", "kind": "output", "params": { "fieldName": "premium", "fieldType": "money" }, "position": { "x": 600, "y": 0 } }
@@ -22,7 +22,7 @@
       { "from": { "node": "chain", "port": "result" }, "to": { "node": "out_p", "port": "value" } }
     ]
   },
-  "externalInputs": { "class_code": "c999" },
+  "externalInputs": { "class_code": "99999" },
   "expectedOutputs": { "premium": 100 },
   "expectedRowStatus": "ok",
   "expectedIssues": [

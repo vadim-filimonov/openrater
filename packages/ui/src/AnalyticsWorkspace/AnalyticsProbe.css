@@ -160,6 +160,20 @@
   overflow-x: auto;
   border: 1px solid var(--rater-border-subtle);
   border-radius: var(--rater-r-8);
+  /* FCA #33 (finding 6) — the 4th premium column clipped at the card
+   * edge with no affordance on overlay-scrollbar platforms. The
+   * classic local-attachment scroll shadows: soft edges appear only
+   * on the side with more content. */
+  background:
+    linear-gradient(to right, var(--rater-surface-1) 30%, transparent) left /
+      40px 100% no-repeat local,
+    linear-gradient(to left, var(--rater-surface-1) 30%, transparent) right /
+      40px 100% no-repeat local,
+    linear-gradient(to right, rgb(0 0 0 / 0.18), transparent) left / 14px 100%
+      no-repeat scroll,
+    linear-gradient(to left, rgb(0 0 0 / 0.18), transparent) right / 14px 100%
+      no-repeat scroll,
+    var(--rater-surface-1);
 }
 
 .rater-probe__table {
@@ -188,6 +202,10 @@
   text-transform: none;
   color: var(--rater-text-default);
   text-align: left;
+  /* FCA #33 (finding 6) — a ~90px label column wrapped class names
+   * over 5–7 lines (20 rows ≈ 1400px tall). Give labels room; the
+   * wrap container scrolls horizontally with shadow affordances. */
+  min-width: 220px;
 }
 
 .rater-probe__table thead th:first-child {

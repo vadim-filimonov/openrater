@@ -1,10 +1,10 @@
 {
   "name": "V52.dual-input-derived-multi",
-  "description": "A fictional Meridian deductible factor uses a derived total-limit band as its second axis. ded_1500 with a 220,000 total selects synthetic factor 0.92.",
+  "description": "ADR-0044 PR5: dual-input deductible factor with a DERIVED second axis — chain.add(building+BPP) -> derive.band(total) -> lookup.multi([deductible, total_band]). ded_1500 × total 220000 (band b_50_250) -> 0.921.",
   "plan": {
     "id": "v52.dual-input-derived",
     "version": "1.0.0",
-    "name": "Meridian dual-input deductible (derived total-limit band)",
+    "name": "Dual-input deductible (derived total-limit band)",
     "line": "bop",
     "effective": "2026-01-01",
     "nodes": [
@@ -27,12 +27,12 @@
         "params": {
           "keyNames": ["property_deductible", "property_total_band"],
           "rows": [
-            { "keys": ["ded_1500", "b_50_250"], "factor": 0.92 },
-            { "keys": ["ded_1500", "b_250_500"], "factor": 0.95 },
-            { "keys": ["ded_5000", "b_50_250"], "factor": 0.78 }
+            { "keys": ["ded_1500", "b_50_250"], "factor": 0.921 },
+            { "keys": ["ded_1500", "b_250_500"], "factor": 0.943 },
+            { "keys": ["ded_5000", "b_50_250"], "factor": 0.773 }
           ],
           "defaultValue": 1.0,
-          "tableName": "Meridian synthetic property deductible"
+          "tableName": "property_deductible"
         },
         "position": { "x": 540, "y": 40 } },
       { "id": "out", "kind": "output", "params": { "fieldName": "deductible_factor", "fieldType": "float" }, "position": { "x": 740, "y": 40 } }
@@ -47,5 +47,5 @@
     ]
   },
   "externalInputs": { "property_deductible": "ded_1500", "building_limit": 180000, "bpp_limit": 40000 },
-  "expectedOutputs": { "deductible_factor": 0.92 }
+  "expectedOutputs": { "deductible_factor": 0.921 }
 }

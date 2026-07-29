@@ -1,6 +1,6 @@
 # OpenRater — pnpm workspace manifest.
 #
-# Workspace layout:
+# Layout (Detachment Brief 1 §2.2):
 #
 #   frontend/          — the app shell (Rate Lab + Portfolio + Integrations).
 #   server/            — the FastAPI backend (Python; not in this manifest).

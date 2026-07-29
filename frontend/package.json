@@ -2,7 +2,7 @@
   "name": "@openrater/app",
   "version": "0.0.0",
   "private": true,
-  "description": "OpenRater's rating-plan authoring, review, analytics, and execution app.",
+  "description": "Rate Lab — the rating-plan authoring + execution surface. The actuary opens this app, drops in entities, tests the plan, runs it against a dataset. Composes against @openrater/contracts (Plan format + runtime), @openrater/ui (entity pickers, plan canvas, block-kind UI), @openrater/api-client (REST SDK), @openrater/hooks (TanStack Query wiring), and @openrater/design-system (tokens + primitives). See docs/specs/platform-model.md.",
   "license": "Apache-2.0",
   "type": "module",
   "scripts": {

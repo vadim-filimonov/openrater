@@ -1,5 +1,5 @@
 /**
- * /exhibits — the one adaptive exhibit (current Exhibits design).
+ * /exhibits — the one adaptive exhibit (Brief: portfolio-redesign v2).
  *
  * A rating plan, drawn: a template lede from counted facts, then the
  * wall — every factor table as one tile, sorted by how much it can
@@ -54,6 +54,7 @@ import {
   DislocationExhibit,
   PlanStatusChip,
   policyBookDislocation,
+  vectorChecksSummary,
 } from "@openrater/ui";
 import {
   rateBookSide,
@@ -325,7 +326,7 @@ function useSideSubstrate(ref: SideRef | null, bookLoaded: boolean) {
     ref !== null && ref.snapshotId === null ? ref.planId : undefined;
   const dimsQuery = useDimensionsList(livePlanId);
   const tablesQuery = useFactorTablesList(livePlanId);
-  // The UNDERWRITING ledger reads stage rows; a live side
+  // MVP-009 — the UNDERWRITING ledger reads stage rows; a live side
   // fetches the plan detail (cached), a snapshot's body carries them.
   const liveDetailQuery = usePlanDetail(livePlanId);
   const snapshotQuery = useQuery({
@@ -458,6 +459,10 @@ export function ExhibitsRoute(): JSX.Element {
       selectedTableId={params.get("t")}
       onSelectTable={(id) => setParam("t", id)}
       onSelectPlan={(id) => setParam("a", id)}
+      // FCA #28 (finding 80) — a plan built mid-session was absent
+      // from the pickers until a full reload; opening a picker now
+      // refreshes the list first.
+      onRefreshPlans={() => void plansQuery.refetch()}
       onSelectB={(ref) => setParam("b", ref === null ? null : formatSideRef(ref))}
       onSwap={
         bRef !== null && bRef.snapshotId === null
@@ -482,6 +487,7 @@ function PlanExhibit({
   selectedTableId,
   onSelectTable,
   onSelectPlan,
+  onRefreshPlans,
   onSelectB,
   onSwap,
 }: {
@@ -491,6 +497,7 @@ function PlanExhibit({
   readonly selectedTableId: string | null;
   readonly onSelectTable: (id: string) => void;
   readonly onSelectPlan: (id: string) => void;
+  readonly onRefreshPlans: () => void;
   readonly onSelectB: (ref: SideRef | null) => void;
   readonly onSwap: (() => void) | null;
 }): JSX.Element {
@@ -522,8 +529,8 @@ function PlanExhibit({
 
   const b = useSideSubstrate(bRef, book !== null);
   const bPlan = plans.find((p) => p.rating_plan_id === bRef?.planId);
-  // Pair underwriting rows across the two sides: gate rules,
-  // modifiers, endorsements, and loadings.
+  // MVP-009 — the compare stops being blind to underwriting: pair the
+  // gate rules / modifiers / endorsements / loadings across the sides.
   const aDetailQuery = usePlanDetail(bRef !== null ? planId : undefined);
   const uw = useMemo(
     () =>
@@ -602,14 +609,37 @@ function PlanExhibit({
     const bBySlug = new Map(
       b.tables.map((t) => [t.slug || t.table_id, t] as const),
     );
+    // FCA #24 (findings 74/102) — the stages ride in so retired/new
+    // coverage towers surface, and territory MEMBERSHIP changes are
+    // first-class: a moved county lights its table as changed even
+    // when every factor cell is identical (the committee rollup used
+    // to read "unchanged" over real premium movement).
+    const facts2 = compareFacts(
+      dims,
+      tables,
+      b.dims,
+      b.tables,
+      aDetailQuery.data?.stages ?? [],
+      b.stages,
+    );
+    const reassignedDims = new Set(
+      facts2.territoryReassignments.map((t) => t.dimSlug),
+    );
+    const tableDimSlugs = (t: PlanFactorTable): readonly string[] =>
+      t.key_dimensions ?? [];
     const changedSlugs = new Set<string>();
     const unchangedNames: string[] = [];
     for (const pair of paired.pairs) {
-      if (cellDelta(pair.a.cells, pair.b.cells).changed > 0)
+      const membershipMoved = tableDimSlugs(pair.a).some((s) =>
+        reassignedDims.has(s),
+      );
+      if (
+        cellDelta(pair.a.cells, pair.b.cells).changed > 0 ||
+        membershipMoved
+      )
         changedSlugs.add(pair.a.slug || pair.a.table_id);
       else unchangedNames.push(pair.a.display_name);
     }
-    const facts2 = compareFacts(dims, tables, b.dims, b.tables);
     // Tables only in B, drawn from the B substrate through the same
     // anatomy (they get their own rail entries, marked "new").
     const onlyBTiles = exhibitTiles(b.dims, paired.onlyB);
@@ -620,8 +650,9 @@ function PlanExhibit({
       facts: facts2,
       onlyBTiles,
       bBySlug,
+      reassignedDims,
     };
-  }, [bRef, b.loading, b.tables, b.dims, tables, dims]);
+  }, [bRef, b.loading, b.tables, b.dims, b.stages, tables, dims, aDetailQuery.data]);
 
   const report = reportQuery.data ?? null;
   const counts = report?.manifest.counts ?? null;
@@ -759,7 +790,17 @@ function PlanExhibit({
       v.largest === null
         ? ""
         : ` · largest swing ${fmtSwing(v.largest.pct)} (${v.largest.member}, ${v.largest.from.toFixed(2)}→${v.largest.to.toFixed(2)})`;
-    return `${v.shared} shared members: ${v.identical} rate identically · ${v.cheaperInB} cheaper in B · ${v.costlierInB} costlier${largest}`;
+    // FCA #24 (findings 74/102) — reassignments are named, aliases
+    // collapsed (the pre-fix line double-counted dual-keyed counties
+    // and never said WHO moved).
+    const moves =
+      v.reassigned.length === 0
+        ? ""
+        : ` · ${v.reassigned.length} reassigned (${v.reassigned
+            .slice(0, 4)
+            .map((r) => `${r.member} ${r.fromTerritory}→${r.toTerritory}`)
+            .join(", ")}${v.reassigned.length > 4 ? ", …" : ""})`;
+    return `${v.shared} shared members: ${v.identical} rate identically · ${v.cheaperInB} cheaper in B · ${v.costlierInB} costlier${moves}${largest}`;
   }, [selected, comparison, b.dims]);
 
   // The strip speaks plan language, never slugs: the biggest move's
@@ -798,6 +839,12 @@ function PlanExhibit({
           status === "changed" && bTable !== undefined
             ? cellDelta(entry.tile.table.cells, bTable.cells)
             : null;
+        // FCA #24 — the row's dim carries reassigned members: the
+        // ledger says so even when every factor cell is identical.
+        const reassignment = comparison.facts.territoryReassignments.find(
+          (t) =>
+            (entry.tile.table.key_dimensions ?? []).includes(t.dimSlug),
+        );
         // The biggest move, in plan language: level label for 1-D
         // keys, "row × col" for grid keys, the raw key as last resort.
         const labelFor = (key: string): string => {
@@ -824,6 +871,7 @@ function PlanExhibit({
             delta === null
               ? null
               : { changed: delta.changed, total: delta.total },
+          reassigned: reassignment?.count ?? null,
           biggest:
             delta !== null && delta.largest !== null
               ? {
@@ -847,7 +895,12 @@ function PlanExhibit({
       <div className="rater-exh__bar">
         <Menu>
           <Menu.Trigger>
-            <button type="button" className="rater-exh__chip" title="Choose a plan">
+            <button
+              type="button"
+              className="rater-exh__chip"
+              title="Choose a plan"
+              onPointerDown={onRefreshPlans}
+            >
               <span className="rater-exh__chip-dot" aria-hidden="true" />
               <b>{plan.display_name}</b>
               <PlanStatusChip status={derivePlanStatus(plan)} />
@@ -874,6 +927,7 @@ function PlanExhibit({
                   type="button"
                   className="rater-exh__ghost"
                   title="Compare with another plan or a frozen version"
+                  onPointerDown={onRefreshPlans}
                 >
                   ＋ Compare…
                 </button>
@@ -982,7 +1036,7 @@ function PlanExhibit({
       <p className="rater-exh__strip">
         {comparison === null ? (
           <>
-            {/*  — this strip counts DIMENSIONS; "inputs" is the
+            {/* MVP-013 — this strip counts DIMENSIONS; "inputs" is the
                 dictionary's word (Overview's "9 inputs"), not this one. */}
             <span className="rater-exh__num">{facts.answers}</span> variables ·{" "}
             <span className="rater-exh__num">{tables.length}</span> tables
@@ -1001,12 +1055,27 @@ function PlanExhibit({
                 </span>{" "}
                 factors cited
                 {report !== null && report.vectors.status === "ran" ? (
+                  // FCA #19 — the lede used to count EXACT matches
+                  // only ("10/30 filed checks reproduce" on a passing
+                  // plan — the most alarming framing on the most
+                  // prominent surface). One vocabulary now: reproduce
+                  // = exact + within tolerance, tolerance share
+                  // disclosed.
                   <>
                     {" · "}
-                    <span className="rater-exh__num">
-                      {report.vectors.matched}/{report.vectors.checks.length}
+                    <span
+                      className="rater-exh__num"
+                      title={vectorChecksSummary(report.vectors).label}
+                    >
+                      {vectorChecksSummary(report.vectors).fraction}
                     </span>{" "}
-                    filed checks reproduce
+                    checks reproduce
+                    {report.vectors.near > 0 &&
+                    report.vectors.mismatched === 0
+                      ? ` (${report.vectors.near} within tolerance)`
+                      : report.vectors.mismatched > 0
+                        ? ` (${report.vectors.mismatched} mismatched)`
+                        : ""}
                   </>
                 ) : null}
                 {" · "}
@@ -1268,6 +1337,10 @@ function PlanExhibit({
                       }
                       aria-current={selected?.id === entry.id}
                       onClick={() => onSelectTable(entry.id)}
+                      // FCA #33 (finding 22) — rail names ellipsize at
+                      // narrow widths with no recourse; the tooltip
+                      // carries the full name.
+                      title={entry.tile.table.display_name}
                     >
                       <span className="rater-exh__rail-name">
                         {entry.changed && comparison !== null ? (

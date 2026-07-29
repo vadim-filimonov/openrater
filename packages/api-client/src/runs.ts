@@ -108,6 +108,11 @@ export const planRunRowSchema = z.object({
   row_status: z.enum(["ok", "error"]).optional(),
   eligibility_tier: z.string().optional(),
   rowIssues: z.array(z.record(z.unknown())).optional(),
+  // FCA #26 (finding 61) — the caller's RAW source row (PolicyNbr and
+  // kin), stored by the worker since the run-export wave; the drawer
+  // shows the identifier column so refusals name policies, not row
+  // numbers.
+  source: z.record(z.unknown()).optional(),
 });
 export type PlanRunRow = z.infer<typeof planRunRowSchema>;
 
@@ -145,6 +150,84 @@ export async function getPlanRun(
     method: "GET",
     path: `/api/v1/plans/${encodeURIComponent(planId)}/runs/${encodeURIComponent(runId)}`,
     schema: planRunSchema,
+    ...(opts.signal !== undefined ? { signal: opts.signal } : {}),
+  });
+}
+
+// ── The two-run compare (FCA #28, finding 78) ───────────────────────
+// Server-owned arithmetic — the drawer renders these numbers verbatim
+// (the chat tool reads the same endpoint; one code path).
+
+const keyedCountSchema = z.object({
+  count: z.number(),
+  examples: z.array(z.string()).default([]),
+});
+
+export const runCompareSchema = z.object({
+  a: z.object({
+    rating_plan_id: z.string(),
+    run_id: z.string(),
+    kind: z.string(),
+    created_at: z.string(),
+    book_content_hash: z.string().nullable(),
+  }),
+  b: z.object({
+    rating_plan_id: z.string(),
+    run_id: z.string(),
+    kind: z.string(),
+    created_at: z.string(),
+    book_content_hash: z.string().nullable(),
+  }),
+  joined_by_column: z.string().nullable(),
+  counts: z.object({
+    rows_a: z.number(),
+    rows_b: z.number(),
+    matched: z.number(),
+    only_a: keyedCountSchema,
+    only_b: keyedCountSchema,
+    rated_both: z.number(),
+    changed: z.number(),
+    unchanged: z.number(),
+  }),
+  totals: z.object({
+    premium_a: z.number(),
+    premium_b: z.number(),
+    delta: z.number(),
+    pct: z.number().nullable(),
+  }),
+  status_changes: z.object({
+    rated_to_refused: keyedCountSchema,
+    refused_to_rated: keyedCountSchema,
+    tier_changed: keyedCountSchema,
+  }),
+  movers: z
+    .array(
+      z.object({
+        key: z.string(),
+        premium_a: z.number(),
+        premium_b: z.number(),
+        delta: z.number(),
+        pct: z.number().nullable(),
+        tier_a: z.string().nullable(),
+        tier_b: z.string().nullable(),
+      }),
+    )
+    .default([]),
+  caveats: z.array(z.string()).default([]),
+});
+export type RunCompare = z.infer<typeof runCompareSchema>;
+
+export async function getPlanRunCompare(
+  planId: string,
+  runId: string,
+  opts: { withRun: string; withPlan?: string; signal?: AbortSignal },
+): Promise<RunCompare> {
+  const params = new URLSearchParams({ with_run: opts.withRun });
+  if (opts.withPlan !== undefined) params.set("with_plan", opts.withPlan);
+  return request({
+    method: "GET",
+    path: `/api/v1/plans/${encodeURIComponent(planId)}/runs/${encodeURIComponent(runId)}/compare?${params.toString()}`,
+    schema: runCompareSchema,
     ...(opts.signal !== undefined ? { signal: opts.signal } : {}),
   });
 }

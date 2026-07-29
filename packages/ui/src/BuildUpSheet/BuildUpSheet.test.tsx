@@ -60,9 +60,9 @@ const LCM_NODE: TowerNode = {
   category: "math",
   subtype: "constant",
   title: "LCM",
-  valueChip: { primary: "× 1.4", secondary: "carrier-set" },
+  valueChip: { primary: "× 1.401", secondary: "carrier-set" },
   icon: "Target",
-  ref: { kind: "constant", constantId: "LCM", role: "lcm", value: 1.4 },
+  ref: { kind: "constant", constantId: "LCM", role: "lcm", value: 1.401 },
 };
 const CAP_NODE: TowerNode = {
   id: "n_out",
@@ -187,7 +187,7 @@ describe("<BuildUpSheet> (Brief 70 §2 · Brief 82)", () => {
       screen.getByTestId("rater-buildup-sheet-steps-tower_bld-row-n_fac"),
     ).toHaveTextContent("2.");
     // the binding sentence speaks product words — and carries the
-    // demoted slug (display name leads, identifier subtitles)
+    // demoted slug (MVP-017: display name leads, identifier subtitles)
     expect(
       screen.getByText("construction_factor · keyed by Construction class"),
     ).toBeInTheDocument();
@@ -220,11 +220,11 @@ describe("<BuildUpSheet> (Brief 70 §2 · Brief 82)", () => {
     // the base's authored value renders (editable), not a computation
     expect(
       screen.getByTestId("rater-buildup-sheet-inline-open-n_base"),
-    ).toHaveTextContent("$0.350");
+    ).toHaveTextContent("$0.35"); // FCA #35 — authored precision, no invented zero
     // the LCM's authored value renders
     expect(
       screen.getByTestId("rater-buildup-sheet-inline-open-n_lcm"),
-    ).toHaveTextContent("1.4");
+    ).toHaveTextContent("1.401");
   });
 
   it("D-B (R1): selecting a step opens the IN-PLACE row editor; selecting again closes it", () => {

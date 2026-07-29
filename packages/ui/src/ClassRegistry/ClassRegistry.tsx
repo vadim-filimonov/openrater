@@ -47,6 +47,16 @@ export interface ClassRegistryProps {
   /** When true, the class_code dimension already exists — the CTA reads
    *  "Update plan dimension" rather than "Add to plan". */
   readonly classDimensionExists?: boolean;
+  /** FCA #30 (finding 147) — the plan's OWN classification dimension,
+   *  when one exists. The registry and the dimension are SEPARATE
+   *  stores: a workbook build creates the dimension directly, so an
+   *  empty registry beside a 30-class dimension used to read "No
+   *  classes yet / 0 classes" — data loss to anyone arriving from
+   *  Dimensions. The empty state leads with the truth instead. */
+  readonly planClassDimension?: {
+    readonly name: string;
+    readonly levelCount: number;
+  } | null;
   readonly testId?: string;
 }
 
@@ -58,6 +68,7 @@ export function ClassRegistry(props: ClassRegistryProps): JSX.Element {
     onBulkImport,
     onAddToPlan,
     classDimensionExists = false,
+    planClassDimension = null,
     testId = "rater-class-registry",
   } = props;
 
@@ -251,10 +262,32 @@ export function ClassRegistry(props: ClassRegistryProps): JSX.Element {
             <div className="rater-class-registry__empty-hero" aria-hidden>
               <FileUp size={24} />
             </div>
-            <div className="rater-class-registry__empty-title">No classes yet</div>
-            <p className="rater-class-registry__empty-hint">
-              Paste a class table to load a filing&rsquo;s codes, or add one by hand.
-            </p>
+            {/* FCA #30 (finding 147) — when the plan already carries a
+                classification dimension (workbook builds create it
+                directly), say so: "No classes yet" on a 30-class plan
+                read as data loss. */}
+            {planClassDimension ? (
+              <>
+                <div className="rater-class-registry__empty-title">
+                  This registry is empty — the plan&rsquo;s classes aren&rsquo;t
+                </div>
+                <p className="rater-class-registry__empty-hint">
+                  {planClassDimension.levelCount} class
+                  {planClassDimension.levelCount === 1 ? "" : "es"} live on the
+                  plan&rsquo;s <b>{planClassDimension.name}</b> dimension
+                  (built from the workbook) — see the Dimensions tab. This
+                  registry is a separate store for pasted class tables and
+                  per-class attributes.
+                </p>
+              </>
+            ) : (
+              <>
+                <div className="rater-class-registry__empty-title">No classes yet</div>
+                <p className="rater-class-registry__empty-hint">
+                  Paste a class table to load a filing&rsquo;s codes, or add one by hand.
+                </p>
+              </>
+            )}
             <div className="rater-class-registry__empty-cta">
               <Button variant="primary" size="sm" onClick={() => setImportOpen(true)}>
                 <FileUp size={14} aria-hidden /> Paste a class table

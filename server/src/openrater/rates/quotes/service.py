@@ -21,6 +21,10 @@ from typing import Any
 
 from openrater.errors import ConflictError, NotFoundError
 from openrater.persistence.db import Database
+from openrater.rates.ingest.reports import (
+    get_build_report_for_plan,
+    verification_verdict,
+)
 from openrater.rates.inputs_mapping.repo import get_input_mapping
 from openrater.rates.plans.models import PlanStatus
 from openrater.rates.plans.repo import get_plan
@@ -36,6 +40,69 @@ from openrater.rates.snapshots.service import (
     get_published_snapshot_with_body,
     get_snapshot_with_body,
 )
+
+
+def _plan_health_issues(
+    *, db: Database, rating_plan_id: str, version: QuoteVersion
+) -> list[dict[str, Any]]:
+    """FCA fca-2026-07-25 #6 (critical) — pricing-time silence. A plan
+    whose build verification MISMATCHED the filing, and whose ledger
+    declared money-affecting gaps, quoted a bare premium: row_status
+    'ok', plan_issues null, the only qualifier a version.kind buried
+    in metadata. The honesty existed at build time and evaporated at
+    the exact moment someone relied on the number.
+
+    These are WARNINGS — qualifiers, never refusals: the premium still
+    serves and row_status is untouched. They read the plan's LATEST
+    build report (the message says so), which is the health signal a
+    caller needs regardless of which version answered the quote.
+    """
+    issues: list[dict[str, Any]] = []
+    report = get_build_report_for_plan(db=db, rating_plan_id=rating_plan_id)
+    if report is not None:
+        v = report.vectors
+        if verification_verdict(v) == "mismatches":
+            near = f", {v.near} near" if v.near else ""
+            issues.append(
+                {
+                    "severity": "warning",
+                    "code": "verification_mismatches",
+                    "message": (
+                        f"The plan's latest build did NOT reproduce the "
+                        f"filing: {v.mismatched} of {v.total_cases} "
+                        f"verification check(s) mismatched "
+                        f"({v.matched} matched{near}). Review the build "
+                        f"report before relying on this number."
+                    ),
+                }
+            )
+        if report.gaps:
+            n = len(report.gaps)
+            issues.append(
+                {
+                    "severity": "warning",
+                    "code": "declared_gaps",
+                    "message": (
+                        f"The build declares {n} transcription "
+                        f"gap(s)/assumption(s) in its ledger — some may "
+                        f"affect premium. See the build report's gaps "
+                        f"ledger."
+                    ),
+                }
+            )
+    if version.kind == "draft":
+        issues.append(
+            {
+                "severity": "warning",
+                "code": "draft_version",
+                "message": (
+                    "Quoted from the working DRAFT — unpublished, not "
+                    "signed off, and subject to change. The published "
+                    "version is the version of record."
+                ),
+            }
+        )
+    return issues
 
 
 def quote_plan(
@@ -118,6 +185,14 @@ def quote_plan(
     views = result.get("views") or {}
     row_status = result.get("row_status") or "ok"
 
+    # FCA #6 — plan health rides every quote (warnings, never refusals).
+    plan_issues = [
+        *(result.get("planIssues") or []),
+        *_plan_health_issues(
+            db=db, rating_plan_id=rating_plan_id, version=version
+        ),
+    ]
+
     return QuoteResponse(
         # Law 1 — THE premium is composed.final (surfaced as views.premium
         # since G4); null when the plan refuses the risk (Law 2).
@@ -137,7 +212,7 @@ def quote_plan(
         outputs=(result.get("outputs") or {}) if row_status == "ok" else {},
         composed=result.get("composed"),
         row_issues=result.get("rowIssues"),
-        plan_issues=result.get("planIssues"),
+        plan_issues=plan_issues or None,
         input_issues=result.get("inputIssues"),
         trace=result.get("trace"),
         as_of=result.get("as_of") or request.as_of,
@@ -197,6 +272,13 @@ def _quote_policy(
         policy_request["options"] = {"as_of": request.as_of}
 
     result = score_policy_once(request=policy_request, base_url=scoring_base_url)
+    # FCA #6 — plan health rides policy quotes identically.
+    plan_issues = [
+        *(result.get("planIssues") or []),
+        *_plan_health_issues(
+            db=db, rating_plan_id=rating_plan_id, version=version
+        ),
+    ]
     return QuoteResponse(
         premium=result.get("premium"),
         tier=result.get("tier"),
@@ -206,7 +288,7 @@ def _quote_policy(
         # Law 2 — a policy-level refusal (e.g. composition_failed over a
         # total-less plan) names itself to the quote consumer.
         row_issues=result.get("rowIssues"),
-        plan_issues=result.get("planIssues"),
+        plan_issues=plan_issues or None,
         input_issues=None,
         trace=result.get("trace"),
         as_of=result.get("as_of") or request.as_of,

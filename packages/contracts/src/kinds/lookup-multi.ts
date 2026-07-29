@@ -10,6 +10,9 @@
  * The composite-key match is positional by `keyNames` order. All
  * declared keys must match for a row to be selected. Falls back to
  * `defaultValue` when no row matches.
+ *
+ * Ported from `<prototype>/plan-builder/src/blocks/kinds/
+ * lookup-multi.tsx` (Phase A.1 PR 6). PURE half only.
  */
 
 import type { BlockKind, PortSpec } from "../block-types";
@@ -26,10 +29,10 @@ export interface MultiLookupRow {
 }
 
 /**
- * Interpolate the factor across one numeric axis
+ * ADR-0063 (amendment) — interpolate the factor across ONE numeric axis
  * of the composite key. The F14 class: a 2-D relativity (limit-band ×
- * construction-group) that interpolates along the limit axis while a
- * discrete row-match steps. The other
+ * construction-group) whose filing INTERPOLATES along the limit axis
+ * (ISO BOP Rule 23.A.2.d) while a discrete row-match STEPS. The other
  * ax(es) still match discretely at runtime (the group is resolved from
  * the risk); the flagged axis receives the RAW numeric value and the
  * factor is read linearly between that axis's breakpoints.
@@ -40,7 +43,7 @@ export interface MultiLookupInterpolateOn {
   /**
    * Row-key value on that axis (band id — and any alias of it) → the
    * numeric breakpoint x it represents (the band's LOWER bound; each
-   * band's factor is the value at its lower breakpoint).
+   * band's factor is the value AT its lower breakpoint per ADR-0063).
    */
   readonly breakpoints: Readonly<Record<string, number>>;
 }
@@ -56,12 +59,12 @@ export interface MultiLookupParams {
   tableName?: string;
   /** Citation reference. */
   citation?: string;
-  /** Authored no-row-match disposition (see lookup.direct). */
+  /** ADR-0056 — authored no-row-match disposition (see lookup.direct). */
   onMiss?: OnMissPolicy;
-  /** Raw input field(s) feeding the keys (message-only). */
+  /** ADR-0056 — raw input field(s) feeding the keys (message-only). */
   keySource?: string;
   /**
-   * When set, the named axis interpolates instead of
+   * ADR-0063 — when set, the named axis interpolates instead of
    * stepping. ABSENT by default: every existing plan is byte-identical.
    * Resolution order: (1) a full discrete match still wins (a
    * pre-binned band id keeps stepping — idempotent, mirrors
@@ -116,7 +119,7 @@ function matchMultiRow(
       const incoming = inputKeyTuple[i];
       // Key equality is STRING equality — row keys are JSON object keys
       // (strings by construction), so a numeric input meaning the same
-      // key must match ("1500" ⟂ 1500). `lookup.direct` gets
+      // key must match ("1500" ⟂ 1500; Brief 83.2). `lookup.direct` gets
       // this free from JS object indexing; this kind compared strictly
       // and silently missed. An absent input never matches.
       if (
@@ -144,7 +147,7 @@ function describeTuple(
 }
 
 /**
- * Interpolated resolution across the flagged axis. Called
+ * ADR-0063 — interpolated resolution across the flagged axis. Called
  * only after the full discrete match missed (so a pre-binned band id is
  * byte-identical to the pre-interpolation behavior).
  *
@@ -238,7 +241,7 @@ export const MultiLookupKind: BlockKind<
       description: "The factor for the matching row",
     } as PortSpec,
   ],
-  // Derive one input port per declared key. The runtime
+  // ADR-0044 — derive one input port per declared key. The runtime
   // groups edges by destination port and a single `record` port can
   // only ever carry the first edge's value (runtime gathers
   // `gathered[0]` for non-`N` ports), so N upstream key producers can't

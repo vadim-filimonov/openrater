@@ -1,7 +1,7 @@
 {
   "id": "IC18",
   "name": "pinned-rerate",
-  "spec": "\u00a74.6",
+  "spec": "\u00a74.6 (ADR-0060 rule 8)",
   "asserts": "pins {plan_ref, snapshot_id} collapse the fan-out to ONE plan at ONE frozen version: after the plan's live version moves on (and drift demotes unpinned serving, IC11), a pin to the inception snapshot still returns the inception computation \u2014 Law 1 extended through time. The member pins kind 'snapshot' + the pinned id; an unknown pin is a NAMED issue with zero members, never a 4xx (Law 2).",
   "contract_version": "1.0",
   "world": {

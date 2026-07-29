@@ -1,5 +1,5 @@
 /**
- * Dimension contract tests.
+ * Dimension contract tests — sub-brief 24.A + 24.A2.
  */
 
 import { describe, it, expect } from "vitest";
@@ -14,7 +14,7 @@ import {
   DEFAULT_DIMENSION_ROLE,
   DEFAULT_DIMENSION_TYPE,
   CLASS_MAPPING_DEFAULT_PATTERN,
-  // Dimension shapes
+  // 26.P0
   DEFAULT_DIMENSION_SHAPE,
   inferDimensionShape,
   isBandedDimension,
@@ -182,7 +182,7 @@ const geographicDim: Dimension = {
   data_type: "string",
   role: "rating-input",
   dimension_type: "geographic",
-  territory_schema_id: "meridian-demo-territories-v1",
+  territory_schema_id: "wi-bop-territories-v1",
 };
 
 const classificationDim: Dimension = {
@@ -192,32 +192,32 @@ const classificationDim: Dimension = {
   data_type: "string",
   role: "both",
   dimension_type: "classification",
-  class_library_id: "meridian-demo-classes-v1",
+  class_library_id: "sample-bop-classes-v2024",
   classification_mapping: [
     {
-      input_pattern: "meridian cafe",
-      canonical_class_code: "c101",
+      input_pattern: "restaurants",
+      canonical_class_code: "71641",
       notes: "Limited cooking",
     },
     {
-      input_pattern: "meridian studio",
-      canonical_class_code: "c104",
+      input_pattern: "bar & grill",
+      canonical_class_code: "71643",
     },
     {
       input_pattern: CLASS_MAPPING_DEFAULT_PATTERN,
-      canonical_class_code: "c101",
+      canonical_class_code: "71641",
       notes: "Default catch-all",
     },
   ],
 };
 
-describe("Dimension subtypes — isStandardDimension", () => {
+describe("Dimension subtypes (24.A2) — isStandardDimension", () => {
   it("returns true for explicit 'standard'", () => {
     expect(isStandardDimension(standardDim)).toBe(true);
   });
 
   it("returns true when dimension_type is absent (backwards compat)", () => {
-    // Older dimensions lack the field; treat them as standard.
+    // Pre-24.A2 dimensions lack the field; treat as standard.
     expect(isStandardDimension({})).toBe(true);
   });
 
@@ -227,7 +227,7 @@ describe("Dimension subtypes — isStandardDimension", () => {
   });
 });
 
-describe("Dimension subtypes — isGeographicDimension", () => {
+describe("Dimension subtypes (24.A2) — isGeographicDimension", () => {
   it("returns true for explicit 'geographic'", () => {
     expect(isGeographicDimension(geographicDim)).toBe(true);
   });
@@ -239,7 +239,7 @@ describe("Dimension subtypes — isGeographicDimension", () => {
   });
 });
 
-describe("Dimension subtypes — isClassificationDimension", () => {
+describe("Dimension subtypes (24.A2) — isClassificationDimension", () => {
   it("returns true for explicit 'classification'", () => {
     expect(isClassificationDimension(classificationDim)).toBe(true);
   });
@@ -251,7 +251,7 @@ describe("Dimension subtypes — isClassificationDimension", () => {
   });
 });
 
-describe("Dimension subtypes — normalizeDimension", () => {
+describe("Dimension subtypes (24.A2) — normalizeDimension", () => {
   it("applies DEFAULT_DIMENSION_TYPE when missing", () => {
     const raw = {
       id: "x",
@@ -288,38 +288,38 @@ describe("Dimension subtypes — normalizeDimension", () => {
       slug: "class",
       data_type: "string" as const,
       dimension_type: "classification" as const,
-      class_library_id: "meridian-demo",
+      class_library_id: "sample-bop",
       classification_mapping: mapping,
     };
     const result = normalizeDimension(raw);
     expect(result.dimension_type).toBe("classification");
-    expect(result.class_library_id).toBe("meridian-demo");
+    expect(result.class_library_id).toBe("sample-bop");
     expect(result.classification_mapping).toEqual(mapping);
   });
 });
 
-describe("Dimension subtypes — resolveClassMapping", () => {
+describe("Dimension subtypes (24.A2) — resolveClassMapping", () => {
   const rules: readonly ClassMappingRule[] = [
-    { input_pattern: "meridian cafe", canonical_class_code: "c101" },
-    { input_pattern: "meridian studio", canonical_class_code: "c104" },
+    { input_pattern: "restaurants", canonical_class_code: "71641" },
+    { input_pattern: "bar & grill", canonical_class_code: "71643" },
     {
       input_pattern: CLASS_MAPPING_DEFAULT_PATTERN,
-      canonical_class_code: "c101",
+      canonical_class_code: "71641",
     },
   ];
 
   it("returns the matching canonical for an exact input", () => {
-    expect(resolveClassMapping(rules, "meridian cafe")).toBe("c101");
-    expect(resolveClassMapping(rules, "meridian studio")).toBe("c104");
+    expect(resolveClassMapping(rules, "restaurants")).toBe("71641");
+    expect(resolveClassMapping(rules, "bar & grill")).toBe("71643");
   });
 
   it("is case-insensitive + trims whitespace", () => {
-    expect(resolveClassMapping(rules, "  MERIDIAN CAFE ")).toBe("c101");
-    expect(resolveClassMapping(rules, "Meridian Studio")).toBe("c104");
+    expect(resolveClassMapping(rules, "  RESTAURANTS ")).toBe("71641");
+    expect(resolveClassMapping(rules, "Bar & Grill")).toBe("71643");
   });
 
   it("falls back to the default rule when no exact match", () => {
-    expect(resolveClassMapping(rules, "no such input")).toBe("c101");
+    expect(resolveClassMapping(rules, "no such input")).toBe("71641");
   });
 
   it("returns null when no rule matches and no default is set", () => {
@@ -341,14 +341,14 @@ describe("Dimension subtypes — resolveClassMapping", () => {
         input_pattern: CLASS_MAPPING_DEFAULT_PATTERN,
         canonical_class_code: "DEFAULT",
       },
-      { input_pattern: "meridian cafe", canonical_class_code: "c101" },
+      { input_pattern: "restaurants", canonical_class_code: "71641" },
     ];
-    expect(resolveClassMapping(reordered, "meridian cafe")).toBe("c101");
+    expect(resolveClassMapping(reordered, "restaurants")).toBe("71641");
     expect(resolveClassMapping(reordered, "unknown")).toBe("DEFAULT");
   });
 });
 
-describe("Dimension subtypes — DEFAULT_DIMENSION_TYPE", () => {
+describe("Dimension subtypes (24.A2) — DEFAULT_DIMENSION_TYPE", () => {
   it("is 'standard' (the safer migration default)", () => {
     // Standard is the safer default because most legacy dimensions
     // ARE plain variables. Misclassifying a geographic / classification
@@ -357,14 +357,14 @@ describe("Dimension subtypes — DEFAULT_DIMENSION_TYPE", () => {
   });
 });
 
-describe("Dimension subtypes — CLASS_MAPPING_DEFAULT_PATTERN", () => {
+describe("Dimension subtypes (24.A2) — CLASS_MAPPING_DEFAULT_PATTERN", () => {
   it("is the literal '__default__' sentinel", () => {
     expect(CLASS_MAPPING_DEFAULT_PATTERN).toBe("__default__");
   });
 });
 
 // ============================================================================
-// Dimension shape tests
+// 26.P0 — Brief 26 (Dimensions v2) tests
 // ============================================================================
 
 describe("Dimension v2 (26.P0) — DEFAULT_DIMENSION_SHAPE", () => {
@@ -674,30 +674,30 @@ describe("Dimension v2 (26.P0) — resolveCategoricalLevel", () => {
   const levels: readonly DimensionLevel[] = [
     {
       kind: "categorical",
-      id: "c101",
-      label: "Meridian Cafe",
-      aliases: ["Cafe", "Meridian Cafe", "demo cafe"],
+      id: "71641",
+      label: "Restaurants — full service",
+      aliases: ["Restaurant", "Restaurant - dine-in", "full-service restaurant"],
     },
     {
       kind: "categorical",
-      id: "c102",
-      label: "Meridian Studio",
-      aliases: ["Studio", "Meridian Studio", "MS"],
+      id: "73911",
+      label: "Bowling Centers",
+      aliases: ["Bowling", "Bowling Center", "BC"],
     },
   ];
 
   it("resolves an exact alias match", () => {
-    expect(resolveCategoricalLevel(levels, "Cafe")).toBe("c101");
-    expect(resolveCategoricalLevel(levels, "MS")).toBe("c102");
+    expect(resolveCategoricalLevel(levels, "Restaurant")).toBe("71641");
+    expect(resolveCategoricalLevel(levels, "BC")).toBe("73911");
   });
 
   it("is case-insensitive and trimmed", () => {
-    expect(resolveCategoricalLevel(levels, "  ms  ")).toBe("c102");
-    expect(resolveCategoricalLevel(levels, "MERIDIAN STUDIO")).toBe("c102");
+    expect(resolveCategoricalLevel(levels, "  bc  ")).toBe("73911");
+    expect(resolveCategoricalLevel(levels, "BOWLING CENTER")).toBe("73911");
   });
 
   it("matches the level's own id as an implicit alias", () => {
-    expect(resolveCategoricalLevel(levels, "c101")).toBe("c101");
+    expect(resolveCategoricalLevel(levels, "71641")).toBe("71641");
   });
 
   it("returns null when no level claims the input", () => {
@@ -709,7 +709,7 @@ describe("Dimension v2 (26.P0) — resolveCategoricalLevel", () => {
       ...levels,
       { kind: "banded", id: "L1", label: "x", lo: 0, hi: 5 },
     ];
-    expect(resolveCategoricalLevel(mixed, "Cafe")).toBe("c101");
+    expect(resolveCategoricalLevel(mixed, "Restaurant")).toBe("71641");
   });
 });
 
@@ -757,7 +757,7 @@ describe("Dimension v2 (26.P0) — Dimension fields are optional + backwards-com
       data_type: "string",
       role: "rating-input",
       draft_status: "extracted",
-      source_pdf_url: "https://example.com/meridian-demo-circular.pdf",
+      source_pdf_url: "https://example.com/sample-bop-circular.pdf",
       source_page: 31,
     };
     expect(d.draft_status).toBe("extracted");
@@ -766,7 +766,7 @@ describe("Dimension v2 (26.P0) — Dimension fields are optional + backwards-com
 });
 
 // ============================================================================
-// Composite dimension tests
+// ADR-0025 (Brief 27) — Composite dimension tests
 // ============================================================================
 
 import {
@@ -809,21 +809,21 @@ const classCodeDim: Dimension = {
   levels: [
     {
       kind: "categorical",
-      id: "c101",
-      label: "Meridian Cafe",
-      aliases: ["Cafe", "Meridian Cafe"],
+      id: "71641",
+      label: "Restaurants — full service",
+      aliases: ["Restaurant", "Restaurant - dine-in"],
     },
     {
       kind: "categorical",
-      id: "c202",
-      label: "Meridian Workshop",
-      aliases: ["Workshop", "Meridian Workshop"],
+      id: "73912",
+      label: "Pool Halls",
+      aliases: ["Pool", "Pool Hall"],
     },
     {
       kind: "categorical",
-      id: "c102",
-      label: "Meridian Studio",
-      aliases: ["Studio"],
+      id: "73911",
+      label: "Bowling Centers",
+      aliases: ["Bowling"],
     },
   ],
 };
@@ -852,7 +852,7 @@ function makeRegistry(...dims: Dimension[]): ReadonlyMap<string, Dimension> {
   return new Map(dims.map((d) => [d.slug, d]));
 }
 
-describe("DimensionShape includes composite", () => {
+describe("ADR-0025 — DimensionShape includes composite", () => {
   it("inferDimensionShape returns 'composite' when set explicitly", () => {
     expect(inferDimensionShape(compositeDim)).toBe("composite");
   });
@@ -869,23 +869,23 @@ describe("DimensionShape includes composite", () => {
   });
 });
 
-describe("resolveCompositeLevel", () => {
+describe("ADR-0025 — resolveCompositeLevel", () => {
   const registry = makeRegistry(buildingAgeDim, classCodeDim, compositeDim);
 
   it("resolves both axes + concatenates with mid-dot", () => {
     const result = resolveCompositeLevel(compositeDim, registry, {
       building_age: 17,
-      class_code: "Cafe",
+      class_code: "Restaurant",
     });
-    expect(result).toBe("band_15_30·c101");
+    expect(result).toBe("band_15_30·71641");
   });
 
   it("resolves alias on categorical axis", () => {
     const result = resolveCompositeLevel(compositeDim, registry, {
       building_age: 2,
-      class_code: "Workshop", // matches alias
+      class_code: "Pool", // matches alias
     });
-    expect(result).toBe("band_0_5·c202");
+    expect(result).toBe("band_0_5·73912");
   });
 
   it("returns null when an axis has no input", () => {
@@ -907,7 +907,7 @@ describe("resolveCompositeLevel", () => {
   it("returns null when banded axis input is non-numeric", () => {
     const result = resolveCompositeLevel(compositeDim, registry, {
       building_age: "abc",
-      class_code: "Cafe",
+      class_code: "Restaurant",
     });
     expect(result).toBeNull();
   });
@@ -940,8 +940,8 @@ describe("resolveCompositeLevel", () => {
       nestedComposite,
     );
     const result = resolveCompositeLevel(nestedComposite, nestedRegistry, {
-      building_age_x_class: "band_15_30·c101",
-      class_code: "Cafe",
+      building_age_x_class: "band_15_30·71641",
+      class_code: "Restaurant",
     });
     expect(result).toBeNull();
   });
@@ -996,7 +996,7 @@ describe("resolveCompositeLevel", () => {
   });
 });
 
-describe("validateCompositeDimension", () => {
+describe("ADR-0025 — validateCompositeDimension", () => {
   const registry = makeRegistry(buildingAgeDim, classCodeDim, compositeDim);
 
   it("returns null for a valid composite", () => {
@@ -1072,7 +1072,7 @@ describe("validateCompositeDimension", () => {
   });
 });
 
-describe("compositeLevelCount", () => {
+describe("ADR-0025 — compositeLevelCount", () => {
   const registry = makeRegistry(buildingAgeDim, classCodeDim, compositeDim);
 
   it("returns the cartesian product of axis level counts", () => {

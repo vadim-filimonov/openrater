@@ -67,13 +67,14 @@ ENV RATER_LOG_FORMAT=json
 
 # The bundled synthetic demo plans: every *.plan.json in docs/fixtures/ is
 # seeded on boot by default (RATER_SEED_COLD_TEST, see openrater_deploy/
-# seed.py). The seeder no-ops cleanly when the directory contains no plans.
+# seed.py). The directory ships empty until Phase D lands the Meridian
+# program (Detachment Brief 1 S3); the seeder no-ops when it finds none.
 # The env points at the DIRECTORY; the seeder loads every *.plan.json.
 COPY docs/fixtures/ /app/fixtures/
 ENV RATER_COLD_TEST_FIXTURE=/app/fixtures
 
 
 EXPOSE 8001
-# One worker: a single SQLite-backed process. Move to a shared database before
-# scaling to multiple workers or instances.
+# One worker: a single SQLite-backed process. (Scaling to multiple workers
+# or instances is the cue to move to Postgres — see docs/AWS_DEPLOYMENT_PLAN.md.)
 CMD ["uvicorn", "openrater_deploy.app:app", "--host", "0.0.0.0", "--port", "8001", "--workers", "1"]

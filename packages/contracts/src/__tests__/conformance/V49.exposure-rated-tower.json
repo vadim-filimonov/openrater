@@ -1,10 +1,10 @@
 {
   "name": "V49.exposure-rated-tower",
-  "description": "A fictional Meridian exposure-rated tower multiplies a 0.4 base factor by a 1.5 relativity, rounds the rate, applies 200,000/100 units and a 1.4 LCM, then rounds the premium to 1,680.",
+  "description": "ADR-0044: exposure-rated coverage tower as the projector emits it — chain.mult(relativities) -> round(3) -> ÷exposure -> ×LCM -> round(0). rate 0.389×1.504=0.585056 -> 0.585 -> ×(200000/100=2000) -> ×1.401 -> 1639.",
   "plan": {
     "id": "v49.exposure-tower",
     "version": "1.0.0",
-    "name": "Meridian synthetic exposure-rated tower",
+    "name": "Exposure-rated tower (ISO Rule 23 close-out)",
     "line": "bop",
     "effective": "2026-01-01",
     "nodes": [
@@ -13,8 +13,8 @@
       { "id": "in_limit", "kind": "input", "params": { "fieldName": "building_limit", "fieldType": "money" }, "position": { "x": 0, "y": 120 } },
 
       { "id": "base", "kind": "constant", "params": { "value": 1.0, "type": "factor" }, "position": { "x": 200, "y": 0 } },
-      { "id": "base_lc", "kind": "lookup.direct", "params": { "table": { "t1": 0.4, "t2": 0.4 }, "defaultValue": 1.0, "tableName": "Meridian synthetic property base factor" }, "position": { "x": 200, "y": 40 } },
-      { "id": "rate_no", "kind": "lookup.direct", "params": { "table": { "r2": 1.5, "r3": 1.3 }, "defaultValue": 1.0, "tableName": "Meridian synthetic building relativity" }, "position": { "x": 200, "y": 80 } },
+      { "id": "base_lc", "kind": "lookup.direct", "params": { "table": { "701": 0.389, "702": 0.389 }, "defaultValue": 1.0, "tableName": "base_lc_property · building" }, "position": { "x": 200, "y": 40 } },
+      { "id": "rate_no", "kind": "lookup.direct", "params": { "table": { "09": 1.504, "25": 1.311 }, "defaultValue": 1.0, "tableName": "rate_number_rel · building" }, "position": { "x": 200, "y": 80 } },
 
       { "id": "mul", "kind": "chain.mult", "params": { "factorNames": ["base_lc", "rate_no"], "stopOnZero": false }, "position": { "x": 400, "y": 40 } },
       { "id": "rate3", "kind": "round", "params": { "decimals": 3 }, "position": { "x": 560, "y": 40 } },
@@ -23,7 +23,7 @@
       { "id": "expdiv", "kind": "math.op", "params": { "op": "div" }, "position": { "x": 560, "y": 120 } },
 
       { "id": "mulexp", "kind": "math.op", "params": { "op": "mul" }, "position": { "x": 700, "y": 80 } },
-      { "id": "lcm", "kind": "constant", "params": { "value": 1.4, "type": "factor" }, "position": { "x": 700, "y": 160 } },
+      { "id": "lcm", "kind": "constant", "params": { "value": 1.401, "type": "factor" }, "position": { "x": 700, "y": 160 } },
       { "id": "mullcm", "kind": "math.op", "params": { "op": "mul" }, "position": { "x": 840, "y": 100 } },
       { "id": "prem", "kind": "round", "params": { "decimals": 0 }, "position": { "x": 980, "y": 100 } },
       { "id": "out", "kind": "output", "params": { "fieldName": "building_premium", "fieldType": "money" }, "position": { "x": 1120, "y": 100 } }
@@ -50,6 +50,6 @@
       { "from": { "node": "prem", "port": "value" }, "to": { "node": "out", "port": "value" } }
     ]
   },
-  "externalInputs": { "territory": "t2", "prop_rate_number": "r2", "building_limit": 200000 },
-  "expectedOutputs": { "building_premium": 1680 }
+  "externalInputs": { "territory": "702", "prop_rate_number": "09", "building_limit": 200000 },
+  "expectedOutputs": { "building_premium": 1639 }
 }

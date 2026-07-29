@@ -13,7 +13,9 @@
  * per-location breakdown is retained for the trace / drill-in. The policy-
  * level appetite gate (E03) runs AFTER this so it sees the policy total.
  *
- * Recommended wiring: a `policy_id` / `location_id` convention in the book CSV drives the roll-up
+ * Recommended wiring (deferred to the brief
+ * `docs/design-briefs/location-rollup-and-policy-appetite.md`, §−1): a
+ * `policy_id` / `location_id` convention in the book CSV drives the roll-up
  * in the batch runner; the policy composer renders the grouped result.
  *
  * Pure + deterministic (P-N1): grouping preserves first-seen policy order +

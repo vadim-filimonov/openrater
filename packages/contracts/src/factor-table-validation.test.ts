@@ -1,5 +1,5 @@
 /**
- * Tests for validateFactorTableRows.
+ * Tests for validateFactorTableRows — M5.1.8 (Brief 18 PR #8).
  */
 
 import { describe, it, expect } from "vitest";
@@ -17,9 +17,9 @@ function rows(...rs: FactorTableValidationRow[]): FactorTableValidationRow[] {
 }
 
 const ok = (extra: Partial<FactorTableValidationRow> = {}): FactorTableValidationRow => ({
-  key: "c201",
-  factor: 1.25,
-  citation_rule: "Meridian Rule MS-R5.2",
+  key: "91342",
+  factor: 1.35,
+  citation_rule: "ISO BOP §5.A.2",
   citation_page: "p. 31",
   ...extra,
 });
@@ -33,11 +33,11 @@ describe("validateFactorTableRows — clean table", () => {
         {
           key: FACTOR_TABLE_DEFAULT_KEY,
           factor: 1.0,
-          citation_rule: "Meridian Rule MS-R5.1",
+          citation_rule: "ISO BOP §5.A.1",
           citation_page: "p. 30",
         },
-        ok({ key: "c101" }),
-        ok({ key: "c201" }),
+        ok({ key: "09011" }),
+        ok({ key: "91342" }),
       ),
     });
     expect(out).toEqual([]);
@@ -71,7 +71,7 @@ describe("validateFactorTableRows — duplicate keys", () => {
     const out = validateFactorTableRows({
       tableId,
       tableDisplayName,
-      rows: rows(ok({ key: "c201" }), ok({ key: "c202" }), ok({ key: "c201" })),
+      rows: rows(ok({ key: "91342" }), ok({ key: "73912" }), ok({ key: "91342" })),
     });
     const dup = out.find((i) => i.message.includes("duplicate key"));
     expect(dup).toBeDefined();
@@ -192,7 +192,7 @@ describe("validateFactorTableRows — missing citations (warning)", () => {
     const out = validateFactorTableRows({
       tableId,
       tableDisplayName,
-      rows: rows({ key: "X", factor: 1.0, citation_rule: "Meridian Rule MS-R1" }),
+      rows: rows({ key: "X", factor: 1.0, citation_rule: "ISO §1" }),
     });
     expect(
       out.find((i) => i.message.includes("citation rule but no page")),
@@ -210,7 +210,7 @@ describe("validateFactorTableRows — Issue shape", () => {
     const issue = out[0]!;
     expect(issue.location.section).toBe("factor-tables");
     expect(issue.location.entity).toContain("class_factor");
-    expect(issue.location.entity).toContain("c201");
+    expect(issue.location.entity).toContain("91342");
     expect(issue.location.field).toBe("factor");
   });
 
@@ -221,7 +221,7 @@ describe("validateFactorTableRows — Issue shape", () => {
       rows: rows(ok({ factor: -1 })),
     });
     expect(out[0]!.fix_hint).toBeDefined();
-    expect(out[0]!.fix_hint?.label).toContain("c201");
+    expect(out[0]!.fix_hint?.label).toContain("91342");
   });
 
   it("emits deterministic ids — same input → same id", () => {

@@ -2,7 +2,8 @@
  * <Segmented> — radio-style segmented control for 2-N mutually-exclusive
  * choices.
  *
- * Replaces two bespoke segmented-control patterns:
+ * Polish PR 8. Codifies the audit's segmented-control north-star
+ * (`docs/design/UI_AUDIT.md` §G2) — replaces 2 bespoke patterns:
  *
  *   - `.rater-pc-pill-group` + `.rater-pc-pill`   (Parametrize Canvas/Saved)
  *   - `.rater-dsp-toggle` + `.rater-dsp-toggle-btn` (Inputs CSV/Webhook)
@@ -137,11 +138,15 @@ export function Segmented<TValue extends string = string>(
       const currentEnabledIdx = enabled.findIndex(
         ({ it }) => it.value === value,
       );
-      if (currentEnabledIdx < 0) return;
       e.preventDefault();
+      // An UNSET group (value matches no item — e.g. a boolean the user
+      // hasn't answered): per the WAI-ARIA radiogroup pattern, arrows
+      // select the first enabled segment instead of no-opping.
       const step = e.key === "ArrowRight" ? 1 : -1;
       const nextEnabledIdx =
-        (currentEnabledIdx + step + enabled.length) % enabled.length;
+        currentEnabledIdx < 0
+          ? 0
+          : (currentEnabledIdx + step + enabled.length) % enabled.length;
       const next = enabled[nextEnabledIdx];
       if (next) {
         onChange(next.it.value);
@@ -170,8 +175,12 @@ export function Segmented<TValue extends string = string>(
     >
       {/* the sliding fill — width 0 (invisible) until first measurement */}
       <span className="rater-segmented__thumb" aria-hidden />
+      {/* Unset group → the first enabled segment is the tab stop, or
+          keyboard users could never reach (and answer) the group. */}
       {items.map((item, i) => {
         const isActive = item.value === value;
+        const isEntryStop =
+          activeIndex < 0 && i === items.findIndex((it) => !it.disabled);
         return (
           <button
             key={item.value}
@@ -188,7 +197,7 @@ export function Segmented<TValue extends string = string>(
             }}
             // Make only the active segment tabbable; arrow keys move
             // focus between segments per WAI-ARIA radiogroup spec.
-            tabIndex={isActive ? 0 : -1}
+            tabIndex={isActive || isEntryStop ? 0 : -1}
           >
             <span className="rater-segmented__label">{item.label}</span>
             {item.count !== undefined ? (

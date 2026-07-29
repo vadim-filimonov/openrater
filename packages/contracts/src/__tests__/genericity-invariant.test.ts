@@ -16,12 +16,12 @@
  *      runtime now earns the same guard the composer always had.
  *
  * The substrate→runtime projector (`stagesToRuntimePlan` in `@openrater/ui`)
- * earns the same guard, but the scan lives in @openrater/ui
+ * earns the SAME guard, but the scan lives in labs-ui
  * (`genericity-projector.test.ts`) since a contracts test cannot import a
- * UI module without inverting the package dependency. Its last legacy
+ * labs-ui module without inverting the package dependency. Its last legacy
  * literal — `line: "bop"` — was dropped when `Plan.lines` was retired (gate
  * 6 finish), so it now scans clean. The behavioral proof of end-to-end
- * genericity meanwhile is the BOP second-product book test (@openrater/ui) and the
+ * genericity meanwhile is the bop second-product book test (labs-ui) + the
  * bop/auto/wc composePolicy unit tests.
  *
  * Mechanism: load each module's own source via Vite `?raw`

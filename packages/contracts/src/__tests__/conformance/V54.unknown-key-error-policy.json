@@ -1,6 +1,6 @@
 {
   "name": "V54.unknown-key-error-policy",
-  "description": "An unknown fictional class key with onMiss error refuses the row: no factor, no premium, a structured unknown_key issue, and row_status error.",
+  "description": "ADR-0056 - unknown lookup key with onMiss error REFUSES the row: no factor, no premium, structured unknown_key issue, row_status error.",
   "plan": {
     "id": "v54.unknown-key-error",
     "version": "1.0.0",
@@ -10,7 +10,7 @@
       { "id": "in_cls", "kind": "input", "params": { "fieldName": "class_code", "fieldType": "string" }, "position": { "x": 0, "y": 0 } },
       { "id": "const_base", "kind": "constant", "params": { "value": 100, "type": "money" }, "position": { "x": 0, "y": 100 } },
       { "id": "lkp", "kind": "lookup.direct",
-        "params": { "table": { "c102": 1.0, "c202": 1.25 }, "defaultValue": 1.0, "tableName": "Meridian synthetic class factor", "keySource": "class_code", "onMiss": { "mode": "error" } },
+        "params": { "table": { "73911": 1.0, "73912": 1.32 }, "defaultValue": 1.0, "tableName": "class_rel", "keySource": "class_code", "onMiss": { "mode": "error" } },
         "position": { "x": 200, "y": 0 } },
       { "id": "chain", "kind": "chain.mult", "params": { "factorNames": ["class_rel"], "stopOnZero": false }, "position": { "x": 400, "y": 0 } },
       { "id": "out_p", "kind": "output", "params": { "fieldName": "premium", "fieldType": "money" }, "position": { "x": 600, "y": 0 } }
@@ -22,7 +22,7 @@
       { "from": { "node": "chain", "port": "result" }, "to": { "node": "out_p", "port": "value" } }
     ]
   },
-  "externalInputs": { "class_code": "c999" },
+  "externalInputs": { "class_code": "99999" },
   "expectedOutputs": {},
   "expectedRowStatus": "error",
   "expectedIssues": [

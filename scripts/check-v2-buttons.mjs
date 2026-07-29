@@ -29,60 +29,60 @@ const ALLOWLIST = {
   "packages/ui/src/PlanGenesis/PlanGenesis.tsx": {
     max: 2,
     reason:
-      "the two genesis door cards (whole-card selectors using the /new template-radio idiom; the duplicate link is a <Button variant=plain>)",
+      "the two genesis door cards (whole-card selectors, the /new template-radio idiom — Brief 89 R3; the duplicate link is a <Button variant=plain>)",
   },
   "packages/ui/src/DimensionEditor/LevelRowsTable.tsx": {
     max: 1,
-    reason: "per-row hover-reveal remove (inline grid control)",
+    reason: "per-row hover-reveal remove (inline grid control, Brief 66)",
   },
   "packages/ui/src/DimensionEditor/UsedInPanel.tsx": {
     max: 1,
-    reason: "the clickable reference row itself (a list row)",
+    reason: "the clickable reference row itself (a list row, Brief 66)",
   },
   "packages/ui/src/AnalyticsWorkspace/PlanReport.tsx": {
     max: 2,
     reason:
-      "the boundary line's two inline-in-prose text links (Book / connect-in-Inputs, using the AppetiteStatement nudge-link idiom); every standard action is a <Button>",
+      "the boundary line's two inline-in-prose text links (Book / connect-in-Inputs — Brief 93 §1.1.8, the AppetiteStatement nudge-link idiom); every standard action is a <Button>",
   },
   "packages/ui/src/AppetiteStatement/AppetiteStatement.tsx": {
     max: 3,
     reason:
-      "the default-tier seat (a chip button) · its picker option rows · the mis-scope nudge text-link",
+      "the default-tier seat (a chip button) · its picker option rows · the mis-scope nudge text-link (Brief 70 §3)",
   },
   "packages/ui/src/StatementComposer/StatementComposer.tsx": {
     max: 3,
     reason:
-      "the composer's slot seat + option row + the value seat's no-match 'Use …' escape row (the mad-libs grammar's own inline controls)",
+      "the composer's slot seat + option row + the value seat's no-match 'Use …' escape row (the mad-libs grammar's own inline controls, Brief 70 P1 / Brief 89.3 follow-up)",
   },
   "packages/ui/src/dimensionMeta.tsx": {
     max: 1,
     reason:
-      "the DimToken pick-list row (a row selector with the keyboard twin)",
+      "the DimToken pick-list row (a row selector with the keyboard twin, Brief 70 P1)",
   },
   "packages/ui/src/ParametrizeCanvas/ParametrizeCanvas.tsx": {
     max: 3,
     reason:
-      "the RATES-BY axis chip (an inline chip control) · the creation CSV drop-zone (a drop target) · the axis popover's pinned coverage-split row",
+      "the RATES-BY axis chip (an inline chip control) · the creation CSV drop-zone (a drop target) · the axis popover's pinned coverage-split row (Brief 70 §1)",
   },
   "packages/ui/src/BuildUpSheet/BuildUpSheet.tsx": {
     max: 12,
     reason:
-      "the sheet's own inline grammar: dashed inline-value scalar · sample chip · exposure pill · add-step row · picker rows · 4 outline rail rows · the define-a-dimension text link · the 2 picker CREATE rows using the same pick-row idiom — every standard button is a <Button>/<IconButton>",
+      "the sheet's own inline grammar (Brief 70 §2): dashed inline-value scalar · sample chip · exposure pill · add-step row · picker rows · 4 outline rail rows · the define-a-dimension text link · the 2 picker CREATE rows (Brief 89 R5, same pick-row idiom) — every standard button is a <Button>/<IconButton>",
   },
   "packages/ui/src/FactorTableNode/FactorTableNode.tsx": {
     max: 1,
     reason:
-      "the '+ Coverage split' two-line axis-slot affordance (an inline drop-slot control; every standard button here is a <Button>/<IconButton>)",
+      "the '+ Coverage split' two-line axis-slot affordance (an inline drop-slot control, Brief 67 — every standard button here is a <Button>/<IconButton>)",
   },
   "packages/ui/src/FactorTablesTable/FactorTablesTable.tsx": {
     max: 1,
     reason:
-      "the clickable table-name row opener (a row selector; every standard button here is an <IconButton>)",
+      "the clickable table-name row opener (a row selector, Brief 67 — every standard button here is an <IconButton>)",
   },
   "packages/ui/src/inputs-v2/InputsPanelV2.tsx": {
     max: 4,
     reason:
-      "mismatch flag · per-row premium chip · per-policy row (inline expand/signal controls) · collapsed summary bar (whole-bar expand affordance)",
+      "mismatch flag · per-row premium chip · per-policy row (inline expand/signal controls) · act-1 collapsed summary bar (whole-bar expand affordance, Brief 65)",
   },
   "packages/ui/src/inputs-v2/DictionaryTable.tsx": {
     max: 5,
@@ -102,17 +102,17 @@ const ALLOWLIST = {
   "packages/ui/src/PlanShell/PlanStatusChip.tsx": {
     max: 1,
     reason:
-      "the status chip's clickable variant (a chip that navigates to Ship, not a standard button)",
+      "the Brief-84 status chip's clickable variant (a chip that navigates to Ship, not a standard button; replaced PlanLifecycleStepper)",
   },
   "frontend/src/components/AppNavV2/AppNavV2.tsx": {
     max: 2,
     reason:
-      "the ⌘K command-palette search trigger (a search affordance) + the sub-900px 'More' overflow trigger (a nav item wrapping Menu.Trigger, styled as .rater-nav2__item)",
+      "the ⌘K command-palette search trigger (a search affordance) + the sub-900px 'More' overflow trigger (a nav item wrapping Menu.Trigger, styled as .rater-nav2__item — Brief 88 §3.1 F10)",
   },
   "frontend/src/routes/ExhibitsRoute.tsx": {
     max: 9,
     reason:
-      "the exhibit's own grammar: the plan/compare/book pills, the swap, the B/book clears, the rail item, the rail's What-changed opener, and the footer's download-all text action — standard actions (Download CSV) are <Button>",
+      "the exhibit's own grammar (Brief: portfolio-redesign v2 §5.1/§5.4 + P4–P7): the plan/compare/book pills, the swap, the B/book clears, the rail item, the rail's What-changed opener (P7), and the footer's download-all text action — standard actions (Download CSV) are <Button>",
   },
   "frontend/src/routes/exhibits/Overview.tsx": {
     max: 1,
@@ -122,7 +122,7 @@ const ALLOWLIST = {
   "frontend/src/routes/PlanNewRoute.tsx": {
     max: 2,
     reason:
-      "the copy-a-plan picker row (a whole-row selector using the KpisDrawer idiom) + the workbook door card (a whole-card selector using the PlanGenesis idiom); every standard action is a <Button> (note toggle / copy door / back are variant=plain)",
+      "the copy-a-plan picker row (a whole-row selector, the KpisDrawer idiom — Brief 91 §1.2) + the workbook door card (whole-card selector, the PlanGenesis idiom — Brief 92's door promoted 2026-07-15); every standard action is a <Button> (note toggle / copy door / back are variant=plain)",
   },
 };
 
