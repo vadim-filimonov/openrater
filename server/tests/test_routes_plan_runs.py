@@ -188,7 +188,7 @@ def test_book_run_submits_and_lazily_finalizes(
 def test_adhoc_book_run_scores_caller_rows_as_a_book(
     client: TestClient, monkeypatch: Any
 ) -> None:
-    """A CSV handed to the chat door is a real book:
+    """Book-intake §3 — a CSV handed to the chat door is a real BOOK:
     `kind: book` + `rows` scores through the batch path with an
     identity column map and lands in history as a book (never a
     probe), rows independent (row-scoped floor)."""
@@ -614,3 +614,368 @@ def test_list_runs_filters_by_kind_and_status(
         params={"kind": "book", "status": "done"},
     ).json()["runs"]
     assert done_books == []
+
+
+def test_run_rows_csv_export_carries_source_identifiers(
+    client: TestClient, monkeypatch: Any
+) -> None:
+    """FCA fca-2026-07-25 (#S2) — no export existed anywhere (the
+    take-away spreadsheet was assembled by hand), and caller policy
+    identifiers vanished at preflight. The CSV deliverable leads with
+    the caller's own source columns, then rating inputs and verdicts;
+    quoting is RFC-4180 (a comma in a cell survives)."""
+    plan_id = create_plan(client)["rating_plan_id"]
+    client.put(
+        f"/api/v1/plans/{plan_id}/inputs-mapping",
+        json={
+            "mapping": {
+                "source": {
+                    "kind": "csv",
+                    "columns": ["pol"],
+                    "sample_rows": [{"pol": "P-1"}],
+                },
+                "column_map": {},
+            }
+        },
+    )
+    monkeypatch.setattr(
+        "openrater.rates.runs.service.submit_batch",
+        lambda *, request, base_url=None: "job_csv_1",
+    )
+    run_id = client.post(
+        f"/api/v1/plans/{plan_id}/runs", json={"kind": "book"}
+    ).json()["run_id"]
+    monkeypatch.setattr(
+        "openrater.rates.runs.service.fetch_batch_state",
+        lambda *, job_id, base_url=None: {
+            "status": "succeeded",
+            "summary": {"row_count": 2, "grouped": False, "totals": {}},
+        },
+    )
+    client.get(f"/api/v1/plans/{plan_id}/runs/{run_id}")
+
+    page = {
+        "rows": [
+            {
+                "source": {"PolicyNbr": "CM-26-000502", "note": "a, b"},
+                "inputs": {"class_code": "0912"},
+                "views": {"premium": 140, "tier": "standard"},
+                "row_status": "ok",
+            },
+            {
+                "source": {"PolicyNbr": "CM-26-000503", "note": ""},
+                "inputs": {"class_code": "0913"},
+                "views": {"premium": None, "tier": None},
+                "row_status": "error",
+                "rowIssues": [
+                    {
+                        "severity": "error",
+                        "code": "missing_input",
+                        "message": "Required input(s) missing: deductible",
+                    }
+                ],
+            },
+        ],
+        "total": 2,
+        "offset": 0,
+        "nextOffset": None,
+    }
+    monkeypatch.setattr(
+        "openrater.rates.runs.scoring.httpx.get",
+        lambda url, params=None, timeout=None: type(
+            "R", (), {"status_code": 200, "json": lambda self: page}
+        )(),
+    )
+    res = client.get(f"/api/v1/plans/{plan_id}/runs/{run_id}/rows.csv")
+    assert res.status_code == 200, res.text
+    assert res.headers["content-type"].startswith("text/csv")
+    assert "attachment" in res.headers["content-disposition"]
+    lines = res.text.strip().splitlines()
+    assert lines[0] == (
+        "row,PolicyNbr,note,class_code,premium,tier,row_status,first_issue"
+    )
+    # The caller's identifier survives to the deliverable, quoted where
+    # needed; the refused row names its reason.
+    assert lines[1] == '1,CM-26-000502,"a, b",0912,140,standard,ok,'
+    assert lines[2] == (
+        "2,CM-26-000503,,0913,,,error,Required input(s) missing: deductible"
+    )
+
+
+# ---------------------------------------------------------------------------
+# FCA fca-2026-07-25 #28 (finding 78) — the two-run compare. "Book
+# impact requires hand-joining two runs": rerate_book returned one
+# totals block per plan, run detail had no diff, and the audit persona
+# computed the −2.4% headline OUTSIDE the product. The compare joins
+# two DONE runs' rows by the caller's own identifier column, and the
+# server owns the arithmetic (one code path for app + chat).
+# ---------------------------------------------------------------------------
+
+
+def _finalize_book_run(
+    client: TestClient,
+    monkeypatch: Any,
+    plan_id: str,
+    job_id: str,
+) -> str:
+    """POST a book run wired to `job_id` and flip it to done."""
+    monkeypatch.setattr(
+        "openrater.rates.runs.service.submit_batch",
+        lambda *, request, base_url=None: job_id,
+    )
+    run_id = client.post(
+        f"/api/v1/plans/{plan_id}/runs", json={"kind": "book"}
+    ).json()["run_id"]
+    monkeypatch.setattr(
+        "openrater.rates.runs.service.fetch_batch_state",
+        lambda *, job_id, base_url=None: {
+            "status": "succeeded",
+            "summary": {"row_count": 3, "grouped": False, "totals": {}},
+        },
+    )
+    client.get(f"/api/v1/plans/{plan_id}/runs/{run_id}")
+    return run_id
+
+
+def _pages_stub(monkeypatch: Any, pages: dict[str, dict[str, Any]]) -> None:
+    """One httpx.get stub serving each job's canned rows page."""
+
+    def fake_get(url: str, params=None, timeout=None):
+        for job_id, page in pages.items():
+            if f"/score-batch/{job_id}/result" in url:
+                return type(
+                    "R", (), {"status_code": 200, "json": lambda self, p=page: p}
+                )()
+        raise AssertionError(f"unexpected scoring URL {url}")
+
+    monkeypatch.setattr("openrater.rates.runs.scoring.httpx.get", fake_get)
+
+
+def _row(
+    pol: str | None,
+    premium: float | None,
+    tier: str | None = "standard",
+    status: str = "ok",
+    issue: str | None = None,
+) -> dict[str, Any]:
+    r: dict[str, Any] = {
+        "inputs": {"class_code": "0912"},
+        "views": {"premium": premium, "tier": tier},
+        "row_status": status,
+    }
+    if pol is not None:
+        r["source"] = {"PolicyNbr": pol}
+    if issue is not None:
+        r["rowIssues"] = [
+            {"severity": "error", "code": "missing_input", "message": issue}
+        ]
+    return r
+
+
+def test_run_compare_joins_by_source_identity_and_names_the_movers(
+    client: TestClient, monkeypatch: Any
+) -> None:
+    plan_id = create_plan(client)["rating_plan_id"]
+    client.put(
+        f"/api/v1/plans/{plan_id}/inputs-mapping",
+        json={
+            "mapping": {
+                "source": {
+                    "kind": "csv",
+                    "columns": ["PolicyNbr"],
+                    "sample_rows": [{"PolicyNbr": "P-1"}],
+                },
+                "column_map": {},
+            }
+        },
+    )
+    run_a = _finalize_book_run(client, monkeypatch, plan_id, "job_cmp_a")
+    run_b = _finalize_book_run(client, monkeypatch, plan_id, "job_cmp_b")
+    _pages_stub(
+        monkeypatch,
+        {
+            "job_cmp_a": {
+                "rows": [
+                    _row("P-1", 100.0),
+                    _row("P-2", 200.0),
+                    _row("P-3", 300.0),
+                ],
+                "total": 3,
+                "offset": 0,
+                "nextOffset": None,
+            },
+            "job_cmp_b": {
+                "rows": [
+                    _row("P-1", 110.0),
+                    _row(
+                        "P-2",
+                        None,
+                        tier=None,
+                        status="error",
+                        issue="Required input(s) missing: deductible",
+                    ),
+                    _row("P-4", 50.0),
+                ],
+                "total": 3,
+                "offset": 0,
+                "nextOffset": None,
+            },
+        },
+    )
+
+    res = client.get(
+        f"/api/v1/plans/{plan_id}/runs/{run_a}/compare",
+        params={"with_run": run_b},
+    )
+    assert res.status_code == 200, res.text
+    cmp = res.json()
+
+    assert cmp["joined_by_column"] == "PolicyNbr"
+    assert cmp["a"]["run_id"] == run_a and cmp["b"]["run_id"] == run_b
+    counts = cmp["counts"]
+    assert counts["rows_a"] == 3 and counts["rows_b"] == 3
+    assert counts["matched"] == 2
+    assert counts["only_a"] == {"count": 1, "examples": ["P-3"]}
+    assert counts["only_b"] == {"count": 1, "examples": ["P-4"]}
+    # Totals cover matched rows rated on BOTH sides — the honest
+    # impact scope, with the exclusions named in a caveat.
+    assert cmp["totals"] == {
+        "premium_a": 100.0,
+        "premium_b": 110.0,
+        "delta": 10.0,
+        "pct": 10.0,
+    }
+    assert cmp["status_changes"]["rated_to_refused"] == {
+        "count": 1,
+        "examples": ["P-2"],
+    }
+    movers = cmp["movers"]
+    assert len(movers) == 1
+    assert movers[0]["key"] == "P-1"
+    assert movers[0]["delta"] == 10.0
+    assert any("excluded" in c for c in cmp["caveats"])
+
+
+def test_run_compare_falls_back_to_row_ordinal_without_identifiers(
+    client: TestClient, monkeypatch: Any
+) -> None:
+    plan_id = create_plan(client)["rating_plan_id"]
+    client.put(
+        f"/api/v1/plans/{plan_id}/inputs-mapping",
+        json={
+            "mapping": {
+                "source": {
+                    "kind": "csv",
+                    "columns": ["class_code"],
+                    "sample_rows": [{"class_code": "0912"}],
+                },
+                "column_map": {},
+            }
+        },
+    )
+    run_a = _finalize_book_run(client, monkeypatch, plan_id, "job_ord_a")
+    run_b = _finalize_book_run(client, monkeypatch, plan_id, "job_ord_b")
+    _pages_stub(
+        monkeypatch,
+        {
+            "job_ord_a": {
+                "rows": [_row(None, 100.0), _row(None, 200.0)],
+                "total": 2,
+                "offset": 0,
+                "nextOffset": None,
+            },
+            "job_ord_b": {
+                "rows": [_row(None, 100.0), _row(None, 240.0)],
+                "total": 2,
+                "offset": 0,
+                "nextOffset": None,
+            },
+        },
+    )
+    res = client.get(
+        f"/api/v1/plans/{plan_id}/runs/{run_a}/compare",
+        params={"with_run": run_b},
+    )
+    assert res.status_code == 200, res.text
+    cmp = res.json()
+    assert cmp["joined_by_column"] is None
+    assert cmp["counts"]["matched"] == 2
+    assert cmp["totals"]["premium_a"] == 300.0
+    assert cmp["totals"]["premium_b"] == 340.0
+    assert cmp["movers"][0]["key"] == "row 2"
+    assert cmp["movers"][0]["delta"] == 40.0
+    # Ordinal joining is honest about what it is.
+    assert any("ordinal" in c.lower() or "position" in c.lower() for c in cmp["caveats"])
+
+
+def test_run_compare_reaches_across_plans_and_discloses_different_books(
+    client: TestClient, monkeypatch: Any
+) -> None:
+    """The audit's own scenario: the SAME book through two plans
+    (rerate_book on each) — the compare must reach across plans; and
+    when the two runs scored DIFFERENT books, that stops being an
+    impact study, so the compare says so."""
+    plan_a = create_plan(client)["rating_plan_id"]
+    plan_b = create_plan(client, display_name="Other plan")["rating_plan_id"]
+    for pid in (plan_a, plan_b):
+        client.put(
+            f"/api/v1/plans/{pid}/inputs-mapping",
+            json={
+                "mapping": {
+                    "source": {
+                        "kind": "csv",
+                        "columns": ["PolicyNbr"],
+                        "sample_rows": [
+                            {"PolicyNbr": "P-1"} if pid == plan_a else {"PolicyNbr": "P-9"}
+                        ],
+                    },
+                    "column_map": {},
+                }
+            },
+        )
+    run_a = _finalize_book_run(client, monkeypatch, plan_a, "job_x_a")
+    run_b = _finalize_book_run(client, monkeypatch, plan_b, "job_x_b")
+    _pages_stub(
+        monkeypatch,
+        {
+            "job_x_a": {
+                "rows": [_row("P-1", 100.0)],
+                "total": 1,
+                "offset": 0,
+                "nextOffset": None,
+            },
+            "job_x_b": {
+                "rows": [_row("P-1", 95.0)],
+                "total": 1,
+                "offset": 0,
+                "nextOffset": None,
+            },
+        },
+    )
+    res = client.get(
+        f"/api/v1/plans/{plan_a}/runs/{run_a}/compare",
+        params={"with_run": run_b, "with_plan": plan_b},
+    )
+    assert res.status_code == 200, res.text
+    cmp = res.json()
+    assert cmp["b"]["rating_plan_id"] == plan_b
+    assert cmp["totals"]["delta"] == -5.0
+    # The two runs pinned different book hashes → named caveat.
+    assert any("different books" in c for c in cmp["caveats"])
+
+
+def test_run_compare_refuses_a_sample_run_by_name(
+    client: TestClient, monkeypatch: Any
+) -> None:
+    plan_id = create_plan(client)["rating_plan_id"]
+    _stub_scoring(monkeypatch, SAMPLE_RESULT)
+    sample = client.post(
+        f"/api/v1/plans/{plan_id}/runs",
+        json={"kind": "sample", "inputs": {"class_code": "62114"}},
+    ).json()["run_id"]
+    res = client.get(
+        f"/api/v1/plans/{plan_id}/runs/{sample}/compare",
+        params={"with_run": sample},
+    )
+    assert res.status_code == 422
+    assert res.json()["error"]["code"] == "not_a_book_run"

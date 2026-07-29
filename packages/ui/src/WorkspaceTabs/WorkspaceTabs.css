@@ -52,8 +52,17 @@
    * margin + padding: the content edge (and labels) stay put, but the first/last
    * tabs' fills now render fully into the gutter — the same 16px the box extends
    * past the label on every other tab. */
-  margin-inline: calc(-1 * var(--rater-s-16));
-  padding-inline: var(--rater-s-16);
+  /* FCA #33 (finding 16) — bleed by AT MOST the page gutter: the
+   * fixed 16px overhung the 12px small-viewport gutter by 4px per
+   * side (a permanent horizontal scrollbar on every plan screen).
+   * Pages that don't define --rater-page-gutter keep the 16px. */
+  margin-inline: calc(
+    -1 * min(var(--rater-s-16), var(--rater-page-gutter, var(--rater-s-16)))
+  );
+  padding-inline: min(
+    var(--rater-s-16),
+    var(--rater-page-gutter, var(--rater-s-16))
+  );
 }
 
 .rater-workspace-tabs__list > .rater-workspace-tabs__tab:first-child {
@@ -165,7 +174,7 @@
   color: var(--rater-text-faint);
 }
 
-/*  — the right group's hairline + eyebrow: the muted tint
+/* MVP-031f — the right group's hairline + eyebrow: the muted tint
  * reads as a NAMED group, not disabled tabs. */
 .rater-workspace-tabs__group {
   display: inline-flex;

@@ -3,8 +3,8 @@
  *
  * The Inputs workspace runs `executePlanBatch` over a user-uploaded
  * CSV; the Analytics workspace needs that output to drive the
- * chart + map. Until a backend cache is available, we plumb the result
- * through `localStorage` keyed by plan id —
+ * chart + map. Until a real backend cache lands (post-detachment),
+ * we plumb the result through `localStorage` keyed by plan id —
  * matches the existing per-plan persistence convention (dimensions,
  * factor tables, etc per ADR-0027).
  *
@@ -23,7 +23,7 @@
  *     surfaces as "no data" rather than crashing the chart.
  *
  * Storage key: `raterlabs:analytics:scored-result:{planId}` — namespaced
- * to avoid collisions with other OpenRater surfaces and make a future cleanup
+ * to avoid collisions with other Labs apps + makes a future cleanup
  * sweep trivial.
  */
 
@@ -784,10 +784,19 @@ export function runRowsToScoredBatchResult(args: {
       (typeof r.views?.tier === "string" ? r.views.tier : undefined);
     const outputs = r.outputs ?? {};
     const viewsPremium = r.views?.premium;
+    // FCA fca-2026-07-25 — a composed row (views.premiumBasis
+    // "composed": the book worker's per-row tail/floor composition)
+    // deliberately keeps outputs at the PRE-floor chain total for
+    // quote parity; the filed number lives in views.premium. The
+    // premium column must serve the filed number, so the composed
+    // basis overrides an engine output of the same name — otherwise
+    // Analytics sums the exact pre-floor figure the ledger and totals
+    // stopped serving.
+    const composedBasis = r.views?.premiumBasis === "composed";
     const extra: Record<string, unknown> = {
       ...(tier != null ? { eligibility_tier: tier } : {}),
       ...(r.row_status === "error" ? { row_status: r.row_status } : {}),
-      ...(!(args.premiumColumn in outputs) &&
+      ...((!(args.premiumColumn in outputs) || composedBasis) &&
       r.row_status !== "error" &&
       typeof viewsPremium === "number" &&
       Number.isFinite(viewsPremium)

@@ -21,7 +21,7 @@
  *   - The UI can re-sort by topological order when it has the plan
  *     context; the substrate gives a deterministic ordering.
  *
- * Pure.
+ * Pure. See `docs/design-briefs/comparison-primitive.md` §6.
  */
 
 import type { TraceEntry } from "../plan-types";

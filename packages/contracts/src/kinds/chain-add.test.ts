@@ -67,14 +67,14 @@ describe("ChainAddKind", () => {
     ).toBe("100 + 50 (load) − 25 (disc) − 10 (rebate) = 115");
   });
 
-  it("explainStep treats missing base as 0", () => {
+  it("explainStep treats missing base as 0 (and hides the empty seed — FCA #34)", () => {
     expect(
       ChainAddKind.explainStep!(
         { addends: [10, 20, 30] },
         {},
         { result: 60 },
       ),
-    ).toBe("0 + 10 + 20 + 30 = 60");
+    ).toBe("10 + 20 + 30 = 60");
   });
 
   it("explainStep flags the no-addends case", () => {
@@ -87,3 +87,39 @@ describe("ChainAddKind", () => {
     ).toBe("100 (no addends) → 100");
   });
 });
+
+  // FCA #34 (findings 25/53) — the package line read "0 + 822 + 211 =
+  // 1033": the zero seed is an accumulator detail, not arithmetic the
+  // manual shows. And on failed rows "0 − NaN − NaN = NaN" (NaN >= 0
+  // is false, so NaN addends drew MINUS signs). The seed is dropped
+  // when it adds nothing and unresolved addends are named.
+  it("explainStep drops the zero seed", () => {
+    expect(
+      ChainAddKind.explainStep!(
+        { base: 0, addends: [822, 211] },
+        {},
+        { result: 1033 },
+      ),
+    ).toBe("822 + 211 = 1033");
+  });
+
+  it("explainStep keeps a real base", () => {
+    expect(
+      ChainAddKind.explainStep!(
+        { base: 100, addends: [22] },
+        {},
+        { result: 122 },
+      ),
+    ).toBe("100 + 22 = 122");
+  });
+
+  it("explainStep names unresolved addends instead of − NaN", () => {
+    const line = ChainAddKind.explainStep!(
+      { base: 0, addends: [Number.NaN, 527] },
+      { addendNames: ["building", "liability"] },
+      { result: Number.NaN },
+    );
+    expect(line).not.toContain("NaN");
+    expect(line).toContain("building");
+    expect(line).toContain("unresolved");
+  });

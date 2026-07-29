@@ -52,8 +52,8 @@ describe("isIrpmSourceSpec", () => {
   });
 
   it("validates the connector source by its required fields; the model arm is retired (S1)", () => {
-    // A model source is no longer structurally valid, even when fully formed
-    // (the resolver refuses it by name).
+    // Detachment Brief 1 §4 S1 — a model source is never structurally
+    // valid anymore, even fully-formed (the resolver refuses it by name).
     expect(isIrpmSourceSpec({ from: "model", model_id: "m1", version: "1.0.0" })).toBe(false);
     expect(isIrpmSourceSpec({ from: "model", model_id: "m1" })).toBe(false);
     // Connector pins a version too (62.6 — "no floating latest").
@@ -210,9 +210,9 @@ describe("makeIrpmAdjustmentResolver", () => {
   });
 });
 
-// ── retired model arm ──────────────────────────────────────
+// ── retired model arm (Detachment Brief 1 §4 S1) ─────────────────────
 //
-// Regression coverage: a legacy `{from:"model"}`
+// The regression suite the brief requires: a legacy `{from:"model"}`
 // source — persisted before the cut, or hand-authored — is refused BY
 // NAME with the canonical message, at both the resolver and the
 // resolver-factory seams. Never a silent no-op, never identity.

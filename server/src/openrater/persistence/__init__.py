@@ -12,7 +12,8 @@ Two modules:
                 migration runner that applies every `NNN_*.sql` file in
                 `migrations/` exactly once.
   · dialect   — SQL dialect abstraction (SQLite today, Postgres later).
-                Pure stdlib with no other OpenRater dependencies.
+                Ported verbatim from the original prototype; pure stdlib + no other
+                openrater dependencies.
 """
 
 from openrater.persistence.db import Database, MigrationError

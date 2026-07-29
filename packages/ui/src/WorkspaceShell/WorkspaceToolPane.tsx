@@ -22,6 +22,8 @@
  *       …
  *     </WorkspaceToolPane.Section>
  *   </WorkspaceToolPane>
+ *
+ * Per docs/design-briefs/24f-workspace-shell.md §Tool pane.
  */
 
 import type {

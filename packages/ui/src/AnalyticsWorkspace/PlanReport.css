@@ -42,7 +42,7 @@
 }
 
 /* Dot separators between meta pieces — grammar, not markup. */
-.rater-report__meta > *:not(last-child)::after {
+.rater-report__meta > *:not(:last-child)::after {
   content: "·";
   margin-left: var(--rater-s-8);
   color: var(--rater-text-faint);
@@ -424,7 +424,7 @@
   .rater-report__head button {
     display: none;
   }
-  /*  — INTERACTIVE chrome never prints: the rate card's axis
+  /* MVP-031b — INTERACTIVE chrome never prints: the rate card's axis
    * pickers, Export CSV, and every button inside the report were
    * printing as ghost chrome. Selects/buttons on paper are dead
    * controls, not content. */

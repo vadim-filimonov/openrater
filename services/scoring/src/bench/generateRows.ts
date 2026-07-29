@@ -2,7 +2,7 @@
  * Deterministic BOP-shaped row generator for the benchmark.
  *
  * Shaped to the V49 "exposure-rated-tower" plan (territory ×
- * prop_rate_number lookups + exposure÷divisor + filed-rate rounding — the E13
+ * prop_rate_number lookups + exposure÷divisor + ISO rounding — the E13
  * path): each row carries `territory`, `prop_rate_number`,
  * `building_limit`. A fixed seed → reproducible books across runs.
  */
@@ -24,7 +24,7 @@ function mulberry32(seed: number): () => number {
   };
 }
 
-const TERRITORIES = ["t1", "t2", "t3", "t4", "t5"] as const;
+const TERRITORIES = ["701", "702", "703", "704", "705"] as const;
 const RATE_NUMBERS = ["07", "08", "09", "10", "11"] as const;
 
 export function generateRows(count: number, seed = 1): BenchRow[] {

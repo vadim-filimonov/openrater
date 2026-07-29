@@ -1,12 +1,12 @@
 /**
- * Territory CSV schema.
+ * Territory CSV schema — Brief 20 §6 + P-TM6 + ADR-0017.
  *
  * ZIP-to-territory CSV imports are the dominant authoring path —
- * Rating organizations and consultants often ship territory schemas as flat CSVs:
+ * ISO + consultants ship territory schemas as flat CSVs:
  *
  *   zip,territory_code,citation_rule,citation_page
- *   z101,t1,Meridian Rule MS-R11,p.107
- *   z102,t1,Meridian Rule MS-R11,p.107
+ *   53201,1,ISO BOP §11.A,p.107
+ *   53202,1,ISO BOP §11.A,p.107
  *   ...
  *
  * The shape is one row per ZIP (NOT one row per territory) so a
@@ -14,7 +14,7 @@
  * `groupByTerritoryCode` to fold the flat list back into the
  * Territory[] schema shape.
  *
- * Required columns = zip, territory_code; optional
+ * Per ADR-0017: required columns = zip, territory_code; optional
  * columns = citation_rule, citation_page, factor. Canonical column
  * order = `zip, territory_code, factor, citation_rule, citation_page`.
  */

@@ -199,13 +199,44 @@ describe("managed runtime", () => {
     expect(status.detail).toMatch(/failed to boot/i);
   });
 
-  it("external status names the next action when nothing is listening", async () => {
+  it("external down-message leads with the HUMAN step and FORBIDS starting a server (FCA PRE-5 + #18)", async () => {
+    // The reader is an AI assistant with a shell; the user hearing
+    // the relay is an actuary. The old "Start yours" hint talked the
+    // assistant into booting a stray server against the real user's
+    // data directory (H-5), and the pre-#18 lead handed a
+    // non-engineer environment variables. The message must name the
+    // configured backend, give a step a non-engineer can take (ask
+    // whoever set it up), and explicitly warn AGAINST starting a
+    // replacement.
     process.env.RATER_API_URL = "http://127.0.0.1:1"; // nothing there
     const config = configFromEnv();
     const status = await runtimeStatus(config);
     expect(status.mode).toBe("external");
     expect(status.healthy).toBe(false);
-    expect(status.detail).toMatch(/Start yours|desktop bundle/);
+    expect(status.detail).toContain("http://127.0.0.1:1");
+    expect(status.detail).toMatch(/isn't running right now/);
+    expect(status.detail).toMatch(/ask whoever set up OpenRater/i);
+    expect(status.detail).toMatch(/do not start a new server/i);
+    expect(status.detail).not.toMatch(/Start yours/);
+    // No nudge toward replacing the configured backend either.
+    expect(status.detail).not.toMatch(/install the desktop bundle/i);
+    // FCA #18 — external mode: the app link outlives the chat, and
+    // the payload says so.
+    expect(status.app_lifecycle).toMatch(/independent of this chat/i);
+  });
+
+  it("managed status carries the app-lifecycle sentence (FCA #18 — the dead-bookmark moment)", async () => {
+    // Finding 84: the engine + app are children of the chat host; a
+    // bookmarked app_url opened cold after the host quit is a dead
+    // page nothing product-authored owned. The doctor's payload now
+    // owns it: the chat is the door, a message relights the link.
+    managedEnv();
+    const config = configFromEnv();
+    const status = await runtimeStatus(config);
+    expect(status.mode).toBe("managed");
+    expect(status.app_lifecycle).toMatch(/only while the chat host is open/i);
+    expect(status.app_lifecycle).toMatch(/send any OpenRater message/i);
+    expect(status.app_lifecycle).toMatch(/bookmark alone is not/i);
   });
 });
 
@@ -356,7 +387,7 @@ describe("sampleAssets (the guided tour's content)", () => {
   });
 });
 
-describe("degraded runtime", () => {
+describe("degraded runtime (MVP-001/MVP-015)", () => {
   it("a dead scoring sidecar degrades the boot instead of killing it", async () => {
     managedEnv();
     process.env.RATER_SCORING_ENTRY = brokenScoringEntry;

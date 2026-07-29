@@ -36,7 +36,9 @@
  * from the browser, the batch runner, and a portable conformance vector
  * alike.
  *
- * Pure. No React and no DOM.
+ * Pure. No React, no DOM. See
+ * `docs/adr/0034-policy-account-composition.md` +
+ * `docs/adr/0042-policy-adjustments-and-irpm-resolver.md`.
  */
 
 import type { CompiledPlan, RunOptions } from "./plan-types";

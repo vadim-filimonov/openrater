@@ -76,7 +76,7 @@ export interface OverviewSectionProps {
     readonly onView: () => void;
     /** Brief 92.R — the revision door ("Re-ingest a revised workbook"). */
     readonly onReingest?: () => void;
-    /** Drift tracking: in-app edits since the build. The
+    /** Drift honesty (MVP-008): in-app edits since the build. The
      *  chip renders warn-tinted with the count; title carries the
      *  first few changes; click opens the build report. */
     readonly edits?: {

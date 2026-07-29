@@ -8,8 +8,8 @@
  * aggregated premium in order. The floor is pinned last (a floor that
  * isn't last is almost always a bug → a warning). The schedule-rating row
  * carries the 62.2 IRPM source (literal / column / connector; the model
- * source is retired, so scores arrive as declared inputs read by the
- * `column` source).
+ * source is retired — Detachment Brief 1 §4 S1 — scores arrive as
+ * declared inputs read by the `column` source).
  *
  * Controlled + pure: takes `adjustments` + `onChange`. No premium math, no
  * product branch, no I/O. Matches mockup F3/F4. The mount into the plan's

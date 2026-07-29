@@ -8,11 +8,11 @@ import { PremiumBuildUp } from "./PremiumBuildUp";
 import type { AdjustmentStep, PolicyResult } from "@openrater/contracts";
 
 /** A full sourced + guarded tail: subtotal 1000 → IRPM −10% (column) →
- *  first-term credit ×0.9 → new-biz (guard-skipped) → +$18 terrorism → floor (not
+ *  Pioneer ×0.9 → new-biz (guard-skipped) → +$18 terrorism → floor (not
  *  binding) = 828. */
 const TAIL: AdjustmentStep[] = [
   { id: "irpm", kind: "schedule_rating", applied: true, before: 1000, factor_or_delta: 0.9, after: 900, detail: "-10.0% (cap ±25%)", provenance: { source: "column" } },
-  { id: "first_term_credit", kind: "package_factor", applied: true, before: 900, factor_or_delta: 0.9, after: 810, detail: "× 0.9" },
+  { id: "pioneer", kind: "package_factor", applied: true, before: 900, factor_or_delta: 0.9, after: 810, detail: "× 0.9" },
   { id: "newbiz", kind: "package_factor", applied: false, before: 810, factor_or_delta: 1, after: 810, detail: "not applied — guard is_new_business eq true not met" },
   { id: "terror", kind: "endorsement", applied: true, before: 810, factor_or_delta: 18, after: 828, detail: "+ $18" },
   { id: "min", kind: "minimum_premium", applied: false, before: 828, factor_or_delta: 0, after: 828, detail: "floor $500 not binding" },
@@ -44,7 +44,7 @@ describe("PremiumBuildUp", () => {
     const { container } = render(<PremiumBuildUp result={result()} />);
     expect(screen.getByText("$1,000")).toBeTruthy(); // subtotal
     expect(screen.getByText("-10.0% (cap ±25%)")).toBeTruthy(); // IRPM detail
-    expect(screen.getByText("× 0.9")).toBeTruthy(); // first-term credit
+    expect(screen.getByText("× 0.9")).toBeTruthy(); // Pioneer
     expect(screen.getByText("+ $18")).toBeTruthy(); // terrorism
     expect(screen.getByText("floor $500 not binding")).toBeTruthy(); // min
     expect(screen.getByText(/filed premium/i)).toBeTruthy();
@@ -60,9 +60,9 @@ describe("PremiumBuildUp", () => {
     expect(screen.getByText("Schedule rating")).toBeTruthy(); // kind label fallback
     expect(screen.getByText("Endorsement")).toBeTruthy();
     rerender(
-      <PremiumBuildUp result={result()} labels={{ irpm: "IRPM", first_term_credit: "First-term credit", terror: "Terrorism" }} />,
+      <PremiumBuildUp result={result()} labels={{ irpm: "IRPM", pioneer: "Pioneer credit", terror: "Terrorism" }} />,
     );
-    expect(screen.getByText("First-term credit")).toBeTruthy();
+    expect(screen.getByText("Pioneer credit")).toBeTruthy();
     expect(screen.getByText("Terrorism")).toBeTruthy();
     expect(container).toBeTruthy();
   });

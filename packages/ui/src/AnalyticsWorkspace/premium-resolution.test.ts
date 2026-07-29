@@ -1,6 +1,6 @@
 /**
  * premium-resolution — the ONE answer to "what does this plan call its
- * premium?", pinned at the @openrater/ui layer.
+ * premium?", pinned at the labs-ui layer.
  *
  * These cases mirror the scoring service's `totalLessPremium.test.ts`
  * end-to-end expectations. That is the point: the resolver is shared

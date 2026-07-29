@@ -9,9 +9,9 @@ import type { TraceEntry } from "@openrater/contracts";
 
 const SIMPLE_ENTRY: TraceEntry = {
   kindId: "lookup.classification",
-  inputs: { class_code: "c101" },
+  inputs: { class_code: "73912" },
   outputs: { value: 1.32 },
-  explanation: "Classified c101 (Meridian Recreation) → 1.32",
+  explanation: "Classified 73912 (Bowling Centers) → 1.32",
   citation: "ISO BP-2024 §3.4",
 };
 
@@ -145,7 +145,7 @@ describe("<TraceStep>", () => {
   it("renders explanation line", () => {
     render(<TraceStep nodeId="cls" entry={SIMPLE_ENTRY} />);
     expect(
-      screen.getByText("Classified c101 (Meridian Recreation) → 1.32"),
+      screen.getByText("Classified 73912 (Bowling Centers) → 1.32"),
     ).toBeInTheDocument();
   });
 

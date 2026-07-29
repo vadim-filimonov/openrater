@@ -87,12 +87,12 @@ describe("<OverviewSection>", () => {
         lastTest={null}
         versions={[]}
         facts={[{ label: "Product", value: "Businessowners" }]}
-        note="Nebraska BOP rate revision for H2 2026."
+        note="Wisconsin BOP rate revision for H2 2026."
       />,
     );
     expect(screen.getByText("Note")).toBeInTheDocument();
     expect(
-      screen.getByText("Nebraska BOP rate revision for H2 2026."),
+      screen.getByText("Wisconsin BOP rate revision for H2 2026."),
     ).toBeInTheDocument();
     expect(container.querySelector(".rater-overview__fact--note")).not.toBeNull();
 

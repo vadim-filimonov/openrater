@@ -131,6 +131,32 @@ export const ModifierScheduleKind: BlockKind<
     },
   },
   defaultSize: "regular",
+  // FCA #23 — a bare-number application on a MULTI-category schedule
+  // can't be attributed; the zero default must be visible, never
+  // silent (six audited rows lost their filed IRPM without a word).
+  collectRowIssues: (inputs, params) => {
+    const raw = inputs.application as unknown;
+    const n =
+      typeof raw === "number"
+        ? raw
+        : typeof raw === "string"
+          ? Number(raw)
+          : Number.NaN;
+    if (!Number.isFinite(n)) return undefined;
+    if (params.schedule.categories.length <= 1) return undefined;
+    return [
+      {
+        severity: "warning",
+        code: "schedule_application_unattributable",
+        message:
+          `Schedule \`${params.schedule.schedule_id}\` received a bare ` +
+          `percentage (${n}) but has ${params.schedule.categories.length} ` +
+          "categories — the value can't be attributed, so NO modifier " +
+          "applied. Supply the per-category JSON envelope.",
+        detail: { field: `schedule_app_${params.schedule.schedule_id}` },
+      },
+    ];
+  },
   execute: (inputs, params) => {
     const { schedule } = params;
     // The application reaches book runs as a raw CSV cell — a JSON
@@ -149,8 +175,42 @@ export const ModifierScheduleKind: BlockKind<
             }
           })()
         : (rawApplication as ScheduleApplication | undefined);
+    // FCA fca-2026-07-25 #23 (finding 13) — a real extract's IRPM
+    // column is a BARE PERCENTAGE (-25 … +20), not the JSON envelope.
+    // It used to parse as a number, fail the {values} shape test, and
+    // degrade to default_zero — six audited rows' filed credits/debits
+    // silently unapplied. A bare number is UNAMBIGUOUS when the
+    // schedule has exactly one category: promote it. With multiple
+    // categories the attribution is genuinely unknowable — keep the
+    // zero default but SAY SO (a row issue below), never silence.
+    const bareNumber =
+      typeof parsedApplication === "number" &&
+      Number.isFinite(parsedApplication)
+        ? (parsedApplication as number)
+        : typeof rawApplication === "number" &&
+            Number.isFinite(rawApplication)
+          ? rawApplication
+          : null;
+    const promoted: ScheduleApplication | undefined =
+      bareNumber !== null && schedule.categories.length === 1
+        ? {
+            schedule_id: schedule.schedule_id,
+            values: {
+              [schedule.categories[0]!.category_id]: {
+                value_pct: bareNumber,
+                reasoning:
+                  "Bare percentage from the mapped book column (single-category schedule).",
+                // The caller asserted the value (the mapped column IS
+                // the underwriter's judgment); default_zero would
+                // misattribute an applied modifier as "none supplied".
+                source: "underwriter" as const,
+              },
+            },
+          }
+        : undefined;
     const application =
-      parsedApplication &&
+      promoted ??
+      (parsedApplication &&
       typeof parsedApplication === "object" &&
       parsedApplication.values &&
       typeof parsedApplication.values === "object"
@@ -158,7 +218,7 @@ export const ModifierScheduleKind: BlockKind<
         : {
             schedule_id: schedule.schedule_id,
             values: {},
-          };
+          });
     const tier = normalizeTier(inputs.tier);
     const cats: AppliedScheduleCategory[] = [];
     let sum = 0;

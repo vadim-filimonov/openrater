@@ -11,21 +11,21 @@ import { LevelMappingRow } from "./LevelMappingRow";
 describe("LevelMappingRow — categorical", () => {
   const categoricalLevel = {
     kind: "categorical" as const,
-    id: "c102",
-    label: "Meridian Hospitality — full service",
-    aliases: ["Meridian Cafe", "Meridian Cafe - dine-in"],
+    id: "71641",
+    label: "Restaurants — full service",
+    aliases: ["Restaurant", "Restaurant - dine-in"],
   };
 
   it("renders the id + label + alias chip-cloud", () => {
     render(
       <LevelMappingRow level={categoricalLevel} onChange={() => {}} />,
     );
-    expect(screen.getByText("c102")).toBeInTheDocument();
+    expect(screen.getByText("71641")).toBeInTheDocument();
     expect(
-      screen.getByDisplayValue("Meridian Hospitality — full service"),
+      screen.getByDisplayValue("Restaurants — full service"),
     ).toBeInTheDocument();
-    expect(screen.getByText("Meridian Cafe")).toBeInTheDocument();
-    expect(screen.getByText("Meridian Cafe - dine-in")).toBeInTheDocument();
+    expect(screen.getByText("Restaurant")).toBeInTheDocument();
+    expect(screen.getByText("Restaurant - dine-in")).toBeInTheDocument();
   });
 
   it("editing the label fires onChange", () => {
@@ -49,11 +49,11 @@ describe("LevelMappingRow — categorical", () => {
     const chipInput = screen.getByTestId(
       "rater-level-mapping-row-aliases-input",
     );
-    fireEvent.change(chipInput, { target: { value: "Meridian Bistro" } });
+    fireEvent.change(chipInput, { target: { value: "Pizzeria" } });
     fireEvent.keyDown(chipInput, { key: "Enter" });
     expect(onChange).toHaveBeenCalledWith({
       ...categoricalLevel,
-      aliases: ["Meridian Cafe", "Meridian Cafe - dine-in", "Meridian Bistro"],
+      aliases: ["Restaurant", "Restaurant - dine-in", "Pizzeria"],
     });
   });
 
@@ -67,7 +67,7 @@ describe("LevelMappingRow — categorical", () => {
     );
     expect(onChange).toHaveBeenCalledWith({
       ...categoricalLevel,
-      aliases: ["Meridian Cafe - dine-in"],
+      aliases: ["Restaurant - dine-in"],
     });
   });
 

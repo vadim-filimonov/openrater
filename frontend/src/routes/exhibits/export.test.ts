@@ -1,5 +1,5 @@
 /**
- * Exhibits export — rows + CSV tests (current Exhibits design).
+ * Exhibits export — rows + CSV tests (Brief: portfolio-redesign v2, P4).
  */
 
 import { describe, expect, it } from "vitest";

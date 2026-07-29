@@ -80,6 +80,43 @@ def _tier_of(response: dict[str, Any]) -> str | None:
     return None
 
 
+def _declared_gate_rule_ids(parsed: ParsedWorkbook) -> list[str]:
+    """The authored eligibility rules (gates sheet, minus the
+    `__default__` row), in sheet order. FCA #19 — these are what
+    vector coverage must exercise; a rule no case fires is invisible
+    to an all-green verdict."""
+    from openrater.rates.ingest.model import DEFAULT_KEY
+
+    rows = parsed.gates.rows if parsed.gates is not None else []
+    out: list[str] = []
+    for row in rows:
+        rule_id = str(row.get("rule_id"))
+        if rule_id and rule_id != DEFAULT_KEY and rule_id not in out:
+            out.append(rule_id)
+    return out
+
+
+def _fired_gate_rules(response: dict[str, Any]) -> set[str]:
+    """Rule ids the ENGINE actually fired for this case, read from the
+    run's own trace (the eligibility.gate node's matched_rule_id) —
+    never a re-implemented comparator (Law 1)."""
+    trace = response.get("trace")
+    fired: set[str] = set()
+    if not isinstance(trace, dict):
+        return fired
+    for entry in trace.values():
+        if not isinstance(entry, dict):
+            continue
+        if entry.get("kindId") != "eligibility.gate":
+            continue
+        outputs = entry.get("outputs")
+        if isinstance(outputs, dict):
+            matched = outputs.get("matched_rule_id")
+            if isinstance(matched, str) and matched:
+                fired.add(matched)
+    return fired
+
+
 def run_vectors(
     *, db: Database, rating_plan_id: str, parsed: ParsedWorkbook
 ) -> VectorsSummary:
@@ -90,6 +127,10 @@ def run_vectors(
     columns = parsed.test_cases.columns  # type: ignore[union-attr]
     expected_cols = [c for c in columns if c.startswith("expected_")]
     total_field = _total_field(parsed)
+    # FCA #19 — coverage bookkeeping: which authored eligibility rules
+    # does this case set actually exercise?
+    declared_rules = _declared_gate_rule_ids(parsed)
+    fired_rules: set[str] = set()
 
     body = compose_plan_body(db=db, plan_id=rating_plan_id)
     checks: list[VectorResult] = []
@@ -142,6 +183,8 @@ def run_vectors(
                 )
             mismatched += len(expected_cols)
             continue
+
+        fired_rules |= _fired_gate_rules(response)
 
         outputs = response.get("outputs") if isinstance(response.get("outputs"), dict) else {}
         for col in expected_cols:
@@ -213,12 +256,32 @@ def run_vectors(
                 )
             )
 
+    # FCA #19 — the coverage verdict. An all-green scorecard whose
+    # cases never fire an authored rule proves nothing about that rule
+    # (the audited plan reported 25/25 over a DEAD knock-out); when
+    # rules go unexercised, the summary says so by name.
+    exercised = [r for r in declared_rules if r in fired_rules]
+    unexercised = [r for r in declared_rules if r not in fired_rules]
+    detail = None
+    if unexercised:
+        n, m = len(unexercised), len(declared_rules)
+        detail = (
+            f"{n} of {m} eligibility rule{'s' if m != 1 else ''} never "
+            f"fire{'s' if n == 1 else ''} in any test case "
+            f"({', '.join(unexercised)}) — an all-green scorecard "
+            f"proves nothing about {'them' if n != 1 else 'it'}. Add a "
+            f"test case that triggers each rule."
+        )
     return VectorsSummary(
         status="ran",
+        detail=detail,
         total_cases=len(cases),
         checks=checks,
         cases=case_records,
         matched=matched,
         near=near,
         mismatched=mismatched,
+        gate_rules_total=len(declared_rules),
+        gate_rules_exercised=len(exercised),
+        unexercised_gate_rules=unexercised,
     )

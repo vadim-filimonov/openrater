@@ -10,19 +10,19 @@
  * Three effect kinds share the editor (Brief 39 §−1 Q4 lock):
  *
  *   · `factor`   — multiplies the chain premium by N
- *                  (e.g., MS 10 03 Liquor liability ×1.15)
+ *                  (e.g., BP 04 39 Liquor liability ×1.15)
  *   · `additive` — adds a flat $ amount to premium
- *                  (e.g., MS 10 05 Wind/hail +$250)
+ *                  (e.g., BP 05 21 Wind/hail +$250)
  *   · `sublimit` — caps a named coverage at $N; premium
  *                  passes through unchanged
- *                  (e.g., MS 10 02 Peak-limit endorsement)
+ *                  (e.g., BP 04 30 Peak-limit endorsement)
  *
  * All three substrate kinds are shipped in PR 39.1 with V17
  * conformance covering chained attachment.
  *
  * Form-number authoring (Brief 39 §−1 Q9 lock):
  *   Free text input + a Suggested dropdown sourced from a static
- *   fixture list of fictional Meridian BOP forms (MS 10 01, MS 10 02,
+ *   fixture list of well-known ISO BOP forms (BP 04 30, BP 14 87,
  *   etc.). Real vocabulary integration via Class Translator lands
  *   in v2.
  *
@@ -54,7 +54,7 @@ import "./EndorsementEditor.css";
 /**
  * Comparison operators for the trigger condition. Matches the
  * `EligibilityOp` set in @openrater/contracts 1:1; redeclared locally
- * to keep @openrater/ui independent of contracts at the type level
+ * to keep labs-ui independent of contracts at the type level
  * (same convention as FilterRuleEditor).
  */
 export type EndorsementOp =
@@ -180,7 +180,7 @@ export interface EndorsementTriggerRow {
 
 export interface EndorsementDraft {
   readonly endorsement_id: string;
-  /** Filing form number or custom string (e.g., "MS 10 02"). */
+  /** ISO form number or custom string (e.g., "BP 04 30"). */
   readonly form_number: string;
   readonly display_name: string;
   /**
@@ -250,7 +250,7 @@ export interface EndorsementEditorProps {
    * when non-empty (Brief 39 §−1 Q3 STRICT lock).
    */
   readonly unmappedReferences?: readonly string[];
-  /** Optional form-number suggestion list. Defaults to Meridian BOP fixtures. */
+  /** Optional form-number suggestion list. Defaults to ISO BOP fixtures. */
   readonly formSuggestions?: readonly EndorsementFormSuggestion[];
   readonly onChange: (next: EndorsementDraft) => void;
   readonly onSave?: () => void;
@@ -388,68 +388,68 @@ export function getReferencedFields(
 }
 
 // ─────────────────────────────────────────────────────────────────
-// Default form suggestions (fictional Meridian BOP fixtures)
+// Default form suggestions (ISO BOP fixtures — Brief 39 §−1 Q9 lock)
 // ─────────────────────────────────────────────────────────────────
 
 export const DEFAULT_FORM_SUGGESTIONS: readonly EndorsementFormSuggestion[] =
   Object.freeze([
     {
-      form_number: "MS 10 02",
+      form_number: "BP 04 30",
       display_name: "Peak-limit endorsement",
       effect_kind: "sublimit",
     },
     {
-      form_number: "MS 10 03",
+      form_number: "BP 04 39",
       display_name: "Liquor liability",
       effect_kind: "factor",
     },
     {
-      form_number: "MS 10 04",
+      form_number: "BP 04 50",
       display_name: "Hired auto / non-owned auto liability",
       effect_kind: "additive",
     },
     {
-      form_number: "MS 10 05",
+      form_number: "BP 05 21",
       display_name: "Wind / hail deductible",
       effect_kind: "additive",
     },
     {
-      form_number: "MS 10 06",
+      form_number: "BP 14 87",
       display_name: "Water back-up + sump-overflow",
       effect_kind: "additive",
     },
     {
-      form_number: "MS 10 07",
+      form_number: "BP 10 02",
       display_name: "Limitation on coverage — roof surfacing",
       effect_kind: "sublimit",
     },
     {
-      form_number: "MS 10 08",
+      form_number: "BP 10 90",
       display_name: "Coastal property — wind exclusion",
       effect_kind: "factor",
     },
     {
-      form_number: "MS 10 09",
+      form_number: "BP 04 17",
       display_name: "Employee dishonesty",
       effect_kind: "additive",
     },
     {
-      form_number: "MS 10 01",
+      form_number: "BP 04 86",
       display_name: "Equipment breakdown",
       effect_kind: "factor",
     },
     {
-      form_number: "MS 10 10",
+      form_number: "BP 05 41",
       display_name: "Earthquake — limited",
       effect_kind: "factor",
     },
     {
-      form_number: "MS 10 11",
+      form_number: "BP 14 06",
       display_name: "Manuscript endorsement",
       effect_kind: "additive",
     },
     {
-      form_number: "MS 10 12",
+      form_number: "BP 04 27",
       display_name: "Computer fraud + funds transfer fraud",
       effect_kind: "sublimit",
     },
@@ -576,7 +576,7 @@ export function EndorsementEditor(
               id={`${uid}-form`}
               className="rater-endorsement-editor__input is-mono"
               value={draft.form_number}
-              placeholder="e.g., MS 10 02"
+              placeholder="e.g., BP 04 30"
               onChange={(e) => updateDraft({ form_number: e.target.value })}
               data-testid={`${testId}-form-number`}
             />
@@ -632,7 +632,7 @@ export function EndorsementEditor(
           </div>
           <p className="rater-endorsement-editor__field-hint">
             Free text in v1 — pick from <strong>Suggested</strong> for
-            common Meridian BOP forms or type any custom form number. Class
+            common ISO BOP forms or type any custom form number. Class
             Translator vocab integration lands in v2.
           </p>
         </div>
@@ -815,7 +815,7 @@ export function EndorsementEditor(
             id={`${uid}-citation`}
             className="rater-endorsement-editor__input is-mono"
             value={draft.citation}
-            placeholder="e.g., Meridian form MS 10 02 — 2026 ed."
+            placeholder="e.g., ISO BP 04 30 — 2018 ed."
             onChange={(e) => updateDraft({ citation: e.target.value })}
             data-testid={`${testId}-citation`}
           />

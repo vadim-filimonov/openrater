@@ -16,7 +16,8 @@
  * Algorithm/Rating dot burned amber forever because loadings/outputs
  * buckets were structurally unfillable).
  *
- * Reshaped by the workspace-era navigation changes.
+ * Implemented per docs/design-briefs/plan-detail-landing.md; reshaped
+ * by Briefs 24/70/78 (the workspace era).
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -57,8 +58,10 @@ import {
   PLAN_SECTIONS,
   PLAN_SECTIONS_BY_ID,
   PLAN_SECTIONS_BY_WORKSPACE,
-  // Workspace taxonomy: Inputs is its own peer (5 authoring workspaces
-  // plus verify), presented as top tabs rather than a left rail.
+  // Workspace taxonomy. 24.B introduced the 4-workspace concept;
+  // 24.F2 promoted Inputs to its own peer (5 authoring + verify) and
+  // shifted the UI from left rail → top tabs (per
+  // docs/design-briefs/24f-workspace-shell.md amendment).
   WORKSPACE_LABELS,
   WORKSPACE_ORDER,
   DEFAULT_WORKSPACE,
@@ -124,6 +127,7 @@ import {
   getApiBase,
   getInputMapping,
   getPlanRun,
+  getPlanRunCompare,
   getPlanRunRows,
   getPublishStatus,
   // Brief 84 D-B — the ONE deploy verb (freeze + publish in one call).
@@ -202,11 +206,11 @@ import {
   // Brief 30 PR 30.5 — delete-with-impact modal.
   DimensionDeletePrompt,
   // 26.P0 — DimensionRow shape for fixture-mode persistence state.
-  // Re-exported through @openrater/ui's index; the route holds a typed
+  // Re-exported through labs-ui's index; the route holds a typed
   // editedDimensions array that the inline editor's autosave + the
   // banded drawer's save handler both mutate.
   type DimensionRow,
-  // Brief 30 PR 30.4 — @openrater/ui's UsedInPanel reference shape.
+  // Brief 30 PR 30.4 — labs-ui's UsedInPanel reference shape.
   type DimensionReference,
   // Brief 27 PR 1 — Shape choice type now exported from the
   // workspace primitive (the modal it used to belong to is gone).
@@ -290,15 +294,25 @@ import {
   stagesToRuntimePlan,
   synthesizeRepresentativeRisk,
   RunSection,
+  // FCA #10 — the Sample-risk form renders EVERY declared input
+  // (gate-only included) with typed controls; the payload builder
+  // omits unset declared fields so the engine's refusal names them.
+  // Ship's try-it rides the same finding: ONE seed rule (the verified
+  // test case overlaid on synthesis) and a wire sample whose declared
+  // required keys always show — null = honestly unanswered.
+  deriveRunFields,
+  buildSampleRisk,
+  buildWireSampleInputs,
+  declaredRowKeys,
+  overlayVerifiedCase,
+  // FCA #14 (display half) — parts-don't-sum reconciliation line.
+  roundingReconciliationCaveat,
   // Trace-panel brief §14 (audit P4-01) — the evaluated-trace remount:
   // adapt the PERSISTED server run (result_json) into <TracePanel>'s
   // grouped view. The Test result renders it inline; history rows open
   // the same panel in a drawer.
   TracePanel,
   buildServerRunTraceView,
-  // W16 — fallback prettifier for Test-form fields that have no declared
-  // display name (dictionary + dimensions are consulted first).
-  humanizeFieldName,
   // Declare guard — a ':' names a binding namespace (literal:1), never a
   // declarable input field.
   isDeclarableFieldName,
@@ -312,7 +326,7 @@ import {
   // Brief 33 PR 33.1 — Parametrize-as-canvas. Since Brief 78 (P5.1)
   // it mounts as the Rating workspace's ?expand=1 TAKEOVER (creation
   // + 2-D editing); the standalone Factor Tables tab is gone. The
-  // legacy <ParametrizeWorkspace> was deleted from @openrater/ui 2026-05-24.
+  // legacy <ParametrizeWorkspace> was deleted from labs-ui 2026-05-24.
   ParametrizeCanvas,
   FactorTableDeletePrompt,
   // Brief 82 R1 — the honest save pill rides the Rating toolbar (the
@@ -320,11 +334,11 @@ import {
   // — are deleted; the tab is one column).
   SavePill,
   getPerLevelTowers,
-  //  — the one public counting (chains · steps) + the tail-kind
+  // MVP-013 — the one public counting (chains · steps) + the tail-kind
   // set the Final-adjustments ledger renders.
   countPublicAlgorithm,
   SHEET_TAIL_STAGE_KINDS,
-  //  — the one absolute date rendering.
+  // MVP-019 — the one absolute date rendering.
   isoDate,
   isoDateTime,
   RatingInlineGrid,
@@ -360,6 +374,8 @@ import {
   PlanStatusChip,
   GoLiveDialog,
   OverviewSection,
+  verificationChecklistItem,
+  verificationHealthOverride,
   BuildReportView,
   InputsPanelV2,
   emptyClampDraft,
@@ -413,6 +429,7 @@ import {
 import { usePolicyTailSynced } from "../integrations/policyTailStore";
 // ADR-0064 — fingerprint-first run staleness (content-hash fallback).
 import { isRunStale } from "../integrations/runStaleness";
+import { runRowsErrorMessage } from "../integrations/runRowsError";
 // G15/G24 — debounced replace-all writes whose pending state survives the
 // effect cleanup, so Freeze can land them first and route-leave can't
 // drop them.
@@ -450,7 +467,7 @@ import "./inputsWorkspaceMount.css";
 import { AlgorithmMount } from "../components/AlgorithmSheet";
 // Brief 82 — the Rating tab's chrome: the summoned table catalog
 // (D-C) + the readiness footer (D-D). The in-row grid editor (R2,
-// RatingInlineGrid) is an @openrater/ui primitive.
+// RatingInlineGrid) is a labs-ui primitive.
 import { RatingTablesMenu, RatingFooter } from "../components/RatingChrome";
 import {
   modifierDraftToStageRequest,
@@ -462,8 +479,20 @@ import {
   SAMPLE_FACTOR_TABLES,
   SAMPLE_PLAN_ID,
 } from "../fixtures/sample-refs";
-// Retired fixture compatibility types. SAMPLE_PLAN_ID is a sentinel that
-// never matches a persisted plan, so all runtime state comes from the API.
+// PR D3.7 — Gate the ISO BOP fixture fallback on the actual sample
+// plan id, not on `line_of_business === "bop"`. Pre-D3.7, any new
+// BOP plan landed with 11 ISO BOP dims + 11 ISO BOP factor tables
+// pre-populated, even when the user picked the "blank" or
+// "nonprofit_990" template. That fixture leak overwrote seeded
+// state via the storeDimensions useEffect → the user saw ISO BOP
+// pollution + lost their template-seeded data.
+// (Phase B: SAMPLE_PLAN_ID is the ../fixtures/sample-refs retired
+// sentinel — the fixture fallback below is permanently dormant.)
+// G0 — BOP-flavored sample gate entries + sample columns/fields
+// (SAMPLE_GATE_ENTRIES, SAMPLE_BOP_FIELDS, SAMPLE_BOP_COLUMN_MAP)
+// removed from the import; GateCanvasMount now derives availableFields
+// + columnMap from the plan's live input_mapping (D6.1) and starts
+// with an empty entries list instead of the 8 BOP samples.
 // D6.2 / ADR-0027 — bridge the API-backed `PlanDimension` shape with
 // the legacy `DimensionRow` UI shape used everywhere downstream.
 import {
@@ -503,7 +532,7 @@ const ANALYTICS_RUN_ROW_CAP = 10_000;
 
 // Brief 55 item 2 — the bundled `nonprofit_990` "Use sample data" dataset was
 // removed from the Inputs surface. It was a D&O/GL template leftover that read
-// as nonsense on an Meridian BOP plan and is no longer offered by default. The
+// as nonsense on an ISO BOP plan and is no longer offered by default. The
 // <DataSourcePicker> `sampleDataset` prop remains an optional API for any
 // consumer that wants to offer a plan-appropriate sample.
 
@@ -676,7 +705,7 @@ type EditorState =
 // Classification / Composite still flow through the workspace's
 // onSelect → existing routes (subsequent PRs inline them).
 
-/**  — run kinds in user language (the wire says `sample`). */
+/** MVP-018 — run kinds in user language (the wire says `sample`). */
 function runKindNoun(kind: string): string {
   return kind === "sample" ? "quote" : kind;
 }
@@ -782,6 +811,15 @@ function PlanDetailContent({ plan }: { plan: PlanDetail }) {
   // §2.4 — the header's Rate sample button requests a Test run; the
   // Test mount listens (a monotonically-increasing nonce, 0 = never).
   const [testRunRequest, setTestRunRequest] = useState(0);
+  // FCA #27 (finding 16) — the sample-risk EDITS live here, above the
+  // conditionally-mounted Run workspace: switching tabs used to
+  // unmount the form and silently discard the entered risk, so "Rate
+  // sample" re-seeded AND ran tc_1 over the user's work. Edits now
+  // survive navigation; Reset remains the one explicit way back to
+  // the seed.
+  const [runFormOverrides, setRunFormOverrides] = useState<
+    Record<string, string>
+  >({});
 
   // §2.5 — "Duplicate plan": create a fresh draft and replay this
   // plan's CURRENT edited substrate (stages in order, dimensions,
@@ -862,7 +900,7 @@ function PlanDetailContent({ plan }: { plan: PlanDetail }) {
   //
   // When slice 4 ships, swap this for a TanStack Query state.
   // Brief 39 follow-up — only seed the BOP fixture dimensions when
-  // the plan IS an Meridian BOP plan. WC / CGL / Auto / Umbrella plans
+  // the plan IS an ISO BOP plan. WC / CGL / Auto / Umbrella plans
   // (and any future LOB) start with an empty dimension list, matching
   // the "blank" template the user picked at /rate-lab/new. The fixture
   // can also leak into a BOP-blank plan today; tightening on the
@@ -875,7 +913,7 @@ function PlanDetailContent({ plan }: { plan: PlanDetail }) {
   // (including the user's blank + nonprofit_990 templates) → 11 ISO
   // BOP dims got seeded + the useEffect on line 508 persisted them
   // to localStorage, overwriting template seed data. Now the
-  // fixture only fires for the actual Meridian BOP sample plan.
+  // fixture only fires for the actual ISO BOP sample plan.
   const [editedDimensions, setEditedDimensions] = useState<
     readonly DimensionRow[]
   >(() => {
@@ -1089,7 +1127,7 @@ function PlanDetailContent({ plan }: { plan: PlanDetail }) {
     [flushDimsSave],
   );
 
-  // Same gating for factor tables — only Meridian BOP plans see the BOP
+  // Same gating for factor tables — only ISO BOP plans see the BOP
   // fixture catalog. Other LOBs start with an empty factor-table
   // catalog so the user isn't authoring against pre-built tables
   // they didn't ask for.
@@ -2102,7 +2140,7 @@ function PlanDetailContent({ plan }: { plan: PlanDetail }) {
         factorTables: planFactorTables,
       });
       // The lite shape is a strict subset of DimensionReference (no
-      // React-specific fields). Pass through verbatim — the @openrater/ui
+      // React-specific fields). Pass through verbatim — the labs-ui
       // type is structurally compatible.
       return lite as readonly DimensionReference[];
     },
@@ -3068,7 +3106,7 @@ function PlanDetailContent({ plan }: { plan: PlanDetail }) {
     return { towers, gateRules };
   }, [plan.stages]);
 
-  //  — the ONE public counting of the algorithm ("3 chains ·
+  // MVP-013 — the ONE public counting of the algorithm ("3 chains ·
   // 24 steps"): the same rows the Rating tab renders (chain build-up
   // steps + Final-adjustment stage rows), shared with the report lede
   // via `countPublicAlgorithm`. Wire counts stay wire-only.
@@ -3127,12 +3165,16 @@ function PlanDetailContent({ plan }: { plan: PlanDetail }) {
         id: "algorithm",
         label: "Build the algorithm",
         done: chainCount > 0,
-        //  — THE public counting (chains · steps), the same
+        // MVP-013 — THE public counting (chains · steps), the same
         // derivation the Rating tab renders and the report lede
         // states. "Rating towers" died with the fifth counting.
+        // FCA #30 (finding 49) — the UNIT is named: three surfaces
+        // showed three bare numbers (28/23/59) for one plan because
+        // authored steps, workbook stages, and executed trace nodes
+        // are different countings with no legend.
         detail:
           chainCount > 0
-            ? `${plural(publicAlgoCounts.chains, "chain")} · ${plural(publicAlgoCounts.steps, "step")}`
+            ? `${plural(publicAlgoCounts.chains, "chain")} · ${plural(publicAlgoCounts.steps, "authored step")}`
             : "No chains yet",
         onOpen: () => handleSelectWorkspace("assemble"),
         actionLabel: "Start the build →",
@@ -3155,7 +3197,7 @@ function PlanDetailContent({ plan }: { plan: PlanDetail }) {
   // (server-scored, survives reloads and other browsers); the
   // localStorage book result remains a fallback until book runs land
   // in the next stacked PR.
-  // Drift tracking: the edited-since-build fact for the
+  // Drift honesty (MVP-008): the edited-since-build fact for the
   // provenance row's chip. Refetches with the plan detail.
   const editsSinceBuildQuery = useQuery({
     queryKey: ["plan", plan.rating_plan_id, "edits-since-build"],
@@ -3284,6 +3326,23 @@ function PlanDetailContent({ plan }: { plan: PlanDetail }) {
   const [buildReportOpen, setBuildReportOpen] = useState(false);
   const [buildReportIndex, setBuildReportIndex] = useState(0);
   const buildReport = buildReports[buildReportIndex] ?? buildReports[0] ?? null;
+
+  // FCA fca-2026-07-25 #11 — verification honesty on the landing
+  // surface. After a build whose checks MISMATCHED the filing, the
+  // Overview showed only green ('Ready to rate', '5 of 5 complete')
+  // with the truth one click deep in the drawer. The LATEST build's
+  // vectors now feed a sixth checklist row and qualify the health
+  // pill; clean builds render a green verification row instead.
+  const latestBuildVectors = buildReports[0]?.vectors ?? null;
+  const verificationItem = useMemo(
+    () =>
+      verificationChecklistItem(latestBuildVectors, () => {
+        setBuildReportIndex(0);
+        setBuildReportOpen(true);
+      }),
+    [latestBuildVectors],
+  );
+  const verificationHealth = verificationHealthOverride(latestBuildVectors);
 
   const overviewFacts = useMemo(
     () =>
@@ -3474,14 +3533,19 @@ function PlanDetailContent({ plan }: { plan: PlanDetail }) {
         // Brief 89 R7 — the pill never outruns the engine: "Ready to
         // rate" requires the RATE rail (compiles AND nothing the
         // structure reads is undeclared), else it speaks the next step.
+        // FCA #11 — a mismatched build qualifies the pill: the plan
+        // rates, but "Ready to rate" must not stand unqualified over
+        // red verification checks.
         health={
           !isWritable
             ? "Read-only"
             : readiness.rateReady
-              ? "Ready to rate"
+              ? (verificationHealth ?? "Ready to rate")
               : (readiness.nextStepHint ?? "In progress")
         }
-        healthTone={readiness.rateReady ? "ok" : "warn"}
+        healthTone={
+          readiness.rateReady && verificationHealth === null ? "ok" : "warn"
+        }
         readOnly={!isWritable}
         // Brief 84 — no statusLabel: the PlanStatusChip in `actions` is
         // the ONE status display, for every lifecycle state.
@@ -3598,7 +3662,11 @@ function PlanDetailContent({ plan }: { plan: PlanDetail }) {
           // presentation; every signal computed here in the route.
           <>
             <OverviewSection
-              checklist={overviewChecklist}
+              checklist={
+                verificationItem
+                  ? [...overviewChecklist, verificationItem]
+                  : overviewChecklist
+              }
               lastTest={overviewLastTest}
               onRunFirstTest={() => handleSelectWorkspace("inputs")}
               versions={overviewVersions}
@@ -3709,6 +3777,8 @@ function PlanDetailContent({ plan }: { plan: PlanDetail }) {
             ready={readiness.rateReady}
             blockingHint={readiness.nextStepHint}
             runRequest={testRunRequest}
+            overrides={runFormOverrides}
+            onOverridesChange={setRunFormOverrides}
             // Brief 95 D2 — the newest build's first verified test case
             // seeds the sample form (null → representative synthesis).
             seedCase={buildReports[0]?.vectors.cases[0] ?? null}
@@ -3734,6 +3804,9 @@ function PlanDetailContent({ plan }: { plan: PlanDetail }) {
             compileReady={readiness.compileReady}
             blockingHint={readiness.blockingHint}
             runSummary={shipRunSummary}
+            // FCA #10 (Ship surface) — the try-it seeds from the SAME
+            // verified case as Run's form, so the two can't disagree.
+            seedCase={buildReports[0]?.vectors.cases[0] ?? null}
             onFreeze={() => {
               setFreezeErrorMessage(null);
               setFreezeOpen(true);
@@ -3792,7 +3865,7 @@ function PlanDetailContent({ plan }: { plan: PlanDetail }) {
             planId={plan.rating_plan_id}
             // Brief 55 item 2 — no default sample dataset. The nonprofit_990
             // CSV was a D&O/GL template leftover that read as nonsense on an
-            // Meridian BOP plan ("Use sample data — 2,000 nonprofit policies").
+            // ISO BOP plan ("Use sample data — 2,000 nonprofit policies").
             // <DataSourcePicker> hides the affordance when sampleDataset is
             // omitted; a consumer can still pass a plan-appropriate sample.
             // Cold-test payoff fix — per-template chain runtime
@@ -4340,7 +4413,7 @@ function SectionDetailPane({
   // import inside this component).
   dimensions: readonly DimensionRow[];
   /**
-   * Factor-table catalog scoped to this plan's LOB. For Meridian BOP
+   * Factor-table catalog scoped to this plan's LOB. For ISO BOP
    * plans it's the seed fixture; for everything else it's `[]`
    * (blank build). The 5 in-pane consumers — DimensionsWorkspace,
    * tower-inventory factor chips, ParametrizeCanvas list + saved
@@ -5492,7 +5565,7 @@ function SectionDetailPane({
             });
             // Brief 82 D-D — the footer chips read the plan's own
             // structure (O-2: the plan's tower names, nothing else).
-            // The tail-kind set is shared so this
+            // The tail-kind set is the shared MVP-013 constant so this
             // footer and the public counting can't drift apart.
             const adjustmentCount =
               projectedDesiredStages.filter((s) =>
@@ -6237,7 +6310,7 @@ function uniqueStageId(
 // 24.E — the GATE workspace now lists modifier_schedule stages as
 // summary rows (display_name + total_cap_pct + category_count) and
 // click-handoff routes to the existing edit-stage drawer. The
-// ModifierScheduleTable @openrater/ui primitive stays available for the
+// ModifierScheduleTable labs-ui primitive stays available for the
 // workspace design-pass to surface a per-category detail when
 // expanding a row.
 
@@ -7781,7 +7854,7 @@ function InputsWorkspaceMount({
 
   // Project DimensionRow[] (the route's editable shape) into the
   // narrower Dimension shape <InputsWorkspace> reads. We pass it
-  // through — @openrater/ui's autoMatch + detectMismatches consume
+  // through — labs-ui's autoMatch + detectMismatches consume
   // `.slug`, `.display_name`, `.levels` which all carry.
   const dims = useMemo(
     () =>
@@ -8480,7 +8553,7 @@ function InputsWorkspaceMount({
         onOpenApiLab={() =>
           navigate(`/api-lab?plan=${encodeURIComponent(planId)}`)
         }
-        //   — the "Fetch from an API" door follows
+        // MVP-027 (owner O2) — the "Fetch from an API" door follows
         // the API Lab ship flag; off for the MVP cold test.
         showApiSourceDoor={showApiLab()}
         // Parity — the paid-connector cost guardrail (Brief 62.6 PR3). The
@@ -8678,7 +8751,7 @@ function downloadTextFile(
 // Wraps <GateCanvas> with controlled state (entries, active,
 // activeDraft). Entries persist to `localStorage` keyed by plan id
 // so saves survive across navigation + reloads. First mount on a
-// fresh plan seeds from `SAMPLE_GATE_ENTRIES` (8 Meridian BOP examples);
+// fresh plan seeds from `SAMPLE_GATE_ENTRIES` (8 ISO BOP examples);
 // subsequent mounts read the user's authored set.
 //
 // Backend persistence (API Lab slices 8 + 9 for modifiers +
@@ -9087,6 +9160,8 @@ function RunSectionMount({
   ready,
   blockingHint,
   runRequest,
+  overrides,
+  onOverridesChange,
   onOpenBuild,
   onOpenAlgorithm,
   onGoLive,
@@ -9115,6 +9190,14 @@ function RunSectionMount({
   readonly ready: boolean;
   readonly blockingHint: string | null;
   readonly runRequest: number;
+  /** FCA #27 — the sample-risk edits, LIFTED to the route so tab
+   *  switches can't discard them (the mount is conditional). */
+  readonly overrides: Record<string, string>;
+  readonly onOverridesChange: (
+    next:
+      | Record<string, string>
+      | ((prev: Record<string, string>) => Record<string, string>),
+  ) => void;
   readonly onOpenBuild: () => void;
   readonly onOpenAlgorithm: () => void;
   /** Brief 84 D-H — present only while the plan is a DRAFT: a green
@@ -9131,23 +9214,27 @@ function RunSectionMount({
       ),
     [stages, dimensions],
   );
+  // FCA #10 — the form's field list is the plan's DECLARED input
+  // dictionary (gate-only fields included), not just the chain-seeded
+  // keys. One projection, reused for the overlay, labels, and fields.
+  const dictEntries = useMemo(() => stagesToInputDictEntries(stages), [stages]);
   // Brief 95 D2 — a verified filed example beats synthesis: overlay the
   // build report's first test-case inputs onto the DECLARED fields
   // (unknown keys stay out — the field list is the plan's, not the
-  // workbook's). Synthesis remains the fallback for hand-authored plans.
-  const seeded = useMemo(() => {
-    if (!seedCase) return representative;
-    const out: Record<string, unknown> = { ...representative };
-    for (const [key, value] of Object.entries(seedCase.inputs)) {
-      if (key in out && value !== null && value !== undefined) {
-        out[key] = value;
-      }
-    }
-    return out;
-  }, [representative, seedCase]);
-  const [overrides, setOverrides] = useState<Record<string, string>>({});
+  // workbook's). The overlay is the SHARED rule (`overlayVerifiedCase`)
+  // Ship's try-it seeds from too, so Run and Ship rate the same sample.
+  // Synthesis remains the fallback for hand-authored plans.
+  const seeded = useMemo(
+    () =>
+      overlayVerifiedCase(
+        representative,
+        seedCase?.inputs ?? null,
+        declaredRowKeys(dictEntries),
+      ),
+    [representative, seedCase, dictEntries],
+  );
   // W16 — an actuary reads declared display names, not runtime slugs.
-  // Input-dictionary names win (via the shared  resolution —
+  // Input-dictionary names win (via the shared MVP-012 resolution —
   // the SAME derivation the Inputs tab and gate prose read), then
   // dimension names, then a humanized slug for anything undeclared.
   // Keys stay the runtime slugs the engine consumes.
@@ -9156,7 +9243,7 @@ function RunSectionMount({
     for (const d of dimensions) {
       if (d.slug && d.display_name) m.set(d.slug, d.display_name);
     }
-    for (const e of stagesToInputDictEntries(stages)) {
+    for (const e of dictEntries) {
       // A resolved name equal to the slug carries no display info —
       // let a mapped dimension's name stand rather than clobber it.
       if (e.fieldName && e.displayName !== e.fieldName) {
@@ -9164,16 +9251,69 @@ function RunSectionMount({
       }
     }
     return m;
-  }, [stages, dimensions]);
+  }, [dictEntries, dimensions]);
+  // FCA #12 — the plan's schedule-rating structures become real form
+  // fields (one signed-percent judgment per category). Derived from
+  // the modifier.schedule stages the engine already consumes.
+  const runSchedules = useMemo(() => {
+    const out: {
+      scheduleId: string;
+      displayName: string;
+      totalCapPct: number;
+      categories: { categoryId: string; name: string; rangePct: number }[];
+    }[] = [];
+    for (const st of stages) {
+      if (st.stage_kind !== "modifier.schedule") continue;
+      const cfg = (st.config_json ?? {}) as {
+        schedule?: {
+          schedule_id?: unknown;
+          display_name?: unknown;
+          total_cap_pct?: unknown;
+          categories?: readonly {
+            category_id?: unknown;
+            name?: unknown;
+            range_pct?: unknown;
+          }[];
+        };
+      };
+      const sched = cfg.schedule;
+      if (!sched || typeof sched !== "object") continue;
+      const scheduleId =
+        typeof sched.schedule_id === "string" && sched.schedule_id !== ""
+          ? sched.schedule_id
+          : st.stage_id;
+      out.push({
+        scheduleId,
+        displayName:
+          typeof sched.display_name === "string" && sched.display_name !== ""
+            ? sched.display_name
+            : scheduleId,
+        totalCapPct:
+          typeof sched.total_cap_pct === "number" ? sched.total_cap_pct : 0,
+        categories: (sched.categories ?? [])
+          .filter((c) => typeof c?.category_id === "string")
+          .map((c) => ({
+            categoryId: String(c.category_id),
+            name:
+              typeof c.name === "string" && c.name !== ""
+                ? c.name
+                : String(c.category_id),
+            rangePct: typeof c.range_pct === "number" ? c.range_pct : 0,
+          })),
+      });
+    }
+    return out;
+  }, [stages]);
   const fields = useMemo(
     () =>
-      Object.entries(seeded).map(([key, v]) => ({
-        key,
-        label: labelByField.get(key) ?? humanizeFieldName(key),
-        value: overrides[key] ?? String(v ?? ""),
-        placeholder: String(v ?? ""),
-      })),
-    [seeded, overrides, labelByField],
+      deriveRunFields({
+        entries: dictEntries,
+        seeded,
+        overrides,
+        labelByField,
+        schedules: runSchedules,
+      }),
+    [dictEntries, seeded, overrides, labelByField, runSchedules],
   );
 
   const [running, setRunning] = useState(false);
@@ -9208,41 +9348,15 @@ function RunSectionMount({
   // persists append-only. The browser engine no longer runs here
   // (keystroke-speed preview lives in Inputs + the sheet).
   const queryClient = useQueryClient();
-  // book intake — the run detail's rows re-trace through this same
+  // Book-intake §3 — the run detail's rows re-trace through this same
   // sample path: `riskOverride` carries a stored row's projected
   // inputs verbatim (already typed by the projection).
-  const run = useCallback(async (riskOverride?: Record<string, unknown>) => {
-    setRunning(true);
-    setError(null);
-    try {
-      // Merge the edited fields over the seeded risk, keeping each
-      // field's original TYPE (numeric defaults parse back to numbers
-      // so banded lookups keep working).
-      const risk: Record<string, unknown> = riskOverride
-        ? { ...riskOverride }
-        : { ...seeded };
-      for (const [key, raw] of riskOverride
-        ? []
-        : Object.entries(overrides)) {
-        const original = seeded[key];
-        if (typeof original === "number") {
-          const n = Number(raw);
-          risk[key] = Number.isFinite(n) ? n : raw;
-        } else {
-          risk[key] = raw;
-        }
-      }
-      const planRun = await createPlanRun(planId, {
-        kind: "sample",
-        inputs: risk,
-        // ADR-0064 — pin the substrate this risk was rated against.
-        ...(currentScoringFingerprint !== null
-          ? { scoring_fingerprint: currentScoringFingerprint }
-          : {}),
-      });
-      // Every persisted run — including a refusal — shows in history.
-      void queryClient.invalidateQueries({ queryKey: ["plan-runs", planId] });
-      const payload = (planRun.result ?? {}) as {
+  // FCA #27 (finding 16) — ONE payload→panel shaping for BOTH the
+  // persisted sample run and the drawer's EPHEMERAL row-trace view
+  // (which must never spawn history entries while reading results).
+  const applyRunPayload = useCallback(
+    (raw: unknown, opts: { readonly saved: boolean }) => {
+      const payload = (raw ?? {}) as {
         outputs?: Record<string, unknown>;
         views?: {
           premium?: number | null;
@@ -9253,11 +9367,9 @@ function RunSectionMount({
         row_status?: string;
         rowIssues?: ReadonlyArray<{ severity: string; message: string }>;
       };
-      // §14 — keep the raw persisted result for the trace panel, on
-      // BOTH paths (a refusal's trace shows WHERE it failed).
-      setLastRunEnvelope(
-        (planRun.result ?? null) as ServerRunResultLike | null,
-      );
+      // §14 — keep the raw result for the trace panel, on BOTH paths
+      // (a refusal's trace shows WHERE it failed).
+      setLastRunEnvelope((raw ?? null) as ServerRunResultLike | null);
       // ADR-0056 — a refused row names its structured reasons; it never
       // renders a number.
       if (payload.row_status === "error") {
@@ -9299,15 +9411,23 @@ function RunSectionMount({
           currency: "USD",
           maximumFractionDigits: 0,
         });
-      const outputs = Object.entries(payload.outputs ?? {})
-        .filter(
-          (e): e is [string, number] =>
-            typeof e[1] === "number" && Number.isFinite(e[1]),
-        )
-        .map(([field, value]) => ({
-          field,
-          valueLabel: fmt(value),
-        }));
+      const numericOutputs = Object.entries(payload.outputs ?? {}).filter(
+        (e): e is [string, number] =>
+          typeof e[1] === "number" && Number.isFinite(e[1]),
+      );
+      const outputs = numericOutputs.map(([field, value]) => ({
+        field,
+        valueLabel: fmt(value),
+      }));
+      // FCA #14 (display half) — when the rounded coverage rows don't
+      // sum to the once-rounded headline ($439 of parts under a $440
+      // total on the filing's own example), the panel says why instead
+      // of showing arithmetic that doesn't close.
+      const roundingCaveat = roundingReconciliationCaveat({
+        outputs: Object.fromEntries(numericOutputs),
+        premium,
+        composed: Boolean(payload.composed),
+      });
       setResult({
         premiumLabel: fmt(premium),
         outputs,
@@ -9319,12 +9439,55 @@ function RunSectionMount({
         // without one the plan authored no tail (still server-scored).
         // A coverage_sum premium says what it is: the plan declares no
         // total row, so the headline is the sum over its coverages.
-        qualifier: payload.composed
-          ? "Filed premium — tail + policy gates applied, server-scored. Saved to run history."
-          : payload.views?.premiumBasis === "coverage_sum"
-            ? "Sum of the coverage premiums — this plan declares no total row. Server-scored; saved to run history."
-            : "Plan premium — no policy tail authored. Server-scored; saved to run history.",
+        // FCA #34 (finding 53) — "tail" is a reserving term: on a
+        // quote screen an actuary reads it as loss development, not
+        // "policy-level adjustment rows". Plain words instead.
+        qualifier:
+          (payload.composed
+            ? "Filed premium — policy-level adjustments and gates applied, server-scored."
+            : payload.views?.premiumBasis === "coverage_sum"
+              ? "Sum of the coverage premiums — this plan declares no total row. Server-scored."
+              : "Plan premium — this plan authors no policy-level adjustments. Server-scored.") +
+          (opts.saved
+            ? " Saved to run history."
+            : " Trace view of a stored row — nothing added to history.") +
+          (roundingCaveat ? ` ${roundingCaveat}` : ""),
       });
+    },
+    [stages],
+  );
+
+  const run = useCallback(async (riskOverride?: Record<string, unknown>) => {
+    setRunning(true);
+    setError(null);
+    try {
+      // FCA #10 — declared fields are typed by the dictionary dtype
+      // (bool toggles send booleans, money re-parses); an UNSET
+      // declared field is OMITTED so the engine's §12.4 refusal names
+      // it instead of "" reading as supplied. Undeclared seeded fields
+      // keep their typed seeds (string overrides re-coerce to number
+      // when the seed was numeric, so banded lookups keep working).
+      const risk: Record<string, unknown> = riskOverride
+        ? { ...riskOverride }
+        : buildSampleRisk({
+            entries: dictEntries,
+            seeded,
+            overrides,
+            // FCA #12 — the form's judgments assemble into the
+            // engine's schedule_app_{id} envelope.
+            schedules: runSchedules,
+          });
+      const planRun = await createPlanRun(planId, {
+        kind: "sample",
+        inputs: risk,
+        // ADR-0064 — pin the substrate this risk was rated against.
+        ...(currentScoringFingerprint !== null
+          ? { scoring_fingerprint: currentScoringFingerprint }
+          : {}),
+      });
+      // Every persisted run — including a refusal — shows in history.
+      void queryClient.invalidateQueries({ queryKey: ["plan-runs", planId] });
+      applyRunPayload(planRun.result ?? null, { saved: true });
     } catch (err) {
       setResult(null);
       // A transport failure has no persisted run — no trace to show.
@@ -9338,26 +9501,90 @@ function RunSectionMount({
       setRunning(false);
     }
   }, [
-    representative,
+    dictEntries,
+    seeded,
     overrides,
-    stages,
+    runSchedules,
     planId,
     currentScoringFingerprint,
     queryClient,
+    applyRunPayload,
   ]);
+
+  // FCA #27 (finding 16) — a history row's "Trace" is a READ. It used
+  // to call run(), PERSISTING a fresh quote per click (19:43 / 19:46 /
+  // 19:47 in the audited session): history filled with side-effect
+  // runs while reading results. The stored inputs re-rate through the
+  // EPHEMERAL quote path (?record=false, draft substrate) purely for
+  // the walk.
+  const traceRow = useCallback(
+    async (inputs: Record<string, unknown>) => {
+      setRunning(true);
+      setError(null);
+      try {
+        const q = await quotePlan(
+          planId,
+          { inputs, trace: "full" },
+          { draft: true, record: false },
+        );
+        applyRunPayload(
+          {
+            outputs: q.outputs,
+            views: { premium: q.premium, tier: q.tier },
+            composed: q.composed,
+            trace: q.trace,
+            rowIssues: q.row_issues,
+            planIssues: q.plan_issues,
+            row_status: q.row_status,
+            as_of: q.as_of,
+          },
+          { saved: false },
+        );
+      } catch (err) {
+        setResult(null);
+        setLastRunEnvelope(null);
+        setError(
+          err instanceof Error
+            ? `Couldn't trace this row: ${err.message}`
+            : "Couldn't trace this row.",
+        );
+      } finally {
+        setRunning(false);
+      }
+    },
+    [planId, applyRunPayload],
+  );
 
   // §14 — run-history trace drawer: any DONE sample row opens its
   // persisted trace (the record IS the evidence; book runs score with
   // trace off and get no affordance).
   const [traceRunId, setTraceRunId] = useState<string | null>(null);
-  // book intake — the run detail rides `?run=<id>` on the Run tab
+  // Book-intake §3 — the run detail rides `?run=<id>` on the Run tab
   // so chat's rerate_book answer can deep-link straight to the rows.
   const [searchParams, setSearchParams] = useSearchParams();
   const detailRunId = searchParams.get("run");
+  // FCA #28 (finding 78) — `&vs=<id>` arms the two-run compare in the
+  // same drawer (`&vsPlan=` when the other run lives on another plan).
+  // The URL carries the whole view, so chat's compare_runs review_url
+  // and a colleague's pasted link land on the same numbers.
+  const vsRunId = searchParams.get("vs");
+  const vsPlanId = searchParams.get("vsPlan");
   const openRunDetail = useCallback(
     (runId: string) => {
       const next = new URLSearchParams(searchParams);
       next.set("run", runId);
+      next.delete("vs");
+      next.delete("vsPlan");
+      setSearchParams(next, { replace: false });
+    },
+    [searchParams, setSearchParams],
+  );
+  const openRunCompare = useCallback(
+    (withRunId: string | null) => {
+      const next = new URLSearchParams(searchParams);
+      if (withRunId === null) next.delete("vs");
+      else next.set("vs", withRunId);
+      next.delete("vsPlan");
       setSearchParams(next, { replace: false });
     },
     [searchParams, setSearchParams],
@@ -9365,6 +9592,8 @@ function RunSectionMount({
   const closeRunDetail = useCallback(() => {
     const next = new URLSearchParams(searchParams);
     next.delete("run");
+    next.delete("vs");
+    next.delete("vsPlan");
     setSearchParams(next, { replace: false });
   }, [searchParams, setSearchParams]);
   const traceRunQuery = useQuery({
@@ -9515,9 +9744,9 @@ function RunSectionMount({
         onOpenBuild={onOpenBuild}
         fields={fields}
         onFieldChange={(key, value) =>
-          setOverrides((prev) => ({ ...prev, [key]: value }))
+          onOverridesChange((prev) => ({ ...prev, [key]: value }))
         }
-        onReset={() => setOverrides({})}
+        onReset={() => onOverridesChange({})}
         onRun={() => void run()}
         running={running}
         result={result}
@@ -9527,8 +9756,8 @@ function RunSectionMount({
         // Brief 95 D2 — say WHERE the numbers came from (cold-test law).
         seedHint={
           seedCase
-            ? `Seeded from ${seedCase.case_id} — the filing's own verified ` +
-              "example. Edit any field, then press Enter or Rate sample."
+            ? `Seeded from ${seedCase.case_id} — a test case verified at ` +
+              "build. Edit any field, then press Enter or Rate sample."
             : undefined
         }
         // Brief 95 D1 — no link on an input-less plan (the endpoint 422s).
@@ -9679,7 +9908,7 @@ function RunSectionMount({
                   : null;
               // 89.4 — a probe's line reads rows, not dollars: the
               // written sum over a synthetic sweep is not a book
-              // number. Use "rows scored" with real plurals.
+              // number. MVP-018 voice — "rows scored", real plurals.
               const probeFacet =
                 r.kind === "probe" && typeof headline.row_count === "number"
                   ? `${headline.row_count.toLocaleString("en-US")} row${
@@ -9706,7 +9935,7 @@ function RunSectionMount({
                 contentHash: currentContentHash,
                 scoringFingerprint: currentScoringFingerprint,
               });
-              // book intake — a done book/probe run's row is a DOOR
+              // Book-intake §3 — a done book/probe run's row is a DOOR
               // to the run detail (rows live there, not in any chat).
               const isDoor =
                 (r.kind === "book" || r.kind === "probe") &&
@@ -9730,7 +9959,7 @@ function RunSectionMount({
                       }
                     : {})}
                 >
-                  {/*  — run kinds speak user language: Quote /
+                  {/* MVP-018 — run kinds speak user language: Quote /
                       Book / Probe, never the wire tokens. */}
                   <span className="rater-runhist__kind" data-kind={r.kind}>
                     {runKindNoun(r.kind)}
@@ -9810,21 +10039,33 @@ function RunSectionMount({
           )}
         </Drawer.Body>
       </Drawer>
-      {/* book intake — the run detail: rows get a home. */}
+      {/* Book-intake §3 — the run detail: rows get a home. With
+          `&vs=` (FCA #28) the same drawer renders the two-run
+          compare instead — deltas, movers, refusal changes. */}
       <Drawer
         open={detailRunId !== null}
         onClose={closeRunDetail}
-        title="Run detail"
+        title={vsRunId !== null ? "Run compare" : "Run detail"}
         size="lg"
       >
         <Drawer.Body>
-          {detailRunId !== null ? (
+          {detailRunId !== null && vsRunId !== null ? (
+            <RunCompareBody
+              planId={planId}
+              runId={detailRunId}
+              vsRunId={vsRunId}
+              vsPlanId={vsPlanId}
+              onBack={() => openRunCompare(null)}
+            />
+          ) : detailRunId !== null ? (
             <RunDetailBody
               planId={planId}
               runId={detailRunId}
+              onCompareWith={openRunCompare}
               onTraceRow={(inputs) => {
                 closeRunDetail();
-                void run(inputs);
+                // FCA #27 — a trace VIEW, never a persisted run.
+                void traceRow(inputs);
               }}
             />
           ) : null}
@@ -9835,8 +10076,8 @@ function RunSectionMount({
 }
 
 /**
- * RunDetailBody — the per-row home of a book or probe run. The
- * header states the run's identity
+ * RunDetailBody — book-intake §3 (MVP-003 · MVP-011 · MVP-018): the
+ * per-row home of a book/probe run. Header states the run's identity
  * (kind · totals · substrate pin · time); the table is the
  * constitution's row grammar (# · premium · tier · status · first
  * issue) — an errored row carries its NAMED reason and no verdict,
@@ -9847,10 +10088,12 @@ function RunSectionMount({
 function RunDetailBody({
   planId,
   runId,
+  onCompareWith,
   onTraceRow,
 }: {
   readonly planId: string;
   readonly runId: string;
+  readonly onCompareWith: (withRunId: string) => void;
   readonly onTraceRow: (inputs: Record<string, unknown>) => void;
 }) {
   const runQuery = useQuery({
@@ -9864,6 +10107,20 @@ function RunDetailBody({
     queryFn: () => getPlanRunRows(planId, runId, { limit: 2000 }),
     enabled: run !== null && isRowKind && run.status === "done",
   });
+  // FCA #28 (finding 78) — the other DONE row-runs of this plan, for
+  // the "Compare with…" control (before this, comparing two runs
+  // meant hand-joining two screens).
+  const compareCandidatesQuery = useQuery({
+    queryKey: ["plan-runs", planId, "compare-candidates"],
+    queryFn: () => listPlanRuns(planId, { limit: 20 }),
+    enabled: run !== null && isRowKind && run.status === "done",
+  });
+  const compareCandidates = (compareCandidatesQuery.data?.runs ?? []).filter(
+    (r) =>
+      (r.kind === "book" || r.kind === "probe") &&
+      r.status === "done" &&
+      r.run_id !== runId,
+  );
   const [problemsOnly, setProblemsOnly] = useState(false);
 
   if (runQuery.isPending) {
@@ -9891,6 +10148,18 @@ function RunDetailBody({
     });
   const page = rowsQuery.data ?? null;
   const allRows = page?.rows ?? [];
+  // FCA #26 (finding 61) — the caller's identifier column. The worker
+  // stores each row's raw `source`; extracts lead with the policy
+  // identifier, so the FIRST source key is the display column (the
+  // full source record rides the cell's title).
+  const sourceIdKey = (() => {
+    for (const r of allRows) {
+      const source = (r as { source?: Record<string, unknown> }).source;
+      const first = source ? Object.keys(source)[0] : undefined;
+      if (first !== undefined) return first;
+    }
+    return null;
+  })();
   const declinedCount = allRows.filter(
     (r) =>
       r.row_status !== "error" &&
@@ -9939,10 +10208,12 @@ function RunDetailBody({
         rowsQuery.isPending ? (
           <p className="rater-runhist__meta">Loading the rows…</p>
         ) : rowsQuery.isError ? (
-          <p className="rater-runhist__meta">
-            The rows for this run aren't available anymore — the scoring
-            job's result store has let them go. The totals above remain
-            the run's record.
+          // FCA #22 — relay the API's own refusal (it says what
+          // happened AND what to do: "re-run the book to regenerate
+          // them") instead of a hardcoded guess that swallowed it.
+          <p className="rater-runhist__meta" role="alert">
+            {runRowsErrorMessage(rowsQuery.error)} The totals above
+            remain the run's record.
           </p>
         ) : page !== null ? (
           <>
@@ -9957,11 +10228,49 @@ function RunDetailBody({
               {errorCount} error{errorCount === 1 ? "" : "s"}
               {problemsOnly ? " — showing problems" : ""}
             </button>
+            {/* FCA #S2 — the take-away spreadsheet used to be
+             * assembled by hand from per-row quote calls; every run
+             * now downloads as one CSV (source identifiers included). */}
+            <Button
+              variant="plain"
+              size="xs"
+              onClick={() =>
+                window.open(
+                  `/api/v1/plans/${encodeURIComponent(planId)}/runs/${encodeURIComponent(runId)}/rows.csv`,
+                  "_blank",
+                )
+              }
+            >
+              Download CSV →
+            </Button>
+            {compareCandidates.length > 0 ? (
+              <label className="rater-rundetail__cmp">
+                Compare with{" "}
+                <select
+                  value=""
+                  onChange={(e) => {
+                    if (e.target.value !== "") onCompareWith(e.target.value);
+                  }}
+                >
+                  <option value="">another run…</option>
+                  {compareCandidates.map((r) => (
+                    <option key={r.run_id} value={r.run_id}>
+                      {runKindNoun(r.kind)} · {isoDateTime(r.created_at)}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            ) : null}
             <div className="rater-rundetail__tablewrap">
               <table className="rater-rundetail__table">
                 <thead>
                   <tr>
                     <th className="is-num">#</th>
+                    {/* FCA #26 (finding 61) — the caller's own first
+                        column (PolicyNbr and kin) rides every row, so
+                        a refusal names a POLICY, not "row 3 of 15
+                        counted by hand against the source CSV". */}
+                    {sourceIdKey !== null ? <th>{sourceIdKey}</th> : null}
                     <th className="is-num">Premium</th>
                     <th>Tier</th>
                     <th>Status</th>
@@ -9981,6 +10290,8 @@ function RunDetailBody({
                     const firstIssue =
                       (r.rowIssues?.[0]?.["message"] as string | undefined) ??
                       null;
+                    const source = (r as { source?: Record<string, unknown> })
+                      .source;
                     return (
                       <tr
                         key={i}
@@ -9993,6 +10304,22 @@ function RunDetailBody({
                         }
                       >
                         <td className="is-num">{i + 1}</td>
+                        {sourceIdKey !== null ? (
+                          <td
+                            className="rater-rundetail__srcid"
+                            title={
+                              source
+                                ? Object.entries(source)
+                                    .map(([k, v]) => `${k}: ${String(v)}`)
+                                    .join(" · ")
+                                : undefined
+                            }
+                          >
+                            {source?.[sourceIdKey] !== undefined
+                              ? String(source[sourceIdKey])
+                              : "—"}
+                          </td>
+                        ) : null}
                         <td className="is-num">
                           {typeof premium === "number"
                             ? fmtUsd(premium)
@@ -10052,6 +10379,160 @@ function RunDetailBody({
 }
 
 /**
+ * RunCompareBody — FCA #28 (finding 78): the two-run compare, the
+ * rate-committee artifact the audit persona assembled by hand. The
+ * SERVER owns the arithmetic (the chat tool reads the same endpoint —
+ * Law 1); this renders it: totals with the % move, rows newly refused
+ * or newly rated, the top movers by dollar swing, and every caveat
+ * the joining had to make (ordinal pairing, different books, excluded
+ * rows) — disclosed, never silently dropped.
+ */
+function RunCompareBody({
+  planId,
+  runId,
+  vsRunId,
+  vsPlanId,
+  onBack,
+}: {
+  readonly planId: string;
+  readonly runId: string;
+  readonly vsRunId: string;
+  readonly vsPlanId: string | null;
+  readonly onBack: () => void;
+}) {
+  const cmpQuery = useQuery({
+    queryKey: ["plan-run-compare", planId, runId, vsRunId, vsPlanId],
+    queryFn: () =>
+      getPlanRunCompare(planId, runId, {
+        withRun: vsRunId,
+        ...(vsPlanId !== null ? { withPlan: vsPlanId } : {}),
+      }),
+  });
+  const fmtUsd = (v: number) =>
+    v.toLocaleString("en-US", {
+      style: "currency",
+      currency: "USD",
+      maximumFractionDigits: 2,
+    });
+  const fmtDelta = (v: number) => `${v > 0 ? "+" : ""}${fmtUsd(v)}`;
+  if (cmpQuery.isPending) {
+    return <p className="rater-runhist__meta">Comparing the runs…</p>;
+  }
+  if (cmpQuery.isError) {
+    return (
+      <p className="rater-runhist__meta" role="alert">
+        {runRowsErrorMessage(cmpQuery.error)}
+      </p>
+    );
+  }
+  const cmp = cmpQuery.data;
+  const changes = cmp.status_changes;
+  const changeLines = [
+    {
+      label: "newly refused",
+      bucket: changes.rated_to_refused,
+    },
+    {
+      label: "newly rated",
+      bucket: changes.refused_to_rated,
+    },
+    { label: "changed tier", bucket: changes.tier_changed },
+    { label: "only in run A", bucket: cmp.counts.only_a },
+    { label: "only in run B", bucket: cmp.counts.only_b },
+  ].filter(({ bucket }) => bucket.count > 0);
+  return (
+    <div className="rater-rundetail">
+      <div className="rater-rundetail__head">
+        <span className="rater-runhist__meta">
+          A · {runKindNoun(cmp.a.kind)} · {isoDateTime(cmp.a.created_at)}
+          {" → "}B · {runKindNoun(cmp.b.kind)} ·{" "}
+          {isoDateTime(cmp.b.created_at)}
+          {cmp.b.rating_plan_id !== cmp.a.rating_plan_id
+            ? ` (plan ${cmp.b.rating_plan_id})`
+            : ""}
+        </span>
+        <Button variant="plain" size="xs" onClick={onBack}>
+          ← Run detail
+        </Button>
+      </div>
+      <p className="rater-rundetail__totals">
+        {fmtUsd(cmp.totals.premium_a)} → {fmtUsd(cmp.totals.premium_b)}{" "}
+        ({fmtDelta(cmp.totals.delta)}
+        {cmp.totals.pct !== null
+          ? `, ${cmp.totals.pct > 0 ? "+" : ""}${cmp.totals.pct}%`
+          : ""}
+        )
+      </p>
+      <p className="rater-runhist__meta">
+        {cmp.counts.matched.toLocaleString("en-US")} row
+        {cmp.counts.matched === 1 ? "" : "s"} matched
+        {cmp.joined_by_column !== null
+          ? ` on ${cmp.joined_by_column}`
+          : " by position"}
+        {" · "}
+        {cmp.counts.changed.toLocaleString("en-US")} changed ·{" "}
+        {cmp.counts.unchanged.toLocaleString("en-US")} unchanged
+      </p>
+      {changeLines.length > 0 ? (
+        <ul className="rater-runcmp__changes">
+          {changeLines.map(({ label, bucket }) => (
+            <li key={label} className="rater-runhist__meta">
+              {bucket.count} {label}
+              {bucket.examples.length > 0
+                ? ` — ${bucket.examples.join(", ")}${
+                    bucket.count > bucket.examples.length ? ", …" : ""
+                  }`
+                : ""}
+            </li>
+          ))}
+        </ul>
+      ) : null}
+      {cmp.movers.length > 0 ? (
+        <div className="rater-rundetail__tablewrap">
+          <table className="rater-rundetail__table">
+            <thead>
+              <tr>
+                <th>{cmp.joined_by_column ?? "Row"}</th>
+                <th className="is-num">Run A</th>
+                <th className="is-num">Run B</th>
+                <th className="is-num">Change</th>
+              </tr>
+            </thead>
+            <tbody>
+              {cmp.movers.map((m) => (
+                <tr key={m.key}>
+                  <td>{m.key}</td>
+                  <td className="is-num">{fmtUsd(m.premium_a)}</td>
+                  <td className="is-num">{fmtUsd(m.premium_b)}</td>
+                  <td className="is-num">
+                    {fmtDelta(m.delta)}
+                    {m.pct !== null
+                      ? ` (${m.pct > 0 ? "+" : ""}${m.pct}%)`
+                      : ""}
+                    {m.tier_a !== m.tier_b
+                      ? ` · ${m.tier_a ?? "—"} → ${m.tier_b ?? "—"}`
+                      : ""}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <p className="rater-runhist__meta">
+          No premium moved between the matched rated rows.
+        </p>
+      )}
+      {cmp.caveats.map((c) => (
+        <p key={c} className="rater-runhist__meta">
+          {c}
+        </p>
+      ))}
+    </div>
+  );
+}
+
+/**
  * ShipSectionMount — Brief 76 (v4 P4.5): the Ship zone.
  *
  * Two panes. VERSIONS: the freeze → publish timeline — publish is THE
@@ -10060,9 +10541,12 @@ function RunDetailBody({
  * VISIBLE, never silently ignored, never hard-locked). API: the panel
  * an integrator copies from — endpoint, per-plan keys (secret shown
  * once, D-D), an editable wire-shape request seeded with the plan's
- * representative risk, and a live try-it that round-trips the REAL
- * `/quote` — the same composed FILED premium the Run tab shows for the
- * same risk on the same version (Law 1).
+ * sample risk (FCA #10: the Run form's seed — synthesis + verified
+ * test case — measured against the DECLARED dictionary, so gate-only
+ * required keys show; `null` = honestly unanswered), and a live
+ * try-it that round-trips the REAL `/quote` — the same composed FILED
+ * premium the Run tab shows for the same risk on the same version
+ * (Law 1).
  */
 function ShipSectionMount({
   planId,
@@ -10071,6 +10555,7 @@ function ShipSectionMount({
   compileReady,
   blockingHint,
   runSummary,
+  seedCase,
   onFreeze,
   notify,
 }: {
@@ -10082,6 +10567,15 @@ function ShipSectionMount({
   readonly blockingHint: string | null;
   /** Compact latest-run line for the hero's readiness strip, or null. */
   readonly runSummary: string | null;
+  /** FCA #10 (Ship surface) — the newest build report's first verified
+   *  test case, the SAME prop Run's form seeds from (null = hand-
+   *  authored plan). Its inputs answer the gate-only declared fields
+   *  the representative synthesis can't. */
+  readonly seedCase: {
+    readonly case_id: string;
+    readonly name: string | null;
+    readonly inputs: Readonly<Record<string, unknown>>;
+  } | null;
   readonly onFreeze: () => void;
   readonly notify: (msg: string) => void;
 }) {
@@ -10090,7 +10584,7 @@ function ShipSectionMount({
     queryKey: ["publish-status", planId],
     queryFn: () => getPublishStatus(planId),
   });
-  //   — the workbook-back export rides the newest
+  // MVP-023 (owner O1) — the workbook-back export rides the newest
   // build report's stored bytes; the hash names what you get.
   const shipBuildReport = useBuildReport(planId);
   const workbookHash = shipBuildReport.data?.workbook_hash ?? null;
@@ -10244,7 +10738,12 @@ function ShipSectionMount({
   );
 
   // ── The try-it: an editable wire-shape request, seeded with the
-  // plan's representative risk (the same synthesis Run's form uses). ──
+  // plan's sample risk — the SAME seed Run's form starts from (FCA
+  // #10, Ship surface): representative synthesis, the verified test
+  // case overlaid, measured against the DECLARED input dictionary so
+  // gate-only required fields show on the wire. A required field
+  // nothing can honestly answer rides as `null` — the engine treats
+  // null as absent and refuses naming it, never guessing eligibility.
   const representative = useMemo(
     () =>
       synthesizeRepresentativeRisk(
@@ -10254,9 +10753,22 @@ function ShipSectionMount({
       ),
     [stages, dimensions],
   );
+  const dictEntries = useMemo(() => stagesToInputDictEntries(stages), [stages]);
+  const wireSample = useMemo(
+    () =>
+      buildWireSampleInputs({
+        entries: dictEntries,
+        seeded: overlayVerifiedCase(
+          representative,
+          seedCase?.inputs ?? null,
+          declaredRowKeys(dictEntries),
+        ),
+      }),
+    [dictEntries, representative, seedCase],
+  );
   const sampleRequest = useMemo(
-    () => JSON.stringify({ inputs: representative }, null, 2),
-    [representative],
+    () => JSON.stringify({ inputs: wireSample.inputs }, null, 2),
+    [wireSample],
   );
   const [requestText, setRequestText] = useState<string | null>(null);
   const effectiveRequest = requestText ?? sampleRequest;
@@ -10624,7 +11136,7 @@ function ShipSectionMount({
             })}
           </ul>
         )}
-        {/*   — the canonical container comes back
+        {/* MVP-023 (owner O1) — the canonical container comes back
             out: the exact ingested bytes, hash-stamped. */}
         {workbookHash ? (
           <p className="rater-ship__meta">
@@ -10739,6 +11251,18 @@ function ShipSectionMount({
                 onChange={(e) => setRequestText(e.target.value)}
                 aria-label="Quote request body"
               />
+              {wireSample.placeholders.length > 0 ? (
+                // FCA #10 — the honest-placeholder legend: the sample
+                // never fabricates an eligibility answer, and the API
+                // refuses rather than guess.
+                <p className="rater-ship__meta">
+                  <code>null</code> marks a required input the plan can’t
+                  answer for you — no workbook default, no verified
+                  example. Replace each with a real value; until then the
+                  API refuses the row naming those fields rather than
+                  guess eligibility.
+                </p>
+              ) : null}
               <div className="rater-ship__row rater-ship__row--bare">
                 <Button
                   variant="primary"

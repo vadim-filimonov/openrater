@@ -5,6 +5,10 @@
  * ACTUAL kinds exported from this package (input + input.source +
  * output + constant + math.op). The other test files cover each kind
  * in isolation; this one proves the wiring works end-to-end.
+ *
+ * Ports the spirit of `<prototype>/plan-builder/src/blocks/
+ * __tests__/v22a4-cascade.test.ts` (the simple-cascade portion) but
+ * scoped to the 5 declaration + math kinds available in PR 5.
  */
 
 import { describe, it, expect, beforeEach } from "vitest";

@@ -2,8 +2,8 @@
 # Copyright 2026 Vadim Filimonov and the OpenRater contributors
 # SPDX-License-Identifier: Apache-2.0
 #
-# PyInstaller spec — the desktop `openrater-server` one-dir bundle.
-# Build via packaging/desktop/build-server.sh; output
+# PyInstaller spec — the desktop `openrater-server` one-dir bundle
+# (Brief 2 §6). Build via packaging/desktop/build-server.sh; output
 # lands in packaging/desktop/dist/openrater-server/.
 #
 # One-DIR (not one-file) deliberately: no self-extraction on every

@@ -137,3 +137,22 @@ describe("ChainMultKind", () => {
     ).toBe("1000 (no factors) → 1000");
   });
 });
+
+  // FCA fca-2026-07-25 #34 (findings 40/47) — "× undefined (PD
+  // deductible credit) = NaN" read as breakage to a no-tech actuary.
+  // A missing factor names itself and the line ends honestly instead
+  // of doing NaN arithmetic in front of the reader.
+  it("explainStep names an unresolved factor instead of × undefined = NaN", () => {
+    const line = ChainMultKind.explainStep!(
+      {
+        base: 1,
+        factors: [6.1, undefined as unknown as number],
+      },
+      { factorNames: ["OTC base", "PD deductible credit"] },
+      { result: Number.NaN },
+    );
+    expect(line).not.toContain("undefined");
+    expect(line).not.toContain("NaN");
+    expect(line).toContain("PD deductible credit");
+    expect(line).toContain("unresolved");
+  });

@@ -100,6 +100,19 @@ export function ClassificationRoute() {
   const classDimensionExists = dims.some(
     (d) => d.dimension_type === "classification",
   );
+  // FCA #30 (finding 147) — the registry and the dimension are
+  // separate stores; a workbook build populates the DIMENSION. When
+  // it exists, the empty registry says so instead of "No classes yet"
+  // (which read as data loss on a 30-class plan).
+  const planClassDim = dims.find(
+    (d) => d.dimension_type === "classification",
+  );
+  const planClassDimension = planClassDim
+    ? {
+        name: planClassDim.display_name || planClassDim.slug,
+        levelCount: (planClassDim.levels ?? []).length,
+      }
+    : null;
 
   // ── add-to-plan: register the class_code dim + derived structural dims ──
   // The writes are additive PUTs (idempotent on dim_id). AFTER them we make
@@ -260,6 +273,7 @@ export function ClassificationRoute() {
           onBulkImport={handleBulkImport}
           onAddToPlan={handleAddToPlan}
           classDimensionExists={classDimensionExists}
+          planClassDimension={planClassDimension}
         />
       )}
     </div>

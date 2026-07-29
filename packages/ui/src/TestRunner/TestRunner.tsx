@@ -8,7 +8,7 @@
  *     │  Sample inputs (JSON)                                     │
  *     │  ┌────────────────────────────────────────────────────┐  │
  *     │  │ {                                                   │  │
- *     │  │   "class_code": "c101",                            │  │
+ *     │  │   "class_code": "73912",                            │  │
  *     │  │   "tiv": 250000                                     │  │
  *     │  │ }                                                   │  │
  *     │  └────────────────────────────────────────────────────┘  │
@@ -29,7 +29,7 @@
  *
  * Design choices:
  *   - The caller provides `onRun(inputs) => RunResult | Promise<RunResult>`
- *     — @openrater/ui doesn't import runtime directly (avoids circular
+ *     — labs-ui doesn't import runtime directly (avoids circular
  *     dep with @openrater/contracts having any UI flavor)
  *   - Paste-mode JSON for V1; structured per-field forms come in M4
  *     when section editors wire up
@@ -95,7 +95,7 @@ interface RunnerState {
 }
 
 const PLACEHOLDER_TEMPLATE = `{
-  "class_code": "c101",
+  "class_code": "73912",
   "tiv": 250000
 }`;
 

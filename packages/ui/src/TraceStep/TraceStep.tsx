@@ -5,7 +5,7 @@
  *
  *     ● class_factor · lookup.classification          1.32
  *     ──────────────────────────────────────────────
- *     Classified c101 (Meridian Recreation) → 1.32
+ *     Classified 73912 (Bowling Centers) → 1.32
  *     ISO BP-2024-RLC §3.4
  *     ▸ inputs · 1                                            ▾
  *

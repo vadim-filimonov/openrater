@@ -1,7 +1,7 @@
 /**
  * Tests for the CSV → ClassDraft mapping (Brief 51 bulk import).
  *
- * The load-bearing rule: a filing `class_table` loads with its
+ * The load-bearing rule: a real ISO BOP `class_table` loads with its
  * derived rating attributes (prop_rate_number / liab_class_group /
  * liab_exposure_base / …) routed into `attributes` automatically.
  */
@@ -9,43 +9,42 @@
 import { describe, it, expect } from "vitest";
 import { parseClassTableCsv, mapRowToDraft } from "./classCsv";
 
-// Intentionally invented Meridian rows. No identifier or rating value below
-// comes from a carrier or bureau filing.
+// The real KS filing class_table header + two rows.
 const CLASS_TABLE_CSV = [
   "class_code,description,sic_code,naics_code,prop_rate_number,liab_class_group,liab_exposure_base,liability_kind,eq_grade,eqsl_grade,citation_rule,citation_page",
-  "c102,Meridian General Merchandise,DEMO-SIC-01,DEMO-NAICS-101,11,mg_01,sales,occupant,A,alpha,Meridian Filing Rule C.1,p.8",
-  "c101,Meridian Neighborhood Bakery,DEMO-SIC-02,DEMO-NAICS-102,07,mg_02,sales,occupant,B,beta,Meridian Filing Rule C.2,p.9",
+  "09015,Bagelry,5812,722515,18,cg_40,sales,occupant,2,M,ISO BOP Classification Table #1(CT),BP-CT-1..47",
+  "53983,Army/Navy Retail,5311,452990,09,cg_07,sales,occupant,3,L,ISO BOP Classification Table #1(CT),BP-CT-1..47",
 ].join("\n");
 
-describe("parseClassTableCsv — fictional Meridian class_table", () => {
+describe("parseClassTableCsv — real ISO BOP class_table", () => {
   it("maps every row + routes unknown columns into attributes", () => {
     const result = parseClassTableCsv(CLASS_TABLE_CSV);
     expect(result.ok).toBe(true);
     expect(result.validCount).toBe(2);
     expect(result.rows).toHaveLength(2);
 
-    const generalMerchandise = result.rows[0]!.draft!;
-    expect(generalMerchandise.class_code).toBe("c102");
+    const bagelry = result.rows[0]!.draft!;
+    expect(bagelry.class_code).toBe("09015");
     // `description` column holds the NAME in the class_table convention.
-    expect(generalMerchandise.display_name).toBe("Meridian General Merchandise");
-    expect(generalMerchandise.description).toBeUndefined(); // not duplicated into description
-    expect(generalMerchandise.naics_code).toBe("DEMO-NAICS-101");
-    expect(generalMerchandise.sic_code).toBe("DEMO-SIC-01");
-    expect(generalMerchandise.citation_rule).toBe("Meridian Filing Rule C.1");
-    expect(generalMerchandise.citation_page).toBe("p.8");
+    expect(bagelry.display_name).toBe("Bagelry");
+    expect(bagelry.description).toBeUndefined(); // not duplicated into description
+    expect(bagelry.naics_code).toBe("722515");
+    expect(bagelry.sic_code).toBe("5812");
+    expect(bagelry.citation_rule).toBe("ISO BOP Classification Table #1(CT)");
+    expect(bagelry.citation_page).toBe("BP-CT-1..47");
     // The derived rating attributes — the whole point.
-    expect(generalMerchandise.attributes).toEqual({
-      prop_rate_number: "11",
-      liab_class_group: "mg_01",
+    expect(bagelry.attributes).toEqual({
+      prop_rate_number: "18",
+      liab_class_group: "cg_40",
       liab_exposure_base: "sales",
       liability_kind: "occupant",
-      eq_grade: "A",
-      eqsl_grade: "alpha",
+      eq_grade: "2",
+      eqsl_grade: "M",
     });
 
-    const neighborhoodBakery = result.rows[1]!.draft!;
-    expect(neighborhoodBakery.class_code).toBe("c101");
-    expect(neighborhoodBakery.attributes.prop_rate_number).toBe("07"); // leading zero kept
+    const armyNavy = result.rows[1]!.draft!;
+    expect(armyNavy.class_code).toBe("53983");
+    expect(armyNavy.attributes.prop_rate_number).toBe("09"); // leading zero kept
   });
 });
 
@@ -110,22 +109,22 @@ describe("parseClassTableCsv — failure + skip handling", () => {
     expect(result.rows[1]!.error).toBe("missing class_code");
   });
 
-  // A filing's trailing documentation row (long prose in class_code)
+  // F3 — a filing's trailing documentation row (long prose in class_code)
   // must be SKIPPED + reported, not 422 the whole batch (geo-importer parity).
   it("skips an over-length class_code instead of producing a draft", () => {
-    const longCode = "MERIDIAN FICTIONAL CLASSIFICATION APPENDIX — documentation row".padEnd(80, ".");
-    const csv = ["class_code,name", "c102,Meridian General Merchandise", `${longCode},Footer prose`].join("\n");
+    const longCode = "THE CLASSIFICATION ENTRY POINT — 456 codes extracted from the KS manual".padEnd(80, ".");
+    const csv = ["class_code,name", "09015,Bagelry", `${longCode},Footer prose`].join("\n");
     const result = parseClassTableCsv(csv);
     expect(result.ok).toBe(true);
     expect(result.validCount).toBe(1);
-    expect(result.rows[0]!.draft!.class_code).toBe("c102");
+    expect(result.rows[0]!.draft!.class_code).toBe("09015");
     expect(result.rows[1]!.draft).toBeUndefined();
     expect(result.rows[1]!.error).toMatch(/class_code too long/);
   });
 
   it("skips an over-length display_name instead of producing a draft", () => {
     const longName = "X".repeat(250);
-    const { draft, error } = mapRowToDraft({ class_code: "c101", name: longName });
+    const { draft, error } = mapRowToDraft({ class_code: "53983", name: longName });
     expect(draft).toBeUndefined();
     expect(error).toMatch(/display_name too long/);
   });

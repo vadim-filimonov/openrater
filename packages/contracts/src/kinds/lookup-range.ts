@@ -14,6 +14,9 @@
  * `hi` may be `null` (or `+Infinity` in-memory) for an open top —
  * platform-test finding E5: JSON has no Infinity, so open ends
  * persist as null and the matcher treats null as ±∞.
+ *
+ * Ported from `<prototype>/plan-builder/src/blocks/kinds/
+ * lookup-range.tsx` (Phase A.1 PR 6). PURE half only.
  */
 
 import type { BlockKind, PortSpec } from "../block-types";

@@ -1,4 +1,6 @@
-/** Tests for territory-csv.ts. */
+/**
+ * Tests for territory-csv.ts — Brief 20 P-TM6.
+ */
 
 import { describe, it, expect } from "vitest";
 import {
@@ -45,7 +47,7 @@ describe("TERRITORY_CSV_SCHEMA", () => {
         zip: "53201",
         territory_code: "1",
         factor: 1.2,
-        citation_rule: "Meridian Rule MS-R11",
+        citation_rule: "ISO BOP §11",
         citation_page: "p.100",
       },
       { zip: "53202", territory_code: "1" },
@@ -88,7 +90,7 @@ describe("groupByTerritoryCode", () => {
         zip: "53201",
         territory_code: "1",
         factor: 1.2,
-        citation_rule: "Meridian Rule MS-R11",
+        citation_rule: "ISO §11",
       },
       {
         zip: "53202",
@@ -97,7 +99,7 @@ describe("groupByTerritoryCode", () => {
       },
     ]);
     expect(out.territories[0]!.factor).toBe(1.2);
-    expect(out.territories[0]!.citation_rule).toBe("Meridian Rule MS-R11");
+    expect(out.territories[0]!.citation_rule).toBe("ISO §11");
     expect(out.factor_conflicts).toEqual([]);
   });
 

@@ -14,7 +14,7 @@
  * Resolution: the consumer (rate-lab) compiles `@openrater/ui` as
  * source, so Vite's `new Worker(new URL("./parseCsv.worker.ts",
  * import.meta.url), { type: "module" })` pattern in `parseCsvAsync.ts`
- * resolves THIS file relative to the @openrater/ui source tree. See the
+ * resolves THIS file relative to the labs-ui source tree. See the
  * docstring in `parseCsvAsync.ts` for the one-shot + fallback design.
  */
 
@@ -32,7 +32,7 @@ export interface ParseCsvWorkerRequest {
 /** Message posted OUT of the worker — the parse result, verbatim. */
 export type ParseCsvWorkerResponse = ReturnType<typeof parseCsvForInputs>;
 
-// Worker globals aren't in the @openrater/ui tsconfig `lib` (no "WebWorker"),
+// Worker globals aren't in the labs-ui tsconfig `lib` (no "WebWorker"),
 // so `self`/`postMessage` aren't typed here. We address the worker
 // scope through a narrowly-typed local handle rather than widening the
 // whole package's lib — keeps the transport explicit and contained.

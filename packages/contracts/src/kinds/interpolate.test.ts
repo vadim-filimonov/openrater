@@ -107,3 +107,23 @@ describe("InterpolateKind", () => {
     expect(s).toContain("(500000, 1.45)");
   });
 });
+
+  // FCA #34 (findings 40/47) — an exactly-on-anchor lookup was
+  // narrated as "between (600000, 1.18) and (1000000, 1.28) → 1.28",
+  // describing a boundary hit as interpolation. An anchor hit says so.
+  it("explainStep names an exact anchor hit instead of 'between'", () => {
+    const line = InterpolateKind.explainStep!(
+      { x: 1_000_000 },
+      {
+        points: [
+          { x: 600_000, y: 1.18 },
+          { x: 1_000_000, y: 1.28 },
+        ],
+        axisLabel: "aggregate_limit",
+      },
+      { y: 1.28 },
+    );
+    expect(line).toContain("at the");
+    expect(line).toContain("anchor");
+    expect(line).not.toContain("between");
+  });

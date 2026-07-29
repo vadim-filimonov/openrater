@@ -1,0 +1,36 @@
+{
+  "name": "V41.eligibility-ks-submit-standard-default",
+  "description": "Brief 55 acceptance: the canonical Sample BOP appetite gate (ordered rules decline-knockout > floor-area-submit > gross-sales-submit > preferred-credit, default_tier STANDARD) fires SUBMIT on the KS-20 risk (42,000 sq ft > 35,000, Rule 22.A). First-match-wins ordering means the floor-area submit rule beats the bceg_1 preferred credit (the §3.3 masking fix) — the risk is a referral, not preferred. Distinct from V33, which used the convenience default_tier preferred; the filing's real default is standard (the sample's 19 non-KS-20 rows).",
+  "plan": {
+    "id": "v39.eligibility_ks_submit_standard_default",
+    "version": "1.0.0",
+    "name": "Sample BOP — appetite gate (standard default)",
+    "lines": ["bop"],
+    "effective": "2025-10-01",
+    "nodes": [
+      {
+        "id": "gate",
+        "kind": "eligibility.gate",
+        "params": {
+          "rules": [
+            { "rule_id": "decline_ineligible_class", "variable": "class_code", "op": "in", "value": ["99999"], "tier": "decline", "reasoning": "Class not in the BOP eligibility table — out of appetite." },
+            { "rule_id": "floor_area_cap", "variable": "total_floor_area_sqft", "op": "gt", "value": 35000, "tier": "submit", "reasoning": "Floor area exceeds the 35,000 sq ft BOP eligibility limit (Sample BOP Rule 22.A) — refer to underwriting." },
+            { "rule_id": "gross_sales_cap", "variable": "annual_gross_sales", "op": "gt", "value": 6000000, "tier": "submit", "reasoning": "Annual gross sales exceed the $6M referral threshold." },
+            { "rule_id": "preferred_protected", "variable": "bceg_grade", "op": "eq", "value": "bceg_1", "tier": "preferred", "reasoning": "Top building-code-effectiveness grade — preferred terms." }
+          ],
+          "default_tier": "standard",
+          "default_reasoning": "Within BOP appetite at standard filed rates."
+        },
+        "position": { "x": 0, "y": 0 }
+      },
+      { "id": "out_tier", "kind": "output", "params": { "fieldName": "tier", "fieldType": "string" }, "position": { "x": 200, "y": 0 } },
+      { "id": "out_rule", "kind": "output", "params": { "fieldName": "matched_rule_id", "fieldType": "string" }, "position": { "x": 200, "y": 100 } }
+    ],
+    "edges": [
+      { "from": { "node": "gate", "port": "tier" }, "to": { "node": "out_tier", "port": "value" } },
+      { "from": { "node": "gate", "port": "matched_rule_id" }, "to": { "node": "out_rule", "port": "value" } }
+    ]
+  },
+  "externalInputs": { "class_code": "53989", "total_floor_area_sqft": 42000, "annual_gross_sales": 900000, "bceg_grade": "bceg_1" },
+  "expectedOutputs": { "tier": "submit", "matched_rule_id": "floor_area_cap" }
+}

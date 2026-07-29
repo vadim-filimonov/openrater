@@ -1,5 +1,5 @@
 /**
- * 2,000-row synthetic BOP benchmark.
+ * 2,000-row ISO BOP benchmark (ADR-0045 deliverable 4).
  *
  * Measures the reused engine over the V49 exposure-rated-tower plan in
  * three modes:
@@ -99,7 +99,7 @@ async function main(): Promise<void> {
 
   /* eslint-disable no-console */
   console.log(
-    `\nOpenRater scoring benchmark — ${ROWS} rows · V49 synthetic exposure-rated tower (${plan.nodes.length} nodes)`,
+    `\nOpenRater scoring benchmark — ${ROWS} rows · V49 exposure-rated-tower (ISO BOP, ${plan.nodes.length} nodes)`,
   );
   console.log(
     `node ${process.version} · heap limit ~${mb(

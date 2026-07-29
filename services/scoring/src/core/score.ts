@@ -42,7 +42,13 @@ import {
   totalLessTailRefusalMessage,
   type ScoreViews,
 } from "./derive";
-import { preflightInputs, type InputsPreflight } from "./inputsPreflight";
+import {
+  declaredInputsFromStages,
+  implausibleInputIssues,
+  preflightInputs,
+  withDeclaredGateDefaults,
+  type InputsPreflight,
+} from "./inputsPreflight";
 import { buildTailResolver } from "./tailResolver";
 import { badRequest } from "./errors";
 import type { ScoreRequest, ScoreTraceMode } from "./schema";
@@ -156,13 +162,21 @@ export async function scoreOne(
   const bundle: ResolvedPlanBundle = await resolvePlanBundle(req, deps);
   const runOptions = toRunOptions(req.options);
 
-  // The gate `{from:"model"}` seam (Brief 87 P5) was retired with the
-  // model registry. A plan whose eligibility gate
+  // Detachment Brief 1 §4 S1 — the gate `{from:"model"}` seam (Brief 87
+  // P5) left with the Model Lab registry. A plan whose eligibility gate
   // still pins a model refuses BY NAME before anything runs — never a
   // silent pass on a variable the model would have scored (Law 2). The
   // migration is the same as the tail's: land the score as a typed
   // input and let the gate read it like any other variable.
-  const inputs: Record<string, unknown> = { ...req.inputs };
+  //
+  // FCA — a workbook default on a GATE-ONLY field (no input node) must
+  // reach the gate's externalInputs read; supplied values always win.
+  const declared = declaredInputsFromStages(bundle.stages);
+  const inputs: Record<string, unknown> = withDeclaredGateDefaults(
+    bundle.plan,
+    declared,
+    req.inputs,
+  );
   const legacyGateRefs = collectLegacyGateModelRefs(bundle.stages ?? []);
   if (legacyGateRefs.length > 0) {
     throw badRequest(
@@ -171,12 +185,13 @@ export async function scoreOne(
     );
   }
 
-  // G5 — name what the caller got wrong BEFORE running. Not a 4xx:
-  // the engine refuses honestly per row (G8 — row_status "error",
-  // premium withheld), so a missing field can never score a plausible
-  // number; this simply tells the caller WHICH fields to fix. The P4
-  // quote endpoint layers the strict 4xx contract on top.
-  const inputIssues = preflightInputs(bundle.plan, inputs);
+  // G5 — name what the caller got wrong BEFORE running. The declared
+  // input dictionary (bundle.stages input_node declarations) widens
+  // the net to gate-only required fields — the FCA S0 where omitting
+  // the one answer that decides eligibility rated 'standard'. Missing
+  // REQUIRED fields are no longer advisory: they refuse the row below
+  // (spec §12.4 — premium withheld, loudly, naming the field).
+  const inputIssues = preflightInputs(bundle.plan, inputs, declared);
   const hasInputIssues =
     inputIssues.missing_inputs.length > 0 ||
     inputIssues.unknown_inputs.length > 0;
@@ -190,6 +205,30 @@ export async function scoreOne(
     }
     throw err;
   }
+
+  // FCA fca-2026-07-25 — spec §12.4: a DECLARED-required input with no
+  // default, absent at runtime, REFUSES the row. The engine already
+  // errors when a chain consumes the field (G8); this covers the
+  // gate-only shape, where the missing-variable grace would otherwise
+  // fall through to a confident default-tier verdict on a risk the
+  // filing may decline. Keyed on refused_inputs — the dictionary-
+  // derived subset — NOT the wider advisory missing_inputs (which
+  // stays G5 ergonomics, as before this fix). Computed BEFORE
+  // composition so a refused row never composes (the composed build-up
+  // would hand back the exact number the refusal withholds). Named so
+  // the refusal points at the field, not at machinery.
+  const missingRequiredIssue: RowIssue | null =
+    inputIssues.refused_inputs.length > 0
+      ? {
+          severity: "error",
+          code: "missing_input",
+          nodeId: "inputs_preflight",
+          message:
+            `Required input(s) missing (no default): ` +
+            `${inputIssues.refused_inputs.join(", ")} — premium and ` +
+            `eligibility verdict withheld.`,
+        }
+      : null;
 
   // ── G4 — compose the FILED premium (tail + policy gates + G9 floor)
   // when the plan carries any of them. One code path: the SAME config
@@ -205,6 +244,7 @@ export async function scoreOne(
   );
   const shouldCompose =
     result.row_status !== "error" &&
+    missingRequiredIssue === null &&
     (composedTail.length > 0 || (baseConfig.policyGates?.length ?? 0) > 0);
 
   const planPremium = resolvePlanPremiumContext(bundle.plan, bundle.stages);
@@ -254,6 +294,24 @@ export async function scoreOne(
       if (policy?.appetite) {
         appetite = policy.appetite;
       }
+      // FCA review 2026-07-26 — a tail that produced NO composed
+      // build-up on an ok row is a FAILED composition, not a fallback
+      // to the pre-tail number (the exact silent-improvise Law 2
+      // kills). evaluatePolicyBook omits `composed` when the premium
+      // subtotal doesn't resolve, and it counts row_errors its OWN
+      // run found (our outer run was clean, so a nonzero count means
+      // the composition pass diverged — same refusal).
+      if (
+        composedTail.length > 0 &&
+        (policy === undefined ||
+          policy.composed === undefined ||
+          (policy.row_errors ?? 0) > 0)
+      ) {
+        composed = undefined;
+        compositionFailure =
+          `the plan tail produced no composed premium ` +
+          `(the '${premiumField}' subtotal did not resolve).`;
+      }
     } catch (err) {
       // Law 2 — a plan that composes but CAN'T is a named refusal.
       // Serving the pre-tail number as THE premium would be the exact
@@ -272,10 +330,15 @@ export async function scoreOne(
       }
     : null;
 
+  // FCA #15 — declared-bounds plausibility warnings (min/max/enum).
+  // Never flip row_status: the row prices; the number stops
+  // pretending nothing is odd.
+  const plausibilityIssues = implausibleInputIssues(declared, inputs);
+
   const trace = projectTrace(result.trace, req.trace);
   const views = deriveViews(result, req.views, planPremium);
   const rowStatus: "ok" | "error" =
-    compositionIssue ? "error" : result.row_status;
+    compositionIssue || missingRequiredIssue ? "error" : result.row_status;
   return {
     outputs: result.outputs,
     // Law 1 — when the plan composes, THE premium is composed.final
@@ -289,7 +352,7 @@ export async function scoreOne(
     // this re-states the invariant over the FINAL row_status.
     views:
       rowStatus === "error"
-        ? //  — an error row carries no verdict either.
+        ? // MVP-011 — an error row carries no verdict either.
           { premium: null, perCoverage: {}, tier: null }
         : {
             ...views,
@@ -302,11 +365,16 @@ export async function scoreOne(
     durationMs: result.durationMs,
     ...(trace ? { trace } : {}),
     row_status: rowStatus,
-    ...((result.issues && result.issues.length > 0) || compositionIssue
+    ...((result.issues && result.issues.length > 0) ||
+    compositionIssue ||
+    missingRequiredIssue ||
+    plausibilityIssues.length > 0
       ? {
           rowIssues: [
             ...(result.issues ?? []),
             ...(compositionIssue ? [compositionIssue] : []),
+            ...(missingRequiredIssue ? [missingRequiredIssue] : []),
+            ...plausibilityIssues,
           ],
         }
       : {}),

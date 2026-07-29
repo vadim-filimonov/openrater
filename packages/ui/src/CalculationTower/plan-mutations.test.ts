@@ -448,14 +448,14 @@ describe("setConstantValue", () => {
     const lcmNode = [...plan.nodes.values()].find(
       (n) => n.ref?.kind === "constant",
     )!;
-    const next = setConstantValue(plan, lcmNode.id, 1.4);
+    const next = setConstantValue(plan, lcmNode.id, 1.401);
     const updated = next.nodes.get(lcmNode.id)!;
-    expect(updated.ref).toMatchObject({ kind: "constant", value: 1.4 });
-    expect(updated.valueChip.primary).toBe("× 1.4");
+    expect(updated.ref).toMatchObject({ kind: "constant", value: 1.401 });
+    expect(updated.valueChip.primary).toBe("× 1.401");
   });
 
   it("clears the value (reverts to the scalar placeholder) on null", () => {
-    const plan = planWithLcm(1.4);
+    const plan = planWithLcm(1.401);
     const lcmNode = [...plan.nodes.values()].find(
       (n) => n.ref?.kind === "constant",
     )!;
@@ -466,7 +466,7 @@ describe("setConstantValue", () => {
   });
 
   it("no-ops on a non-constant node + an unknown id (pure)", () => {
-    const plan = planWithLcm(1.4);
+    const plan = planWithLcm(1.401);
     const outputNode = [...plan.nodes.values()].find(
       (n) => n.category === "output",
     )!;

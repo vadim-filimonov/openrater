@@ -11,6 +11,11 @@
  * `params.defaultValue`) before reaching `execute`. The stub here
  * returns `{ value: null }` so the BlockKind contract is satisfied
  * if a caller bypasses the runtime.
+ *
+ * Ported from `<prototype>/plan-builder/src/blocks/kinds/
+ * input.tsx` (Phase A.1 PR 5). PURE half only — params + execute +
+ * validate. React renderBody/renderInspector live in the rate-lab
+ * frontend in the original port plan.
  */
 
 import type { BlockKind, PortSpec, PrimitiveType } from "../block-types";

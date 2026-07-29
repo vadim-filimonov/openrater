@@ -18,33 +18,33 @@ from fastapi.testclient import TestClient
 
 from tests._helpers import create_plan, promote
 
-# Intentionally invented Meridian reference rows. These identifiers and
-# values are synthetic and are not copied from any carrier or bureau filing.
-_MERIDIAN_GENERAL_MERCHANDISE = {
-    "class_code": "c102",
-    "display_name": "Meridian General Merchandise",
-    "family": "Meridian demo retail",
-    "naics_code": "DEMO-NAICS-101",
-    "sic_code": "DEMO-SIC-01",
+# A realistic ISO BOP class row from the KS filing class_table — incl. the
+# DERIVED rating attributes the factor tables key off (ADR-0035).
+_BAGELRY = {
+    "class_code": "09015",
+    "display_name": "Bagelry",
+    "family": "Restaurants",
+    "naics_code": "722515",
+    "sic_code": "5812",
     "eligible_for": ["bop"],
     "exposure_bases": [{"code": "sales", "coverage_tags": ["liability"]}],
     "attributes": {
-        "prop_rate_number": "11",
-        "liab_class_group": "mg_01",
+        "prop_rate_number": "18",
+        "liab_class_group": "cg_40",
         "liab_exposure_base": "sales",
     },
-    "source": "custom",
-    "citation_rule": "Meridian Filing Rule C.1",
-    "citation_page": "p.8",
+    "source": "iso",
+    "citation_rule": "ISO BOP Classification Table #1(CT)",
+    "citation_page": "BP-CT-1..47",
 }
 
-_MERIDIAN_NEIGHBORHOOD_BAKERY = {
-    "class_code": "c101",
-    "display_name": "Meridian Neighborhood Bakery",
-    "family": "Meridian demo food",
+_ARMY_NAVY = {
+    "class_code": "53983",
+    "display_name": "Army/Navy Retail",
+    "family": "Retail",
     "eligible_for": ["bop"],
-    "attributes": {"prop_rate_number": "07", "liab_class_group": "mg_02"},
-    "source": "custom",
+    "attributes": {"prop_rate_number": "09", "liab_class_group": "cg_07"},
+    "source": "iso",
 }
 
 
@@ -64,66 +64,53 @@ def test_list_unknown_plan_404(client: TestClient) -> None:
 
 def test_create_and_get_roundtrip(client: TestClient) -> None:
     pid = create_plan(client)["rating_plan_id"]
-    r = client.post(
-        f"/api/v1/plans/{pid}/class-codes", json=_MERIDIAN_GENERAL_MERCHANDISE
-    )
+    r = client.post(f"/api/v1/plans/{pid}/class-codes", json=_BAGELRY)
     assert r.status_code == 201, r.text
     body = r.json()
     # Every field round-trips, including the opaque derived attributes.
-    assert body["class_code"] == "c102"
-    assert body["display_name"] == "Meridian General Merchandise"
-    assert body["attributes"]["prop_rate_number"] == "11"
+    assert body["class_code"] == "09015"
+    assert body["display_name"] == "Bagelry"
+    assert body["attributes"]["prop_rate_number"] == "18"
     assert body["attributes"]["liab_exposure_base"] == "sales"
     assert body["eligible_for"] == ["bop"]
     assert body["exposure_bases"] == [
         {"code": "sales", "coverage_tags": ["liability"]}
     ]
-    assert body["source"] == "custom"
+    assert body["source"] == "iso"
     assert body["content_hash"]  # computed
     # And the list endpoint returns it.
     listed = client.get(f"/api/v1/plans/{pid}/class-codes").json()
-    assert [c["class_code"] for c in listed["class_codes"]] == ["c102"]
+    assert [c["class_code"] for c in listed["class_codes"]] == ["09015"]
 
 
 def test_put_upsert_preserves_created_at(client: TestClient) -> None:
     pid = create_plan(client)["rating_plan_id"]
-    client.put(
-        f"/api/v1/plans/{pid}/class-codes/c102",
-        json=_MERIDIAN_GENERAL_MERCHANDISE,
-    )
+    client.put(f"/api/v1/plans/{pid}/class-codes/09015", json=_BAGELRY)
     first = client.get(f"/api/v1/plans/{pid}/class-codes").json()["class_codes"][0]
     created = first["created_at"]
     # Edit the display name + an attribute.
-    edited = {
-        **_MERIDIAN_GENERAL_MERCHANDISE,
-        "display_name": "Meridian General Merchandise (edited)",
-    }
-    r = client.put(f"/api/v1/plans/{pid}/class-codes/c102", json=edited)
+    edited = {**_BAGELRY, "display_name": "Bagelry (edited)"}
+    r = client.put(f"/api/v1/plans/{pid}/class-codes/09015", json=edited)
     assert r.status_code == 200
     body = r.json()
-    assert body["display_name"] == "Meridian General Merchandise (edited)"
+    assert body["display_name"] == "Bagelry (edited)"
     assert body["created_at"] == created  # preserved across the update
 
 
 def test_put_class_code_mismatch_400(client: TestClient) -> None:
     pid = create_plan(client)["rating_plan_id"]
-    r = client.put(
-        f"/api/v1/plans/{pid}/class-codes/99999",
-        json=_MERIDIAN_GENERAL_MERCHANDISE,
-    )
+    r = client.put(f"/api/v1/plans/{pid}/class-codes/99999", json=_BAGELRY)
     assert r.status_code == 400
     assert r.json()["error"]["code"] == "class_code_mismatch"
 
 
 def test_delete(client: TestClient) -> None:
     pid = create_plan(client)["rating_plan_id"]
-    client.post(
-        f"/api/v1/plans/{pid}/class-codes", json=_MERIDIAN_GENERAL_MERCHANDISE
-    )
-    r = client.delete(f"/api/v1/plans/{pid}/class-codes/c102")
+    client.post(f"/api/v1/plans/{pid}/class-codes", json=_BAGELRY)
+    r = client.delete(f"/api/v1/plans/{pid}/class-codes/09015")
     assert r.status_code == 204
     # Gone now → 404 on a second delete.
-    r2 = client.delete(f"/api/v1/plans/{pid}/class-codes/c102")
+    r2 = client.delete(f"/api/v1/plans/{pid}/class-codes/09015")
     assert r2.status_code == 404
     assert r2.json()["error"]["code"] == "class_code_not_found"
 
@@ -131,20 +118,10 @@ def test_delete(client: TestClient) -> None:
 def test_bulk_import_merge(client: TestClient) -> None:
     pid = create_plan(client)["rating_plan_id"]
     # Seed one class, then merge-import two more (one overlapping).
-    client.post(
-        f"/api/v1/plans/{pid}/class-codes", json=_MERIDIAN_GENERAL_MERCHANDISE
-    )
+    client.post(f"/api/v1/plans/{pid}/class-codes", json=_BAGELRY)
     r = client.post(
         f"/api/v1/plans/{pid}/class-codes/bulk",
-        json={
-            "classes": [
-                _MERIDIAN_NEIGHBORHOOD_BAKERY,
-                {
-                    **_MERIDIAN_GENERAL_MERCHANDISE,
-                    "display_name": "Meridian General Merchandise v2",
-                },
-            ]
-        },
+        json={"classes": [_ARMY_NAVY, {**_BAGELRY, "display_name": "Bagelry v2"}]},
     )
     assert r.status_code == 200, r.text
     body = r.json()
@@ -152,28 +129,26 @@ def test_bulk_import_merge(client: TestClient) -> None:
     assert body["mode"] == "merge"
     codes = {c["class_code"]: c for c in body["class_codes"]}
     # Merge kept both, and updated the overlapping one.
-    assert set(codes) == {"c102", "c101"}
-    assert codes["c102"]["display_name"] == "Meridian General Merchandise v2"
-    assert codes["c101"]["attributes"]["prop_rate_number"] == "07"
+    assert set(codes) == {"09015", "53983"}
+    assert codes["09015"]["display_name"] == "Bagelry v2"
+    assert codes["53983"]["attributes"]["prop_rate_number"] == "09"
 
 
 def test_bulk_import_replace(client: TestClient) -> None:
     pid = create_plan(client)["rating_plan_id"]
-    client.post(
-        f"/api/v1/plans/{pid}/class-codes", json=_MERIDIAN_GENERAL_MERCHANDISE
-    )
+    client.post(f"/api/v1/plans/{pid}/class-codes", json=_BAGELRY)
     r = client.post(
         f"/api/v1/plans/{pid}/class-codes/bulk",
-        json={"classes": [_MERIDIAN_NEIGHBORHOOD_BAKERY], "mode": "replace"},
+        json={"classes": [_ARMY_NAVY], "mode": "replace"},
     )
     assert r.status_code == 200
     codes = [c["class_code"] for c in r.json()["class_codes"]]
-    assert codes == ["c101"]  # the seeded Meridian class was cleared
+    assert codes == ["53983"]  # bagelry was cleared
 
 
 def test_invalid_source_rejected(client: TestClient) -> None:
     pid = create_plan(client)["rating_plan_id"]
-    bad = {**_MERIDIAN_GENERAL_MERCHANDISE, "source": "made_up"}
+    bad = {**_BAGELRY, "source": "made_up"}
     r = client.post(f"/api/v1/plans/{pid}/class-codes", json=bad)
     assert r.status_code == 422
 
@@ -190,21 +165,14 @@ def test_classification_dimension_fields_roundtrip(client: TestClient) -> None:
 
     class_dim = {
         "dim_id": "class_code",
-        "display_name": "Meridian fictional class code",
+        "display_name": "ISO BOP class code",
         "slug": "class_code",
         "data_type": "string",
         "role": "rating-input",
         "dimension_type": "classification",
         "shape": "categorical",
         "class_library_id": pid,
-        "levels": [
-            {
-                "kind": "categorical",
-                "id": "c102",
-                "label": "Meridian General Merchandise",
-                "aliases": [],
-            }
-        ],
+        "levels": [{"kind": "categorical", "id": "09015", "label": "Bagelry", "aliases": []}],
     }
     r = client.put(f"/api/v1/plans/{pid}/dimensions/class_code", json=class_dim)
     assert r.status_code == 200, r.text
@@ -219,7 +187,7 @@ def test_classification_dimension_fields_roundtrip(client: TestClient) -> None:
         "dimension_type": "standard",
         "shape": "categorical",
         "derived_from": {"source_dim": "class_code", "attribute": "prop_rate_number"},
-        "levels": [{"kind": "categorical", "id": "11", "label": "11", "aliases": []}],
+        "levels": [{"kind": "categorical", "id": "18", "label": "18", "aliases": []}],
     }
     r2 = client.put(f"/api/v1/plans/{pid}/dimensions/prop_rate_number", json=derived_dim)
     assert r2.status_code == 200, r2.text
@@ -279,15 +247,11 @@ class TestWritabilityGate:
         pid = self._frozen_plan(client)
         # a VALID body, so the writable gate (not body validation) is what
         # refuses.
-        create = client.post(
-            f"/api/v1/plans/{pid}/class-codes",
-            json=_MERIDIAN_GENERAL_MERCHANDISE,
-        )
+        create = client.post(f"/api/v1/plans/{pid}/class-codes", json=_BAGELRY)
         assert create.status_code == 409, create.text
         assert create.json()["error"]["code"] == "illegal_state_transition"
         delete = client.delete(
-            f"/api/v1/plans/{pid}/class-codes/"
-            f"{_MERIDIAN_GENERAL_MERCHANDISE['class_code']}"
+            f"/api/v1/plans/{pid}/class-codes/{_BAGELRY['class_code']}"
         )
         assert delete.status_code == 409, delete.text
 

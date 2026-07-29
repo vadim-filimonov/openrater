@@ -135,8 +135,8 @@ describe("isPolicy — adjustments[] (Brief 62.1)", () => {
       },
       {
         kind: "package_factor",
-        id: "first_term_credit",
-        display_name: "Meridian first-term credit",
+        id: "pioneer",
+        display_name: "Pioneer",
         factor: 0.9,
         when: { field: "is_first_term", op: "eq", value: true },
       },
@@ -174,7 +174,7 @@ describe("isPolicy — adjustments[] (Brief 62.1)", () => {
 
 describe("effectivePolicyTail — inherit/override (Brief 62.3 §2a)", () => {
   const planTail: PolicyAdjustment[] = [
-    { kind: "package_factor", id: "first_term_credit", display_name: "Meridian first-term credit", factor: 0.9 },
+    { kind: "package_factor", id: "pioneer", display_name: "Pioneer", factor: 0.9 },
     { kind: "minimum_premium", id: "min", floor: 500 },
   ];
   const policyOverride: PolicyAdjustment[] = [

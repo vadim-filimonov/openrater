@@ -18,7 +18,7 @@
 
 /** The Δ column's tooltip — the honesty note both tables carry. */
 export const VECTOR_DELTA_NOTE =
-  "Signed, to the cent. Green within the filing's own tolerance.";
+  "Signed, to the cent. Green within the workbook's authored tolerance.";
 
 export function formatVectorDelta(check: {
   readonly status: string;

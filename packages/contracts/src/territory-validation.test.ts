@@ -14,7 +14,7 @@ function mkTerritory(over: Partial<Territory>): Territory {
     factor: 1.0,
     state: "US-WI",
     boundary: { kind: "zip_set", zips: ["53201"] },
-    citation_rule: "Meridian Rule MS-R11",
+    citation_rule: "ISO BOP §11",
     citation_page: "p.100",
     ...over,
   };

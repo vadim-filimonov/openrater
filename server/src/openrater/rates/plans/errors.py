@@ -18,6 +18,12 @@ Inheritance: every error here ultimately extends
 per-route `except`. The default status is 500 (internal) because by
 the time content lives in our DB it should have been validated on the
 way in; if parsing fails it's a server-side data issue, not a 400.
+
+Port note: in the original prototype these errors carried a program-specific
+prefix because they originated in that program's parser. openrater
+surfaces the same shapes under the generic names below — the meaning
+is identical. (The legacy spellings survived here as aliases until
+2026-07-14; nothing imported them, so they were retired.)
 """
 
 from __future__ import annotations

@@ -4,6 +4,8 @@
  * Pure deterministic diff functions + data shapes. Same inputs →
  * byte-identical output (verified by tests). Consumers in
  * `@openrater/ui` render the resulting trees via `<PlanCompareView>`.
+ *
+ * See `docs/design-briefs/comparison-primitive.md`.
  */
 
 export { diffPlans, diffValue } from "./diff-plans";

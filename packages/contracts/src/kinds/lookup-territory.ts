@@ -1,36 +1,42 @@
 /**
- * `lookup.territory` kind — (state, ZIP5) → filing-defined factor record.
+ * `lookup.territory` kind — (state, ZIP5) → 6-rate record.
  *
  * Per Plan Format Spec v1 §4.5 + §6.5: takes a 2-letter state code
  * and a 5-digit ZIP, finds the Territory whose `state_code` matches
  * AND whose `zips` list contains the ZIP, returns that territory's
- * numeric factor record.
+ * 6-base-rate record.
  *
  * Territories are snapshotted into `params.territories` at publish
  * time (per ADR-0015 invariant 3 — vendor data frozen into the plan).
- * A caller-defined fallback Territory supplies the factors when no
- * match resolves. The generic default id is the fictional Meridian
- * reference program's `t0`; plans should set their own filed code.
+ * A deployment-wide fallback Territory (typically code "704" / rural
+ * baseline) supplies the rates when no match resolves.
+ *
+ * Ported from `<prototype>/plan-builder/src/blocks/kinds/
+ * lookup-territory.tsx` (Phase A.1 PR 6). PURE half only.
  */
 
 import type { BlockKind, PortSpec } from "../block-types";
 
-/**
- * Filing-defined numeric factors for one territory. Key names are plan
- * data; the platform does not prescribe a line of business or coverage set.
- */
-export type TerritoryRates = Readonly<Record<string, number>>;
+/** The six ISO BOP base loss costs per territory. Spec §6.5. */
+export interface TerritoryRates {
+  building_per_100: number;
+  bpp_per_100: number;
+  occupant_liab_per_100: number;
+  occupant_liab_per_1k_sales: number;
+  occupant_liab_per_1k_payroll: number;
+  lessors_per_100: number;
+}
 
 export interface SnapshottedTerritory {
   /** Stable territory id (slug). */
   territory_id: string;
-  /** Filing-defined territory code. */
+  /** ISO-style territory code. */
   territory_code: string;
   /** Two-letter state code. */
   state_code: string;
   /** ZIP5 strings, ascending in canonical form. */
   zips: readonly string[];
-  /** The territory's filing-defined numeric factors. */
+  /** The 6 base loss costs. */
   base_rates: TerritoryRates;
 }
 
@@ -51,7 +57,14 @@ export type TerritoryLookupOutputs = {
   rates: TerritoryRates;
 };
 
-const EMPTY_RATES: TerritoryRates = Object.freeze({});
+const ZERO_RATES: TerritoryRates = {
+  building_per_100: 0,
+  bpp_per_100: 0,
+  occupant_liab_per_100: 0,
+  occupant_liab_per_1k_sales: 0,
+  occupant_liab_per_1k_payroll: 0,
+  lessors_per_100: 0,
+};
 
 export const TerritoryLookupKind: BlockKind<
   TerritoryLookupParams,
@@ -61,7 +74,7 @@ export const TerritoryLookupKind: BlockKind<
   id: "lookup.territory",
   category: "lookup",
   label: "Territory lookup",
-  description: "(state, ZIP5) → filing-defined factor record",
+  description: "(state, ZIP5) → 6-rate record",
   inputs: [
     {
       name: "state",
@@ -83,13 +96,13 @@ export const TerritoryLookupKind: BlockKind<
     {
       name: "rates",
       type: "record",
-      description: "The territory's filing-defined numeric factors",
+      description: "The 6 base loss costs",
     } as PortSpec,
   ],
   defaultParams: {
     territories: [],
-    fallbackRates: EMPTY_RATES,
-    fallbackCode: "t0",
+    fallbackRates: ZERO_RATES,
+    fallbackCode: "704",
   },
   defaultSize: "large",
   provenance: "core",
@@ -109,7 +122,7 @@ export const TerritoryLookupKind: BlockKind<
       }
     }
     return {
-      territory_code: params.fallbackCode ?? "t0",
+      territory_code: params.fallbackCode ?? "704",
       rates: params.fallbackRates,
     };
   },

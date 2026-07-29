@@ -272,7 +272,7 @@ class TestHardDelete:
         assert response.status_code == 409
         body = response.json()
         assert body["error"]["code"] == "plan_not_archived"
-        #  — the envelope speaks values, never Python enum reprs.
+        # MVP-020 — the envelope speaks values, never Python enum reprs.
         assert "status 'draft'" in body["error"]["message"]
         assert "PlanStatus" not in body["error"]["message"]
 
@@ -443,8 +443,8 @@ def _author_full_substrate(client: TestClient, pid: str) -> None:
     r = client.post(
         f"/api/v1/plans/{pid}/class-codes",
         json={
-            "class_code": "c101",
-            "display_name": "Meridian Neighborhood Bakery",
+            "class_code": "09015",
+            "display_name": "Bagelry",
             "family": "restaurant",
         },
     )
@@ -511,7 +511,7 @@ class TestDuplicate:
         # Class registry.
         classes = client.get(f"/api/v1/plans/{new_id}/class-codes").json()
         codes = [c["class_code"] for c in classes["class_codes"]]
-        assert codes == ["c101"]
+        assert codes == ["09015"]
 
         # Input mapping.
         mapping = client.get(f"/api/v1/plans/{new_id}/inputs-mapping").json()

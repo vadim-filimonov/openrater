@@ -11,6 +11,9 @@
  * `canonical.ts`), no floating-point suppression (Brief 12 Q9 /
  * P-CP10 #3 — show all deltas including 0.0001), and deterministic
  * traversal.
+ *
+ * See `docs/design-briefs/comparison-primitive.md` §6 for the full
+ * design + §11 for the audit semantics.
  */
 
 /**

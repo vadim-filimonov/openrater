@@ -11,9 +11,9 @@ describe("ClassificationLookupKind", () => {
 
   it("returns the table factor when the class code is present", () => {
     const r = ClassificationLookupKind.execute(
-      { class_code: "c301" },
+      { class_code: "00811" },
       {
-        table: { "c301": 1.85, "c302": 0.65 },
+        table: { "00811": 1.85, "00812": 0.65 },
         defaultValue: 1.0,
       },
     );
@@ -24,7 +24,7 @@ describe("ClassificationLookupKind", () => {
     const r = ClassificationLookupKind.execute(
       { class_code: "99999" },
       {
-        table: { "c301": 1.85 },
+        table: { "00811": 1.85 },
         defaultValue: 1.0,
       },
     );
@@ -33,7 +33,7 @@ describe("ClassificationLookupKind", () => {
 
   it("validate flags NaN defaultValue", () => {
     const r = ClassificationLookupKind.validate!({
-      table: { "c301": 1 },
+      table: { "00811": 1 },
       defaultValue: NaN,
     });
     expect(r.valid).toBe(false);
@@ -57,16 +57,16 @@ describe("ClassificationLookupKind", () => {
 
   it("explainStep distinguishes classified vs default", () => {
     const params = {
-      table: { "c301": 1.85, "c302": 0.65 },
+      table: { "00811": 1.85, "00812": 0.65 },
       defaultValue: 1.0,
     };
     expect(
       ClassificationLookupKind.explainStep!(
-        { class_code: "c301" },
+        { class_code: "00811" },
         params,
         { value: 1.85 },
       ),
-    ).toBe("Classified `c301` → 1.85");
+    ).toBe("Classified `00811` → 1.85");
     expect(
       ClassificationLookupKind.explainStep!(
         { class_code: "99999" },

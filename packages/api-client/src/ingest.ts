@@ -207,6 +207,13 @@ export const vectorsSummarySchema = z.object({
   matched: z.number(),
   near: z.number(),
   mismatched: z.number(),
+  // FCA #19 — gate-rule coverage (defaulted so pre-coverage persisted
+  // reports keep parsing). "All checks green" says nothing about
+  // eligibility rules no test case ever fires; these fields let the
+  // UI say so.
+  gate_rules_total: z.number().default(0),
+  gate_rules_exercised: z.number().default(0),
+  unexercised_gate_rules: z.array(z.string()).default([]),
 });
 export type VectorsSummary = z.infer<typeof vectorsSummarySchema>;
 
@@ -277,7 +284,8 @@ export function buildWorkbookPlan(
   });
 }
 
-/** In-app edits the live plan carries relative to its latest build. */
+/** Drift honesty (brief drift-honesty.md, MVP-008): the in-app edits
+ *  the live plan carries relative to its latest build. */
 export const editsSinceBuildSchema = z.object({
   edited: z.boolean(),
   changes: z.array(

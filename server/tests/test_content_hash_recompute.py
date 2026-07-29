@@ -56,7 +56,7 @@ def db():
 def _make_plan(db: Database):
     return create_plan(
         db=db,
-        display_name="Test Meridian BOP NE",
+        display_name="Test ISO BOP WI",
         line_of_business=LineOfBusiness.BOP,
         jurisdiction="WI",
         effective_date="2026-06-01",
@@ -239,3 +239,43 @@ def test_hash_is_deterministic_for_same_content(db):
         f"After add+remove, hash should return to initial. "
         f"initial={h_initial}, added={h_added}, removed={h_removed}"
     )
+
+
+def test_shape_validation_refusal_names_the_failing_field(db):
+    """FCA fca-2026-07-25 #7 (the other half): a config_json shape
+    refusal used to name only an internal stage id + kind — a
+    transcriber could not act on it (locating the 120-char cap took
+    offline pydantic reproduction). The summary line now carries the
+    validator's own field-path detail."""
+    from openrater.rates.plans.author import PlanValidationError
+
+    plan = _make_plan(db)
+    with pytest.raises(PlanValidationError) as excinfo:
+        add_stage_to_draft(
+            db=db,
+            draft_plan_id=plan.rating_plan_id,
+            stage_id="bad_chain",
+            stage_kind=StageKind.MULTIPLICATIVE_CHAIN,
+            display_name="Bad chain",
+            config_json={
+                "chains": [
+                    {
+                        "name": "x" * 200,  # blows FactorLookup-adjacent caps
+                        "base_input": "form_input.base",
+                        "factor_lookups": [],
+                        "lcm": {"value": 1.0},
+                        "output_field": "premium",
+                    }
+                ],
+                # missing output_total_field + oversize name → the
+                # message must say WHICH fields, not just the stage.
+            },
+            insert_after_stage_id="$last",
+            inputs=[],
+            outputs=[],
+        )
+    msg = str(excinfo.value)
+    assert "bad_chain" in msg
+    # The validator's field-path detail rides the summary line.
+    assert "validation error" in msg
+    assert "name" in msg or "output_total_field" in msg

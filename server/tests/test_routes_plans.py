@@ -134,7 +134,7 @@ class TestDescriptionRoundTrip:
     shape serialized it, so the note behind '+ Add a note' vanished
     after create. Both reads carry it now."""
 
-    NOTE = "Nebraska BOP rate revision for H2 2026."
+    NOTE = "Wisconsin BOP rate revision for H2 2026."
 
     def test_note_rides_list_and_detail(self, client: TestClient) -> None:
         created = create_plan(

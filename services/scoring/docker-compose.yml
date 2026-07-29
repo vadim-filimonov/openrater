@@ -3,8 +3,9 @@
 #   In-memory queue (zero deps):   docker compose up --build
 #   Redis-backed queue:            QUEUE_DRIVER=redis docker compose --profile redis up --build
 #
-# The same container can use alternate queue and result-store adapters when
-# those adapters are implemented.
+# The container is the SAME artifact you "lift" to ECS/Fargate; swapping
+# to SQS + S3 is config (QUEUE_DRIVER=sqs, STORE_DRIVER=s3) once those
+# adapters are implemented — see docs/adr/0045-backend-scoring-service.md.
 name: rater-scoring
 services:
   scoring:

@@ -1,6 +1,6 @@
 /**
  * preflight — the book header meets the input dictionary BEFORE any
- * row rates.
+ * row rates (book-intake brief §2 / MVP-004 · MVP-010).
  *
  * One pure derivation, shared by BOTH doors: the app runs it on
  * upload (exact/normalized matches apply automatically; fuzzy hits
@@ -10,8 +10,9 @@
  * never the garbled per-row lookup error.
  *
  * Matching uses the SAME core as the app's Auto-recognize
- * (`nameSimilarity`) so the two doors cannot disagree about what a
- * column name means. Fuzzy suggestions surface at ≥ 0.4.
+ * (`nameSimilarity`, Brief 38 §7 / Brief 57) so the two doors can't
+ * disagree about what a column name means. Thresholds mirror the
+ * Brief 38 §7 locks: fuzzy suggestions surface at ≥ 0.4.
  */
 
 import { nameSimilarity, normalizeIdent } from "./name-similarity";
@@ -45,17 +46,30 @@ export interface BookPreflight {
   readonly suggested: readonly PreflightSuggestion[];
   /** Columns that are not plan inputs (ignored unless mapped). */
   readonly unknown: readonly string[];
+  /** FCA #13 — columns the rating STRUCTURE reads directly (schedule
+   *  applications, predicate/branch fields) without a dictionary
+   *  declaration. These were labeled 'ignored' while every row's
+   *  values were consumed and applied — a false note that shipped a
+   *  wrong headline number. Named truthfully now. */
+  readonly consumed: readonly string[];
+  /** FCA #13 — header names appearing more than once (the classic
+   *  Excel-export artifact). The parser would silently keep only the
+   *  LAST copy's values (+20% written in the audit), so duplicates
+   *  BLOCK: `ok` is false while any exist. */
+  readonly duplicates: readonly string[];
   /** Required inputs no column matched (suggestions don't count). */
   readonly missing: readonly string[];
   /** The sniffed delimiter of the header line. */
   readonly delimiter: "," | ";" | "\t" | "|";
   /** Non-null when the delimiter isn't the comma the parser reads. */
   readonly note: string | null;
-  /** True when rating can proceed: every required input matched and
-   *  the file parses as CSV. Unknown columns alone don't block. */
+  /** True when rating can proceed: every required input matched, no
+   *  duplicate headers, and the file parses as CSV. Unknown columns
+   *  alone don't block. */
   readonly ok: boolean;
-  /** THE user sentence (leftovers + missing + suggestions + note);
-   *  null when there is nothing to say. Both doors print this one. */
+  /** THE user sentence (duplicates + leftovers + missing + suggestions
+   *  + note); null when there is nothing to say. Both doors print
+   *  this one. */
   readonly sentence: string | null;
 }
 
@@ -118,15 +132,40 @@ export function composePreflightSentence(args: {
   readonly missing: readonly string[];
   readonly suggested: readonly PreflightSuggestion[];
   readonly note: string | null;
+  readonly consumed?: readonly string[];
+  readonly duplicates?: readonly string[];
 }): string | null {
   const parts: string[] = [];
   if (args.note) parts.push(args.note);
+  const duplicates = args.duplicates ?? [];
+  if (duplicates.length > 0) {
+    const n = duplicates.length;
+    parts.push(
+      `Duplicate column${n === 1 ? "" : "s"} (${listOf(duplicates)}) — ` +
+        `each row would silently keep only the last copy's values. ` +
+        `Remove the duplicate${n === 1 ? "" : "s"} and retry.`,
+    );
+  }
   if (args.unknown.length > 0) {
     const n = args.unknown.length;
+    // FCA #13 (grammar) — '1 of your column isn't' read broken on
+    // virtually every book run; the count agrees with the verb, the
+    // noun stays plural ('1 of your columns').
     parts.push(
-      `${n} of your column${n === 1 ? " isn't a plan input" : "s aren't plan inputs"} (${listOf(
+      `${n} of your columns ${n === 1 ? "isn't a plan input" : "aren't plan inputs"} (${listOf(
         args.unknown,
       )}) — ignored unless mapped.`,
+    );
+  }
+  const consumed = args.consumed ?? [];
+  if (consumed.length > 0) {
+    const n = consumed.length;
+    // FCA #13 — never call a load-bearing column 'ignored': these are
+    // read by the rating structure and applied to every row.
+    parts.push(
+      `${n} column${n === 1 ? "" : "s"} (${listOf(consumed)}) ` +
+        `${n === 1 ? "is" : "are"} read directly by the rating ` +
+        `structure — values apply to every row as-is.`,
     );
   }
   for (const s of args.suggested) {
@@ -148,6 +187,7 @@ export function preflightHeader(
   columns: readonly string[],
   inputs: readonly PreflightInput[],
   delimiterInfo?: { delimiter: BookPreflight["delimiter"]; note: string | null },
+  consumedFields: readonly string[] = [],
 ): BookPreflight {
   const { delimiter, note } = delimiterInfo ?? { delimiter: ",", note: null };
   const byNormalized = new Map<string, PreflightInput>();
@@ -159,18 +199,52 @@ export function preflightHeader(
       if (!byNormalized.has(key)) byNormalized.set(key, input);
     }
   }
+  // FCA #13 — the structure-consumed vocabulary: field keys the
+  // runtime plan reads that carry no dictionary declaration
+  // (schedule applications, predicate/branch fields). A column that
+  // normalizes onto one of these is NOT 'ignored' — it is applied to
+  // every row.
+  const consumedNormalized = new Set(
+    consumedFields.map((f) => normalizeIdent(f)),
+  );
 
   const matched: PreflightMatch[] = [];
   const suggested: PreflightSuggestion[] = [];
   const unknown: string[] = [];
+  const consumed: string[] = [];
   const claimed = new Set<string>();
   const fuzzyColumns: string[] = [];
+
+  // FCA #13 — duplicate headers (the classic Excel artifact): the
+  // row parser keeps only the LAST copy's values, so every row rates
+  // with silently-wrong data. Detect on the normalized name and BLOCK.
+  const seenColumns = new Map<string, number>();
+  for (const column of columns) {
+    const trimmed = column.trim();
+    if (trimmed === "") continue;
+    const key = normalizeIdent(trimmed);
+    seenColumns.set(key, (seenColumns.get(key) ?? 0) + 1);
+  }
+  const duplicateKeys = new Set(
+    [...seenColumns.entries()].filter(([, n]) => n > 1).map(([k]) => k),
+  );
+  const duplicates: string[] = [];
+  const listedDupKeys = new Set<string>();
 
   // Pass 1 — exact/normalized (these apply automatically).
   for (const column of columns) {
     const trimmed = column.trim();
     if (trimmed === "") continue;
-    const hit = byNormalized.get(normalizeIdent(trimmed));
+    const key = normalizeIdent(trimmed);
+    if (duplicateKeys.has(key)) {
+      // One entry per (normalized) name, first spelling shown.
+      if (!listedDupKeys.has(key)) {
+        listedDupKeys.add(key);
+        duplicates.push(trimmed);
+      }
+      continue;
+    }
+    const hit = byNormalized.get(key);
     if (hit && !claimed.has(hit.name)) {
       matched.push({ column: trimmed, input: hit.name });
       claimed.add(hit.name);
@@ -179,8 +253,13 @@ export function preflightHeader(
     }
   }
 
-  // Pass 2 — fuzzy suggestions over the unclaimed remainder.
+  // Pass 2 — the structure-consumed vocabulary, then fuzzy
+  // suggestions over the unclaimed remainder.
   for (const column of fuzzyColumns) {
+    if (consumedNormalized.has(normalizeIdent(column))) {
+      consumed.push(column);
+      continue;
+    }
     let best: { input: PreflightInput; score: number } | null = null;
     for (const input of inputs) {
       if (claimed.has(input.name)) continue;
@@ -221,15 +300,22 @@ export function preflightHeader(
     missing,
     suggested,
     note,
+    consumed,
+    duplicates,
   });
   return {
     matched,
     suggested,
     unknown,
+    consumed,
+    duplicates,
     missing,
     delimiter,
     note,
-    ok: unmatchedRequired.length === 0 && note === null,
+    ok:
+      unmatchedRequired.length === 0 &&
+      note === null &&
+      duplicates.length === 0,
     sentence,
   };
 }
@@ -238,11 +324,12 @@ export function preflightHeader(
 export function preflightBook(
   csvText: string,
   inputs: readonly PreflightInput[],
+  consumedFields: readonly string[] = [],
 ): BookPreflight {
   const headerLine = headerLineOf(csvText);
   const sniffed = sniffDelimiter(headerLine);
   const columns = headerLine
     .split(sniffed.delimiter)
     .map((c) => c.trim().replace(/^"|"$/g, ""));
-  return preflightHeader(columns, inputs, sniffed);
+  return preflightHeader(columns, inputs, sniffed, consumedFields);
 }

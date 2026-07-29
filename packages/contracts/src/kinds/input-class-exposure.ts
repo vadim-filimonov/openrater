@@ -26,6 +26,10 @@
  * BlockKind contract for every kind would bloat the surface. Special-
  * casing in the runtime mirrors the pattern used for `input` and
  * `input.source` since v0.
+ *
+ * See `docs/design-briefs/class-conditional-exposure.md` §6 for the
+ * full design (resolution rules, runtime context handles, validation
+ * rules).
  */
 
 import type { BlockKind, PortSpec } from "../block-types";

@@ -12,6 +12,9 @@
  * runtime attempt. The optional params (`originalKind`,
  * `originalParams`) preserve the original kind reference + params
  * so a round-trip load → save doesn't drop data.
+ *
+ * Ported from `<prototype>/plan-builder/src/blocks/kinds/
+ * unknown.tsx` (Phase A.1 PR 9). PURE half only.
  */
 
 import type { BlockKind } from "../block-types";

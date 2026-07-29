@@ -7,10 +7,11 @@ that exercises every spec-v1.0 construct the
 invented; the ZIP codes are real public geography, the grouping and
 pricing are not. This bundle exists so the ingestion pipeline's
 hardest paths stay green in CI **without any licensed rating content
-in the repo**. Private filings can be checked through the local-only
-acceptance gate (`RATER_ACCEPTANCE_WORKBOOK`) and are never committed.
+in the repo** — the owner's real filed program runs only through the
+local-only acceptance gate (`RATER_ACCEPTANCE_WORKBOOK`), never
+committed.
 
-The bundle is also **the reference filing**: the
+Since Brief 2 P2 the bundle is also **the reference FILING**: the
 same program rendered as a realistic 17-page rate filing PDF — the
 document the transcription cold-test, the tutorial, the demo
 screencast, and the eval harness all read. The filing and the
@@ -35,14 +36,15 @@ fresh deploy boots with, guarded in CI by
 `frontend/src/integrations/meridianSeedFixture.verify.test.ts`. See
 [`docs/fixtures/FIXTURE_PROVENANCE.md`](../../../fixtures/FIXTURE_PROVENANCE.md).
 
-## What this bundle verifies
+## What this bundle caught on its first live run
 
-The bundle guards against a multi-coverage failure mode where one
-endorsement/model node is incorrectly shared across multiple tower tips,
-causing every coverage to return the first tower's premium. It requires
-per-tip factor instances and a structured
-`endorsement_additive_multi_tower` refusal for once-per-policy amounts. It
-also verifies the floor's true home:
+Building it against the real engine surfaced a genuine multi-coverage
+premium bug: the projector wired ONE endorsement/model node across N
+tower tips, so every coverage came back with the first tower's
+premium. The fix (per-tip instances for factors; a structured
+`endorsement_additive_multi_tower` refusal for once-per-policy
+amounts) shipped with this bundle — which is exactly the job of an
+all-constructs regression net. It also pinned the floor's true home:
 `round_min` applies once per policy at the composition seam
 (`views.premium` / `composed.final`), not on the raw plan output.
 

@@ -5,6 +5,11 @@
  * it through one output port. Useful for parameters that don't come
  * from elsewhere in the plan (caps, default factors, thresholds).
  *
+ * Ported from `<prototype>/plan-builder/src/blocks/kinds/
+ * constant.tsx` (Phase A.1 PR 4). The PURE half only — params type,
+ * execute(), jacobian(), validate(). React renderBody/renderInspector
+ * are NOT here; they live in the rate-lab frontend in the original port plan.
+ *
  * Per node-design-principles P-N1 (pure execute): zero side effects.
  * Same params → same output forever.
  */

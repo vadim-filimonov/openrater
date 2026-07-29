@@ -1,6 +1,6 @@
 /**
- * Exhibits story — deterministic annotation-template tests over counted
- * facts in both moods.
+ * Exhibits story — annotation template tests (Brief: portfolio-redesign
+ * v2, P5). Deterministic sentences over counted facts, both moods.
  */
 
 import { describe, expect, it } from "vitest";

@@ -1,5 +1,5 @@
 /**
- * resolveInputDisplayName tests — pins the  rule: both writers
+ * resolveInputDisplayName tests — pins the MVP-012 rule: both writers
  * (hand editor: display name in config.name; workbook builder: slug in
  * config.name, label on the stage) resolve to the human name, and a
  * degenerate name never shadows a real one.

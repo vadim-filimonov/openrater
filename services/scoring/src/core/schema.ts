@@ -125,14 +125,14 @@ const common = {
 
 const scoreExtra = { inputs: z.record(z.unknown()).default({}) } as const;
 // Brief 75 (P3) — the BOOK bag: when present, `rows` are RAW book rows
-// (CSV strings); the worker projects them through the shared UI
+// (CSV strings); the worker projects them through the ONE labs-ui
 // projection path (`projectRowsToExternalInputs`, dtypes derived from
 // the stages) and composes policies per the grouping + roll-ups. The
 // gates/floor/tail still derive from the plan substrate (G4 seam) —
 // this bag carries only what lives in the MAPPING, not the plan.
 const bookBagSchema = z.object({
   column_map: z.record(z.string()),
-  // The mapping's value translations (dimension slug →
+  // Book-intake §4 — the mapping's value translations (dim slug →
   // raw value → canonical level id). The worker projects through
   // them, so aliases resolved in Inputs hold on server book runs too.
   alias_overrides: z.record(z.record(z.string())).optional(),

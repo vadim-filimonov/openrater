@@ -1,7 +1,7 @@
 /**
  * <EmptyState> — the canonical "you have nothing here yet" surface.
  *
- * Canonical empty-state structure:
+ * Polish PR 5. Codifies the audit's empty-state north-star:
  *
  *     [hero icon · 24px · muted color]
  *     [title · t-16 · semibold]
@@ -11,7 +11,8 @@
  *
  * Replaces 4 different empty-state patterns across the workspaces
  * (DimensionsWorkspace's hero+title+hint, GateCanvas's title+lede+
- * 3-CTA grid, plus per-section variants in Dimensions).
+ * 3-CTA grid, plus per-section variants in Dimensions). See
+ * `docs/design/UI_AUDIT.md` §F.
  *
  * NOT for functional empty states like dropzones (Inputs CSV
  * dropzone, Assemble TowerSpawnZone) — those are interactive drop

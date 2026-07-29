@@ -131,7 +131,8 @@
   gap: var(--rater-s-4);
   font-size: var(--rater-t-13);
   font-weight: var(--rater-fw-medium);
-  color: var(--rater-accent-primary);
+  /* FCA #32 (finding 20) — the TEXT role, not the fill color. */
+  color: var(--rater-accent-primary-text);
   white-space: nowrap;
 }
 .rater-home-plans__open svg {
@@ -216,7 +217,8 @@
   gap: var(--rater-s-4);
   font-size: var(--rater-t-13);
   font-weight: var(--rater-fw-medium);
-  color: var(--rater-accent-primary);
+  /* FCA #32 (finding 20) — the TEXT role, not the fill color. */
+  color: var(--rater-accent-primary-text);
   white-space: nowrap;
   text-decoration: none;
 }
@@ -263,7 +265,8 @@
 }
 
 .rater-home__workbook-line a {
-  color: var(--rater-accent-primary);
+  /* FCA #32 (finding 20) — the TEXT role, not the fill color. */
+  color: var(--rater-accent-primary-text);
   text-decoration: none;
-  border-bottom: 1px dotted var(--rater-accent-primary);
+  border-bottom: 1px dotted var(--rater-accent-primary-text);
 }

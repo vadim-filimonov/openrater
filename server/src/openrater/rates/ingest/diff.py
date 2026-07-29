@@ -121,7 +121,7 @@ def _pct(a: Any, b: Any) -> float | None:
 
 
 def _change(field: str, a: Any, b: Any, *, rate: bool = False) -> FieldChange:
-    """One field move.  — `pct` is RATE grammar: it rides factor
+    """One field move. MVP-022 — `pct` is RATE grammar: it rides factor
     cells and the filing's expected results, never thresholds, orders,
     or other plain numbers (a gate moving 3 → 5 is not '+66.7%')."""
     return FieldChange(field=field, from_=a, to=b, pct=_pct(a, b) if rate else None)
@@ -368,7 +368,7 @@ def _diff_test_cases(base: ParsedWorkbook, new: ParsedWorkbook) -> DiffSection:
     )
     # The filing revising its own examples is the strongest rate-change
     # signal — say it in those words. Expected results are RATE grammar
-    # (): they keep their pct where plain fields lost it.
+    # (MVP-022): they keep their pct where plain fields lost it.
     for item in sec.items:
         if item.state == "changed":
             expected = [
@@ -394,7 +394,7 @@ _GATE_CLAUSE_SUFFIXES = ("", "_2", "_3")
 
 
 def _gate_phrase(row: Row | None, ch: FieldChange) -> str:
-    """One gate move in the plan's own words (): a clause column
+    """One gate move in the plan's own words (MVP-022): a clause column
     resolves to its VARIABLE — "years_in_business threshold 3 → 5",
     never "value_2 changed"."""
     for sfx in _GATE_CLAUSE_SUFFIXES:

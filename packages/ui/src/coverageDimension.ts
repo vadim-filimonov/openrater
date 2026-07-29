@@ -2,7 +2,7 @@
  * CANONICAL_COVERAGE_DIMENSION — the seeded "coverage" structural axis
  * (Brief 53).
  *
- * Property factor tables in Meridian BOP are 2-D `risk-input × coverage`
+ * Property factor tables in ISO BOP are 2-D `risk-input × coverage`
  * (e.g. base_lc_property = territory × coverage). The second axis is
  * always Building vs BPP. Rather than make the actuary hand-author that
  * dimension before every 2-D table, the Parametrize column slot offers a
@@ -40,7 +40,7 @@ export const CANONICAL_COVERAGE_DIMENSION: DimensionRow = {
   dimension_type: "standard",
   shape: "categorical",
   description:
-    "Coverage rating axis — Building vs BPP — for 2-D property relativity tables (Meridian BOP Rule 23.C.6.a). Structural: it indexes the algorithm, never asked of the risk.",
+    "Coverage rating axis — Building vs BPP — for 2-D property relativity tables (ISO BOP Rule 23.C.6.a). Structural: it indexes the algorithm, never asked of the risk.",
   levels: [
     { kind: "categorical", id: "building", label: "Building" },
     { kind: "categorical", id: "bpp", label: "BPP" },

@@ -477,7 +477,7 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* The preflight sentence above the Match table:
+/* Book-intake §2 — the pre-flight sentence above the Match table:
  * one quiet line naming ignored columns / suggestions / missing
  * required inputs (the same sentence the chat door refuses with). */
 .rater-inputs2__preflight {
@@ -1018,6 +1018,20 @@
   color: var(--rater-text-muted);
   font-size: var(--rater-t-13);
 }
+/* FCA #23 — the scaled-column multiplier (column × N). */
+.rater-inputs2__times-mult {
+  flex: none;
+  width: 5.5em;
+  min-width: 0;
+  height: var(--rater-s-28);
+  padding: 0 var(--rater-s-8);
+  border: 1px solid var(--rater-border-default);
+  border-radius: var(--rater-r-6);
+  background: var(--rater-surface-2);
+  color: var(--rater-text-default);
+  font-family: inherit;
+  font-size: var(--rater-t-12);
+}
 /* ── Dictionary authoring (P0.1) — quietly editable ───────────── */
 /* The name reads as plain text; hover reveals it's editable, click edits. */
 .rater-inputs2__fname-edit {
@@ -1036,7 +1050,7 @@
   cursor: text;
   transition: background var(--rater-d-80) var(--rater-ease-snap);
 }
-.rater-inputs2__fname-edit:hover:not(disabled) {
+.rater-inputs2__fname-edit:hover:not(:disabled) {
   background: var(--rater-surface-2);
 }
 .rater-inputs2__fname-edit:disabled,
@@ -1066,7 +1080,7 @@ button.rater-inputs2__type {
 button.rater-inputs2__type.is-editable {
   cursor: pointer;
 }
-button.rater-inputs2__type.is-editable:hover:not(disabled) {
+button.rater-inputs2__type.is-editable:hover:not(:disabled) {
   border-color: var(--rater-border-strong);
   color: var(--rater-text-default);
 }
@@ -1106,7 +1120,7 @@ button.rater-inputs2__type:disabled {
 .rater-inputs2__draftrow .rater-inputs2__del {
   opacity: 1;
 }
-.rater-inputs2__del:hover:not(disabled) {
+.rater-inputs2__del:hover:not(:disabled) {
   color: var(--rater-feedback-warn);
   background: var(--rater-surface-2);
 }

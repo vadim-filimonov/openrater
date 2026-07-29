@@ -11,9 +11,10 @@ FastAPI service hosting the entity registry that Rate Lab consumes:
 plans, dimensions, factor tables, curves, class codes, eligibility
 rules, loadings, modifiers, sample submissions, etc.
 
-The local development service runs unauthenticated against a development
-database. Production integrators provide the authentication layer appropriate
-for their deployment.
+This package was ported as-is from the original prototype in 2026-05 as part
+of the W4 §0.5 OSS detachment. Auth and session middleware were
+stripped — Labs runs unauthenticated against a dev database;
+integrators wrap with their own auth layer per their stack.
 """
 
 __version__ = "0.1.0"

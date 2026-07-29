@@ -20,7 +20,7 @@ import { cleanup } from "@testing-library/react";
 // in jsdom; the library throws at mount otherwise.
 //
 // Stubs only — we don't assert on viewport / pan-zoom behavior in
-// jsdom. See packages/ui/src/Canvas/Canvas.test.tsx for the
+// jsdom. See packages/labs-ui/src/Canvas/Canvas.test.tsx for the
 // rationale.
 
 if (typeof globalThis.ResizeObserver === "undefined") {

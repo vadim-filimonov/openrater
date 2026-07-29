@@ -163,6 +163,21 @@ export interface DerivedRequiredInput {
  * Exported for testing — callers usually consume the higher-level
  * deriveRequiredInputs() instead.
  */
+/**
+ * Slug-safe field key. ONE function for every derived field name —
+ * the projector's `schedule_app_${sanitize(id)}` and this deriver's
+ * mappable entry must agree byte-for-byte (FCA #23), so the
+ * implementation lives here and stagesToRuntimePlan re-exports it.
+ */
+export function sanitize(s: string): string {
+  return (
+    s
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "_")
+      .replace(/^_+|_+$/g, "") || "x"
+  );
+}
+
 export function normalizePath(path: string | undefined | null): string {
   if (!path) return "";
   const s = String(path).trim();
@@ -265,7 +280,7 @@ export function deriveRequiredInputs(
   // Walk in TWO passes so dim refs (highest-priority metadata) lock
   // the entry before the input_node + raw-path walks fill in the
   // rest. Without this, an input_node stage that happens to share a
-  // path with a dim ref (e.g., the Meridian BOP fixture's
+  // path with a dim ref (e.g., the ISO BOP fixture's
   // `input_class_code` stage shares `class_code` with the
   // BUILDING_CHAIN class factor) would register first as
   // category="input" with no dimSlug — losing the alias-resolution
@@ -299,7 +314,7 @@ export function deriveRequiredInputs(
         const path = stringField(cfg, "source_path") ?? stage.stage_id;
         const id = normalizePath(path) || stage.stage_id;
         if (out.has(id)) continue;
-        //  — `config_json.name` is the display name only when
+        // MVP-012 — `config_json.name` is the display name only when
         // the editor authored one (it differs from the field key); the
         // workbook builder writes the slug there and puts the label on
         // stage.display_name. One rule, shared with the dictionary.
@@ -376,6 +391,37 @@ export function deriveRequiredInputs(
         break;
       }
 
+      case "modifier.schedule": {
+        // FCA #23 (finding 13) — the per-risk schedule application
+        // (IRPM credits/debits) reads `schedule_app_{schedule_id}`
+        // from the row, exactly as the projector wires it — but this
+        // deriver never listed it, so the Match columns screen
+        // offered an extract's IRPM_PCT no destination and six rows'
+        // filed schedule modifiers were silently unapplied. OPTIONAL:
+        // an absent application is neutral (1.0), never a missing-
+        // input nag; a mapped bare percentage applies through the
+        // kind's single-category promotion.
+        const cfg = readObject(stage.config_json);
+        const schedule = readObject(cfg?.["schedule"]) ?? cfg;
+        const scheduleId =
+          (typeof schedule?.["schedule_id"] === "string" &&
+            schedule["schedule_id"]) ||
+          stage.stage_id;
+        const id = `schedule_app_${sanitize(scheduleId)}`;
+        if (out.has(id)) break;
+        const label =
+          stage.display_name?.trim() || `Schedule ${scheduleId}`;
+        out.set(id, {
+          id,
+          name: `${label} — schedule application`,
+          category: "inputs",
+          dtype: "number",
+          origin: `Schedule · ${label}`,
+          optional: true,
+        });
+        break;
+      }
+
       default:
         // model.* + future stage kinds — see §4.2 deferred list.
         break;
@@ -420,6 +466,12 @@ export function deriveRequiredInputs(
       if (seenDimSlugs.has(slug)) continue;
       if (out.has(slug)) continue;
       const d = dimsBySlug.get(slug);
+      // ADR-0025 / FCA #21 — a composite dim's key is derived in-graph
+      // from its members (each a catalog dim that surfaces itself);
+      // the composite is never a CSV column.
+      if ((d as { shape?: string } | undefined)?.shape === "composite") {
+        continue;
+      }
       out.set(slug, {
         id: slug,
         name: d?.display_name?.trim() || slug,
@@ -443,6 +495,8 @@ export function deriveRequiredInputs(
     if (!d.slug) continue;
     if (seenDimSlugs.has(d.slug)) continue;
     if (out.has(d.slug)) continue;
+    // Composite dims derive in-graph — see the Pass 3 guard.
+    if ((d as { shape?: string }).shape === "composite") continue;
     out.set(d.slug, {
       id: d.slug,
       name: d.display_name?.trim() || d.slug,
@@ -606,6 +660,33 @@ function addDimRefsFromLookup(
             `${lookup.name || lookup.factor_kind || "Factor"} · ${chainName} (computes ${dimSlug})`,
           );
         }
+      }
+      continue;
+    }
+    // ADR-0025 / FCA #21 — a composite axis consumes its MEMBERS'
+    // fields; the composite slug itself is derived in-graph (never a
+    // required input — the audit's plan demanded a 13th input the
+    // schema didn't list). Mark it computed so the catalog passes
+    // don't resurrect it as a phantom column.
+    if (
+      binding?.source === "composite" &&
+      binding.axes &&
+      typeof binding.axes === "object"
+    ) {
+      computed.dims.add(dimSlug);
+      for (const [memberSlug, member] of Object.entries(binding.axes)) {
+        if (!member?.path) continue;
+        const mid = normalizePath(member.path);
+        if (!mid || isNonInputNamespaceId(mid) || out.has(mid)) continue;
+        const mdim = dimsBySlug.get(memberSlug);
+        out.set(mid, {
+          id: mid,
+          name: mdim?.display_name?.trim() || memberSlug,
+          category: "dimensions",
+          dtype: dimDtype(mdim),
+          dimSlug: memberSlug,
+          origin: `${lookup.name || lookup.factor_kind || "Factor"} · ${chainName} (member of ${dimSlug})`,
+        });
       }
       continue;
     }

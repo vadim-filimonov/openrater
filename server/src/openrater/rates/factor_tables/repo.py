@@ -321,7 +321,7 @@ def upsert_factor_table_cells(
                 "WHERE rating_plan_id = ? AND table_id = ?",
                 (now, rating_plan_id, table_id),
             )
-            # Drift tracking: every substrate mutation
+            # Drift honesty (MVP-008): every substrate mutation
             # recomputes the plan hash — the authoring paths always
             # did; the direct cells edit was the gap that made both
             # If-Match and "edited since build" blind to it.

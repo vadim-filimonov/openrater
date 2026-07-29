@@ -1,5 +1,5 @@
 #!/bin/sh
-# Build the desktop `openrater-server` one-dir bundle.
+# Build the desktop `openrater-server` one-dir bundle (Brief 2 §6).
 # Output: packaging/desktop/dist/openrater-server/
 set -e
 cd "$(dirname "$0")/../.."

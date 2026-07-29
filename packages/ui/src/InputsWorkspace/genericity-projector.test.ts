@@ -13,9 +13,9 @@
  *
  * Mechanism: load the projector's own source via Vite `?raw`, strip
  * comments, assert no `PRODUCT_CODES` value appears as a quoted literal
- * in the remaining executable code. (Lives in @openrater/ui, not contracts,
+ * in the remaining executable code. (Lives in labs-ui, not contracts,
  * because the projector lives here — a contracts test cannot import a
- * UI module without inverting the package dependency.)
+ * labs-ui module without inverting the package dependency.)
  */
 
 import { describe, it, expect } from "vitest";

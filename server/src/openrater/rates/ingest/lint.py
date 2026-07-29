@@ -20,6 +20,7 @@ boundary can move without touching this module.
 from __future__ import annotations
 
 import json
+import math
 import re
 from datetime import date, datetime
 from importlib import resources
@@ -94,6 +95,22 @@ def _registry_message(registry: dict[str, Any], construct_id: str) -> str:
     return construct_id
 
 
+def _registry_instead(registry: dict[str, Any], construct_id: str) -> str:
+    """The registry entry's 'instead' recipe — the actionable half.
+    Falls back to the message when an entry has no recipe."""
+    for c in registry.get("constructs", []):
+        if c.get("id") == construct_id:
+            return str(c.get("instead") or c.get("message", construct_id))
+    return construct_id
+
+
+def _shortlist(keys: list[str], cap: int = 8) -> str:
+    """First `cap` keys, with an honest count of the rest."""
+    if len(keys) <= cap:
+        return ", ".join(keys)
+    return ", ".join(keys[:cap]) + f" (+{len(keys) - cap} more)"
+
+
 def _num(v: Any) -> float | None:
     """A numeric cell value, or None when it isn't one. Strings are
     NOT coerced (R-005 — numbers must be numbers)."""
@@ -133,6 +150,37 @@ def _csv(v: Any) -> list[str]:
     return [p.strip() for p in str(v).split(",") if p.strip()]
 
 
+def _comparator_numeric(v: Any) -> bool:
+    """Can the runtime comparator read v as a finite number? Mirrors
+    the contracts' toFiniteNumber (tier-types.ts): real numbers yes,
+    booleans never, strings iff they parse finite."""
+    if isinstance(v, bool):
+        return False
+    if isinstance(v, (int, float)):
+        return math.isfinite(v)
+    if isinstance(v, str) and v.strip() != "":
+        try:
+            return math.isfinite(float(v))
+        except ValueError:
+            return False
+    return False
+
+
+def _enum_literal_matches(entry: Any, allowed_value: str) -> bool:
+    """Can the runtime comparator equate a gate literal with one
+    allowed_values spelling? Mirrors looseEq (tier-types.ts): strict
+    equality, the typed-boolean literal seam, and the finite-number
+    seam — nothing wider (two non-numeric strings that differ
+    strictly never bridge)."""
+    if isinstance(entry, bool):
+        return _bool(allowed_value) is entry
+    if str(entry) == allowed_value:
+        return True
+    if _comparator_numeric(entry) and _comparator_numeric(allowed_value):
+        return float(str(entry)) == float(allowed_value)
+    return False
+
+
 class _Lint:
     def __init__(self, wb: ParsedWorkbook, registry: dict[str, Any]) -> None:
         self.wb = wb
@@ -140,6 +188,8 @@ class _Lint:
         self.issues: list[CheckIssue] = []
         # Cross-sheet lookups built as we go.
         self.input_names: set[str] = set()
+        self.input_data_types: dict[str, str] = {}
+        self.input_allowed_values: dict[str, list[str]] = {}
         self.required_inputs_without_default: set[str] = set()
         # Brief 95 C2 — validated derived inputs: slug -> sum operands.
         self.derived_inputs: dict[str, list[str]] = {}
@@ -325,7 +375,7 @@ class _Lint:
             return
         seen: dict[str, int] = {}
         derived_rows: list[tuple[str, Any, str]] = []  # (slug, row, raw expr)
-        data_types: dict[str, str] = {}
+        data_types = self.input_data_types  # promoted: lint_gates reads it (R-171)
         for row in t.rows:
             name = self.require_cell(row, "name", t.sheet)
             slug = self.check_slug(name, t.sheet, row.ref("name"), "Input name")
@@ -358,6 +408,9 @@ class _Lint:
             required = _bool(self.require_cell(row, "required", t.sheet))
             allowed = _csv(row.get("allowed_values"))
             default = row.get("default_value")
+            if slug and allowed:
+                # promoted: lint_gates reads it (R-172)
+                self.input_allowed_values[slug] = allowed
 
             if str(dt) == "enum" and not allowed:
                 self.add(
@@ -716,6 +769,10 @@ class _Lint:
                 continue
             refs = self.territory_refs.get(geo.slug, set())
             seen: dict[str, int] = {}
+            # key → territory_code, for the alias-aware universe check
+            # (FCA #25: a name key riding beside an in-universe FIPS
+            # key in the same territory is the dual-key convention).
+            assignments: dict[str, str] = {}
             for row in geo.table.rows:
                 key = row.get("zip") or row.get("county")
                 if key is not None:
@@ -737,7 +794,9 @@ class _Lint:
                         sheet=geo.sheet,
                         cell=row.ref("territory_code"),
                     )
-            self._lint_geo_universe(geo.slug, geo.sheet, set(seen))
+                if key is not None and code is not None:
+                    assignments[str(key)] = str(code)
+            self._lint_geo_universe(geo.slug, geo.sheet, assignments)
 
         # R-086 — geographic declared, but no geographic indicator
         # anywhere. Geography engages only with ZIP/county detail; a
@@ -760,18 +819,22 @@ class _Lint:
                 )
 
     def _lint_geo_universe(
-        self, slug: str, sheet: str, keys: set[str]
+        self, slug: str, sheet: str, assignments: dict[str, str]
     ) -> None:
         """R-083…R-085 — the geo sheet against the Census universe.
 
         Coverage holes surface HERE, at validate time, instead of as
         quote-time refusals: in-scope keys never mapped (R-083,
         notice — a consequence, not a defect: a program may write
-        only part of its state, and unmapped keys refuse honestly),
-        keys outside the declared scope (R-084, warning — typos or a
-        wrong scope), and keys the Census universe doesn't know at
-        all (R-085, notice — PO-box ZIPs have no ZCTA; typos look
-        like this too).
+        only part of its state, and unmapped keys refuse honestly;
+        FCA #25: 0% mapped ESCALATES to a warning naming the likely
+        vocabulary mistake), keys outside the declared scope (R-084,
+        warning — typos or a wrong scope), and keys the Census
+        universe doesn't know at all (R-085, notice — PO-box ZIPs
+        have no ZCTA; typos look like this too; FCA #25: a
+        NAME-shaped key riding beside an in-universe key in the same
+        territory is the sanctioned dual-key convention, never a
+        typo suspect).
         """
         meta = self.dim_geo.get(slug)
         if meta is None:
@@ -780,6 +843,7 @@ class _Lint:
         universe = load_geo_universe().get(gran)
         if universe is None:  # state grain carries no geo-sheet detail
             return
+        keys = set(assignments)
         states: list[str] | None = None
         if scope.startswith("subset:"):
             states = [
@@ -787,16 +851,40 @@ class _Lint:
             ]
         in_scope = universe.in_states(states)
         noun = "ZCTA" if gran == "zip" else "county"
+        vocab = (
+            "5-digit Census FIPS codes"
+            if gran == "county"
+            else "5-digit ZCTA codes"
+        )
 
+        # FCA #25 (findings 35/108) — the dual-key convention: the only
+        # way to make the manual's own county vocabulary quotable is a
+        # name row beside each FIPS row. A name-shaped unknown whose
+        # territory group also carries an in-universe key is that
+        # convention, not a typo — flagging all 93 forever trained
+        # users to ignore real R-085 hits.
+        known_territories = {
+            code
+            for key, code in assignments.items()
+            if key in universe.state_of
+        }
         unknown = sorted(k for k in keys if k not in universe.state_of)
-        if unknown:
-            sample = ", ".join(unknown[:5]) + ("…" if len(unknown) > 5 else "")
+        flagged = [
+            k
+            for k in unknown
+            if k.strip().isdigit()
+            or assignments.get(k) not in known_territories
+        ]
+        if flagged:
+            sample = ", ".join(flagged[:5]) + ("…" if len(flagged) > 5 else "")
             self.add(
                 "R-085",
                 "notice",
-                f"{len(unknown)} key(s) in 'geo.{slug}' aren't in the Census "
-                f"{noun} universe: {sample}. PO-box ZIPs have no ZCTA; typos "
-                "look like this too.",
+                f"{len(flagged)} key(s) in 'geo.{slug}' aren't in the Census "
+                f"{noun} universe: {sample}. The platform joins {noun}s by "
+                f"{vocab}; a name is quotable only as an alias row beside "
+                "an in-universe row. PO-box ZIPs have no ZCTA; typos look "
+                "like this too.",
                 sheet=sheet,
             )
 
@@ -822,12 +910,29 @@ class _Lint:
         if unmapped:
             mapped = len(keys & in_scope)
             sample = ", ".join(unmapped[:5]) + ("…" if len(unmapped) > 5 else "")
+            # FCA #25 (finding 108's inverse) — a sheet that maps
+            # NOTHING in scope almost always keys the wrong vocabulary
+            # (county NAMES where FIPS codes belong); every quote will
+            # refuse. That's a defect signal, not partial coverage —
+            # it warns and names the likely cause. Partial coverage
+            # stays a notice: a program may write only part of its
+            # state.
+            zero = mapped == 0 and len(keys) > 0
+            hint = (
+                f" Nothing in scope is mapped — the keys likely use "
+                f"another vocabulary. {noun.capitalize()} keys must be "
+                f"{vocab}; names are quotable only as alias rows beside "
+                "an in-universe row."
+                if zero
+                else ""
+            )
             self.add(
                 "R-083",
-                "notice",
+                "warning" if zero else "notice",
                 f"'geo.{slug}' maps {mapped} of {len(in_scope)} {noun}s in "
                 f"the declared scope ({scope}); {len(unmapped)} unmapped — an "
-                f"unmapped {noun} refuses at rating time. Unmapped: {sample}",
+                f"unmapped {noun} refuses at rating time.{hint} "
+                f"Unmapped: {sample}",
                 sheet=sheet,
             )
 
@@ -895,7 +1000,7 @@ class _Lint:
 
         # Brief 95 C5 (registry r9) — linear interpolation is SUPPORTED
         # on both table shapes now; R-111 downgrades to a notice naming
-        # each interpolating table (an FYI, never a caveat).  —
+        # each interpolating table (an FYI, never a caveat). MVP-014 —
         # the notice is ONE user sentence; ADR/Brief provenance lives in
         # the spec and the registry, never in user output.
         if str(ft.meta_value("interpolation") or "stepped") == "linear":
@@ -969,6 +1074,28 @@ class _Lint:
                     f"'{ft.slug}' come from?",
                     sheet=sheet,
                 )
+            # R-174 (FCA #31) — declared-level coverage, matrix shape;
+            # the 1-D site below tells the story. Matrices admit no
+            # '__default__' row, so a miss always refuses honestly.
+            for axis, dim, keys, covered in (
+                ("row", row_dim, row_keys, set(seen_rows)),
+                ("column", col_dim, col_keys, set(seen_cols)),
+            ):
+                if not keys or dim is None or str(dim) in self.dim_geo:
+                    continue
+                missing = sorted(keys - covered)
+                if missing:
+                    self.add(
+                        "R-174",
+                        "notice",
+                        f"Matrix '{ft.slug}' covers "
+                        f"{len(keys) - len(missing)} of {len(keys)} declared "
+                        f"levels of '{dim}' — no {axis} for: "
+                        f"{_shortlist(missing)}. Quotes at those levels "
+                        "refuse at runtime. Add the missing "
+                        f"{axis}(s) or remove the unused levels.",
+                        sheet=sheet,
+                    )
             return
 
         # 1-D
@@ -1020,6 +1147,41 @@ class _Lint:
                 f"'{DEFAULT_KEY}' appears {defaults} times — at most once per table.",
                 sheet=sheet,
             )
+        # R-174 (FCA #31, finding 32) — the inverse of R-104: every
+        # DECLARED level needs a factor row. A live S4 workbook
+        # declared ded_1000, carried rows only for none/ded_500/
+        # ded_2500, and check said ok — the hole surfaced as a
+        # quote-time refusal instead of at the review stop. Without a
+        # default the miss refuses honestly (notice); WITH a
+        # '__default__' row it silently PRICES the missing level, so
+        # it warns. Geographic dims are exempt — territory tables key
+        # by group, with member levels riding under them.
+        if row_keys and row_dim is not None and str(row_dim) not in self.dim_geo:
+            missing = sorted(row_keys - set(seen))
+            if missing:
+                lede = (
+                    f"Table '{ft.slug}' covers "
+                    f"{len(row_keys) - len(missing)} of {len(row_keys)} "
+                    f"declared levels of '{row_dim}' — no row for: "
+                    f"{_shortlist(missing)}."
+                )
+                if defaults:
+                    self.add(
+                        "R-174",
+                        "warning",
+                        f"{lede} The '{DEFAULT_KEY}' row silently prices "
+                        "those levels. Add explicit rows or remove the "
+                        "unused levels.",
+                        sheet=sheet,
+                    )
+                else:
+                    self.add(
+                        "R-174",
+                        "notice",
+                        f"{lede} Quotes at those levels refuse at runtime. "
+                        "Add the missing rows or remove the unused levels.",
+                        sheet=sheet,
+                    )
         if rows_missing_citation and ft.meta_value("citation_rule") is None:
             self.add(
                 "R-201",
@@ -1070,7 +1232,7 @@ class _Lint:
                     cell=row.ref("stage_kind"),
                 )
             if kind_s == "flat_factor":
-                # Use one user-facing sentence; the registry keeps
+                # MVP-014 voice — one user sentence; the registry keeps
                 # the engineering provenance.
                 self.add(
                     "R-190",
@@ -1462,6 +1624,10 @@ class _Lint:
                         sheet=t.sheet,
                         cell=row.ref(f"op{suffix}"),
                     )
+                elif var is not None and op is not None and val is not None:
+                    self._check_gate_literal(
+                        str(var), str(op), val, t.sheet, row.ref(f"value{suffix}")
+                    )
         if defaults != 1:
             self.add(
                 "R-160",
@@ -1470,6 +1636,79 @@ class _Lint:
                 f"(found {defaults}).",
                 sheet=t.sheet,
             )
+
+    def _check_gate_literal(
+        self, var: str, op: str, raw: Any, sheet: str, cell: str | None
+    ) -> None:
+        """R-171 (FCA S2 follow-up) — a gate literal the bound input's
+        declared data_type can never equal doesn't error at runtime;
+        the comparator just never equates the two sides, so the
+        condition is decided before any risk arrives: eq/in/ordering
+        never hit, ne/nin always pass. The audit's app-side stress
+        probe planted 'banana' against a boolean input and the
+        knock-out vanished without a trace — this warns at check time
+        instead. String inputs are exempt: the comparator's numeric
+        and boolean-literal widening lets any literal reach a
+        string-valued input. Enum inputs get the R-172 seat instead:
+        the type matches, but a literal outside the closed set is
+        disarmed the same way."""
+        dtype = self.input_data_types.get(var)
+        if dtype == "enum":
+            self._check_enum_gate_literal(var, op, raw, sheet, cell)
+            return
+        if dtype not in ("boolean", "number", "currency"):
+            return
+        entries: list[Any] = _csv(raw) if op in ("in", "nin") else [raw]
+        for entry in entries:
+            if dtype == "boolean":
+                dead = _bool(entry) is None
+            else:
+                dead = not _comparator_numeric(entry)
+            if dead:
+                self.add(
+                    "R-171",
+                    "warning",
+                    f"value {entry!r} can never match input '{var}' "
+                    f"(declared data_type {dtype!r}) — the comparison is "
+                    "decided before any risk arrives (eq/in/ordering "
+                    "never hit it, ne/nin always pass it), so the rule "
+                    "looks armed but isn't. Fix the literal or the "
+                    "input's data_type.",
+                    sheet=sheet,
+                    cell=cell,
+                )
+
+    def _check_enum_gate_literal(
+        self, var: str, op: str, raw: Any, sheet: str, cell: str | None
+    ) -> None:
+        """R-172 — R-171's enum seat: an enum input's runtime value
+        never leaves its declared allowed_values, so an eq/ne/in/nin
+        literal outside that closed set is decided before any risk
+        arrives (eq/in never hit, ne/nin always pass) and the rule is
+        silently disarmed the same way. Ordering ops are exempt — they
+        compare numerically, and a threshold literal need not be a
+        member of the set (gt 0 over numeric-coded levels is armed)."""
+        if op not in ("eq", "ne", "in", "nin"):
+            return
+        allowed = self.input_allowed_values.get(var)
+        if not allowed:
+            return  # no closed set to test (R-042 errors on that already).
+        entries: list[Any] = _csv(raw) if op in ("in", "nin") else [raw]
+        for entry in entries:
+            if not any(_enum_literal_matches(entry, v) for v in allowed):
+                self.add(
+                    "R-172",
+                    "warning",
+                    f"value {entry!r} isn't among input '{var}'s "
+                    f"allowed_values ({', '.join(allowed)}) — an enum "
+                    "value never leaves its closed set, so the "
+                    "comparison is decided before any risk arrives "
+                    "(eq/in never hit it, ne/nin always pass it) and "
+                    "the rule looks armed but isn't. Fix the literal "
+                    "or extend allowed_values.",
+                    sheet=sheet,
+                    cell=cell,
+                )
 
     # -- modifiers / endorsements / loadings / adjustments ---------------------------
 
@@ -1797,6 +2036,26 @@ class _Lint:
                     sheet=t.sheet,
                 )
 
+        # R-175 (FCA #31, finding 45) — per-coverage rounding is not
+        # expressible (registry: per_coverage_rounding), and its
+        # symptom is exact-expected test vectors missing by cents
+        # AFTER the human review stop, with nothing having said why.
+        # The detectable precondition — several expected_* columns,
+        # zero tolerance_* columns — gets the registry's own recipe
+        # BEFORE ingestion instead.
+        premium_cols = [c for c in expected_cols if c != "expected_tier"]
+        if len(premium_cols) >= 2 and not tolerance_cols:
+            self.add(
+                "R-175",
+                "notice",
+                f"test_cases carries {len(premium_cols)} expected_* columns "
+                "and no tolerance_* columns. If the filing rounds each "
+                "coverage before summing, exact matches will miss by cents "
+                "— the engine rounds ONCE at the package level. "
+                + _registry_instead(self.registry, "per_coverage_rounding"),
+                sheet=t.sheet,
+            )
+
         for col in input_cols:
             self._consume_input(col, t.sheet, None)
             if col in self.derived_inputs:
@@ -1863,10 +2122,46 @@ class _Lint:
 
     # -- gaps -----------------------------------------------------------------------
 
+    #: R-173 — description tokens that claim inability. A construct
+    #: phrase alone can appear in innocent prose; paired with one of
+    #: these (or a kind of gap/unsupported) it reads as "the platform
+    #: can't", which is exactly the claim the registry can refute.
+    _INABILITY_TOKENS = (
+        "unsupported",
+        "not supported",
+        "cannot",
+        "can't",
+        "can not",
+        "unable",
+        "inexpressible",
+        "no way to",
+    )
+
     def lint_gaps(self) -> None:
         t = self.wb.gaps
         if t is None:
             return
+        # R-173 (FCA fca-2026-07-25 #20) — the missing cross-check
+        # between the gaps ledger and the capability registry. An
+        # audited transcription declared coverage election
+        # 'unsupported' while registry r9 marks it SUPPORTED; the
+        # false ship-belief priced storage vehicles for coverages they
+        # don't carry, and a filed $24 fee was steered into the ledger
+        # when the registry's own pattern expresses it. Match phrases:
+        # each supported/partial construct's id (underscores → spaces)
+        # and its label head.
+        claims: list[tuple[str, str, str]] = []
+        for c in self.registry.get("constructs", []):
+            status = str(c.get("status"))
+            if status not in ("supported", "partial"):
+                continue
+            cid = str(c.get("id", ""))
+            phrases = {cid.replace("_", " ").strip().lower()}
+            head = str(c.get("label", "")).split(" (", 1)[0].strip().lower()
+            if head:
+                phrases.add(head)
+            claims.extend((p, cid, status) for p in phrases if p)
+
         for row in t.rows:
             kind = self.require_cell(row, "kind", t.sheet)
             if kind is not None and str(kind) not in GAP_KINDS:
@@ -1879,6 +2174,32 @@ class _Lint:
                 )
             self.require_cell(row, "description", t.sheet)
             self.require_cell(row, "impact", t.sheet)
+
+            desc = str(row.get("description") or "").lower()
+            if not desc:
+                continue
+            claims_inability = str(kind) in ("gap", "unsupported") or any(
+                tok in desc for tok in self._INABILITY_TOKENS
+            )
+            if not claims_inability:
+                continue
+            flagged: dict[str, str] = {}
+            for phrase, cid, status in claims:
+                if phrase in desc:
+                    flagged.setdefault(cid, status)
+            for cid, status in sorted(flagged.items()):
+                word = "SUPPORTED" if status == "supported" else "PARTIALLY supported"
+                self.add(
+                    "R-173",
+                    "warning",
+                    f"this gap declares '{cid.replace('_', ' ')}' out of "
+                    f"reach, but the capability registry marks that "
+                    f"construct {word} — re-check before shipping it as "
+                    f"a gap. Registry: "
+                    f"{_registry_message(self.registry, cid)}",
+                    sheet=t.sheet,
+                    cell=row.ref("description"),
+                )
 
     # -- run ------------------------------------------------------------------------
 

@@ -143,7 +143,8 @@ class ProductCode(StrEnum):
     EXCESS = "excess"
     MARINE = "marine"
     INLAND_MARINE = "inland_marine"
-    # Personal lines: an HO-3 / DP-3 filing lands as itself, not `other`.
+    # Brief 94.6 (owner-gated, confirmed 2026-07-16) — personal lines:
+    # an HO-3 / DP-3 filing lands as itself, not `other`.
     HOMEOWNERS = "homeowners"
     DWELLING = "dwelling"
     OTHER = "other"
@@ -268,7 +269,7 @@ class RatingPlan(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
     rating_plan_id: str = Field(..., min_length=1, max_length=80)
-    """Slug identifier (e.g., 'sample_bop_ne_2025_baseline')."""
+    """Slug identifier (e.g., 'sample_bop_wi_2025_baseline')."""
 
     display_name: str = Field(..., min_length=1, max_length=200)
     line_of_business: LineOfBusiness

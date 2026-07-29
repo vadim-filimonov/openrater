@@ -3,7 +3,7 @@
  * authored plan + input mapping (E08 + E03 PR D; ADR-016's "config from plan"
  * adapter).
  *
- * P2 G4 (ADR-0056) — lifted from app integrations into @openrater/ui so the
+ * P2 G4 (ADR-0056) — LIFTED from rate-lab integrations into labs-ui so the
  * scoring service composes the FILED premium through the SAME extraction the
  * browser uses (Law 1: one premium, one code path). The rate-lab module
  * re-exports from here. Stage inputs are the structural `StageLike` — both

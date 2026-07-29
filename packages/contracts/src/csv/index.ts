@@ -1,12 +1,16 @@
 /**
- * CSV roundtrip library barrel.
+ * CSV roundtrip library barrel — ADR-0017.
  *
- * Shared by CSV batch import, Factor Table editing, territory mapping,
- * classification, and eligibility-rule authoring.
+ * Shared by Briefs 6 (CSV batch import), 18 (Factor Table editor),
+ * 19 (Curve editor), 20 (Territory map), 21 (Class translator),
+ * and 22 (Eligibility condition builder).
  *
  * Pure functions; no React, no I/O. Consumers wrap these with
- * their row schemas to produce typed `ImportDiff<TRow>`
+ * their per-brief row schemas to produce typed `ImportDiff<TRow>`
  * conflict previews.
+ *
+ * See:
+ *   - docs/adr/0017-csv-import-export-semantics.md
  */
 
 export type {
@@ -33,7 +37,7 @@ export {
 } from "./conflict";
 export type { ComputeDiffOptions, DiffSummary } from "./conflict";
 
-// Shared identifier matching and the
+// Book-intake brief §2 — the shared identifier-matching core + the
 // header pre-flight both doors run before any row rates.
 export {
   normalizeIdent,

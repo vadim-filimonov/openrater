@@ -26,7 +26,7 @@ import {
 import { FreezeVersionDialog } from "./FreezeVersionDialog";
 
 const PLAN = {
-  display_name: "Meridian BOP — 2026 baseline",
+  display_name: "ISO BOP — 2026 baseline",
   line_of_business: "bop",
   effective_date: "2026-04-01",
   content_hash: "abc1234567890def",
@@ -70,7 +70,7 @@ describe("<FreezeVersionDialog> context strip", () => {
   it("renders the plan name + LOB + effective date + short hash", () => {
     renderDialog();
     const strip = screen.getByTestId("rater-freeze-version-dialog-context");
-    expect(strip).toHaveTextContent("Meridian BOP — 2026 baseline");
+    expect(strip).toHaveTextContent("ISO BOP — 2026 baseline");
     expect(strip).toHaveTextContent("BOP");
     expect(strip).toHaveTextContent("2026-04-01");
     // Hash is sliced to the first 7 chars.

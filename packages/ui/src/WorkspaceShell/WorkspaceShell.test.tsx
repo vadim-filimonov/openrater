@@ -139,7 +139,7 @@ describe("<WorkspaceToolPane>", () => {
           <WorkspaceToolPane.Button>Standard</WorkspaceToolPane.Button>
         </WorkspaceToolPane.Section>
         <WorkspaceToolPane.Section label="TEMPLATES">
-          <WorkspaceToolPane.Button>Meridian BOP defaults</WorkspaceToolPane.Button>
+          <WorkspaceToolPane.Button>ISO BOP defaults</WorkspaceToolPane.Button>
         </WorkspaceToolPane.Section>
       </WorkspaceToolPane>,
     );

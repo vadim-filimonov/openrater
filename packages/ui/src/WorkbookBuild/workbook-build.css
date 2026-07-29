@@ -580,7 +580,7 @@
   list-style: none;
 }
 
-/*  — the applied diff, one server-voiced line per construct. */
+/* MVP-025 — the applied diff, one server-voiced line per construct. */
 .rater-build-report__diff-totals {
   margin: 0 0 var(--rater-s-8);
   font-size: var(--rater-t-12);

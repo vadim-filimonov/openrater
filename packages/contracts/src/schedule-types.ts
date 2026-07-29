@@ -26,6 +26,9 @@
  * `kinds/modifier-schedule.ts`. The UI primitives (<ScheduleCategoryRow>,
  * <ScheduleApplicationForm>, <RunningTotalChip>) live in @openrater/ui
  * and consume these shapes verbatim.
+ *
+ * See `docs/design-briefs/modifiers-section.md` §6 (data shape) for
+ * the full design.
  */
 
 import type { EligibilityTier } from "./tier-types";
@@ -131,7 +134,7 @@ export interface Schedule {
   readonly total_cap_pct: number;
   /** The category structure. Order is the display order. */
   readonly categories: readonly ScheduleCategory[];
-  /** Citation to the filed schedule (e.g., "Meridian Rule MS-R4.2"). */
+  /** Citation to the filed schedule (e.g., "ISO BOP §4.2"). */
   readonly citation?: string;
   /** Actuary reasoning verbatim into the trace. */
   readonly reasoning?: string;

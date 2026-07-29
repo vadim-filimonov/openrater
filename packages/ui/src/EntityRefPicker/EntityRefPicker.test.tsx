@@ -8,9 +8,9 @@ import { useState } from "react";
 import { EntityRefPicker, type EntityRefOption } from "./EntityRefPicker";
 
 const CLASSES: readonly EntityRefOption[] = [
-  { value: "c102", label: "Meridian Hospitality", subLabel: "c102 · Hospitality" },
-  { value: "c101", label: "Meridian Recreation", subLabel: "c101 · Recreation" },
-  { value: "c103", label: "Meridian Contracting", subLabel: "c103 · Construction" },
+  { value: "71641", label: "Restaurants", subLabel: "71641 · Hospitality" },
+  { value: "73912", label: "Bowling Centers", subLabel: "73912 · Recreation" },
+  { value: "91342", label: "Concrete contractors", subLabel: "91342 · Construction" },
 ];
 
 function Harness({
@@ -77,21 +77,21 @@ describe("<EntityRefPicker> — selection", () => {
     render(<Harness onChange={onChange} />);
     const input = screen.getByRole("combobox");
     fireEvent.focus(input);
-    fireEvent.mouseDown(screen.getByText("Meridian Recreation"));
-    expect(onChange).toHaveBeenCalledWith("c101");
+    fireEvent.mouseDown(screen.getByText("Bowling Centers"));
+    expect(onChange).toHaveBeenCalledWith("73912");
   });
 
   it("displays the selected option's label when value matches", () => {
-    render(<Harness initial="c103" />);
-    expect(screen.getByRole("combobox")).toHaveValue("Meridian Contracting");
+    render(<Harness initial="91342" />);
+    expect(screen.getByRole("combobox")).toHaveValue("Concrete contractors");
   });
 
   it("renders option label + monospace subLabel", () => {
     render(<Harness />);
     fireEvent.focus(screen.getByRole("combobox"));
-    expect(screen.getByText("Meridian Hospitality")).toBeInTheDocument();
-    expect(screen.getByText("c102 · Hospitality")).toBeInTheDocument();
-    const subLabel = screen.getByText("c102 · Hospitality");
+    expect(screen.getByText("Restaurants")).toBeInTheDocument();
+    expect(screen.getByText("71641 · Hospitality")).toBeInTheDocument();
+    const subLabel = screen.getByText("71641 · Hospitality");
     expect(subLabel.className).toContain("__opt-sublabel");
   });
 });
@@ -103,7 +103,7 @@ describe("<EntityRefPicker> — stale-ref detection", () => {
   });
 
   it("does NOT show warning when value matches an option", () => {
-    render(<Harness initial="c102" />);
+    render(<Harness initial="71641" />);
     expect(screen.queryByRole("img")).toBeNull();
   });
 
@@ -136,7 +136,7 @@ describe("<EntityRefPicker> — stale-ref detection", () => {
     render(<Harness initial="99999" onChange={onChange} />);
     expect(screen.getByRole("img")).toBeInTheDocument();
     fireEvent.focus(screen.getByRole("combobox"));
-    fireEvent.mouseDown(screen.getByText("Meridian Recreation"));
+    fireEvent.mouseDown(screen.getByText("Bowling Centers"));
     expect(screen.queryByRole("img")).toBeNull();
   });
 });
@@ -231,19 +231,19 @@ describe("<EntityRefPicker> — keyboard nav (delegated to Combobox)", () => {
     render(<Harness onChange={onChange} />);
     const input = screen.getByRole("combobox");
     fireEvent.focus(input);
-    fireEvent.keyDown(input, { key: "ArrowDown" }); // moves to Meridian Recreation (index 1)
+    fireEvent.keyDown(input, { key: "ArrowDown" }); // moves to Bowling Centers (index 1)
     fireEvent.keyDown(input, { key: "Enter" });
-    expect(onChange).toHaveBeenCalledWith("c101");
+    expect(onChange).toHaveBeenCalledWith("73912");
   });
 
   it("Escape closes without selecting", () => {
     const onChange = vi.fn();
-    render(<Harness initial="c102" onChange={onChange} />);
+    render(<Harness initial="71641" onChange={onChange} />);
     const input = screen.getByRole("combobox");
     fireEvent.focus(input);
     fireEvent.change(input, { target: { value: "bow" } });
     fireEvent.keyDown(input, { key: "Escape" });
-    expect(input).toHaveValue("Meridian Hospitality"); // restored
+    expect(input).toHaveValue("Restaurants"); // restored
     expect(onChange).not.toHaveBeenCalled();
   });
 });

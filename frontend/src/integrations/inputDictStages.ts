@@ -128,7 +128,7 @@ export function stagesToInputDictEntries(
     out.push({
       id: s.stage_id,
       fieldName,
-      //  — config.name is the display name only when it differs
+      // MVP-012 — config.name is the display name only when it differs
       // from the field key (the workbook builder writes the slug there;
       // the label rides stage.display_name). One shared rule.
       displayName: resolveInputDisplayName({

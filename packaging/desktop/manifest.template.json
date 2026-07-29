@@ -97,7 +97,8 @@
   "license": "Apache-2.0",
   "compatibility": {
     "platforms": [
-      "{{MCPB_PLATFORM}}"
+      "darwin",
+      "win32"
     ],
     "runtimes": {
       "node": ">=18"

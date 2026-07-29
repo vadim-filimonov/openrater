@@ -1,10 +1,10 @@
 [project]
 name = "openrater-server"
 version = "0.1.0"
-description = "FastAPI service for OpenRater plans, workbook ingestion, quotes, and audit records."
+description = "API Lab — FastAPI service hosting the entity registry that Rate Lab consumes. Part of OpenRater."
 requires-python = ">=3.12"
 license = { text = "Apache-2.0" }
-authors = [{ name = "OpenRater contributors" }]
+authors = [{ name = "OpenRater", email = "engineering@raterrisk.com" }]
 readme = "README.md"
 
 dependencies = [
@@ -16,23 +16,24 @@ dependencies = [
     # log line.
     "structlog>=24.1",
     # SQLite is stdlib; nothing else needed for v0 persistence.
-    # Outbound HTTP and local environment loading for optional connectors.
+    # Brief 47 — API Lab connectors.
     "httpx>=0.27",         # outbound connector HTTP calls.
     "python-dotenv>=1.0",  # load .env for local connector secrets.
-    # Encrypt connector API keys at rest (Fernet/AES) so an actuary can
+    # E06 — encrypt connector API keys at rest (Fernet/AES) so an actuary can
     # set a key in the Connector Studio instead of editing the server's .env.
     "cryptography>=43.0",
-    # Read-only Postgres adapter. Imported lazily (a deployment that never
+    # Brief 86 R1 (ADR-0061) — Data Lab's read-only Postgres adapter. The
+    # repo's first real PG client; imported LAZILY (a deployment that never
     # connects a warehouse never loads it), fail-closed with a named error
-    # when absent.
+    # when absent. Same posture as the vault's `cryptography` ruling.
     "psycopg[binary]>=3.2",
-    # The deterministic workbook ingester reads filing-transcription
-    # workbooks. Pure-Python, MIT. The parser is the
+    # Brief 92 (ADR-0065) — the deterministic workbook ingester reads
+    # filing-transcription workbooks. Pure-Python, MIT. The parser is the
     # ONLY consumer; no other module may read xlsx.
     "openpyxl>=3.1",
 ]
 
-# Optional ONNX model support (the portable ML export target).
+# Brief 62.5 PR5 — the ONNX Tier-A adapter (the universal ML export target).
 # OPTIONAL by design: GLM-coeff ingest stays zero-binary-deps; ONNX is
 # imported LAZILY (only when an .onnx artifact is ingested/served), so a
 # GLM-only deployment never pulls the runtime. Install with `[models]`.
@@ -41,8 +42,8 @@ models = [
     "onnxruntime>=1.18",  # pinned runtime; deterministic inference.
     "onnx>=1.16",         # graph inspection (nondeterministic-op gate) + fixtures.
     "numpy>=1.26",        # onnxruntime I/O.
-    # Native booster to ONNX conversion at ingest time.
-    # Dependencies are Apache-2.0 or MIT licensed. Parsed and converted only inside the
+    # Tier-B (Brief 62.5 PR5b) — native booster → ONNX convert-at-ingest.
+    # All Apache-2.0 / MIT (OSS-clean). Parsed + converted ONLY inside the
     # sandbox; the serving path runs the converted ONNX (a pure function).
     "xgboost>=2.0",       # parse the native XGBoost booster (Apache-2.0).
     "lightgbm>=4.0",      # parse the native LightGBM booster (MIT).

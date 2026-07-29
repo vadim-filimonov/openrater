@@ -2,7 +2,7 @@
   "name": "@openrater/scoring",
   "version": "0.0.0",
   "private": true,
-  "description": "Headless scoring service built on OpenRater's deterministic TypeScript engine, with pluggable queue, result-store, and plan-source adapters.",
+  "description": "Backend scoring service. Imports the ONE rating engine from @openrater/contracts (no Python port) so server-side scoring is byte-identical to the Rate Lab canvas. Deployment-agnostic core behind JobQueue / ResultStore / PlanSource ports; local adapters now (in-memory + Redis + filesystem), AWS adapters later (SQS + S3). See docs/adr/0045-backend-scoring-service.md.",
   "license": "Apache-2.0",
   "type": "module",
   "scripts": {

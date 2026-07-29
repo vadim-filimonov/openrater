@@ -13,7 +13,7 @@ unrecoverable. Verification hashes the presented `X-API-Key` and looks it
 up among the plan's non-revoked keys.
 
 The gate (`authorize_quote`) is deliberately permissive by default: OpenRater
-OpenRater ships open for local development, so a quote succeeds with no key UNLESS
+Labs ships open (OSS/dev), so a quote succeeds with no key UNLESS
 `RATER_QUOTE_REQUIRE_KEY` is set. When it is, a valid key is
 mandatory (401 without). Either way, a presented valid key is verified +
 attributed. This mirrors the `auth.py` shim — open by default, locked by

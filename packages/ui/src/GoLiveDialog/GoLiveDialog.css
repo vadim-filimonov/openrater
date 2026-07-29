@@ -127,8 +127,8 @@
   min-height: 64px;
 }
 
-.rater-go-live-dialog__input:hover:not(disabled),
-.rater-go-live-dialog__textarea:hover:not(disabled) {
+.rater-go-live-dialog__input:hover:not(:disabled),
+.rater-go-live-dialog__textarea:hover:not(:disabled) {
   border-color: var(--rater-border-strong);
 }
 

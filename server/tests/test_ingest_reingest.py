@@ -288,7 +288,7 @@ def test_cli_reingest(
     assert "moved +5.0% median" in out
 
 # ---------------------------------------------------------------------------
-# Drift tracking: the sweep's
+# Drift honesty (brief drift-honesty.md — MVP-002/007/008): the sweep's
 # Walk-3 sequence, pinned. An edited plan names its edits, refuses a
 # blind apply, snapshots before a consented one, and the cells API
 # shares the workbook's factor law.
@@ -310,7 +310,12 @@ def test_edited_plan_is_named_gated_and_snapshotted(
 
     # Pristine: the endpoint and the check agree there is nothing.
     pristine = client.get(f"/api/v1/plans/{plan_id}/edits-since-build").json()
-    assert pristine == {"edited": False, "changes": [], "note": None}
+    assert pristine == {
+        "edited": False,
+        "changes": [],
+        "stage_edits": [],
+        "note": None,
+    }
 
     # The sweep's edit: a factor cell moves in the app.
     _edit_frame_cell(client, plan_id, 0.85)
@@ -326,7 +331,7 @@ def test_edited_plan_is_named_gated_and_snapshotted(
     } in edits["changes"]
 
     # 2. The re-ingest preview of the ORIGINAL workbook shows the edit
-    #    as a revert — never "0 changed" silence ().
+    #    as a revert — never "0 changed" silence (MVP-002).
     check = client.post(
         f"/api/v1/plans/{plan_id}/reingest/check",
         content=to_bytes(build_base()),
@@ -391,3 +396,63 @@ def test_cells_api_shares_the_workbook_factor_law(
         assert resp.status_code == 422, f"{bad}: {resp.text}"
         assert resp.json()["error"]["code"] == "factor_out_of_range"
 
+
+
+def test_stage_edits_itemize_and_exports_stamp_divergence(
+    client, monkeypatch  # noqa: ANN001
+) -> None:
+    """FCA fca-2026-07-25 #16 — repairs must travel, or say they
+    didn't. Before: a stage-level in-app edit tripped the
+    edited-since-build banner with changes=[] and a note claiming the
+    change was 'outside what this differ itemizes' (wrong — it names
+    the very classes it can't itemize); the export served build-time
+    bytes with no divergence stamp; and a what-if built from the
+    export silently resurrected the repaired defect. Now the audit
+    timeline itemizes the edit, the export stamps the divergence, and
+    a check of the stale bytes names the staleness."""
+    from tests._helpers import add_stage
+
+    plan_id, _ = _built_plan(client, monkeypatch)
+    add_stage(
+        client,
+        plan_id,
+        stage_id="in_extra_flag",
+        stage_kind="input_node",
+        display_name="Extra flag",
+        config_json={
+            "name": "extra_flag",
+            "data_type": "bool",
+            "source": "form",
+            "source_path": "extra_flag",
+            "required": False,
+        },
+        outputs=[{
+            "output_name": "value",
+            "data_type": "string",
+            "description": None,
+        }],
+    )
+
+    # 1. The stage edit is ITEMIZED (audit timeline), not hand-waved.
+    edits = client.get(f"/api/v1/plans/{plan_id}/edits-since-build").json()
+    assert edits["edited"] is True
+    assert edits["changes"] == []  # not a factor-cell edit
+    assert len(edits["stage_edits"]) == 1
+    assert "in_extra_flag" in edits["stage_edits"][0]
+    assert "1 in-app edit" in edits["note"]
+    assert "outside what this differ itemizes" not in (edits["note"] or "")
+
+    # 2. The export stamps the divergence on the wire.
+    wb = client.get(f"/api/v1/plans/{plan_id}/workbook")
+    assert wb.status_code == 200
+    assert wb.headers["x-edited-since-build"] == "true"
+    assert int(wb.headers["x-edits-since-build-count"]) >= 1
+
+    # 3. Checking those exact bytes names the staleness BY NAME.
+    check = client.post(
+        "/api/v1/plans/ingest/check", content=wb.content
+    ).json()
+    ab = check["already_built"]
+    assert ab["rating_plan_id"] == plan_id
+    assert ab["edited_since_build"] is True
+    assert "NOT in these bytes" in ab["edits_note"]

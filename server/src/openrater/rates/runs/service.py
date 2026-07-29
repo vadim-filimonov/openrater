@@ -55,7 +55,7 @@ def create_run(
         )
 
     if request.kind == "book":
-        # book intake — rows in the request = an ad-hoc book (the
+        # Book-intake §3 — rows in the request = an ad-hoc book (the
         # chat door's CSV); no rows = the plan's connected book.
         if request.rows:
             return _create_adhoc_book_run(
@@ -130,7 +130,7 @@ def create_run(
     )
 
 
-#: book intake — the chat door's ad-hoc book cap (mirrors the MCP
+#: Book-intake §3 — the chat door's ad-hoc book cap (mirrors the MCP
 #: rerate cap; the connected-book path is unbounded by request shape).
 ADHOC_BOOK_MAX_ROWS = 5000
 
@@ -143,8 +143,8 @@ def _create_adhoc_book_run(
     request: CreateRunRequest,
     scoring_base_url: str | None,
 ) -> PlanRun:
-    """Score caller-supplied rows as a BOOK run (book intake /
-    ): a CSV handed to the chat door is a real book, not a
+    """Score caller-supplied rows as a BOOK run (book-intake §3 /
+    MVP-018): a CSV handed to the chat door is a real book, not a
     probe — it must land in run history under the Book chip and open
     in the run detail like any other book. Identity column map (the
     caller's header names ARE the plan's declared input names — the
@@ -212,7 +212,7 @@ def _create_book_run(
     """Submit the plan's connected book to the scoring service as an
     async batch job (Brief 75 D-E). RAW rows ship with the mapping's
     column_map + grouping + roll-ups; the WORKER projects them through
-    the shared UI path and composes policies; the API service never rates."""
+    the one labs-ui path and composes policies — api-lab never rates."""
     envelope = get_input_mapping(db=db, rating_plan_id=rating_plan_id)
     mapping = envelope.mapping if envelope else None
     source = (mapping or {}).get("source") or {}
@@ -239,7 +239,7 @@ def _create_book_run(
         "trace": "none",
         "book": {
             "column_map": (mapping or {}).get("column_map") or {},
-            # book intake — the mapping's alias vocabulary rides to
+            # Book-intake §4 — the mapping's alias vocabulary rides to
             # the worker, so a value translated in Inputs holds here.
             **(
                 {"alias_overrides": (mapping or {}).get("alias_overrides")}
@@ -449,3 +449,33 @@ def get_run_rows(
         limit=limit,
         base_url=scoring_base_url,
     )
+
+
+def collect_run_rows(
+    *,
+    db: Database,
+    rating_plan_id: str,
+    run_id: str,
+    scoring_base_url: str | None = None,
+) -> list[dict[str, Any]]:
+    """EVERY row of a DONE book/probe run, paged out of the scoring
+    result store (bounded by the book caps). The CSV export and the
+    two-run compare both read through here — one collection path."""
+    rows: list[dict[str, Any]] = []
+    offset = 0
+    while True:
+        page = get_run_rows(
+            db=db,
+            rating_plan_id=rating_plan_id,
+            run_id=run_id,
+            offset=offset,
+            limit=2000,
+            scoring_base_url=scoring_base_url,
+        )
+        page_rows = page.get("rows") or []
+        rows.extend(r for r in page_rows if isinstance(r, dict))
+        next_offset = page.get("nextOffset")
+        if not isinstance(next_offset, int):
+            break
+        offset = next_offset
+    return rows

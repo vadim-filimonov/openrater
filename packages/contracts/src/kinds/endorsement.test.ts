@@ -1,5 +1,5 @@
 /**
- * `endorsement.*` kinds tests.
+ * `endorsement.*` kinds tests (Brief 39 PR 39.1).
  *
  * Three kinds, all sharing the same trigger semantics + a common
  * effect interface. Tests cover:
@@ -89,12 +89,12 @@ describe("endorsement.factor", () => {
     const result = EndorsementFactorKind.execute(
       { premium: 10_000 },
       {
-        form_number: "MS 10 03",
+        form_number: "BP 04 39",
         display_name: "Liquor liability",
-        trigger: { variable: "class_code", op: "eq", value: "c101" },
+        trigger: { variable: "class_code", op: "eq", value: "71641" },
         factor: 1.15,
       },
-      { externalInputs: { class_code: "c101" }, as_of: "2026-01-01" },
+      { externalInputs: { class_code: "71641" }, as_of: "2026-01-01" },
     );
     expect(result.attached).toBe(true);
     expect(result.premium_out).toBe(11_500);
@@ -104,12 +104,12 @@ describe("endorsement.factor", () => {
     const result = EndorsementFactorKind.execute(
       { premium: 10_000 },
       {
-        form_number: "MS 10 03",
+        form_number: "BP 04 39",
         display_name: "Liquor liability",
-        trigger: { variable: "class_code", op: "eq", value: "c101" },
+        trigger: { variable: "class_code", op: "eq", value: "71641" },
         factor: 1.15,
       },
-      { externalInputs: { class_code: "c999" }, as_of: "2026-01-01" },
+      { externalInputs: { class_code: "55555" }, as_of: "2026-01-01" },
     );
     expect(result.attached).toBe(false);
     expect(result.premium_out).toBe(10_000);
@@ -119,8 +119,8 @@ describe("endorsement.factor", () => {
     const result = EndorsementFactorKind.execute(
       { premium: 10_000 },
       {
-        form_number: "MS 10 01",
-        display_name: "Base coverage surcharge",
+        form_number: "TRIA 2024",
+        display_name: "Terrorism surcharge",
         trigger: null,
         factor: 1.02,
       },
@@ -140,7 +140,7 @@ describe("endorsement.additive", () => {
     const result = EndorsementAdditiveKind.execute(
       { premium: 10_000 },
       {
-        form_number: "MS 10 04",
+        form_number: "BP 20 12",
         display_name: "Hired auto liability",
         trigger: { variable: "has_hired_auto", op: "eq", value: true },
         amount: 1_200,
@@ -155,7 +155,7 @@ describe("endorsement.additive", () => {
     const result = EndorsementAdditiveKind.execute(
       { premium: 10_000 },
       {
-        form_number: "MS 10 04",
+        form_number: "BP 20 12",
         display_name: "Hired auto liability",
         trigger: { variable: "has_hired_auto", op: "eq", value: true },
         amount: 1_200,
@@ -176,7 +176,7 @@ describe("endorsement.sublimit", () => {
     const result = EndorsementSublimitKind.execute(
       { premium: 10_000 },
       {
-        form_number: "MS 10 02",
+        form_number: "BP 04 30",
         display_name: "Peak limit",
         trigger: { variable: "tiv", op: "gt", value: 1_000_000 },
         coverage: "peak_items",
@@ -196,7 +196,7 @@ describe("endorsement.sublimit", () => {
     const result = EndorsementSublimitKind.execute(
       { premium: 10_000 },
       {
-        form_number: "MS 10 02",
+        form_number: "BP 04 30",
         display_name: "Peak limit",
         trigger: { variable: "tiv", op: "gt", value: 1_000_000 },
         coverage: "peak_items",
@@ -233,7 +233,7 @@ describe("endorsement — integration via executePlan", () => {
           id: "end1",
           kind: "endorsement.factor",
           params: {
-            form_number: "MS 90 01",
+            form_number: "BP A",
             display_name: "Factor A",
             trigger: null,
             factor: 1.15,
@@ -244,7 +244,7 @@ describe("endorsement — integration via executePlan", () => {
           id: "end2",
           kind: "endorsement.factor",
           params: {
-            form_number: "MS 90 02",
+            form_number: "BP B",
             display_name: "Factor B",
             trigger: null,
             factor: 1.05,
@@ -284,7 +284,7 @@ describe("endorsement — integration via executePlan", () => {
           id: "end",
           kind: "endorsement.factor",
           params: {
-            form_number: "MS 90 01",
+            form_number: "BP A",
             display_name: "Should skip",
             trigger: { variable: "tiv", op: "gt", value: 1_000_000 },
             factor: 1.15,
@@ -309,7 +309,7 @@ describe("endorsement — integration via executePlan", () => {
 });
 
 // ────────────────────────────────────────────────────────────────
-// endorsement.rate_branch
+// Phase H.4 — endorsement.rate_branch (Brief 40 §−1 + Brief 42 §−1 Q5)
 // ────────────────────────────────────────────────────────────────
 
 describe("EndorsementRateBranchKind", () => {
@@ -332,7 +332,7 @@ describe("EndorsementRateBranchKind", () => {
           id: "branch",
           kind: "endorsement.rate_branch",
           params: {
-            form_number: "MS 10 06",
+            form_number: "CG-2147",
             display_name: "Liquor Liability",
             trigger: { variable: "has_liquor", op: "eq", value: true },
             branch_chain: {
@@ -403,7 +403,7 @@ describe("EndorsementRateBranchKind", () => {
           id: "branch",
           kind: "endorsement.rate_branch",
           params: {
-            form_number: "MS 10 06",
+            form_number: "CG-2147",
             display_name: "Liquor Liability",
             trigger: { variable: "has_liquor", op: "eq", value: true },
             branch_chain: {

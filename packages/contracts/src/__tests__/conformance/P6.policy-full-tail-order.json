@@ -1,6 +1,6 @@
 {
   "name": "P6.policy-full-tail-order",
-  "description": "A full synthetic Meridian policy tail: subtotal $1,000, schedule rating of -10%, a guarded first-term factor of 0.90, a flat $18 service endorsement, and a $500 minimum premium. The ordered result is $828.",
+  "description": "The full ordered tail over one policy (Brief 62.3 §4): subtotal $1,000 → schedule_rating literal −10% (cap ±25% not binding) → package_factor 0.90 (Pioneer, is_first_term ✓) → endorsement flat +$18 → minimum_premium $500 (not binding) = $828. Asserts the order, the capped net, and the running-total threading.",
   "policy": {
     "policy_id": "P6",
     "lines": [
@@ -9,8 +9,8 @@
   },
   "policy_tail": [
     { "kind": "schedule_rating", "id": "irpm", "display_name": "Schedule rating (IRPM)", "cap_pct": 25, "source": { "from": "literal", "total": -10 } },
-    { "kind": "package_factor", "id": "first_term_credit", "display_name": "Meridian first-term credit", "factor": 0.9, "when": { "field": "is_first_term", "op": "eq", "value": true } },
-    { "kind": "endorsement", "id": "service_fee", "display_name": "Meridian service endorsement", "effect": { "kind": "flat", "amount": 18 } },
+    { "kind": "package_factor", "id": "pioneer", "display_name": "Pioneer credit", "factor": 0.9, "when": { "field": "is_first_term", "op": "eq", "value": true } },
+    { "kind": "endorsement", "id": "terror", "display_name": "Terrorism", "effect": { "kind": "flat", "amount": 18 } },
     { "kind": "minimum_premium", "id": "min", "floor": 500 }
   ],
   "adjustmentInputs": { "is_first_term": true },
@@ -47,8 +47,8 @@
     ],
     "adjustments": [
       { "id": "irpm", "kind": "schedule_rating", "applied": true, "before": 1000, "after": 900, "detail": "-10.0% (cap ±25%)", "provenance": { "source": "literal" } },
-      { "id": "first_term_credit", "kind": "package_factor", "applied": true, "before": 900, "after": 810, "detail": "× 0.9" },
-      { "id": "service_fee", "kind": "endorsement", "applied": true, "before": 810, "after": 828, "detail": "+ $18" },
+      { "id": "pioneer", "kind": "package_factor", "applied": true, "before": 900, "after": 810, "detail": "× 0.9" },
+      { "id": "terror", "kind": "endorsement", "applied": true, "before": 810, "after": 828, "detail": "+ $18" },
       { "id": "min", "kind": "minimum_premium", "applied": false, "before": 828, "after": 828, "detail": "floor $500 not binding" }
     ]
   }

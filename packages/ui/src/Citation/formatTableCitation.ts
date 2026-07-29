@@ -1,5 +1,5 @@
 /**
- * formatTableCitation — : "where did this number come from"
+ * formatTableCitation — MVP-016: "where did this number come from"
  * as one quiet clause, from the table record's own provenance
  * (`source_page` + the rule reference the workbook's citation_rule
  * column carried, stored in `source_pdf_url`).

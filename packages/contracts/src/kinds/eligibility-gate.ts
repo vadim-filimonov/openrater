@@ -32,6 +32,9 @@
  *
  * Pure. No special-casing in the runtime — `execute` reads from
  * `ctx.externalInputs` directly.
+ *
+ * See `docs/design-briefs/eligibility-appetite-section.md` for the
+ * full design rationale.
  */
 
 import type { BlockKind, PortSpec } from "../block-types";

@@ -24,6 +24,9 @@
  *   - Active: text-strong + 2px accent underline (cat-input azure)
  *   - Strip bottom-bordered with hairline-base; sits below the
  *     studio header, above the workspace content
+ *
+ * Per docs/design-briefs/24f-workspace-shell.md §Top-tab amendment
+ * (24.F2).
  */
 
 import type { JSX, KeyboardEvent, ReactNode } from "react";
@@ -172,7 +175,7 @@ export function WorkspaceTabs(props: WorkspaceTabsProps): JSX.Element {
         {siblings.length > 0 ? (
           <span className="rater-workspace-tabs__spacer" aria-hidden />
         ) : null}
-        {/*  — a hairline + eyebrow names the right group, so
+        {/* MVP-031f — a hairline + eyebrow names the right group, so
             its quieter tint reads as grouping, not disabled. */}
         {siblings.length > 0 ? (
           <span className="rater-workspace-tabs__group" aria-hidden>

@@ -181,12 +181,28 @@ function parseCellInput(raw: string): number | null {
   return Number.isFinite(n) ? n : null;
 }
 
-/** Format a numeric cell for display. Three decimal places max,
- *  trailing zeros trimmed, never scientific. */
-function formatCell(value: number): string {
-  if (value === 0) return "0";
-  // toFixed(3) → "1.000"; strip trailing zeros + trailing "."
-  return value.toFixed(3).replace(/\.?0+$/, "") || "0";
+/** Format a numeric cell for display at the grid's shared precision.
+ *  FCA #35 (finding 14) — trailing zeros were trimmed per cell, so
+ *  one column mixed "0.9" with "0.92" and a bare "1" sat among
+ *  factors; filed tables print uniform precision (Exhibits already
+ *  does). The grid's decimals = the widest fraction any cell carries
+ *  (cap 3, the old max); an all-integer grid stays integer. */
+function formatCell(value: number, gridDecimals: number): string {
+  return value.toFixed(gridDecimals);
+}
+
+/** The widest decimal-fraction width across the grid's cells (≤3). */
+function decimalsOf(cells: ReadonlyMap<string, number>): number {
+  let widest = 0;
+  for (const v of cells.values()) {
+    if (!Number.isFinite(v)) continue;
+    const s = String(v);
+    const dot = s.indexOf(".");
+    if (dot === -1) continue;
+    widest = Math.max(widest, Math.min(s.length - dot - 1, 3));
+    if (widest === 3) break;
+  }
+  return widest;
 }
 
 /** Frozen empty set — reused when no selection prop is provided. */
@@ -345,6 +361,10 @@ export function FactorTableGrid2D(
     () => ({ start: 0, end: colCount }),
     [colCount],
   );
+
+  // FCA #35 — one display precision for the whole grid (see
+  // formatCell): the widest fraction any cell carries, capped at 3.
+  const gridDecimals = useMemo(() => decimalsOf(cells), [cells]);
 
   // ── Edit state ───────────────────────────────────────────────────
   const [editing, setEditing] = useState<EditingState | null>(null);
@@ -1042,7 +1062,7 @@ export function FactorTableGrid2D(
                     ·
                   </span>
                 ) : (
-                  formatCell(value!)
+                  formatCell(value!, gridDecimals)
                 )}
               </div>
             );

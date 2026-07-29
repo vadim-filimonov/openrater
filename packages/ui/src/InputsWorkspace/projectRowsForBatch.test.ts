@@ -27,16 +27,16 @@ import type { AliasOverrides } from "./detectMismatches";
 describe("projectRow — column mapping", () => {
   it("maps a single input by columnName", () => {
     const result = projectRow(
-      { CLASS_CODE: "c101" },
+      { CLASS_CODE: "09011" },
       { class_code: "CLASS_CODE" },
     );
-    expect(result.externalInputs).toEqual({ class_code: "c101" });
+    expect(result.externalInputs).toEqual({ class_code: "09011" });
     expect(result.errors).toEqual([]);
   });
 
   it("maps multiple inputs in one pass", () => {
     const result = projectRow(
-      { CLASS_CODE: "c101", CONSTR: "Frame", TIV_USD: "1360000" },
+      { CLASS_CODE: "09011", CONSTR: "Frame", TIV_USD: "1247438" },
       {
         class_code: "CLASS_CODE",
         construction: "CONSTR",
@@ -44,18 +44,18 @@ describe("projectRow — column mapping", () => {
       },
     );
     expect(result.externalInputs).toEqual({
-      class_code: "c101",
+      class_code: "09011",
       construction: "Frame",
-      tiv: "1360000",
+      tiv: "1247438",
     });
   });
 
   it("skips inputs whose mapped column is missing from the row", () => {
     const result = projectRow(
-      { CLASS_CODE: "c101" },
+      { CLASS_CODE: "09011" },
       { class_code: "CLASS_CODE", construction: "CONSTR" },
     );
-    expect(result.externalInputs).toEqual({ class_code: "c101" });
+    expect(result.externalInputs).toEqual({ class_code: "09011" });
     // construction stays unmapped — no error (the upstream column map
     // is the source of truth; the engine reports missing inputs per
     // node, not here).
@@ -72,7 +72,7 @@ describe("projectRow — column mapping", () => {
 
   it("ignores empty-string column names in the map (defensive)", () => {
     const result = projectRow(
-      { CLASS_CODE: "c101" },
+      { CLASS_CODE: "09011" },
       { class_code: "" },
     );
     expect(result.externalInputs).toEqual({});
@@ -80,7 +80,7 @@ describe("projectRow — column mapping", () => {
 
   it("does not include keys for unmapped row columns", () => {
     const result = projectRow(
-      { CLASS_CODE: "c101", AGENT_ID: "A001" },
+      { CLASS_CODE: "09011", AGENT_ID: "A001" },
       { class_code: "CLASS_CODE" },
     );
     expect(Object.keys(result.externalInputs)).toEqual(["class_code"]);
@@ -138,7 +138,7 @@ describe("projectRow — alias overrides", () => {
       { construction: "CONSTR" },
       {
         inputDimMap: { construction: "construction" },
-        aliasOverrides: { quality_grade: { foo: "bar" } },
+        aliasOverrides: { protection_class: { foo: "bar" } },
       },
     );
     expect(result.externalInputs).toEqual({ construction: "WOOD" });
@@ -232,7 +232,7 @@ describe("projectRow — derived ratio", () => {
   it("projects ratios alongside plain mapped columns in one pass", () => {
     const result = projectRow(
       {
-        CLASS_CODE: "c101",
+        CLASS_CODE: "09011",
         total_expenses: "750000",
         revenue: "1000000",
       },
@@ -241,8 +241,59 @@ describe("projectRow — derived ratio", () => {
         stress: "@ratio:total_expenses/revenue",
       },
     );
-    expect(result.externalInputs.class_code).toBe("c101");
+    expect(result.externalInputs.class_code).toBe("09011");
     expect(result.externalInputs.stress).toBeCloseTo(0.75, 10);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────
+// Scaled column (@times:column*multiplier) — FCA #23 finding 13
+// ─────────────────────────────────────────────────────────────────
+
+describe("projectRow — scaled column", () => {
+  it("the audited shape: payroll in thousands × 1000 projects dollars", () => {
+    const result = projectRow(
+      { PAYROLL_K: "240" },
+      { payroll: "@times:PAYROLL_K*1000" },
+    );
+    expect(result.externalInputs.payroll).toBe(240_000);
+    expect(result.errors).toEqual([]);
+  });
+
+  it("strips thousands commas in the component", () => {
+    const result = projectRow(
+      { PAYROLL_K: "1,247" },
+      { payroll: "@times:PAYROLL_K*1000" },
+    );
+    expect(result.externalInputs.payroll).toBe(1_247_000);
+  });
+
+  it("skips missing / non-numeric cells like empty cells (engine owns the outcome)", () => {
+    expect(
+      projectRow({}, { payroll: "@times:PAYROLL_K*1000" }).externalInputs,
+    ).toEqual({});
+    expect(
+      projectRow({ PAYROLL_K: "n/a" }, { payroll: "@times:PAYROLL_K*1000" })
+        .externalInputs,
+    ).toEqual({});
+  });
+
+  it("skips a malformed times sentinel like an empty cell", () => {
+    const result = projectRow(
+      { PAYROLL_K: "240" },
+      { payroll: "@times:PAYROLL_K" }, // no multiplier → malformed
+    );
+    expect(result.externalInputs).toEqual({});
+    expect(result.errors).toEqual([]);
+  });
+
+  it("bypasses dtype coercion (the value is already a number)", () => {
+    const result = projectRow(
+      { PAYROLL_K: "240" },
+      { payroll: "@times:PAYROLL_K*1000" },
+      { inputDtypes: { payroll: "string" } },
+    );
+    expect(result.externalInputs.payroll).toBe(240_000);
   });
 });
 
@@ -253,11 +304,11 @@ describe("projectRow — derived ratio", () => {
 describe("projectRow — number coercion", () => {
   it("strips thousands commas before parsing", () => {
     const result = projectRow(
-      { TIV: "1,360,000" },
+      { TIV: "1,247,438" },
       { tiv: "TIV" },
       { columnDtypes: { TIV: "number" } },
     );
-    expect(result.externalInputs).toEqual({ tiv: 1360000 });
+    expect(result.externalInputs).toEqual({ tiv: 1247438 });
   });
 
   it("parses negative + decimal numbers", () => {
@@ -363,31 +414,31 @@ describe("projectRow — date coercion", () => {
 describe("projectRow — dtype precedence", () => {
   it("inputDtypes outrank columnDtypes when both set", () => {
     const result = projectRow(
-      { X: "1360000" },
+      { X: "1247438" },
       { tiv: "X" },
       {
         columnDtypes: { X: "string" }, // would pass through
         inputDtypes: { tiv: "number" }, // wins
       },
     );
-    expect(result.externalInputs.tiv).toBe(1360000);
+    expect(result.externalInputs.tiv).toBe(1247438);
   });
 
   it("falls back to columnDtypes when inputDtypes lacks an entry", () => {
     const result = projectRow(
-      { X: "1360000" },
+      { X: "1247438" },
       { tiv: "X" },
       { columnDtypes: { X: "number" } },
     );
-    expect(result.externalInputs.tiv).toBe(1360000);
+    expect(result.externalInputs.tiv).toBe(1247438);
   });
 
   it("falls back to string passthrough when no dtype hint at all", () => {
     const result = projectRow(
-      { X: "1360000" },
+      { X: "1247438" },
       { tiv: "X" },
     );
-    expect(result.externalInputs.tiv).toBe("1360000");
+    expect(result.externalInputs.tiv).toBe("1247438");
   });
 });
 
@@ -397,9 +448,9 @@ describe("projectRow — dtype precedence", () => {
 
 describe("projectRows + projectRowsToExternalInputs", () => {
   const rows = [
-    { CLASS_CODE: "c101", TIV: "1,360,000" },
-    { CLASS_CODE: "c102", TIV: "8,900,000" },
-    { CLASS_CODE: "c103", TIV: "2,100,000" },
+    { CLASS_CODE: "09011", TIV: "1,247,438" },
+    { CLASS_CODE: "07712", TIV: "8,900,000" },
+    { CLASS_CODE: "06811", TIV: "2,100,000" },
   ];
   const columnMap = { class_code: "CLASS_CODE", tiv: "TIV" };
   const options = {
@@ -410,17 +461,17 @@ describe("projectRows + projectRowsToExternalInputs", () => {
     const projected = projectRows(rows, columnMap, options);
     expect(projected).toHaveLength(3);
     expect(projected[0]?.externalInputs).toEqual({
-      class_code: "c101",
-      tiv: 1360000,
+      class_code: "09011",
+      tiv: 1247438,
     });
     expect(projected[2]?.externalInputs.tiv).toBe(2100000);
   });
 
   it("isolates per-row errors", () => {
     const mixedRows = [
-      { CLASS_CODE: "c101", TIV: "1,360,000" },
-      { CLASS_CODE: "c102", TIV: "abc" }, // bad number
-      { CLASS_CODE: "c103", TIV: "2,100,000" },
+      { CLASS_CODE: "09011", TIV: "1,247,438" },
+      { CLASS_CODE: "07712", TIV: "abc" }, // bad number
+      { CLASS_CODE: "06811", TIV: "2,100,000" },
     ];
     const projected = projectRows(mixedRows, columnMap, options);
     expect(projected[0]?.errors).toEqual([]);
@@ -431,7 +482,7 @@ describe("projectRows + projectRowsToExternalInputs", () => {
   it("projectRowsToExternalInputs returns flat array of inputs", () => {
     const inputs = projectRowsToExternalInputs(rows, columnMap, options);
     expect(inputs).toHaveLength(3);
-    expect(inputs[0]).toEqual({ class_code: "c101", tiv: 1360000 });
+    expect(inputs[0]).toEqual({ class_code: "09011", tiv: 1247438 });
   });
 });
 
@@ -442,18 +493,18 @@ describe("projectRows + projectRowsToExternalInputs", () => {
 describe("Brief 38 — realistic BOP submission projection", () => {
   it("projects a typical row with mixed dtypes + alias override", () => {
     const row = {
-      CLASS_CODE: "c101",
+      CLASS_CODE: "09011",
       CONSTR: "WOOD",
-      QUALITY_GRADE: "q1",
+      PROT_CLASS: "4",
       BUILT: "1987",
-      TIV_USD: "1,360,000",
+      TIV_USD: "1,247,438",
       SPRINK_Y: "Y",
       EFF_DATE: "2026-07-01",
     };
     const columnMap = {
       class_code: "CLASS_CODE",
       construction: "CONSTR",
-      quality_grade: "QUALITY_GRADE",
+      protection_class: "PROT_CLASS",
       year_built: "BUILT",
       tiv: "TIV_USD",
       sprinklered: "SPRINK_Y",
@@ -465,7 +516,7 @@ describe("Brief 38 — realistic BOP submission projection", () => {
       columnDtypes: {
         CLASS_CODE: "string",
         CONSTR: "string",
-        QUALITY_GRADE: "string",
+        PROT_CLASS: "string",
         BUILT: "number",
         TIV_USD: "number",
         SPRINK_Y: "boolean",
@@ -473,11 +524,11 @@ describe("Brief 38 — realistic BOP submission projection", () => {
       },
     });
     expect(result.externalInputs).toEqual({
-      class_code: "c101",
+      class_code: "09011",
       construction: "frame", // alias-resolved
-      quality_grade: "q1",
+      protection_class: "4",
       year_built: 1987,
-      tiv: 1360000,
+      tiv: 1247438,
       sprinklered: true,
       policy_date: "2026-07-01",
     });

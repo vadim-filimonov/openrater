@@ -44,7 +44,7 @@ describe("dimensionBindingSchema", () => {
     ).toThrow();
   });
 
-  // Axis sources beyond a raw form_input column.
+  // ADR-0047 — axis sources beyond a raw form_input column.
   it("parses a literal-source binding (constant key)", () => {
     expect(
       dimensionBindingSchema.parse({ source: "literal", value: "group_c" }),
@@ -160,25 +160,26 @@ describe("lcmApplicationSchema", () => {
     expect(() => lcmApplicationSchema.parse({ input_path: "" })).toThrow();
   });
 
-  // Authored carrier LCM aligned with the backend value/overridable shape.
+  // Brief 54 / ADR-0047 — authored carrier LCM (realigns Zod to the
+  // Pydantic, which already carries value/overridable).
   it("parses an authored carrier LCM value (no input column)", () => {
     const parsed = lcmApplicationSchema.parse({
-      value: 1.4,
-      citation_rule: "Meridian synthetic rule MS-R4",
+      value: 1.401,
+      citation_rule: "SERFF BMUT-134648356-4",
     });
-    expect(parsed.value).toBe(1.4);
+    expect(parsed.value).toBe(1.401);
     expect(parsed.input_path).toBeUndefined();
     expect(parsed.overridable).toBe(false);
   });
 
   it("parses an overridable value + input (D3 escape hatch)", () => {
     const parsed = lcmApplicationSchema.parse({
-      value: 1.4,
+      value: 1.401,
       input_path: "form_input.lcm",
       overridable: true,
     });
     expect(parsed.overridable).toBe(true);
-    expect(parsed.value).toBe(1.4);
+    expect(parsed.value).toBe(1.401);
   });
 
   it("rejects neither value nor input_path (must resolve the LCM)", () => {
@@ -253,7 +254,7 @@ describe("chainSpecSchema", () => {
     expect(parsed.base_value).toBeNull();
   });
 
-  // Explicit exposure opt-in for a per-account tower.
+  // ADR-0047 — explicit exposure opt-in for a per-account tower.
   it("parses an exposure-rated per-account tower (apply_exposure)", () => {
     const parsed = chainSpecSchema.parse({
       name: "nonprofit tower",

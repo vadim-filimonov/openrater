@@ -302,13 +302,13 @@ describe("computeSliceExhibit — slice→input column binding (Brief 51 L1)", (
   // lives in CSV column `territory` (mapped via column_map). The level
   // ids ARE the territory codes. Reproduces + guards the all-"—" bug.
   const TERRITORY_ROWS: AnalyticsScoredRow[] = [
-    { inputs: { territory: "t1" }, outputs: { premium: 100 } },
-    { inputs: { territory: "t1" }, outputs: { premium: 200 } },
-    { inputs: { territory: "t2" }, outputs: { premium: 50 } },
+    { inputs: { territory: "701" }, outputs: { premium: 100 } },
+    { inputs: { territory: "701" }, outputs: { premium: 200 } },
+    { inputs: { territory: "702" }, outputs: { premium: 50 } },
   ];
   const TERRITORY_LEVELS = [
-    { id: "t1", label: "t1" },
-    { id: "t2", label: "t2" },
+    { id: "701", label: "701" },
+    { id: "702", label: "702" },
   ];
 
   it("groups by sliceColumn when it differs from sliceId (dim id ≠ column)", () => {
@@ -322,8 +322,8 @@ describe("computeSliceExhibit — slice→input column binding (Brief 51 L1)", (
       premiumColumn: "premium",
       definedLevels: TERRITORY_LEVELS,
     });
-    const t701 = exhibit.levels.find((l) => l.id === "t1")!;
-    const t702 = exhibit.levels.find((l) => l.id === "t2")!;
+    const t701 = exhibit.levels.find((l) => l.id === "701")!;
+    const t702 = exhibit.levels.find((l) => l.id === "702")!;
     expect(t701.baselineValue).toBe(300); // 100 + 200
     expect(t702.baselineValue).toBe(50);
     expect(exhibit.baselineTotal).toBe(350);

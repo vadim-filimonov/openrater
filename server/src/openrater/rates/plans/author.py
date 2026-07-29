@@ -35,9 +35,13 @@ endpoint:
   · `rollback_plan`           — re-promote the most-recently-archived sibling
                                 of the currently-active plan.
   · `write_audit_event` / `list_audit_events` — audit log writer + reader.
-  · `current_operator`        — request-scoped operator identity. Local
-                                development uses `operator@openrater.local`;
-                                deployments can register an auth resolver.
+  · `current_operator`        — slice-2 returns the default no-auth operator
+                                stub. Integrators swap when adding auth.
+
+Port note: the original prototype hard-coded a single-user operator
+email. openrater ships unauthenticated by default; the stub is
+`operator@openrater.local` and integrators replace `current_operator`
+when wiring an auth layer.
 
 The state-machine transitions are designed so illegal transitions raise
 typed errors that the route layer surfaces with the right HTTP status.
@@ -57,9 +61,10 @@ from uuid import uuid4
 # Operator identity (delegated to openrater.auth)
 # ---------------------------------------------------------------------------
 #
-# Operator resolution lives in `openrater.auth`, where deployments can
-# register a resolver (JWT, session, mTLS, etc.). This module re-exports the
-# helpers for plan-author call sites.
+# The historic stub `current_operator() → "operator@openrater.local"`
+# moved to `openrater.auth` in M3.5.4 so integrators can register a real
+# resolver (JWT, session, mTLS, etc.) without forking. We re-export
+# from here for the existing call sites that import from author.py.
 #
 # See `openrater.auth` for the registration API + ContextVar pattern.
 from openrater.auth import DEFAULT_OPERATOR_ID, current_operator
@@ -104,8 +109,8 @@ class PlanAuthorError(PlanParseError):
     `openrater.errors` converts every instance to the structured envelope
     without per-route `except` boilerplate.
 
-    Subclasses set their own `code` + `default_status_code`; those stable
-    codes are part of the API error contract.
+    Subclasses set their own `code` + `default_status_code`. Stable
+    codes are documented (eventually) in `docs/api/errors.md`.
     """
 
     code = "plan_author_error"
@@ -986,10 +991,11 @@ def _require_draft(plan: RatingPlan | None, plan_id: str, op: str) -> RatingPlan
     """Common precondition check: target plan exists AND is a draft.
 
     Delegates to `state_machine.assert_action_allowed` so the
-    allowed-state table is the single source of truth. The `op` string
-    (e.g. "patch_draft_stages") is mapped to the matching `Action` enum
-    value; an unknown value fails closed through `Action.PATCH`, the
-    generic "edit a draft" action.
+    allowed-state table is the single source of truth. The legacy
+    `op` string (e.g. "patch_draft_stages") is mapped to the matching
+    `Action` enum value; if an unknown `op` is passed we default to
+    `Action.PATCH` (the generic "edit a draft" action), which matches
+    the historical behavior of failing-closed-to-draft.
     """
     from openrater.rates.plans.state_machine import Action, assert_action_allowed
 
@@ -1217,9 +1223,17 @@ def add_stage_to_draft(
                 ),
             ),
         )
+        # FCA #7 — the summary line is what a transcriber sees (MCP
+        # relays it verbatim); without the underlying cause it named
+        # only an internal stage id, an unactionable dead-end. Flatten
+        # the validator's own detail (pydantic includes field paths
+        # like `chains.0.factor_lookups.2.name`) into the message.
+        detail = " ; ".join(
+            line.strip() for line in str(exc).splitlines() if line.strip()
+        )[:500]
         raise PlanValidationError(
             f"add_stage_to_draft: stage {stage_id!r} config_json failed "
-            f"shape validation for kind={stage_kind.value}",
+            f"shape validation for kind={stage_kind.value}: {detail}",
             report=report,
         ) from exc
 
@@ -2213,7 +2227,7 @@ def hard_delete_plan(
             f"hard_delete_plan: plan_id={rating_plan_id!r} not found"
         )
     if plan.status != "archived":
-        # The envelope speaks values, never enum representations
+        # MVP-020 — the envelope speaks values, never enum reprs
         # ("status 'draft'", not "<PlanStatus.DRAFT: 'draft'>").
         status_value = getattr(plan.status, "value", plan.status)
         raise PlanNotArchivedError(
@@ -2221,8 +2235,8 @@ def hard_delete_plan(
             f"hard-delete requires 'archived'."
         )
 
-    # The DELETE below cascades `plan_snapshots`, but integration exposures
-    # reference the plan
+    # The delete guard (2026-07-11 audit): the DELETE below cascades
+    # `plan_snapshots` away, but integration exposures reference the plan
     # (CASCADE would silently drop that carrier from a pairing). Refuse
     # unless the operator detaches first or forces knowingly.
     with db.connection() as conn:
@@ -2477,7 +2491,7 @@ def patch_stage_positions(
 
 
 # ===========================================================================
-# Wire authoring (drag output → input)
+# Port wiring (drag output → input)
 # ===========================================================================
 
 

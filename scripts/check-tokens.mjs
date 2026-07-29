@@ -7,10 +7,11 @@
  * `packages/design-system/src/tokens.css`, and prints any
  * references that aren't backed by a definition.
  *
- * This guard covers undefined tokens referenced across the codebase
+ * The UI Audit (docs/design/UI_AUDIT.md) caught 8 distinct
+ * undefined tokens referenced across the codebase
  * (`--rater-r-10`, `--rater-cat-error*`, `--rater-t-9`, `--rater-t-15`,
- * `--rater-r-md`, `--rater-r-sm`, `--rater-r-pill`) so they cannot
- * silently fall through to browser defaults.
+ * `--rater-r-md`, `--rater-r-sm`, `--rater-r-pill`). PR 1 swept all
+ * of them; this script ensures they don't come back.
  *
  * Exit codes:
  *   0 — every var(--rater-…) reference points at a defined token
@@ -125,7 +126,12 @@ function main() {
   console.error(
     "  Either define the token in packages/design-system/src/tokens.css,",
   );
-  console.error("  or replace the references with a canonical equivalent.");
+  console.error(
+    "  or sweep the references to a canonical equivalent. The UI audit",
+  );
+  console.error(
+    "  doc (docs/design/UI_AUDIT.md) documents the canonical scale.",
+  );
 
   process.exit(1);
 }

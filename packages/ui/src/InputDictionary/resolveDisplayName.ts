@@ -1,6 +1,6 @@
 /**
  * resolveInputDisplayName — the ONE rule for naming a declared input
- * (presentation consistency).
+ * (MVP-012, mvp-tightness §3.2).
  *
  * Two writers share `input_node` stages and disagree about where the
  * human name lives: the hand editor authors it into `config_json.name`

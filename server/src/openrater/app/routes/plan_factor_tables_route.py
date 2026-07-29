@@ -227,7 +227,7 @@ async def upsert_factor_table_cells_endpoint(
     doesn't exist."""
     db = _resolve_db(request)
     _require_writable_plan(db, rating_plan_id, resource="factor_tables")
-    # Drift tracking: the edit path shares the workbook's cell
+    # Drift honesty (MVP-007): the edit path shares the workbook's cell
     # law (R-107 — factors finite and positive). The workbook check
     # would refuse these; the editor must not be the door around it.
     _require_lawful_factors(payload.cells)

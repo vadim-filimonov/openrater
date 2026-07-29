@@ -158,36 +158,36 @@ describe("applyAutoMatchToMapping — mode flag", () => {
 describe("applyAutoMatchToMapping — exact-identity priority (Brief 55 item 5)", () => {
   // Repro of the Sample BOP walkthrough bug: the `class_code` column
   // name-collides at confidence 1.0 with every input that merely shares a
-  // token ("quality_code" via "code"), because tokenPrefixSimilarity returns
+  // token ("bceg_grade" via "code"), because tokenPrefixSimilarity returns
   // 1.0 on a single shared token and value-match is skipped for level-less
   // dims. Greedy first-wins gave the column to whoever iterated first.
   it("the input the column NAMES wins it, even when a token-collision input iterates first", () => {
     const r = applyAutoMatchToMapping(
-      [input("quality_code"), input("class_code")], // quality_code iterates FIRST
+      [input("bceg_grade"), input("class_code")], // bceg_grade iterates FIRST
       {
-        quality_code: [cand("class_code", 1.0)], // spurious 1.0 (shared "code")
+        bceg_grade: [cand("class_code", 1.0)], // spurious 1.0 (shared "code")
         class_code: [cand("class_code", 1.0)], // the definitional match
       },
       {},
     );
     expect(r.mapping.class_code).toBe("class_code"); // not starved
-    expect(r.mapping.quality_code).toBeUndefined(); // loses the contested column
+    expect(r.mapping.bceg_grade).toBeUndefined(); // loses the contested column
     expect(r.conflicts).toHaveLength(1);
     expect(r.conflicts[0]?.winnerInputId).toBe("class_code");
-    expect(r.conflicts[0]?.loserInputIds).toEqual(["quality_code"]);
+    expect(r.conflicts[0]?.loserInputIds).toEqual(["bceg_grade"]);
   });
 
   it("each input still claims its OWN exact column when both are present", () => {
     const r = applyAutoMatchToMapping(
-      [input("quality_code"), input("class_code")],
+      [input("bceg_grade"), input("class_code")],
       {
-        quality_code: [cand("class_code", 1.0), cand("quality_code", 1.0)],
+        bceg_grade: [cand("class_code", 1.0), cand("bceg_grade", 1.0)],
         class_code: [cand("class_code", 1.0)],
       },
       {},
     );
     expect(r.mapping).toEqual({
-      quality_code: "quality_code",
+      bceg_grade: "bceg_grade",
       class_code: "class_code",
     });
     expect(r.conflicts).toEqual([]);
@@ -196,17 +196,17 @@ describe("applyAutoMatchToMapping — exact-identity priority (Brief 55 item 5)"
   it("matches on display name / matching name, not only id", () => {
     // id is namespaced but the matching name equals the column exactly.
     const ns: RequiredInput = { id: "submission.class_code", name: "class_code" };
-    const other: RequiredInput = { id: "quality_code", name: "quality_code" };
+    const other: RequiredInput = { id: "bceg_grade", name: "bceg_grade" };
     const r = applyAutoMatchToMapping(
       [other, ns],
       {
-        quality_code: [cand("class_code", 1.0)],
+        bceg_grade: [cand("class_code", 1.0)],
         "submission.class_code": [cand("class_code", 1.0)],
       },
       {},
     );
     expect(r.mapping["submission.class_code"]).toBe("class_code");
-    expect(r.mapping.quality_code).toBeUndefined();
+    expect(r.mapping.bceg_grade).toBeUndefined();
   });
 
   it("respects apply mode — an exact match below the auto bar is not force-applied in auto mode", () => {

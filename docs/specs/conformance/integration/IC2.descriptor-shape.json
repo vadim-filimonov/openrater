@@ -5,7 +5,7 @@
   "asserts": "The descriptor speaks peer vocabulary: required_fields are the plan's consumed inputs pulled back through the mapping.",
   "contract_version": "1.0",
   "world": {
-    "integration": { "name": "Example Integrator — fixture", "paired": true },
+    "integration": { "name": "OpenRater Front — fixture", "paired": true },
     "plans": ["plan-alpha", "plan-beta"]
   },
   "steps": [

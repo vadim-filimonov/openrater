@@ -5,7 +5,8 @@
 # Runs on the HOST (not in a container) from cron. Uses SQLite's online
 # `.backup` command, which is WAL-safe: it takes a consistent snapshot
 # WITHOUT stopping the app (unlike a plain `cp`, which can copy a torn
-# page mid-write). Restore with the SQLite CLI's `.restore` command.
+# page mid-write). See docs/DEMO_DEPLOYMENT_RUNBOOK.md → "Backups &
+# recovery" for install + restore.
 #
 # Requires the sqlite3 CLI on the host:  sudo apt-get install -y sqlite3
 #

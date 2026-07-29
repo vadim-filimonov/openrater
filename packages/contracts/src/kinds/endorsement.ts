@@ -3,8 +3,8 @@
  * kinds — form-based add-ons that auto-attach when their trigger
  * condition fires.
  *
- * Endorsements are post-rate adjustments: each one has a form_number
- * (e.g., "MS 10 02"), a
+ * Brief 39 (Gate workspace v2). Endorsements are post-rate
+ * adjustments: each one has a form_number (e.g., "BP 04 30"), a
  * display name, an optional trigger condition over externalInputs,
  * and an effect kind. When the trigger matches (or is empty,
  * meaning "always attach"), the endorsement's effect is applied to
@@ -23,9 +23,10 @@
  *
  * Trigger shape mirrors eligibility.gate's single-rule format
  * (variable + op + value). For multi-condition triggers, the
- * authoring UX can compose conditions through a richer expression tree.
- * V1 ships the single-condition shape; multi-condition support remains
- * a backward-compatible extension.
+ * authoring UX composes via AND/OR (Brief 39 §6.2 — quick-form
+ * supports up to 3 conditions; Advanced exposes the full tree).
+ * V1 ships the single-condition shape; multi-condition is an
+ * additive extension (Brief 39 §11 — out of scope v1).
  *
  * Inputs come from `ctx.externalInputs` for trigger evaluation +
  * the wired `premium` port for effect application. The kind has
@@ -49,6 +50,9 @@
  *
  * Pure. No special-casing in the runtime — `execute` reads from
  * `ctx.externalInputs` directly.
+ *
+ * See `docs/design-briefs/39-gate-workspace.md` §4 + §8 for the
+ * full design rationale.
  */
 
 import type { BlockKind, PortSpec } from "../block-types";
@@ -58,7 +62,7 @@ import {
 } from "../tier-types";
 
 // ────────────────────────────────────────────────────────────────
-// Shared trigger shape — single-condition v1
+// Shared trigger shape — single-condition v1 (Brief 39 §11)
 // ────────────────────────────────────────────────────────────────
 
 /**
@@ -90,7 +94,7 @@ export function evaluateEndorsementTrigger(
 // ────────────────────────────────────────────────────────────────
 
 export interface EndorsementFactorParams {
-  /** Filing form number or custom string (e.g., "MS 10 02"). */
+  /** ISO form number or custom string (e.g., "BP 04 30"). */
   readonly form_number: string;
   /** Human-readable name surfaced in trace + UI. */
   readonly display_name: string;
@@ -98,7 +102,7 @@ export interface EndorsementFactorParams {
   readonly trigger: EndorsementTrigger | null;
   /** Multiplier applied to premium when attached. */
   readonly factor: number;
-  /** Optional citation (e.g., "Meridian form MS 10 02 — 2026 ed."). */
+  /** Optional citation (e.g., "ISO BP 04 30 — 2018 ed."). */
   readonly citation?: string;
 }
 
@@ -331,13 +335,14 @@ export const EndorsementSublimitKind: BlockKind<
 
 // ────────────────────────────────────────────────────────────────
 // endorsement.rate_branch — additive branch via mini-chain
+// (Brief 40 §−1 + Brief 42 §−1 Q5)
 // ────────────────────────────────────────────────────────────────
 
 /**
  * Authored shape of a branch chain (a self-contained mini-chain). The
  * structure mirrors a top-level multiplicative_chain spec so the
- * authoring layer can reuse the same form. The branch's LCM is
- * independent of the main chain's LCM — the branch
+ * authoring layer can reuse the same form. Per Brief 42 §−1 Q5, the
+ * branch's LCM is INDEPENDENT of the main chain's LCM — the branch
  * applies its own loss-cost multiplier to its own exposure.
  *
  * `factor_lookups` is reserved for v2 work — v1 evaluates only base ×
@@ -416,7 +421,7 @@ export const EndorsementRateBranchKind: BlockKind<
   category: "transform",
   label: "Endorsement (rate branch)",
   description:
-    "Evaluates a mini-chain when the trigger fires; the branch's result is added to the incoming premium.",
+    "Evaluates a mini-chain when the trigger fires; the branch's result is ADDED to the incoming premium (Brief 40 §−1 Q3 — additive composition).",
   inputs: [
     {
       name: "premium",
@@ -434,7 +439,7 @@ export const EndorsementRateBranchKind: BlockKind<
       name: "contribution",
       type: "float",
       description:
-        "Amount the branch contributed (0 when not fired); composition is additive.",
+        "Amount the branch contributed (0 when not fired). Per Brief 40 §−1 Q3 the composition is additive.",
     } as PortSpec,
     {
       name: "premium_out",
@@ -475,8 +480,8 @@ export const EndorsementRateBranchKind: BlockKind<
       branch.exposure_unit_divisor !== 0
         ? branch.exposure_unit_divisor
         : 1;
-    // The branch's product is added, not multiplied, into the upstream
-    // premium. v1 evaluates only base ×
+    // Per Brief 40 §−1 Q3, the branch's product is ADDED (not
+    // multiplied) into the upstream premium. v1 evaluates only base ×
     // lcm / divisor; factor_lookups support is a v2 extension that
     // requires the runtime to receive a factor-table catalog through
     // ctx.

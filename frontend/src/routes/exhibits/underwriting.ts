@@ -1,5 +1,5 @@
 /**
- * Exhibits — the UNDERWRITING ledger (presentation consistency / ).
+ * Exhibits — the UNDERWRITING ledger (mvp-tightness §5.2 / MVP-009).
  *
  * The compare was blind to everything that isn't a factor: two plans
  * could differ only in who they DECLINE and the ledger read "no

@@ -32,7 +32,7 @@ const DIMS: readonly DimensionRow[] = [
     display_name: "Territory",
     slug: "territory",
     dimension_type: "geographic",
-    levels: [{ kind: "geographic", id: "t1", label: "t1" }],
+    levels: [{ kind: "geographic", id: "701", label: "701" }],
   },
 ];
 

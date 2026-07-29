@@ -131,6 +131,18 @@ export {
 } from "./ratioMapping";
 export type { ParsedRatio } from "./ratioMapping";
 
+// ── FCA #23 — scaled-column (@times:column*multiplier) sentinel ──
+// Payroll-in-thousands and its kin: a unit transform expressed
+// inside the existing column_map string shape.
+export {
+  TIMES_PREFIX,
+  isTimesMapping,
+  parseTimes,
+  formatTimes,
+  computeTimesForRow,
+} from "./timesMapping";
+export type { ParsedTimes } from "./timesMapping";
+
 // ── webhook helpers + payload-schema inference — the v1
 //    <WebhookConfigDrawer> primitive was deleted in the v2 cutover;
 //    WebhookSource (v2) composes these. ──────────────────────────

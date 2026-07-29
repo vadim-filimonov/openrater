@@ -1,5 +1,5 @@
 /**
- * underwriting ledger tests — pins : the compare pairs gate
+ * underwriting ledger tests — pins MVP-009: the compare pairs gate
  * RULES, modifiers, endorsements, loadings across sides and speaks
  * each change in the plan's own words (the T1 gate-diff voice) — the
  * exact gap the sweep's Walk 7 hit ("two plans that differ only in

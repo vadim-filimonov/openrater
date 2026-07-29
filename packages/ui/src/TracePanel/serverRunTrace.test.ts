@@ -43,7 +43,7 @@ const TERRITORY_DIM: Dimension = {
 const BASE_LC_TABLE: FactorTableLike[] = [
   {
     id: "ft_base_lc",
-    display_name: "Meridian base factor",
+    display_name: "KS base loss cost",
     key_dimensions: ["territory", "coverage"],
     slug: "base_lc_property",
   } as unknown as FactorTableLike,
@@ -53,10 +53,10 @@ const BASE_LC_CELLS = new Map<string, ReadonlyMap<string, number>>([
   [
     "ft_base_lc",
     new Map([
-      ["t1::building", 0.4],
-      ["t1::bpp", 0.199],
-      ["t2::building", 0.4],
-      ["t2::bpp", 0.18],
+      ["701::building", 0.389],
+      ["701::bpp", 0.199],
+      ["702::building", 0.389],
+      ["702::bpp", 0.18],
     ]),
   ],
 ]);
@@ -155,7 +155,7 @@ function serverEnvelopeFor(risk: Record<string, unknown>): {
 // ── Tests ──────────────────────────────────────────────────────────
 
 describe("buildServerRunTraceView — a clean run", () => {
-  const { run, envelope } = serverEnvelopeFor({ territory: "t1" });
+  const { run, envelope } = serverEnvelopeFor({ territory: "701" });
   const view = buildServerRunTraceView({
     result: envelope,
     stages: fixtureStages(),
@@ -235,10 +235,39 @@ describe("buildServerRunTraceView — a clean run", () => {
     expect(view.nodeLabels["chain_building"]).toBe("building — build-up");
   });
 
+  it("an AUTHORED LCM keeps the plain label; an unauthored one is marked scaffold (FCA #30)", () => {
+    // Finding 5/48: plans whose manual says "no loss cost multiplier
+    // applies" still showed "× 1 (LCM)" as a filed-looking step —
+    // the caller's identity default. This fixture's chains AUTHOR an
+    // lcm (input_path), so the plain label stands…
+    expect(view.nodeLabels["const_lcm_building"]).toBe("LCM");
+    // …while a chain that authored NO lcm gets the scaffold mark.
+    const bare = buildServerRunTraceView({
+      result: {
+        outputs: {},
+        trace: {},
+        as_of: "2026-07-13",
+        row_status: "ok",
+      },
+      stages: [
+        {
+          stage_kind: "multiplicative_chain",
+          config_json: {
+            output_total_field: "premium",
+            chains: [{ name: "bare", output_field: "premium" }],
+          },
+        },
+      ],
+    });
+    expect(bare.nodeLabels["const_lcm_bare"]).toBe(
+      "LCM — platform default, not filed",
+    );
+  });
+
   it("a clean run withholds nothing and keeps the premium visible", () => {
     expect(view.withheldOutputs).toEqual([]);
     expect(view.run.row_status).toBe("ok");
-    expect(view.run.outputs["building_premium"]).toBeCloseTo(400, 6);
+    expect(view.run.outputs["building_premium"]).toBeCloseTo(389, 6);
   });
 
   it("as_of + durationMs ride through from the envelope", () => {

@@ -1268,7 +1268,7 @@ export const TOTAL_TOWER_ID = "tower_total";
  * Default output field name for the Total tower. Brief 35 §7.
  * Mirrors the `DEFAULT_DIM_SUM_OUTPUT_FIELD` constant from
  * `@openrater/contracts`'s `chain.dim_sum` kind (kept in sync at the UI
- * layer rather than imported across packages — @openrater/ui doesn't
+ * layer rather than imported across packages — labs-ui doesn't
  * pull from contracts at runtime).
  */
 export const TOTAL_TOWER_OUTPUT_FIELD = "total_premium";

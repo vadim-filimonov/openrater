@@ -26,7 +26,7 @@ import {
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
 import "./IntegrationsRoute.css";
 
-//  — absolute dates are ISO everywhere.
+// MVP-019 — absolute dates are ISO everywhere.
 const day = (iso: string | null): string => (iso ? isoDate(iso) : "—");
 
 export function IntegrationsRoute(): JSX.Element {
@@ -89,7 +89,7 @@ export function IntegrationsRoute(): JSX.Element {
           {rows?.length === 0 && (
             <>
               <h2 className="ints__empty-title">Connect a platform</h2>
-              {/*  — the empty state names the user's world (a
+              {/* MVP-031e — the empty state names the user's world (a
                   product they have) and promises no ledger before one
                   renders. */}
               <p className="ints__empty-copy">

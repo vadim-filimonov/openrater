@@ -1,16 +1,16 @@
 {
   "name": "V4.lookup-direct-known",
-  "description": "A fictional Meridian class code resolves to a synthetic factor through lookup.direct.",
+  "description": "class_code -> factor via lookup.direct (known key).",
   "plan": {
     "id": "v4.lookup",
     "version": "1.0.0",
-    "name": "Meridian synthetic direct lookup",
+    "name": "Direct lookup",
     "line": "bop",
     "effective": "2026-01-01",
     "nodes": [
       { "id": "in_cls", "kind": "input", "params": { "fieldName": "class_code", "fieldType": "string" }, "position": { "x": 0, "y": 0 } },
       { "id": "lkp", "kind": "lookup.direct",
-        "params": { "table": { "c102": 1.0, "c202": 1.25, "c103": 0.9 }, "defaultValue": 1.0, "tableName": "Meridian synthetic class factor" },
+        "params": { "table": { "73911": 1.0, "73912": 1.32, "73210": 0.85 }, "defaultValue": 1.0 },
         "position": { "x": 200, "y": 0 } },
       { "id": "out_f", "kind": "output", "params": { "fieldName": "factor", "fieldType": "float" }, "position": { "x": 400, "y": 0 } }
     ],
@@ -19,6 +19,6 @@
       { "from": { "node": "lkp",    "port": "value" }, "to": { "node": "out_f", "port": "value" } }
     ]
   },
-  "externalInputs": { "class_code": "c202" },
-  "expectedOutputs": { "factor": 1.25 }
+  "externalInputs": { "class_code": "73912" },
+  "expectedOutputs": { "factor": 1.32 }
 }

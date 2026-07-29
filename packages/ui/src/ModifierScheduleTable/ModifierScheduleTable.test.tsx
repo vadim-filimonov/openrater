@@ -153,10 +153,10 @@ describe("<ModifierScheduleTable> — footer", () => {
         displayName="Test"
         totalCapPct={25}
         categories={CATEGORIES}
-        citation="Meridian BOP §4.2"
+        citation="ISO BOP §4.2"
       />,
     );
-    expect(screen.getByText(/Citation: Meridian BOP §4.2/i)).toBeInTheDocument();
+    expect(screen.getByText(/Citation: ISO BOP §4.2/i)).toBeInTheDocument();
   });
 
   it("does not render footer when neither citation nor onAddCategory provided", () => {

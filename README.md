@@ -94,7 +94,7 @@ copy `deploy/.env.example` and run
 frontend/            the web app (Rate Lab authoring + analytics, Exhibits, Integrations)
 server/              FastAPI service: plans, ingestion, quotes, integration events
 services/scoring/    the ONE deterministic rating engine (TypeScript)
-services/mcp/        @openrater/mcp — 16 tools exposing the loop to any MCP client
+services/mcp/        @openrater/mcp — 18 tools exposing the loop to any MCP client
 skills/              the transcription skill (the agent runbook for filings)
 packaging/desktop/   the Claude Desktop extension (.mcpb) build
 docs/specs/          the contracts: filing-transcription spec, plan format, engine

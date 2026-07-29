@@ -7,7 +7,7 @@
 #     http://www.apache.org/licenses/LICENSE-2.0
 """Integration seam REST endpoints — ADR-0057 (contract §§2–3, L1–L3).
 
- consumer audit (2026-07-19, against
+MVP-028 consumer audit (2026-07-19, against
 docs/specs/integration-contract.md): every endpoint below names who
 calls it. "UI" = the Integrations pages + Ship's Connect card
 (frontend/src/api/integrations.ts); "integrator" = the paired peer
@@ -503,7 +503,7 @@ def list_events_endpoint(
 ) -> EventsListResponse:
     """ADR-0060 rule 5 — the event ledger, readable. Operator-facing (same
     trust posture as GET /quote-ledger: internal forensic data; integrators
-    bring identity) and the surface the Spine's pull worker consumes — OpenRater
+    bring identity) and the surface the Spine's pull worker consumes — Labs
     never pushes. 404s on an unknown integration; newest first."""
     db = _resolve_db(request)
     if get_integration(db=db, integration_id=integration_id) is None:

@@ -1,7 +1,7 @@
 /**
  * Shared types for the writable class registry primitives (Brief 51).
  *
- * Re-declared here (not imported from @openrater/contracts) so @openrater/ui stays
+ * Re-declared here (not imported from @openrater/contracts) so labs-ui stays
  * dependency-light — the same convention `<ClassBrowser>` follows. The
  * shapes mirror `ClassRecord` / `PlanClassCode` 1:1.
  */

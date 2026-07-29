@@ -4,7 +4,7 @@
  * The standard edit drawer (node-design-principle P-N8): same chrome,
  * title / body / footer, save-cancel-delete in the same places. The only
  * novel field group is the DERIVED RATING ATTRIBUTES editor — opaque
- * key/value pairs (prop_rate_number → 07, …) that feed the structural
+ * key/value pairs (prop_rate_number → 09, …) that feed the structural
  * dimensions a factor table keys off (ADR-0035).
  *
  * Attribute rows are held in local state keyed by a STABLE id so renaming
@@ -117,13 +117,13 @@ export function ClassEditDrawer(props: ClassEditDrawerProps): JSX.Element {
           </div>
         )}
         <div className="rater-class-edit-drawer__grid">
-          <Field label="Class code" hint={codeLocked ? "Locked after creation." : "The filed classification code (e.g. c101)."}>
+          <Field label="Class code" hint={codeLocked ? "Locked after creation." : "The filed classification code (e.g. 53983)."}>
             <input
               className="rater-class-edit-drawer__input rater-class-edit-drawer__input--mono"
               value={draft.class_code}
               disabled={codeLocked}
               onChange={(e) => set("class_code", e.target.value)}
-              placeholder="c101"
+              placeholder="53983"
               aria-label="Class code"
               data-testid={`${testId}-class-code`}
             />
@@ -139,7 +139,7 @@ export function ClassEditDrawer(props: ClassEditDrawerProps): JSX.Element {
               className="rater-class-edit-drawer__input"
               value={draft.display_name}
               onChange={(e) => set("display_name", e.target.value)}
-              placeholder="Meridian Neighborhood Bakery"
+              placeholder="Army/Navy Retail"
               aria-label="Display name"
               data-testid={`${testId}-display-name`}
             />
@@ -222,7 +222,7 @@ export function ClassEditDrawer(props: ClassEditDrawerProps): JSX.Element {
               </Button>
             </div>
             <p className="rater-class-edit-drawer__hint">
-              e.g. <code>prop_rate_number → 07</code>. These drive the structural
+              e.g. <code>prop_rate_number → 09</code>. These drive the structural
               dimensions a factor table keys off.
             </p>
             {attrRows.length === 0 ? (
@@ -242,7 +242,7 @@ export function ClassEditDrawer(props: ClassEditDrawerProps): JSX.Element {
                       className="rater-class-edit-drawer__input rater-class-edit-drawer__input--mono"
                       value={r.value}
                       onChange={(e) => updateAttr(r.id, { value: e.target.value })}
-                      placeholder="07"
+                      placeholder="09"
                       aria-label={`Value for ${r.key || "attribute"}`}
                     />
                     <button

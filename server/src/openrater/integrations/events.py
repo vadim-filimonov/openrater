@@ -8,7 +8,7 @@
 """The market-events ledger (ADR-0057 D6, contract §5 — L3).
 
 The integrator reports market facts; the ledger records them. Since the
-Exhibits re-founding (current Exhibits design) OpenRater keeps
+Exhibits re-founding (Brief: portfolio-redesign v2 §6) OpenRater keeps
 NO book of record — so this adapter is ledger-only: every accepted
 event lands as one append-only `integration_events` row and nothing
 else. The book materialization the original adapter performed

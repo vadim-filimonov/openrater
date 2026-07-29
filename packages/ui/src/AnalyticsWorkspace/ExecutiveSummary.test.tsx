@@ -9,7 +9,7 @@ describe("<ExecutiveSummary>", () => {
   it("leads with the rate change when a comparison is bound", () => {
     render(
       <ExecutiveSummary
-        planLabel="Meridian BOP · Kansas"
+        planLabel="ISO BOP · Kansas"
         totalPremium={4_730_000}
         policyCount={412}
         avgPremium={11480}
@@ -35,7 +35,7 @@ describe("<ExecutiveSummary>", () => {
   it("leads with the book premium when there is no comparison", () => {
     render(
       <ExecutiveSummary
-        planLabel="Meridian BOP · Kansas"
+        planLabel="ISO BOP · Kansas"
         totalPremium={4_730_000}
         policyCount={412}
         avgPremium={11480}
@@ -49,7 +49,7 @@ describe("<ExecutiveSummary>", () => {
   it("renders top movers — and NO publish affordance (Ship owns publish, Brief 76)", () => {
     render(
       <ExecutiveSummary
-        planLabel="Meridian BOP · Kansas"
+        planLabel="ISO BOP · Kansas"
         totalPremium={4_730_000}
         policyCount={412}
         avgPremium={11480}

@@ -1,5 +1,5 @@
 /**
- * dates — the ONE absolute date rendering (presentation consistency
+ * dates — the ONE absolute date rendering (MVP-019, mvp-tightness
  * §3.4). Absolute dates are ISO (`2026-07-18`), with 24h minutes when
  * the time is load-bearing (`2026-07-18 21:12`). Relative renderings
  * ("1d ago") are allowed only in list recency columns — that decision

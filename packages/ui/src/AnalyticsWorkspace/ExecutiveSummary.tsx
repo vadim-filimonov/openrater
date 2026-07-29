@@ -23,7 +23,7 @@ export interface ExecMover {
 }
 
 export interface ExecutiveSummaryProps {
-  /** Eyebrow, e.g. "Meridian BOP · Kansas · Rate review". */
+  /** Eyebrow, e.g. "ISO BOP · Kansas · Rate review". */
   readonly planLabel: string;
   readonly totalPremium: number;
   readonly policyCount: number;

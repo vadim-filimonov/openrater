@@ -2,7 +2,7 @@
  * <AlgorithmMount> — Brief 70 §2 / Phase 3, rescoped by Brief 82 (the
  * rate build-up sheet's rate-lab glue).
  *
- * Brief 82 O-1 — the AMBIENT SAMPLE machinery is
+ * Brief 82 O-1 (owner, 2026-07-10) — the AMBIENT SAMPLE machinery is
  * DELETED, not moved: no synthesized risk, no browser-engine run, no
  * per-step dollars on the Rating tab. Run solely owns dollars (Law 1);
  * this mount now derives the sheet's PRODUCT LANGUAGE only:
@@ -47,7 +47,7 @@ interface FactorTableLike {
   readonly display_name: string;
   readonly key_dimension?: string;
   readonly key_dimensions?: readonly string[];
-  /**  — the table's filed provenance, when the build carried it. */
+  /** MVP-016 — the table's filed provenance, when the build carried it. */
   readonly source_page?: number | null;
   readonly source_pdf_url?: string | null;
 }

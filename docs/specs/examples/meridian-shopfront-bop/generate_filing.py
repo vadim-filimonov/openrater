@@ -5,23 +5,23 @@
 # You may obtain a copy of the License at
 #
 #     http://www.apache.org/licenses/LICENSE-2.0
-"""The Meridian reference FILING - a realistic, fully synthetic rate
+"""The Meridian reference FILING — a realistic, fully synthetic rate
 filing PDF for the fictional Meridian Mutual Insurance Company's
-Shopfront BOP program.
+Shopfront BOP program (Brief 2 §8, P2).
 
 ONE source of truth: every number renders from generate_workbook.py's
 program constants (classes, factors, bands, territories, vectors, the
 engine-mirrored price()). The PDF and the workbook can never drift.
 
 Outputs (committed):
-  · meridian_shopfront_bop_filing.pdf   - the ~25-page filing
-  · meridian_filing_pages.json          - {section key → rule id + page},
+  · meridian_shopfront_bop_filing.pdf   — the ~25-page filing
+  · meridian_filing_pages.json          — {section key → rule id + page},
     read by generate_workbook.py to stamp REAL citations into the
     workbook (citation_rule / citation_page point at actual pages).
 
 Regenerate:  uv run --with reportlab python generate_filing.py
 Deterministic: reportlab invariant mode (fixed metadata, no timestamps)
-- the committed PDF is byte-stable across runs.
+— the committed PDF is byte-stable across runs.
 
 Every page footer states the carrier is fictional. Real Nebraska ZIP
 codes are public geography; every factor, rate, and rule is invented.
@@ -82,7 +82,7 @@ PROGRAM = "Shopfront Businessowners (BOP) Program"
 STATE = "Nebraska"
 EFFECTIVE = "September 1, 2026"
 FOOT = (
-    "Meridian Mutual is a FICTIONAL carrier - synthetic OpenRater "
+    "Meridian Mutual is a FICTIONAL carrier — synthetic OpenRater "
     "reference filing; every number is invented."
 )
 
@@ -132,10 +132,10 @@ class FilingCanvas(pdfcanvas.Canvas):
         kwargs["invariant"] = 1
         super().__init__(*args, **kwargs)
         self._page_states: list[dict] = []
-        self.setTitle(f"{CARRIER} - {PROGRAM} - {STATE} Rates & Rules")
-        self.setAuthor("OpenRater")
+        self.setTitle(f"{CARRIER} — {PROGRAM} — {STATE} Rates & Rules")
+        self.setAuthor("OpenRater reference materials (synthetic)")
         self.setSubject(f"Filing {FILING_NO} (fictional)")
-        self.setCreator("OpenRater")
+        self.setCreator("generate_filing.py")
 
     def showPage(self) -> None:  # noqa: N802 (reportlab API)
         self._page_states.append(dict(self.__dict__))
@@ -196,7 +196,7 @@ def tbl(rows: list[list], widths: list[float] | None = None) -> Table:
     for i, row in enumerate(rows):
         out_row = []
         for cell in row:
-            text = str(cell).replace("—", "-").replace("–", "-")
+            text = str(cell)
             if len(text) > 34:
                 out_row.append(Paragraph(text, CELL_H if i == 0 else CELL))
             else:
@@ -212,7 +212,7 @@ def money(x: float) -> str:
 
 
 def rule_head(key: str, title: str) -> list:
-    return [Mark(key), Paragraph(f"Rule {RULES[key]} - {title}", H2)]
+    return [Mark(key), Paragraph(f"Rule {RULES[key]} — {title}", H2)]
 
 
 def build_story(toc_pages: dict[str, int] | None) -> list:
@@ -223,11 +223,11 @@ def build_story(toc_pages: dict[str, int] | None) -> list:
     s.append(Paragraph(CARRIER, ParagraphStyle("cv1", parent=H1, fontSize=22, leading=26)))
     s.append(Paragraph(PROGRAM, ParagraphStyle("cv2", parent=H1, fontSize=17)))
     s.append(Spacer(1, 0.25 * inch))
-    s.append(Paragraph(f"{STATE} - Rates and Rules Manual", STYLES["Heading3"]))
+    s.append(Paragraph(f"{STATE} — Rates and Rules Manual", STYLES["Heading3"]))
     s.append(Spacer(1, 0.4 * inch))
     cover = [
         ["Filing number", FILING_NO],
-        ["Filing type", "Rates and rules - new program"],
+        ["Filing type", "Rates and rules — new program"],
         ["State", STATE],
         ["Line of business", "Businessowners (BOP)"],
         ["Proposed effective date", EFFECTIVE],
@@ -237,7 +237,7 @@ def build_story(toc_pages: dict[str, int] | None) -> list:
     s.append(Spacer(1, 0.5 * inch))
     s.append(
         Paragraph(
-            "SYNTHETIC REFERENCE DOCUMENT - this filing, its carrier, and every "
+            "SYNTHETIC REFERENCE DOCUMENT — this filing, its carrier, and every "
             "number in it are invented. It exists so that software (and the "
             "people reviewing it) can practice reading a realistically "
             "structured rate filing without touching any carrier's real "
@@ -271,13 +271,13 @@ def build_story(toc_pages: dict[str, int] | None) -> list:
         "examples": "Worked premium examples",
     }
     for key, title in toc_titles.items():
-        page = str((toc_pages or {}).get(key, "-"))
+        page = str((toc_pages or {}).get(key, "—"))
         toc_rows.append([RULES[key], title, page])
     s.append(tbl(toc_rows, [0.7 * inch, 4.6 * inch, 0.7 * inch]))
     s.append(PageBreak())
 
-    # ── Section A - General rules ────────────────────────────────────
-    s.append(Paragraph("Section A - General Rules", H1))
+    # ── Section A — General rules ────────────────────────────────────
+    s.append(Paragraph("Section A — General Rules", H1))
     s.extend(rule_head("program", "Program description"))
     s.append(
         Paragraph(
@@ -304,8 +304,8 @@ def build_story(toc_pages: dict[str, int] | None) -> list:
             [
                 ["Order", "Condition", "Action"],
                 ["1", "Annual gross sales over $5,000,000 AND less than 3 years in business", "Decline"],
-                ["2", "Classification c111 (Woodworking - light) or c112 (Welding supply)", "Submit to company"],
-                ["3", "Fully sprinklered AND public protection class 1-4", "Preferred acceptance"],
+                ["2", "Classification c111 (Woodworking — light) or c112 (Welding supply)", "Submit to company"],
+                ["3", "Fully sprinklered AND public protection class 1–4", "Preferred acceptance"],
                 ["4", "All other risks meeting this manual's terms", "Standard acceptance"],
             ],
             [0.55 * inch, 4.35 * inch, 1.3 * inch],
@@ -318,7 +318,7 @@ def build_story(toc_pages: dict[str, int] | None) -> list:
             "are each OPTIONAL; a policy must carry at least one of them. "
             "Liability coverage is mandatory and is rated from annual gross "
             "sales. A coverage that is not elected develops no premium and "
-            "its rating steps are skipped entirely - an elected coverage "
+            "its rating steps are skipped entirely — an elected coverage "
             "with a zero limit is not permitted.",
             BODY,
         )
@@ -334,7 +334,7 @@ def build_story(toc_pages: dict[str, int] | None) -> list:
             BODY,
         )
     )
-    s.append(Paragraph("Rule A.5 - Policy term and administration", H2))
+    s.append(Paragraph("Rule A.5 — Policy term and administration", H2))
     s.append(
         Paragraph(
             "Policies are written for a 12-month term. All premiums are "
@@ -346,8 +346,8 @@ def build_story(toc_pages: dict[str, int] | None) -> list:
     )
     s.append(PageBreak())
 
-    # ── Section B - Premium determination ────────────────────────────
-    s.append(Paragraph("Section B - Premium Determination", H1))
+    # ── Section B — Premium determination ────────────────────────────
+    s.append(Paragraph("Section B — Premium Determination", H1))
     s.extend(rule_head("rating_order", "Rating order"))
     s.append(
         Paragraph(
@@ -364,7 +364,7 @@ def build_story(toc_pages: dict[str, int] | None) -> list:
         ["3", f"Multiply by the loss cost multiplier ({LCM:.2f}) and round to whole dollars.", f"Multiply by the loss cost multiplier ({LCM:.2f}) and round to whole dollars."],
         ["4", "Endorsements (Section F) multiply each coverage premium.", "Same."],
         ["5", f"Apply the expense loading ({LOADING:.2f}).", "Same."],
-        ["6", "-", f"Liability minimum premium: {money(LIAB_MIN)} (Rule B.2)."],
+        ["6", "—", f"Liability minimum premium: {money(LIAB_MIN)} (Rule B.2)."],
         ["7", "Sum the coverage premiums; apply the package floor and final rounding (Rule B.2).", ""],
     ]
     s.append(tbl(order_rows, [0.5 * inch, 3.0 * inch, 3.0 * inch]))
@@ -403,8 +403,8 @@ def build_story(toc_pages: dict[str, int] | None) -> list:
     )
     s.append(PageBreak())
 
-    # ── Section C - Rates and factors ────────────────────────────────
-    s.append(Paragraph("Section C - Rates and Factors", H1))
+    # ── Section C — Rates and factors ────────────────────────────────
+    s.append(Paragraph("Section C — Rates and Factors", H1))
     s.extend(rule_head("base_rates", "Base rates and multipliers"))
     s.append(
         tbl(
@@ -470,8 +470,8 @@ def build_story(toc_pages: dict[str, int] | None) -> list:
         tf_rows.append([code.upper(), f"{prop_f:.2f}", f"{liab_f:.2f}"])
     s.append(tbl(tf_rows, [1.4 * inch, 1.4 * inch, 1.4 * inch]))
 
-    # ── Section D - Territory definitions ────────────────────────────
-    s.append(Paragraph("Section D - Territory Definitions", H1))
+    # ── Section D — Territory definitions ────────────────────────────
+    s.append(Paragraph("Section D — Territory Definitions", H1))
     s.extend(rule_head("territory_zips", "ZIP code assignments"))
     tz_rows = [["Territory", "ZIP codes"]]
     for code in sorted(TERRITORIES):
@@ -487,8 +487,8 @@ def build_story(toc_pages: dict[str, int] | None) -> list:
     )
     s.append(PageBreak())
 
-    # ── Section E - Classifications ──────────────────────────────────
-    s.append(Paragraph("Section E - Classification Table", H1))
+    # ── Section E — Classifications ──────────────────────────────────
+    s.append(Paragraph("Section E — Classification Table", H1))
     s.extend(rule_head("classes", "Eligible classifications"))
     cl_rows = [["Code", "Classification", "Property factor", "Liability factor"]]
     for code, label, pf, lf in CLASSES:
@@ -496,8 +496,8 @@ def build_story(toc_pages: dict[str, int] | None) -> list:
     s.append(tbl(cl_rows, [0.8 * inch, 3.4 * inch, 1.1 * inch, 1.1 * inch]))
     s.append(PageBreak())
 
-    # ── Section F - Endorsements ─────────────────────────────────────
-    s.append(Paragraph("Section F - Endorsements", H1))
+    # ── Section F — Endorsements ─────────────────────────────────────
+    s.append(Paragraph("Section F — Endorsements", H1))
     s.extend(rule_head("endorsement_equip", "Equipment breakdown endorsement (MS 10 01)"))
     s.append(
         Paragraph(
@@ -520,8 +520,8 @@ def build_story(toc_pages: dict[str, int] | None) -> list:
     )
     s.append(PageBreak())
 
-    # ── Section G - Worked examples ──────────────────────────────────
-    s.append(Paragraph("Section G - Worked Premium Examples", H1))
+    # ── Section G — Worked examples ──────────────────────────────────
+    s.append(Paragraph("Section G — Worked Premium Examples", H1))
     s.extend(rule_head("examples", "Worked examples"))
     s.append(
         Paragraph(
@@ -545,7 +545,7 @@ def build_story(toc_pages: dict[str, int] | None) -> list:
 
         if v["case_id"] != "mv_01":
             s.append(PageBreak())
-        s.append(Paragraph(f"Example {v['case_id']} - {v['name']}", H2))
+        s.append(Paragraph(f"Example {v['case_id']} — {v['name']}", H2))
         risk_rows = [
             ["Class", f"{v['class_code']}"], ["Building limit", money(v["building_limit"])],
             ["BPP limit", money(v["bpp_limit"])], ["Annual gross sales", money(v["annual_gross_sales"])],
@@ -611,10 +611,6 @@ def build_story(toc_pages: dict[str, int] | None) -> list:
 def render(path: Path, toc_pages: dict[str, int] | None) -> None:
     doc = SimpleDocTemplate(
         str(path),
-        title=f"{CARRIER} - {PROGRAM} - {STATE} Rates & Rules",
-        author="OpenRater",
-        subject=f"Filing {FILING_NO} (fictional)",
-        creator="OpenRater",
         pagesize=letter,
         leftMargin=0.75 * inch,
         rightMargin=0.75 * inch,
@@ -631,7 +627,7 @@ def main() -> None:
     first_pass = dict(PAGES)
     PAGES.clear()
     render(PDF_OUT, first_pass)
-    assert PAGES == first_pass, "TOC page numbers shifted layout - widen the TOC column"
+    assert PAGES == first_pass, "TOC page numbers shifted layout — widen the TOC column"
 
     sidecar = {
         "filing": FILING_NO,

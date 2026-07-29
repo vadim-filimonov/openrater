@@ -12,37 +12,37 @@ import { sliceCellsToCoverageColumn } from "./stagesToRuntimePlan";
 
 // Sample BOP base_lc_property — territory(row) × coverage(col).
 const BASE_LC = new Map<string, number>([
-  ["t1::building", 0.4],
-  ["t1::bpp", 0.199],
-  ["t2::building", 0.4],
-  ["t2::bpp", 0.18],
+  ["701::building", 0.389],
+  ["701::bpp", 0.199],
+  ["702::building", 0.389],
+  ["702::bpp", 0.18],
 ]);
 
 describe("sliceCellsToCoverageColumn", () => {
   it("slices the building column, re-keyed by the row (territory) axis", () => {
     expect(sliceCellsToCoverageColumn(BASE_LC, "building")).toEqual({
-      "t1": 0.4,
-      "t2": 0.4,
+      "701": 0.389,
+      "702": 0.389,
     });
   });
 
   it("slices the bpp column (the columns genuinely differ)", () => {
     expect(sliceCellsToCoverageColumn(BASE_LC, "bpp")).toEqual({
-      "t1": 0.199,
-      "t2": 0.18,
+      "701": 0.199,
+      "702": 0.18,
     });
   });
 
   it("handles coverage on the ROW axis (coverage::risk encoding)", () => {
     const rowCoverage = new Map<string, number>([
-      ["building::t1", 0.4],
-      ["building::t2", 0.4],
-      ["bpp::t1", 0.199],
-      ["bpp::t2", 0.18],
+      ["building::701", 0.389],
+      ["building::702", 0.389],
+      ["bpp::701", 0.199],
+      ["bpp::702", 0.18],
     ]);
     expect(sliceCellsToCoverageColumn(rowCoverage, "bpp")).toEqual({
-      "t1": 0.199,
-      "t2": 0.18,
+      "701": 0.199,
+      "702": 0.18,
     });
   });
 
@@ -55,18 +55,18 @@ describe("sliceCellsToCoverageColumn", () => {
     expect(sliceCellsToCoverageColumn(undefined, "building")).toEqual({});
     expect(sliceCellsToCoverageColumn(new Map(), "building")).toEqual({});
     const dirty = new Map<string, number>([
-      ["t1::building", Number.NaN],
-      ["t2::building", 0.4],
+      ["701::building", Number.NaN],
+      ["702::building", 0.389],
     ]);
     expect(sliceCellsToCoverageColumn(dirty, "building")).toEqual({
-      "t2": 0.4,
+      "702": 0.389,
     });
   });
 
   it("ignores 1-D (non-composite) cell keys", () => {
     const oneD = new Map<string, number>([
-      ["t1", 0.4],
-      ["t2", 0.41],
+      ["701", 0.389],
+      ["702", 0.41],
     ]);
     expect(sliceCellsToCoverageColumn(oneD, "building")).toEqual({});
   });

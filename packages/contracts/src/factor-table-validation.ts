@@ -20,7 +20,7 @@
  * input always produces the same Issue ids (per Brief 13 P-UE8).
  *
  * For Brief 18's `class_factor` table, an additional check could
- * verify each non-default key is a valid Meridian BOP class code. That
+ * verify each non-default key is a valid ISO BOP class code. That
  * lives in `collectIssues()` because it requires the class library
  * snapshot — see Brief 9. This module covers the table-only checks.
  */

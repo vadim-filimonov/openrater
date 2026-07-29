@@ -54,7 +54,7 @@
     transform 120ms ease;
 }
 
-.rater-genesis__door:hover:not(disabled) {
+.rater-genesis__door:hover:not(:disabled) {
   border-color: var(--rater-text-subtle);
   transform: translateY(-1px);
 }
@@ -71,7 +71,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .rater-genesis__door,
-  .rater-genesis__door:hover:not(disabled) {
+  .rater-genesis__door:hover:not(:disabled) {
     transition: none;
     transform: none;
   }

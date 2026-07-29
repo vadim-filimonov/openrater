@@ -18,10 +18,10 @@ import { autoMatch, exampleValueFor, type CatalogField } from "./integrations";
 
 const CATALOG: CatalogField[] = [
   { key: "rest.gross_receipts", label: "Annual gross receipts", dtype: "number", unit: "USD" },
-  { key: "property.construction_type", label: "Construction type", dtype: "enum" },
+  { key: "property.iso_construction", label: "ISO construction class", dtype: "enum" },
   { key: "geo.zip", label: "ZIP code", dtype: "string" },
   { key: "property.tiv", label: "Total insured value", dtype: "number" },
-  { key: "property.quality_grade", label: "Property quality grade", dtype: "string", example: "q2" },
+  { key: "property.protection_class", label: "Fire protection class", dtype: "string", example: "3" },
 ];
 
 describe("autoMatch", () => {
@@ -40,23 +40,23 @@ describe("autoMatch", () => {
 
   it("matches token containment — likely, confirm required", () => {
     expect(
-      autoMatch({ key: "construction_type", label: null }, CATALOG),
-    ).toEqual({ peerKey: "property.construction_type", confidence: "exact" });
+      autoMatch({ key: "iso_construction", label: null }, CATALOG),
+    ).toEqual({ peerKey: "property.iso_construction", confidence: "exact" });
     expect(autoMatch({ key: "construction", label: null }, CATALOG)).toEqual({
-      peerKey: "property.construction_type",
+      peerKey: "property.iso_construction",
       confidence: "likely",
     });
   });
 
-  it("guesses on strong label similarity — the quality-grade case", () => {
+  it("guesses on strong label similarity — the PPC case", () => {
     expect(
-      autoMatch({ key: "risk_quality", label: "Meridian Quality Grade" }, CATALOG),
-    ).toEqual({ peerKey: "property.quality_grade", confidence: "guess" });
+      autoMatch({ key: "ppc", label: "Public Protection Class" }, CATALOG),
+    ).toEqual({ peerKey: "property.protection_class", confidence: "guess" });
   });
 
   it("never fuzzy-matches — one short shared token is not a guess", () => {
     expect(autoMatch({ key: "annual_payroll", label: "Annual payroll" }, CATALOG)).toBeNull();
-    expect(autoMatch({ key: "material_grade", label: "Material grade" }, CATALOG)).toBeNull();
+    expect(autoMatch({ key: "bceg_grade", label: "BCEG grade" }, CATALOG)).toBeNull();
   });
 });
 
@@ -76,11 +76,11 @@ describe("exampleValueFor", () => {
         {
           dtype: "string",
           allowed_values: [
-            { value: "q1", label: "Quality grade 1" },
-            { value: "q3", label: "Quality grade 3" },
+            { value: "ppc_1", label: "PPC 1" },
+            { value: "ppc_3", label: "PPC 3" },
           ],
         },
-        { example: "q2", dtype: "string" },
+        { example: "3", dtype: "string" },
       ),
     ).toBeNull();
   });

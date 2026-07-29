@@ -3,6 +3,8 @@
  *
  * The compound primitive's CSS. Section heading + tool button styles
  * + vertical rhythm. Sits inside <WorkspaceShell>'s left aside.
+ *
+ * Per docs/design-briefs/24f-workspace-shell.md §Tool pane.
  * ============================================================================ */
 
 .rater-workspace-tool-pane {
@@ -61,7 +63,7 @@
     color var(--rater-d-80) var(--rater-ease-snap);
 }
 
-.rater-workspace-tool-pane__button:hover:not(disabled) {
+.rater-workspace-tool-pane__button:hover:not(:disabled) {
   background: var(--rater-surface-1);
   border-color: var(--rater-hairline-soft);
   color: var(--rater-text-strong);
@@ -87,7 +89,7 @@
   color: var(--rater-text-muted);
 }
 
-.rater-workspace-tool-pane__button:hover:not(disabled)
+.rater-workspace-tool-pane__button:hover:not(:disabled)
   .rater-workspace-tool-pane__button-icon {
   color: var(--rater-text-strong);
 }
@@ -162,7 +164,7 @@
 }
 
 /* Toned buttons keep their colored glyph on hover. */
-.rater-workspace-tool-pane__button[class*="--tone-"]:hover:not(disabled)
+.rater-workspace-tool-pane__button[class*="--tone-"]:hover:not(:disabled)
   .rater-workspace-tool-pane__button-icon {
   color: inherit;
 }

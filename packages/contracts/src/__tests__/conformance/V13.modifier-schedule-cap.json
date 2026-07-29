@@ -28,7 +28,7 @@
               { "category_id": "premises_maint", "name": "Premises maintenance", "range_pct": 5, "reasoning_required": true },
               { "category_id": "safety_devices", "name": "Safety devices", "range_pct": 10, "reasoning_required": true }
             ],
-            "citation": "Meridian Rule MS-R4.2"
+            "citation": "ISO BOP §4.2"
           }
         },
         "position": { "x": 200, "y": 0 }

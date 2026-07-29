@@ -24,6 +24,9 @@
  * Pure. No special-casing in the runtime — the cardinality-N
  * `level_outputs` port is the same fan-in path `chain.lob_sum` uses.
  * Per node-design-principle P-N1 (pure execute) + P-N2 (typed I/O).
+ *
+ * See `docs/design-briefs/35-assemble-dimensioned-towers.md` §4.1
+ * for the wire-format spec + §7 for the rendering semantics.
  */
 
 import type { BlockKind, PortSpec } from "../block-types";

@@ -7,7 +7,8 @@
  * The top nav is grouped by the business (Brief 88 P1): the cores
  * Rate Lab · Exhibits, a hairline, then Integrations. API Lab left
  * the bar (P3) but kept its room — reached from Rate Lab's "API Lab"
- * door, attention deep-links, and ⌘K.
+ * door, attention deep-links, and ⌘K. (MVP-031c — this comment now
+ * describes the nav that ships, not the one that didn't.)
  */
 
 import { useEffect, useState } from "react";
@@ -23,7 +24,7 @@ import { HomeRoute } from "./routes/HomeRoute";
 import { PlansListRoute } from "./routes/PlansListRoute";
 import { PlanNewRoute } from "./routes/PlanNewRoute";
 import { PlanDetailRoute } from "./routes/PlanDetailRoute";
-// current Exhibits design — Exhibits, the one adaptive exhibit.
+// Brief: portfolio-redesign v2 — Exhibits, the one adaptive exhibit.
 // The Portfolio book of record (Book/Map/Trends/Compose) was deleted
 // with its substrate; /portfolio deep-links land on /exhibits.
 import { ExhibitsRoute } from "./routes/ExhibitsRoute";
@@ -38,7 +39,7 @@ import { IntegrationDetailRoute } from "./routes/IntegrationDetailRoute";
 import { AppNavV2, type NavItemV2 } from "./components/AppNavV2/AppNavV2";
 import { showApiLab } from "./integrations/apiLabFlag";
 // V2_INTERFACE_SPEC §2.4 — the global ⌘K (the palette shipped in
-// @openrater/ui unconsumed; this wires it).
+// labs-ui unconsumed; this wires it).
 import {
   CommandPalette,
   useCommandPaletteHotkey,
@@ -96,12 +97,13 @@ const THEME_KEY = "rater:theme";
 // map of the building (F8).
 const V2_NAV_CORE: NavItemV2[] = [
   { label: "Rate Lab", to: "/rate-lab" },
-  // current Exhibits design — Exhibits, the plans presented.
+  // Brief: portfolio-redesign v2 §2 — Exhibits, the plans presented.
   { label: "Exhibits", to: "/exhibits" },
 ];
 const V2_NAV_SUPPORTING: NavItemV2[] = [
-  // Model Lab and Data Lab are not part of this platform; the supporting
-  // group carries Integrations only.
+  // Detachment Brief 1 S2 — Model Lab + Data Lab are not part of this
+  // platform; the supporting group carries Integrations only. TODO(S2):
+  // proper two-core layout pass.
   // Brief 77 §9 Q1 (owner-locked) — Integrations stays a top-level tab:
   // a daily-glance surface once live (the pulse), not a setting.
   { label: "Integrations", to: "/integrations" },
@@ -156,10 +158,10 @@ export function App() {
       group: "Go to",
       onSelect: () => navigate(item.to),
     })),
-    // The API Lab ships flag-off for the cold
+    // MVP-027 (owner O2) — the API Lab ships flag-off for the cold
     // test: the ⌘K destination renders only when the flag is on. The
     // room's code + /api-lab URL stay; the door leaves the first-run
-    // story. (one name; "Connectors" stays inside the room.)
+    // story. (MVP-006 — one name; "Connectors" stays inside the room.)
     ...(showApiLab()
       ? [
           {
@@ -241,7 +243,7 @@ export function App() {
           <Route path="/" element={<HomeRoute />} />
           <Route path="/rate-lab" element={<PlansListRoute />} />
           <Route path="/rate-lab/new" element={<PlanNewRoute />} />
-          {/* current Exhibits design — the one adaptive exhibit.
+          {/* Brief: portfolio-redesign v2 — the one adaptive exhibit.
               Every legacy /portfolio deep-link (book/map/trends/compose)
               redirects here; the surfaces are gone, the bookmark isn't. */}
           <Route path="/exhibits" element={<ExhibitsRoute />} />
@@ -297,3 +299,4 @@ export function App() {
     </div>
   );
 }
+

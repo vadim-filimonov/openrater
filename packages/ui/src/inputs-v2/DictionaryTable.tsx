@@ -241,7 +241,7 @@ export function DictionaryTable({
                         {e.displayName}
                       </button>
                     )}
-                    {/*  — the slug line earns its row only when
+                    {/* MVP-012 — the slug line earns its row only when
                         it differs from the name (no slug-over-slug). */}
                     {e.fieldName !== e.displayName ||
                     (usedSlugs && usedSlugs.size > 0 && !usedSlugs.has(e.fieldName)) ? (

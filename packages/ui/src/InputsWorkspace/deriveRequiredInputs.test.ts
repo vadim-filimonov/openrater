@@ -2,7 +2,7 @@
  * deriveRequiredInputs tests — Brief 38 §4.2 (PR 11h).
  *
  * Covers each of the four walkers + path-normalization + dedup +
- * stable ordering. Plus the Meridian BOP sample plan as an end-to-end
+ * stable ordering. Plus the ISO BOP sample plan as an end-to-end
  * fixture (it's the simplest non-toy plan the workspace renders).
  */
 
@@ -254,7 +254,7 @@ describe("deriveRequiredInputs · chain dim refs", () => {
 
   it("dedupes a dim shared across two chains", () => {
     // class_code referenced by both BUILDING_CHAIN and BPP_CHAIN —
-    // mirrors the Meridian BOP fixture. The deriver should surface ONE
+    // mirrors the ISO BOP fixture. The deriver should surface ONE
     // required input.
     const result = deriveRequiredInputs(
       [
@@ -333,7 +333,7 @@ describe("deriveRequiredInputs · chain raw paths", () => {
           {
             name: "Building chain",
             base_input: "form_input.base_rate",
-            lcm: { value: 1.4 }, // authored constant, not overridable
+            lcm: { value: 1.401 }, // authored constant, not overridable
           },
         ]),
       ],
@@ -352,7 +352,7 @@ describe("deriveRequiredInputs · chain raw paths", () => {
             name: "Building chain",
             base_input: "form_input.base_rate",
             lcm: {
-              value: 1.4,
+              value: 1.401,
               input_path: "form_input.lcm",
               overridable: true,
             },
@@ -398,7 +398,7 @@ describe("deriveRequiredInputs · chain raw paths", () => {
           {
             name: "Premium",
             lcm: {
-              value: 1.4,
+              value: 1.401,
               input_path: "form_input.lcm",
               overridable: true,
             },
@@ -659,10 +659,10 @@ describe("deriveRequiredInputs · ordering", () => {
 });
 
 // ─────────────────────────────────────────────────────────────────
-// Meridian BOP fixture — end-to-end
+// ISO BOP fixture — end-to-end
 // ─────────────────────────────────────────────────────────────────
 
-describe("deriveRequiredInputs · Meridian BOP fixture shape", () => {
+describe("deriveRequiredInputs · ISO BOP fixture shape", () => {
   it("derives the full required-inputs set for an BOP-shaped plan", () => {
     // Mirrors the sample-bop-sample-plan.ts fixture (without importing
     // it — keeps the test self-contained). Building chain + BPP
@@ -1048,5 +1048,140 @@ describe("computed dimension bindings (Brief 95 C2)", () => {
       },
     );
     expect(result.map((r) => r.id)).not.toContain("prop_limit_band");
+  });
+});
+
+describe("deriveRequiredInputs · composite dims (ADR-0025 / FCA #21)", () => {
+  const compositeDim = () =>
+    ({
+      slug: "gd_basis",
+      display_name: "Good-driver basis",
+      shape: "composite",
+      axes: ["sdip_band", "lic_band"],
+    }) as unknown as Dimension;
+
+  it("a composite binding surfaces its MEMBERS' fields, never the composite slug — from any pass", () => {
+    // Live-caught on the composite demo plan: the chain pass skipped
+    // the composite (good) but Pass 3 re-registered `gd_basis` from
+    // the FT's key_dimension — the Overview banner demanded
+    // "Declare 1 input the algorithm needs" for a field the graph
+    // derives. The composite is never a column, in ANY pass.
+    const result = deriveRequiredInputs(
+      [
+        chainStage([
+          {
+            name: "GD chain",
+            base_input: "form_input.base",
+            factor_lookups: [
+              {
+                name: "Good-driver factor",
+                factor_kind: "gd_factor",
+                dimensions: {
+                  gd_basis: {
+                    source: "composite",
+                    axes: {
+                      sdip_band: {
+                        source: "form_input",
+                        path: "form_input.sdip_points",
+                      },
+                      lic_band: {
+                        source: "form_input",
+                        path: "form_input.lic_years",
+                      },
+                    },
+                    // The deriver's FactorLookup binding type is the
+                    // narrow {source, path} record shape.
+                  } as unknown as { source: string; path: string },
+                },
+              },
+            ],
+          },
+        ]),
+      ],
+      [
+        compositeDim(),
+        dim("sdip_band", "SDIP point band", "banded"),
+        dim("lic_band", "Years licensed band", "banded"),
+      ],
+      {
+        factorTables: [
+          {
+            id: "ft_gd",
+            display_name: "Good-driver factor",
+            key_dimension: "gd_basis",
+          },
+        ],
+      },
+    );
+    const ids = result.map((r) => r.id);
+    expect(ids).toContain("sdip_points");
+    expect(ids).toContain("lic_years");
+    expect(ids).not.toContain("gd_basis");
+    const member = result.find((r) => r.id === "sdip_points");
+    expect(member?.dimSlug).toBe("sdip_band");
+    expect(member?.dtype).toBe("number");
+    expect(member?.origin).toContain("member of gd_basis");
+  });
+
+  it("an UNBOUND composite in the catalog contributes nothing itself — its members surface", () => {
+    const result = deriveRequiredInputs(
+      [],
+      [
+        compositeDim(),
+        dim("sdip_band", "SDIP point band", "banded"),
+        dim("lic_band", "Years licensed band", "banded"),
+      ],
+      {},
+    );
+    const ids = result.map((r) => r.id);
+    expect(ids).not.toContain("gd_basis");
+    expect(ids).toContain("sdip_band");
+    expect(ids).toContain("lic_band");
+  });
+});
+
+describe("deriveRequiredInputs · schedule applications (FCA #23)", () => {
+  it("a modifier.schedule stage surfaces its schedule_app_* field as an OPTIONAL mappable input", () => {
+    // Finding 13: the extract's IRPM_PCT column had no destination —
+    // the projector reads schedule_app_{id} from every row, but this
+    // deriver never listed it, so Match columns couldn't map it and
+    // six rows' filed credits/debits silently unapplied.
+    const result = deriveRequiredInputs(
+      [
+        {
+          stage_id: "mod_stage",
+          stage_kind: "modifier.schedule",
+          display_name: "Schedule rating",
+          config_json: {
+            schedule: {
+              schedule_id: "psm_schedule",
+              categories: [{ category_id: "overall", range_pct: 40 }],
+            },
+          },
+        },
+      ],
+      [],
+    );
+    const entry = result.find((r) => r.id === "schedule_app_psm_schedule");
+    expect(entry).toBeDefined();
+    expect(entry!.optional).toBe(true);
+    expect(entry!.dtype).toBe("number");
+    expect(entry!.origin).toContain("Schedule");
+  });
+
+  it("the field key matches the projector's sanitize (one derivation)", () => {
+    const result = deriveRequiredInputs(
+      [
+        {
+          stage_id: "mod_stage",
+          stage_kind: "modifier.schedule",
+          config_json: { schedule: { schedule_id: "PSM Schedule-9" } },
+        },
+      ],
+      [],
+    );
+    expect(result.some((r) => r.id === "schedule_app_psm_schedule_9")).toBe(
+      true,
+    );
   });
 });

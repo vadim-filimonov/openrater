@@ -5,7 +5,7 @@
 # You may obtain a copy of the License at
 #
 #     http://www.apache.org/licenses/LICENSE-2.0
-"""Bundled connector manifests.
+"""Bundled connector manifests (Brief 47 §8).
 
 Each entry is a connector declared as DATA — the generic `RestConnector` runs
 it. This is the extension point: a new vendor is a new manifest here (or, later,
@@ -104,7 +104,7 @@ GOOGLE_PLACES_TEXT_SEARCH = ConnectorManifest(
             name="matched_name",
             json_path="results.0.name",
             description="Name of the business Google matched (review it — may differ from the query).",
-            # Drives the match-confidence badge: compare this against
+            # Brief 50 — drives the match-confidence badge: compare this against
             # the value bound to the `query` input so a wrong-org match is visible.
             echo_of="query",
         ),
@@ -132,8 +132,8 @@ LIGHTBOX_STRUCTURES = ConnectorManifest(
     category="property_peril",
     version="v1",
     method="GET",
-    # Bundled local-development endpoint. A real LightBox license overrides
-    # it via a "duplicate to
+    # The Sample BOP stress-test mock (docs/stress-tests/.../lightbox-mock).
+    # A real LightBox license overrides this endpoint via a "duplicate to
     # customize" user connector; the contract (inputs/outputs) is identical.
     endpoint="http://127.0.0.1:8900/v1/structures",
     secret_env="RATER_LIGHTBOX_API_KEY",
@@ -160,7 +160,7 @@ LIGHTBOX_STRUCTURES = ConnectorManifest(
             name="matched_address",
             json_path="matches.0.formatted_address",
             description="Address LightBox matched — review it; may differ from the query.",
-            # Drives the name-similarity confidence badge so a
+            # Brief 50 — lights up the name-similarity confidence badge so a
             # wrong match is caught before the value is pushed onto the plan.
             echo_of="address",
         ),

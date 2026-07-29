@@ -21,7 +21,8 @@
 # NOTE: these files are PER-CONTAINER and are reset when a container is
 # recreated (e.g. `docker compose up --build`). They bound disk growth;
 # they do NOT preserve request/quote traces across a redeploy. Durable,
-# off-box trace retention is a separate operational concern.
+# off-box trace retention is a separate concern (see the runbook's
+# "Backups & recovery" section and the 2026-07-11 audit).
 x-logging: &default-logging
   driver: json-file
   options:
@@ -45,7 +46,7 @@ services:
       #   "1" = seed if absent (in-app edits survive) · "reset" = restore each boot
       #   · SEED_COLD_TEST=0 to ship empty
       RATER_SEED_COLD_TEST: ${SEED_COLD_TEST:-1}
-      # --- Rate Lab: every quote and run delegates to the scoring service
+      # --- Rate Lab: the scoring service (Brief 76) — every quote + run
       #     delegates here (server-to-server, internal). ---
       RATER_SCORING_URL: http://scoring:8080
       # --- optional: require an API key on POST /plans/{id}/quote.
@@ -81,8 +82,8 @@ services:
       start_period: 40s
 
   scoring:
-    # Rate Lab's rating engine as a service. The server delegates every quote
-    # and run here — the SAME engine the
+    # Rate Lab's rating engine as a service (ADR-0045). the server delegates
+    # every quote (Brief 76) + run (Brief 75) here — the SAME engine the
     # browser previews with, so the API and the UI can't disagree (Law 1).
     # Internal only — reached via `app`'s RATER_SCORING_URL, never published
     # to the host or the tunnel. The runtime image is a single esbuild
@@ -96,8 +97,8 @@ services:
       HOST: 0.0.0.0
       NODE_ENV: production
       # In-memory queue + filesystem store — book-run results persist on the
-      # host volume so Analytics' run-fed reads survive a restart.
-      # Swapping to SQS+S3 is config, not code.
+      # host volume so Analytics' run-fed reads survive a restart (Brief 75
+      # phase 4). Swapping to SQS+S3 is config, not code (ADR-0045).
       QUEUE_DRIVER: memory
       STORE_DRIVER: fs
       STORE_DIR: /data/scoring
@@ -143,7 +144,7 @@ services:
     # is disabled, and idles (no crash loop, no restart storm). The
     # replica config is deploy/litestream.yml; every value there is
     # env-expanded, so credentials never live in the repo. Enable + restore
-    # recovery steps should be rehearsed before enabling this sidecar.
+    # steps are in docs/DEMO_DEPLOYMENT_RUNBOOK.md → "Backups & recovery".
     image: litestream/litestream:0.3.13
     # Override the default `litestream` entrypoint with a tiny guard so an
     # unconfigured box no-ops cleanly instead of erroring on a missing

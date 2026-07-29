@@ -158,7 +158,7 @@ export function manifestTiles(
 
 export interface WorkbookBuildPanelProps {
   /** The check operation — the app layer passes api-client's
-   *  `checkWorkbook`; @openrater/ui never talks HTTP itself. */
+   *  `checkWorkbook`; labs-ui never talks HTTP itself. */
   readonly checkWorkbook: CheckWorkbookFn;
   /** The build operation — api-client's `buildWorkbookPlan`. */
   readonly buildWorkbook: BuildWorkbookFn;
@@ -169,7 +169,7 @@ export interface WorkbookBuildPanelProps {
   /** Navigate to a plan (the built one, or an already-built twin). */
   readonly onOpenPlan: (ratingPlanId: string) => void;
   /** Starter-kit download URLs (Brief 94 §2) — the app layer builds
-   *  them from api-client's `ingestAssetUrl`; @openrater/ui never talks
+   *  them from api-client's `ingestAssetUrl`; labs-ui never talks
    *  HTTP itself. The server's Content-Disposition drives the save. */
   readonly assetUrls: {
     readonly spec: string;
@@ -763,7 +763,7 @@ export function WorkbookBuildPanel({
               Worked example
             </span>
             <span className="rater-workbook-build__kit-desc">
-              A complete program: 22 sheets, 20 filing examples, all green.
+              A complete program: 22 sheets, 20 test cases, all green.
             </span>
             <span className="rater-workbook-build__kit-meta">
               .xlsx · nonprofit D&amp;O + GL

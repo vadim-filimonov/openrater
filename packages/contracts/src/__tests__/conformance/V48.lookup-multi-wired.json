@@ -1,10 +1,10 @@
 {
   "name": "V48.lookup-multi-wired",
-  "description": "A lookup.multi node wired through derived per-key ports receives fictional Meridian territory and exposure-basis inputs and returns a synthetic factor.",
+  "description": "lookup.multi wired via derived per-key ports (ADR-0044): (territory, exposure_base) -> liability base loss cost. Two upstream inputs feed two named key ports.",
   "plan": {
     "id": "v48.multi",
     "version": "1.0.0",
-    "name": "Meridian multi-key lookup (wired per-key ports)",
+    "name": "Multi-key lookup (wired per-key ports)",
     "line": "bop",
     "effective": "2026-01-01",
     "nodes": [
@@ -14,15 +14,15 @@
         "params": {
           "keyNames": ["territory", "exposure_base"],
           "rows": [
-            { "keys": ["t1", "area"], "factor": 0.05 },
-            { "keys": ["t1", "sales"], "factor": 1.5 },
-            { "keys": ["t1", "payroll"], "factor": 10.0 },
-            { "keys": ["t2", "area"], "factor": 0.06 },
-            { "keys": ["t2", "sales"], "factor": 1.6 },
-            { "keys": ["t2", "payroll"], "factor": 10.5 }
+            { "keys": ["701", "loi"], "factor": 0.025 },
+            { "keys": ["701", "sales"], "factor": 1.518 },
+            { "keys": ["701", "payroll"], "factor": 10.214 },
+            { "keys": ["702", "loi"], "factor": 0.029 },
+            { "keys": ["702", "sales"], "factor": 1.577 },
+            { "keys": ["702", "payroll"], "factor": 10.419 }
           ],
           "defaultValue": 1.0,
-          "tableName": "Meridian synthetic liability factor"
+          "tableName": "base_lc_liability"
         },
         "position": { "x": 220, "y": 60 } },
       { "id": "out_f", "kind": "output", "params": { "fieldName": "base_lc", "fieldType": "float" }, "position": { "x": 440, "y": 60 } }
@@ -33,6 +33,6 @@
       { "from": { "node": "lkp", "port": "value" }, "to": { "node": "out_f", "port": "value" } }
     ]
   },
-  "externalInputs": { "territory": "t2", "exposure_base": "sales" },
-  "expectedOutputs": { "base_lc": 1.6 }
+  "externalInputs": { "territory": "702", "exposure_base": "sales" },
+  "expectedOutputs": { "base_lc": 1.577 }
 }

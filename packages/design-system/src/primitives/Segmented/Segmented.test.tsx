@@ -155,6 +155,47 @@ describe("<Segmented>", () => {
     expect(onChange).not.toHaveBeenCalled();
   });
 
+  // FCA #10 follow-through — the Run form's boolean control starts
+  // UNSET (value matches no item). The group must stay reachable and
+  // answerable by keyboard, per the WAI-ARIA radiogroup pattern.
+  it("an unset group keeps its first enabled segment tabbable", () => {
+    render(
+      <Segmented
+        value={"" as "canvas" | "saved"}
+        onChange={() => {}}
+        items={ITEMS}
+        ariaLabel="Canvas mode"
+      />,
+    );
+    expect(screen.getByRole("radio", { name: /Canvas/ })).toHaveAttribute(
+      "tabindex",
+      "0",
+    );
+    expect(screen.getByRole("radio", { name: /Saved/ })).toHaveAttribute(
+      "tabindex",
+      "-1",
+    );
+  });
+
+  it("an unset group selects the first enabled segment on arrow keys", async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(
+      <Segmented
+        value={"" as "canvas" | "saved"}
+        onChange={onChange}
+        items={[
+          { value: "canvas", label: "Canvas", disabled: true },
+          { value: "saved", label: "Saved" },
+        ]}
+        ariaLabel="Canvas mode"
+      />,
+    );
+    screen.getByRole("radio", { name: /Saved/ }).focus();
+    await user.keyboard("{ArrowRight}");
+    expect(onChange).toHaveBeenLastCalledWith("saved");
+  });
+
   it("renders with the radiogroup role + aria-label", () => {
     render(
       <Segmented

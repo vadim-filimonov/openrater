@@ -1,6 +1,11 @@
 /**
  * Runtime tests — compile + run end-to-end with stub kinds.
  *
+ * Adapted from `<prototype>/plan-builder/src/canvas/__tests__/
+ * plan-runtime.test.ts` (Phase A.1 PR 2). The original imports `@/blocks`
+ * for the v0 kind registrations + an SAMPLE_BOP_CASCADE example; those
+ * port in later A.1 PRs alongside the actual 18 kinds.
+ *
  * THIS test registers minimal stubs (just enough to exercise compile +
  * run + topo + fan-in + as_of propagation) so the runtime's behavior
  * is verified independently of the kinds themselves.
@@ -13,6 +18,7 @@ import {
   executePlan,
   runPlanBatch,
   executePlanBatch,
+  cleanExplanationNoise,
 } from "./runtime";
 import {
   registerBlockKind,
@@ -397,6 +403,65 @@ describe("batch mode", () => {
 
 // ── runPlan signature (sanity check) ────────────────────────
 
+describe("batch mode — RunOptions thread through (FCA review)", () => {
+  // `runPlanBatch` used to pass `{ as_of }` ALONE to each row — every
+  // other option (classLibrary today, anything tomorrow) was silently
+  // dropped, so any batch-path re-run (evaluatePolicyBook's policy
+  // composition included) rated class-exposure rows against an unbound
+  // library while the single-risk path rated them correctly.
+  const ECHO_LIB_KIND: BlockKind = {
+    id: "test.echo_lib",
+    category: "transform",
+    label: "Echo classLibrary presence",
+    description: "out = whether ctx.classLibrary is bound",
+    inputs: [],
+    outputs: [{ name: "result", type: "string" }],
+    defaultParams: {},
+    defaultSize: "regular",
+    execute: (_inputs, _params, ctx) => ({
+      result: (ctx as { classLibrary?: unknown } | undefined)?.classLibrary
+        ? "bound"
+        : "unbound",
+    }),
+  };
+
+  const plan: Plan = {
+    id: "t.batch-options",
+    version: "0.1.0",
+    name: "batch options",
+    nodes: [
+      { id: "echo", kind: "test.echo_lib", params: {} },
+      { id: "out", kind: "output", params: { fieldName: "lib" } },
+    ],
+    edges: [
+      {
+        from: { node: "echo", port: "result" },
+        to: { node: "out", port: "value" },
+      },
+    ],
+  };
+
+  it("every batch row sees the caller's non-as_of options", () => {
+    registerBlockKind(ECHO_LIB_KIND);
+    const compiled = compilePlan(plan);
+    const marker = { lookup: () => undefined } as never;
+    const results = runPlanBatch(compiled, [{}, {}, {}], {
+      as_of: "2024-01-01",
+      classLibrary: marker,
+    });
+    expect(results.map((r) => r.outputs.lib)).toEqual([
+      "bound",
+      "bound",
+      "bound",
+    ]);
+    // …and the batch-pinned as_of still wins per row.
+    expect(results.every((r) => r.as_of === "2024-01-01")).toBe(true);
+    // Without the option, rows stay unbound (no phantom library).
+    const bare = runPlanBatch(compiled, [{}], { as_of: "2024-01-01" });
+    expect(bare[0]!.outputs.lib).toBe("unbound");
+  });
+});
+
 describe("runPlan signature", () => {
   it("accepts a pre-compiled plan + external inputs", () => {
     const plan: Plan = {
@@ -445,7 +510,7 @@ describe("trace contract", () => {
     outputs: [{ name: "value", type: "factor" }],
     defaultParams: {},
     defaultSize: "regular",
-    citation: "Meridian Rule MS-R5.2",
+    citation: "ISO BP-2024-RLC pp.47",
     execute: () => ({ value: 1.25 }),
   };
 
@@ -529,7 +594,7 @@ describe("trace contract", () => {
       ],
     };
     const result = executePlan(plan, {});
-    expect(result.trace.k?.citation).toBe("Meridian Rule MS-R5.2");
+    expect(result.trace.k?.citation).toBe("ISO BP-2024-RLC pp.47");
   });
 
   it("node-level params.citation overrides kind-level citation", () => {
@@ -802,5 +867,25 @@ describe("input port coercion (Brief 83.4)", () => {
   it("string port: values pass through untouched", () => {
     const compiled = compilePlan(plan("string"));
     expect(runPlan(compiled, { flag: "false" }).outputs.v).toBe("false");
+  });
+});
+
+// FCA fca-2026-07-25 #34 — kinds interpolate raw doubles into prose:
+// "128 × 1.18 = 115.54560000000001". The values stay exact in
+// outputs; only the NARRATION cleans binary dust.
+describe("cleanExplanationNoise (FCA #34)", () => {
+  it("rewrites long float tails to their intended reading", () => {
+    expect(
+      cleanExplanationNoise("128 × 1.18 (x) = 115.54560000000001"),
+    ).toBe("128 × 1.18 (x) = 115.5456");
+    expect(cleanExplanationNoise("= 9.675999999999998")).toBe("= 9.676");
+    expect(cleanExplanationNoise("round 9.216000000000001 -> 9.216 (3 dp)")).toBe(
+      "round 9.216 -> 9.216 (3 dp)",
+    );
+  });
+
+  it("leaves clean numbers, ids, and short decimals alone", () => {
+    const s = "1000 × 1.1 (LCM) × 0.95 = 1045 — Rule 5.A p.51 v1.2.3";
+    expect(cleanExplanationNoise(s)).toBe(s);
   });
 });

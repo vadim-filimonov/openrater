@@ -1,5 +1,5 @@
 /**
- * Exhibits book — the ORACLE pin (current Exhibits design).
+ * Exhibits book — the ORACLE pin (Brief: portfolio-redesign v2 §5.4, P3).
  *
  * The exhibit's book mode must reproduce the demo book's committed
  * `expected_tier` / `expected_total` columns EXACTLY — the same oracle

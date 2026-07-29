@@ -19,11 +19,12 @@
  * `coverage_id`; coverages aggregate via the existing `chain.dim_sum`
  * by explicit id, never by name-heuristic.
  *
- * `coverage_id` is a free slug for v1;
+ * `coverage_id` is a free slug for v1 (owner decision O-4, 2026-05-29);
  * a controlled vocab tied to the Class Translator is a later refinement
  * that does not change this shape.
  *
- * Pure types. No React and no DOM.
+ * Pure types. No React, no DOM. See
+ * `docs/adr/0033-line-coverage-product-axis-cleanup.md`.
  */
 
 import type { ProductCode } from "./product-types";
@@ -37,8 +38,9 @@ import { isProductCode } from "./product-types";
  * `rating_dimension` is unchanged (it already names the splitting dim).
  *
  * `limit` / `retention` / `exposure_ref` are optional in v1 — the entity
- * exists so the axes are clean; their runtime semantics are deliberately
- * outside this type definition.
+ * exists now (this ADR) so the axes are clean; their RUNTIME semantics
+ * (how they affect scoring) are a sibling ADR, deliberately not decided
+ * here.
  */
 export interface Coverage {
   /** Free slug, unique within a plan (O-4). e.g. "property",

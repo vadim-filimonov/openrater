@@ -6,7 +6,7 @@
  * hands the chunk's results to `onChunk` (the worker appends them to the
  * ResultStore + updates job progress) and yields the event loop, so a
  * 2,000-row book never blocks the process and results stream out instead
- * of accumulating in memory. Pure over @openrater/contracts — no UI package, no
+ * of accumulating in memory. Pure over @openrater/contracts — NO labs-ui, NO
  * I/O; the caller owns persistence + progress.
  *
  * `as_of` is resolved ONCE by the caller (pinned at enqueue, passed via

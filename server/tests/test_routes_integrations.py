@@ -15,7 +15,7 @@ from fastapi.testclient import TestClient
 
 
 def _create(client: TestClient) -> str:
-    r = client.post("/api/v1/integrations", json={"name": "Example Integrator — test"})
+    r = client.post("/api/v1/integrations", json={"name": "OpenRater Front — test"})
     assert r.status_code == 201, r.text
     return r.json()["integration_id"]
 

@@ -61,18 +61,19 @@ const constructionDim: Dimension = {
   ],
 };
 
-const qualityGradeDim: Dimension = {
-  id: "dim_quality_grade",
-  slug: "quality_grade",
-  display_name: "Meridian quality grade",
+const protectionClassDim: Dimension = {
+  id: "dim_protection_class",
+  slug: "protection_class",
+  display_name: "Protection class",
   data_type: "enum",
   role: "rating-input",
   shape: "categorical",
-  levels: [
-    { kind: "categorical", id: "q1", label: "Quality grade 1", aliases: ["1"] },
-    { kind: "categorical", id: "q2", label: "Quality grade 2", aliases: ["2"] },
-    { kind: "categorical", id: "q3", label: "Quality grade 3", aliases: ["3"] },
-  ],
+  levels: Array.from({ length: 10 }, (_, i) => ({
+    kind: "categorical" as const,
+    id: `pc_${i + 1}`,
+    label: String(i + 1),
+    aliases: [`class ${i + 1}`],
+  })),
 };
 
 const buildingAgeDim: Dimension = {
@@ -91,7 +92,7 @@ const buildingAgeDim: Dimension = {
 
 const ALL_DIMS: readonly Dimension[] = [
   constructionDim,
-  qualityGradeDim,
+  protectionClassDim,
   buildingAgeDim,
 ];
 
@@ -250,10 +251,10 @@ describe("nameSimilarity", () => {
   });
 
   it("normalizes various punctuation to equivalent", () => {
-    // "QUAL-GRADE", "QUAL_GRADE", "qualGrade" should all be ~1.0
-    // against the same normalized synthetic name.
-    expect(nameSimilarity("QUAL_GRADE", "qual_grade")).toBe(1.0);
-    expect(nameSimilarity("qual-grade", "qual_grade")).toBe(1.0);
+    // "PROT-CLASS", "PROT_CLASS", "protClass" should all be ~1.0
+    // against "protection_class".
+    expect(nameSimilarity("PROT_CLASS", "prot_class")).toBe(1.0);
+    expect(nameSimilarity("prot-class", "prot_class")).toBe(1.0);
   });
 });
 
@@ -263,8 +264,8 @@ describe("nameSimilarity", () => {
 
 describe("nameSimilarity · Brief 57 single-shared-token discount", () => {
   // The Sample BOP walkthrough bug: CSV column `class_code` shared the
-  // exact token "class" with construction_class / liab_class_group /
-  // risk_class and "code" with quality_code — every one
+  // exact token "class" with construction_class / liab_class_group / ppc
+  // ("...Class") and "code" with bceg_grade ("...Code...") — every one
   // scored nameSimilarity 1.0 → "auto", a swarm of false auto-applies.
   // After Brief 57 only the TRUE owner (class_code) scores 1.0; the
   // token-sharers fall below the 0.8 auto bar.
@@ -276,19 +277,19 @@ describe("nameSimilarity · Brief 57 single-shared-token discount", () => {
     for (const other of [
       "construction_class",
       "liab_class_group",
-      "Meridian risk class",
-      "Meridian quality code",
+      "Public Protection (Fire) Class", // ppc display name
+      "Building Code Effectiveness Grade", // bceg display name
     ]) {
       const score = nameSimilarity("class_code", other);
       expect(score).toBeLessThan(0.8); // below the auto threshold
     }
   });
 
-  // Preserve genuine matches: BOTH tokens of "qual_grade" match
-  // "quality_grade" (qual→quality partial, grade→grade exact), so
+  // Preserve genuine matches: BOTH tokens of "prot_class" match
+  // "protection_class" (prot→protection partial, class→class exact), so
   // it stays a strong suggestion (and value-match promotes it to auto).
-  it("still rewards a genuine multi-token abbreviation (qual_grade ↔ quality_grade)", () => {
-    expect(nameSimilarity("quality_grade", "qual_grade")).toBeGreaterThan(0.7);
+  it("still rewards a genuine multi-token abbreviation (prot_class ↔ protection_class)", () => {
+    expect(nameSimilarity("protection_class", "prot_class")).toBeGreaterThan(0.7);
   });
 
   // Full token-set coverage (reorder) is still a perfect match: every
@@ -701,11 +702,11 @@ describe("autoMatchColumns", () => {
     // confidence === nameScore, the exact pathology (a dim with no
     // populated levels). Only `input_class_code` should bucket "auto".
     const inputs: readonly RequiredInput[] = [
-      { id: "input_class_code", name: "class_code", displayName: "Meridian BOP class code" },
+      { id: "input_class_code", name: "class_code", displayName: "ISO BOP class code" },
       { id: "input_construction_class", name: "construction_class", displayName: "Construction type" },
       { id: "input_liab_class_group", name: "liab_class_group", displayName: "Liability class group" },
-      { id: "input_risk_class", name: "risk_class", displayName: "Meridian risk class" },
-      { id: "input_quality_code", name: "quality_code", displayName: "Meridian quality code" },
+      { id: "input_ppc", name: "ppc", displayName: "Public Protection (Fire) Class" },
+      { id: "input_bceg_grade", name: "bceg_grade", displayName: "Building Code Effectiveness Grade" },
     ];
     const columns: readonly SourceColumn[] = [{ name: "class_code", dtype: "string" }];
     const result = autoMatchColumns(inputs, columns, [], []);
@@ -719,8 +720,8 @@ describe("autoMatchColumns", () => {
     for (const id of [
       "input_construction_class",
       "input_liab_class_group",
-      "input_risk_class",
-      "input_quality_code",
+      "input_ppc",
+      "input_bceg_grade",
     ]) {
       const onClassCode = result[id]?.find((c) => c.columnName === "class_code");
       expect(onClassCode?.bucket === "auto").toBe(false);
@@ -735,7 +736,7 @@ describe("autoMatchColumns", () => {
         id: "class_code",
         name: "class_code",
         dtype: "string",
-        dimSlug: "quality_grade", // illustrative — using a stand-in
+        dimSlug: "protection_class", // illustrative — using a stand-in
       },
       {
         id: "construction",
@@ -744,10 +745,10 @@ describe("autoMatchColumns", () => {
         dimSlug: "construction",
       },
       {
-        id: "quality_grade",
-        name: "quality_grade",
+        id: "protection_class",
+        name: "protection_class",
         dtype: "string",
-        dimSlug: "quality_grade",
+        dimSlug: "protection_class",
       },
       { id: "tiv", name: "tiv", dtype: "number" },
       { id: "building_age", name: "building_age", dtype: "number" },
@@ -755,20 +756,20 @@ describe("autoMatchColumns", () => {
     const columns: readonly SourceColumn[] = [
       { name: "CLASS_CODE", dtype: "string" },
       { name: "CONSTR", dtype: "string" },
-      { name: "QUALITY_GRADE", dtype: "string" },
+      { name: "PROT_CLASS", dtype: "string" },
       { name: "TIV_USD", dtype: "number" },
       { name: "BUILT", dtype: "number" }, // matches building_age via prefix
       { name: "AGENT_ID", dtype: "string" }, // unrelated noise
     ];
     const sampleRows = [
-      { CLASS_CODE: "c101", CONSTR: "Frame", QUALITY_GRADE: "q1", TIV_USD: 1360000, BUILT: 1987 },
-      { CLASS_CODE: "c102", CONSTR: "Masonry", QUALITY_GRADE: "q2", TIV_USD: 8900000, BUILT: 2001 },
-      { CLASS_CODE: "c103", CONSTR: "Non-combustible", QUALITY_GRADE: "q3", TIV_USD: 2100000, BUILT: 2015 },
+      { CLASS_CODE: "09011", CONSTR: "Frame", PROT_CLASS: "4", TIV_USD: 1247438, BUILT: 1987 },
+      { CLASS_CODE: "07712", CONSTR: "Masonry", PROT_CLASS: "6", TIV_USD: 8900000, BUILT: 2001 },
+      { CLASS_CODE: "06811", CONSTR: "Non-combustible", PROT_CLASS: "3", TIV_USD: 2100000, BUILT: 2015 },
     ];
     const result = autoMatchColumns(inputs, columns, sampleRows, ALL_DIMS);
-    // Each of construction, quality_grade, tiv should auto-bucket.
+    // Each of construction, protection_class, tiv should auto-bucket.
     expect(result["construction"]?.[0]?.bucket).toBe("auto");
-    expect(result["quality_grade"]?.[0]?.bucket).toBe("auto");
+    expect(result["protection_class"]?.[0]?.bucket).toBe("auto");
     expect(result["tiv"]?.[0]?.bucket).toBe("auto");
     // building_age via BUILT prefix is a suggestion (not auto).
     const ageTop = result["building_age"]?.[0];

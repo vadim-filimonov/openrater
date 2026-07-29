@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Color-domain and typography-token guard.
+ * Color-domain + type-DNA guard — V2_INTERFACE_SPEC enforcement.
  *
  * The spec assigns every color a DOMAIN (interaction / status /
  * computation-kind / data-viz) and every label one type DNA (tracking +
@@ -134,7 +134,8 @@ if (failures.length > 0) {
   console.error(failures.join("\n"));
   console.error(
     "\nFix: use the domain token (--rater-accent-*/--rater-feedback-*/--rater-viz-*)," +
-      "\na --rater-tracking-*/--rater-fw-* type token, or the renamed label.",
+      "\na --rater-tracking-*/--rater-fw-* type token, or the renamed label." +
+      "\nSee docs/V2_INTERFACE_SPEC.md (design constitution).",
   );
   process.exit(1);
 }

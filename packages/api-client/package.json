@@ -2,7 +2,7 @@
   "name": "@openrater/api-client",
   "version": "0.0.0",
   "private": true,
-  "description": "Typed REST SDK for the OpenRater server. One function per endpoint with error normalization and Zod-validated responses; apps use this package instead of calling fetch directly.",
+  "description": "Typed REST SDK for the OpenRater API Lab backend. One function per endpoint; handles error normalization + Zod-validated responses. The single source of truth for how frontends talk to api-lab/backend — apps MUST go through this, never call fetch() directly. Wraps TanStack Query in @openrater/hooks.",
   "license": "Apache-2.0",
   "type": "module",
   "main": "./src/index.ts",

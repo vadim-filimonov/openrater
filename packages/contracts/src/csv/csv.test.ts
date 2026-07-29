@@ -1,5 +1,5 @@
 /**
- * Conformance tests for @openrater/contracts/csv.
+ * Conformance vectors for @openrater/contracts/csv — ADR-0017.
  *
  * Covers:
  *   - RFC-4180 strict parsing (delimiter, quoting, escapes)
@@ -125,15 +125,15 @@ describe("formatNumber", () => {
 describe("encodeCsv", () => {
   it("emits header + sorted rows + trailing newline", () => {
     const rows: FtRow[] = [
-      { key: "c201", factor: 1.25, citation_rule: "Meridian Rule MS-R5.2", citation_page: "p.31" },
-      { key: "c101", factor: 0.9, citation_rule: "Meridian Rule MS-R5.2", citation_page: "p.31" },
+      { key: "91342", factor: 1.35, citation_rule: "ISO §5.A.2", citation_page: "p.31" },
+      { key: "71641", factor: 0.95, citation_rule: "ISO §5.A.2", citation_page: "p.31" },
     ];
     const out = encodeCsv(rows, ftSchema);
     expect(out).toBe(
       [
         "key,factor,citation_rule,citation_page",
-        "c101,0.9,Meridian Rule MS-R5.2,p.31",
-        "c201,1.25,Meridian Rule MS-R5.2,p.31",
+        "71641,0.95,ISO §5.A.2,p.31",
+        "91342,1.35,ISO §5.A.2,p.31",
         "",
       ].join("\n"),
     );
@@ -170,12 +170,12 @@ describe("decodeCsv", () => {
   it("parses a simple CSV", () => {
     const text =
       "key,factor,citation_rule,citation_page\n" +
-      "c201,1.25,Meridian Rule MS-R5.2,p.31\n";
+      "91342,1.35,ISO §5.A.2,p.31\n";
     const result = decodeCsv(text, ftSchema);
     expect(result.ok).toBe(true);
     if (result.ok) {
       expect(result.rows).toEqual([
-        { key: "c201", factor: 1.25, citation_rule: "Meridian Rule MS-R5.2", citation_page: "p.31" },
+        { key: "91342", factor: 1.35, citation_rule: "ISO §5.A.2", citation_page: "p.31" },
       ]);
       expect(result.warnings).toEqual([]);
     }
@@ -276,11 +276,11 @@ describe("decodeCsv", () => {
 describe("encode → decode → encode round-trip", () => {
   it("is byte-stable for a 5-row table with citations + quoted fields", () => {
     const rows: FtRow[] = [
-      { key: "c201", factor: 1.25, citation_rule: "Meridian Rule MS-R5.2", citation_page: "p.31" },
-      { key: "c101", factor: 0.9, citation_rule: 'Meridian Rule MS-R5.2, footnote "a"', citation_page: "p.32" },
-      { key: "c301", factor: 1.5, citation_rule: "Meridian Rule MS-R5.3", citation_page: "p.33" },
-      { key: "c302", factor: 0.85, citation_rule: "", citation_page: "" },
-      { key: "c202", factor: 1.4, citation_rule: "Meridian Rule MS-R5.4", citation_page: "p.40" },
+      { key: "91342", factor: 1.35, citation_rule: "ISO BOP §5.A.2", citation_page: "p.31" },
+      { key: "71641", factor: 0.95, citation_rule: 'ISO BOP §5.A.2, footnote "a"', citation_page: "p.32" },
+      { key: "58291", factor: 1.55, citation_rule: "Carrier proprietary", citation_page: "internal" },
+      { key: "10101", factor: 0.88, citation_rule: "", citation_page: "" },
+      { key: "73912", factor: 1.4, citation_rule: "ISO BOP §5.A.3", citation_page: "p.40" },
     ];
     const csv1 = encodeCsv(rows, ftSchema);
     const decoded = decodeCsv(csv1, ftSchema);
@@ -445,7 +445,7 @@ describe("parseRequiredNumber", () => {
   it("rejects non-numeric", () => {
     expect(parseRequiredNumber("abc", 1).ok).toBe(false);
   });
-  it("rejects thousands separators", () => {
+  it("rejects thousands separators (ADR-0017 anti-pattern #7)", () => {
     const r = parseRequiredNumber("1,000", 1);
     expect(r.ok).toBe(false);
     if (!r.ok) expect(r.error).toContain("thousands separators");

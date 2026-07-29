@@ -78,7 +78,7 @@ export interface PlanReportProps {
   readonly defaultTierLabel?: string | null;
 
   // ── §1.1.7 / R5 (93.3) — worked examples, the workbook variant ──
-  /** The filing's own test cases, verified at build (Brief 92). The
+  /** The workbook's test cases, verified at build (Brief 92). The
    *  consumer builds this from the persisted build report via
    *  buildVerifiedExamples; non-null REPLACES the probe-book variant. */
   readonly verifiedExamples?: VerifiedExamples | null;
@@ -123,6 +123,10 @@ export function buildPinsCaption(
   for (const [key, value] of Object.entries(pins)) {
     if (value == null) continue;
     if (typeof value !== "string" && typeof value !== "number") continue;
+    // FCA #33 (finding 118) — a non-finite number is a JS sentinel,
+    // never a filed fact; on a manual-page exhibit "−Infinity" reads
+    // as a computation error. Belt behind the finite-pin synthesis.
+    if (typeof value === "number" && !Number.isFinite(value)) continue;
     const label = labels?.get(key) ?? key;
     const resolved = valueLabels?.get(key)?.(value) ?? null;
     parts.push(
@@ -464,8 +468,10 @@ export function PlanReport(props: PlanReportProps): JSX.Element {
         >
           <div className="rater-report__sec-head">
             <h2 className="rater-report__sec-title">Worked examples</h2>
+            {/* FCA #20 — the test_cases sheet is transcriber-authored;
+                "the filing's own" overclaimed provenance. */}
             <span className="rater-report__sec-src">
-              the filing's own test cases, scored at build
+              the workbook's test cases, scored at build
             </span>
           </div>
           <p
@@ -478,7 +484,10 @@ export function PlanReport(props: PlanReportProps): JSX.Element {
             <thead>
               <tr>
                 <th>Example</th>
-                <th>Filing says</th>
+                {/* FCA #19/#20 — the expected value is the workbook's
+                    test case (transcriber-authored), not necessarily
+                    a number the filing prints. */}
+                <th>Expected (test case)</th>
                 <th>Engine computed</th>
                 <th title={VECTOR_DELTA_NOTE}>Δ</th>
               </tr>

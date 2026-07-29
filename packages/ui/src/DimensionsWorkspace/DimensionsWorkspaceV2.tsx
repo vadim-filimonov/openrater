@@ -1,12 +1,31 @@
 /**
- * <DimensionsWorkspaceV2> — the Dimensions authoring surface.
+ * <DimensionsWorkspaceV2> — the v2 Dimensions surface.
  *
- * A two-column layout keeps the searchable dimension list and Add menu
- * on the left, with the selected dimension opening inline on the right.
+ * The validated redesign (docs/design-pass/dimensions-v2-redesign.md): a calm
+ * **2-column** layout — a searchable/filterable dimension LIST on the left with
+ * a quiet `+ Add ▾` shape menu, and the selected dimension opening **inline on
+ * the right** as its working detail. No 3rd region, no inspect→edit hop.
  *
- * The route owns dimension state, selection, persistence, and references.
- * This component renders editable categorical and banded levels plus the
- * shape-specific geographic, classification, and composite views.
+ * §2B parity-by-construction: this is a VIEW only. It takes the same
+ * `DimensionsWorkspaceProps` the route already feeds the v1
+ * `<DimensionsWorkspace>` (all dimension state + add/select/edit/autosave/
+ * reference handlers stay in the route), and renders the v2 layout. Swapped in
+ * behind `?dims2=1` while it's built out.
+ *
+ * Phase status:
+ *   · P1 — the SHELL: list (search · Segmented filter · shape-chip rows) ·
+ *     Add-shape menu · the right pane's empty + read-only detail. ✅
+ *   · P2 — the EDITABLE body (this file): for categorical + banded dims on a
+ *     writable plan the detail's name/id + levels become editable, autosaving
+ *     on blur. It reuses the proven primitives — `<LevelRowsTable>` (the
+ *     editable level grid: inline id/label/aliases, banded lo/hi, drag-reorder)
+ *     and `<UsedInPanel>` (the references hub) — wired to the route's
+ *     `onCommitDimension` / `onDeleteDimension` / `resolveReferences` exactly
+ *     as v1 wires them, so behaviour is preserved by construction. Delete fires
+ *     the route's `<DimensionDeletePrompt>` impact modal. ✅
+ *   · P3 — the shape-specific bodies (banded scrubber + Generate · geographic
+ *     map/territories · composite axis reorder). Until then geographic /
+ *     classification / composite dims render the read-only level view.
  */
 
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -51,8 +70,8 @@ import type {
   LevelInlineWarning,
   LevelRow,
 } from "../DimensionEditor";
-// LevelRowsTable and UsedInPanel import their own stylesheets, so this
-// surface has no dependency on the legacy DimensionEditor stylesheet.
+// LevelRowsTable + UsedInPanel self-import their stylesheets (Brief 66
+// §3.1) — no legacy DimensionEditor.css dependency on this surface.
 import type { DimensionRow } from "../DimensionsTable";
 import {
   SHAPE_META,
@@ -62,13 +81,14 @@ import {
 } from "../dimensionMeta";
 import "./dims-v2.css";
 
-// ── Workspace contract ──
+// ── The workspace contract (moved here at the Brief 66 cutover — the
+//    legacy DimensionsWorkspace that defined it is deleted). ──
 
 /**
  * The shape choice fired from the tool pane's Add buttons.
  *
- * Mirrors `DimensionShape` from @openrater/contracts, with the
- * addition of "classification" for
+ * Mirrors `DimensionShape` from @openrater/contracts (26.P0 +
+ * ADR-0025), with the addition of "classification" for
  * convenience (since classification is a categorical dim with
  * library mapping — surfaced separately in the UI even though
  * it's not its own substrate shape).
@@ -90,7 +110,7 @@ export type DimensionShapeChoice =
  * - "banded"         — shape === "banded"
  * - "geographic"     — dimension_type === "geographic"
  * - "classification" — dimension_type === "classification"
- * - "composite"      — shape === "composite"
+ * - "composite"      — shape === "composite" (ADR-0025)
  *
  * The "standard" filter keeps its 24.A2 name for backward
  * compatibility; the v2 mockup labels the same chip "Categorical."
@@ -118,23 +138,29 @@ export interface DimensionsWorkspaceProps {
    * (banded / geographic / classification / composite). The route
    * decides whether to open a drawer or navigate elsewhere. For
    * **categorical** rows the workspace handles selection internally
-   * by entering inline-edit mode.
+   * by entering inline-edit mode (Brief 30 PR 30.1).
    */
   readonly onSelect?: (id: string) => void;
   /**
-   * Fired when the user clicks one of the shape buttons in the tool pane.
-   * When the user clicks "+ Categorical", the route
+   * 27.PR1 — Fired when the user clicks one of the 4 shape buttons
+   * OR the Composite button in the tool pane.
+   *
+   * Brief 30 PR 30.1: when the user clicks "+ Categorical", the route
    * should (a) create a new categorical `DimensionRow` with a unique
    * id, (b) append it to `dimensions`, and (c) call
    * `onEditingDimensionIdChange(newDim.id)` so the workspace enters
-   * inline-edit mode for the new dimension.
+   * inline-edit mode for the new dim. Other shapes still use legacy
+   * flows (banded drawer / navigate / toast) until subsequent PRs
+   * inline them.
    */
   readonly onAdd?: (shape: DimensionShapeChoice) => void;
   /**
-   * Controlled id of the dimension currently being
+   * Brief 30 PR 30.1 — Controlled id of the dimension currently being
    * edited inline. When set + the dim exists in `dimensions`, the
    * workspace's center pane swaps from the browse list to
-   * `<DimensionEditor>`. `null` or undefined renders the browse list.
+   * `<DimensionEditor>` (categorical only — banded etc. still routes
+   * to the legacy drawer until PR 30.2+). `null` / undefined renders
+   * the browse list.
    */
   readonly editingDimensionId?: string | null;
   /**
@@ -145,7 +171,7 @@ export interface DimensionsWorkspaceProps {
    */
   readonly onEditingDimensionIdChange?: (id: string | null) => void;
   /**
-   * Fires when the inline editor commits a field
+   * Brief 30 PR 30.1 — Fires when the inline editor commits a field
    * patch (autosave on blur). The route applies the patch to its
    * `editedDimensions` array.
    */
@@ -155,40 +181,43 @@ export interface DimensionsWorkspaceProps {
    * pill (the route's debounced dimension write). Defaults to "saved".
    */
   readonly saveState?: "saving" | "saved" | "error";
-  /** Explicit jump to the plan's class registry (the
+  /** Brief 66 §3.3 — explicit jump to the plan's class registry (the
    *  classification dim's management surface). The v2 detail renders it
    *  as a CTA; the old row-click hijack (which also lost the query
    *  string) is gone. */
   readonly onOpenClassRegistry?: ((dimId: string) => void) | undefined;
-  /** The dimensions request failed: edits stay local-only
+  /** Brief 66 §3.2 — the dimensions GET failed: edits stay local-only
    *  until the service answers. The v2 surface renders an honest banner
    *  (the pill used to read "Saved" over a dead sync). */
   readonly syncBlocked?: boolean;
   /** Retry the failed dimensions fetch. */
   readonly onRetrySync?: (() => void) | undefined;
   /**
-   * Fires when the user clicks the editor's Delete button. The route
-   * owns confirmation and impact preview behavior.
+   * Brief 30 PR 30.1 — Fires when the user clicks the editor's
+   * Delete button. PR 30.5 wires an impact-preview modal; for now
+   * the route can call `confirm()` or just delete.
    */
   readonly onDeleteDimension?: (dimId: string) => void;
   /**
-   * Looks up downstream references to a dimension. When undefined,
-   * the editor's "Used in" panel renders the empty CTA.
+   * Brief 30 PR 30.4 — Looks up the downstream references to a dim
+   * (chains / factor tables / modifiers / curves). When undefined,
+   * the editor's "Used in" panel renders the empty CTA. PR 30.4
+   * wires a real resolver.
    */
   readonly resolveReferences?: (dimId: string) => readonly DimensionReference[];
   /**
-   * Fires when the user clicks an empty-state action
+   * Brief 30 PR 30.4 — Fires when the user clicks an empty-CTA
    * button or a Used-in row. The route owns the navigation.
    */
   readonly onJumpToReference?: (ref: DimensionReference) => void;
   /**
-   * Empty-state actions. When omitted, the buttons
+   * Brief 30 PR 30.4 — Empty-state CTAs. When omitted, the CTA buttons
    * are hidden.
    */
   readonly onReferenceInChain?: (dimId: string) => void;
   readonly onUseAsFactorTableKey?: (dimId: string) => void;
   /**
-   * Composite axis-change side channel. Fires
+   * Brief 30 PR 30.6 — Composite axis-change side channel. Fires
    * separately from `onCommitDimension` so the route can toast on
    * `"reorder"` (lock #10: factor tables keyed on this dim will
    * re-key their columns).
@@ -199,7 +228,7 @@ export interface DimensionsWorkspaceProps {
     kind: "add" | "remove" | "reorder",
   ) => void;
   /**
-   * Optional back-crumb for edit-in-place. When set
+   * Brief 30 PR 30.7 — Back-crumb (Tier 2 of edit-in-place). When set
    * and the inline editor is open, an extra crumb appears above
    * "All dimensions" — `← back to <label>`. Clicking fires `onClick`,
    * which the route uses to navigate back to the consumer surface
@@ -209,7 +238,7 @@ export interface DimensionsWorkspaceProps {
     readonly label: string;
     readonly onClick: () => void;
   };
-  // ── Geographic inline editor ─────────────────
+  // ── Brief 44 PR 44.11 — Geographic inline editor ─────────────────
   //
   // When the user clicks an existing geographic dim in the list, the
   // workspace's center pane swaps to `<GeoDimEditor>` (instead of the
@@ -244,7 +273,7 @@ export interface DimensionsWorkspaceProps {
 
 type Shape = DimensionShape;
 
-// shapeOf, SHAPE_META, and countLabel live in the shared
+// Brief 70 Phase 1 — shapeOf / SHAPE_META / countLabel moved to the
 // shared dimensionMeta module (the canonical dimension language;
 // <DimToken> renders it everywhere else). dims2 re-consumes the module
 // so it stays the reference implementation.
@@ -261,7 +290,7 @@ function editableLevelShape(shape: Shape): "categorical" | "banded" | null {
   return null;
 }
 
-// Composite is omitted from the Add menu: coverage_value
+// ADR-0051 — composite left the Add menu: ADR-0039's coverage_value
 // slicing + the structural coverage dim cover the 2-D case, and the
 // composite create path was a dead end (a stale toast). Existing
 // composite dims remain readable in the detail pane.
@@ -368,7 +397,7 @@ export function DimensionsWorkspaceV2(
 
   return (
     <div className="rater-dims2">
-      {/* Make sync failure visible: a failed
+      {/* Brief 66 §3.2 — the sync-blocked state has a face: a failed
           dimensions GET used to silently disable ALL persistence while
           the pill read "Saved". */}
       {syncBlocked ? (
@@ -596,7 +625,7 @@ function DimensionDetail({
   const canEdit = typeof onCommit === "function";
   const canEditLevels = canEdit && editLevelShape !== null;
   const unitPlural = m.units;
-  // The geographic shape body lives in this pane:
+  // Brief 66 §3.3 — the geographic shape body rehomes INTO this pane:
   // the GeoDimEditor (Levels / Map / Territories tabs) renders headless
   // below the identity header. Controlled tab state when the route
   // provides it; local fallback otherwise.
@@ -607,7 +636,7 @@ function DimensionDetail({
     setLocalGeoTab(tab);
     onGeographicActiveTabChange?.(tab);
   };
-  // The structure count follows the canonical domain:
+  // ADR-0038 — the structure count follows the canonical domain:
   // territories when grouped, else levels labeled by granularity.
   const geoGrouped = (dim.geo_territories?.length ?? 0) > 0;
   const structureUnits =
@@ -735,7 +764,7 @@ function DimensionDetail({
       setFocusLevelId(candidate);
       return;
     }
-    // An open tail band splits instead of appending
+    // Brief 66 §3.5 — an OPEN tail band splits instead of appending
     // past Infinity: [lo, ∞) becomes [lo, lo+width) + [lo+width, ∞).
     const openTail = [...levels]
       .reverse()
@@ -811,7 +840,7 @@ function DimensionDetail({
     setFocusLevelId(candidate);
   };
   const handleRemoveLevel = (levelId: string) => {
-    // Remove the first match only: with a duplicated id
+    // Brief 66 §3.5 — remove the FIRST match only: with a duplicated id
     // the filter-by-id form deleted BOTH rows from one click.
     const idx = levels.findIndex((l) => l.id === levelId);
     if (idx < 0) return;
@@ -855,7 +884,7 @@ function DimensionDetail({
     });
   };
 
-  // Banded integrity uses the same gap/overlap validation
+  // Brief 66 §3.5 — banded integrity: the SAME gap/overlap validation
   // the legacy editor ran, with the one-click add-band-into-the-gap fix.
   // A banded vocabulary with holes must never look healthy.
   const handleInsertLevels = useCallback(
@@ -867,7 +896,7 @@ function DimensionDetail({
     levels,
     canEdit ? handleInsertLevels : undefined,
   );
-  // Duplicate level ids are visible the moment they
+  // Brief 66 §3.5 — duplicate level ids are VISIBLE the moment they
   // exist (they used to commit silently; edits + deletes then hit
   // multiple rows). Rendered through the same inline-warning rows the
   // banded gap detection uses.
@@ -898,7 +927,7 @@ function DimensionDetail({
     [bandedWarnings, duplicateIdWarnings],
   );
 
-  // ── Bulk authoring paths for large class sets.
+  // ── Brief 66 §3.5 — the bulk authoring paths (the 200-class case).
   //    Paste levels (categorical), Paste bands + Generate (banded) —
   //    the legacy editor's capabilities, rebuilt dims2-native. ──
   const [bulkMode, setBulkMode] = useState<
@@ -1083,7 +1112,7 @@ function DimensionDetail({
       <div className="rater-dims2__d-divider" />
 
       {dim.role === "structural" || dim.role === "both" ? (
-        /* The structural coverage axis announces itself:
+        /* Brief 66 §3.3 — the structural coverage axis announces itself:
            renaming its level ids silently breaks every 2-D table. */
         <p className="rater-dims2__d-structural">
           Structural — the algorithm's 2-D tables key on this axis.
@@ -1091,7 +1120,7 @@ function DimensionDetail({
       ) : null}
 
       {isGeoEditable ? (
-        /* All geographic edits flow
+        /* Brief 66 §3.3 — the geographic body, rehomed. All edits flow
            through the same onCommit channel the other shapes use. */
         <GeoDimEditor
           headless
@@ -1122,7 +1151,7 @@ function DimensionDetail({
             })
           }
           onImportLevelsAndTerritories={(seedLevels, territories) =>
-            /* One commit keeps levels and territories from racing. */
+            /* ADR-0038 — ONE commit so levels + territories can't race. */
             onCommit?.({
               ...dim,
               levels: seedLevels.map((l) => ({
@@ -1283,7 +1312,7 @@ function DimensionDetail({
       )}
 
       {shape === "classification" ? (
-        /* Classification manages its classes in the
+        /* Brief 66 §3.3 — classification manages its classes in the
            registry; the jump is an EXPLICIT action (the old row-click
            hijacked navigation and lost the query string). */
         <div className="rater-dims2__d-registry">

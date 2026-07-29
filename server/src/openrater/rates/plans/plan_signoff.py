@@ -5,19 +5,35 @@
 # You may obtain a copy of the License at
 #
 #     http://www.apache.org/licenses/LICENSE-2.0
-"""Sign-off records, edit-lock enforcement, and revoke helpers.
+"""Sign-off / lock-for-filing — lock read path + revoke.
 
-An active sign-off locks plan edits until it is revoked:
+State machine:
 
+    [draft, not signed]
+            │  sign_off()      ← requires filing-readiness == 'ready'
+            ▼
     [draft, signed]   ────── edits 409 from author.py ─────
             │  revoke()
             ▼
-    [draft, not signed]   (operators can edit again)
+    [draft, not signed]   (operators can edit again + re-sign)
 
-`assert_plan_unlocked`, `revoke_signoff`, `get_active_signoff`, and
-`get_signoff_history` are available. Sign-off creation is intentionally
-unavailable because this service does not provide the required
-filing-readiness evaluator; the route layer does not mount that operation.
+Slice-2 port note
+=================
+
+The `sign_off_plan` path needs `compute_plan_flow_filing_readiness`
+from `rates.plans.plan_flow_filing`, which depends on the cascade
+engine. That whole chain is out of this slice's scope, so
+`sign_off_plan` ships as a `NotImplementedError` stub here and the
+route layer doesn't mount the corresponding POST.
+
+The PORTABLE half — `assert_plan_unlocked`, `revoke_signoff`,
+`get_active_signoff`, `get_signoff_history` — has no filing-readiness
+dependency and ships in full. That's enough for `author.py` to
+enforce edit-locks against signed-off plans, and for the read-side of
+the sign-off UI (chip, history, revoke) to work end-to-end.
+
+When the engine ports (later slice), `sign_off_plan` becomes a
+one-line uncomment + a wire to `compute_plan_flow_filing_readiness`.
 """
 
 from __future__ import annotations
@@ -105,7 +121,7 @@ class PlanLockedError(PlanSignoffError):
 
     code = "plan_locked"
     default_status_code = 409
-    default_hint = "Revoke the active sign-off before editing."
+    default_hint = "Revoke the sign-off before editing (not exposed over the API in the MVP)."
 
 
 # ===========================================================================
@@ -208,15 +224,19 @@ def sign_off_plan(
     operator_id: str,
     note: str = "",
 ) -> PlanSignoff:
-    """Reserved sign-off creation operation.
+    """Sign off a plan for filing.
 
-    The server does not expose the filing-readiness evaluator required to
-    create a sign-off, so the route layer does not mount this operation.
+    SLICE-2 PORT NOTE: this requires `compute_plan_flow_filing_readiness`
+    from `rates.plans.plan_flow_filing`, which depends on the cascade
+    engine. Both port in a later slice; until then this raises
+    NotImplementedError. The route layer should not mount this endpoint.
     """
     raise NotImplementedError(
-        "Plan sign-off creation is unavailable because this service does "
-        "not provide filing-readiness evaluation. Sign-off reads, edit-lock "
-        "enforcement, and revoke helpers remain available."
+        "sign_off_plan is deferred to a later slice — filing-readiness "
+        "computation depends on the cascade engine, which hasn't ported "
+        "yet. The lock READ path (assert_plan_unlocked) and the REVOKE "
+        "path (revoke_signoff) are functional in this slice; only the "
+        "CREATE path is stubbed."
     )
 
 

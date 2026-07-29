@@ -1,10 +1,10 @@
 {
   "name": "V47.round-half-up",
-  "description": "The round kind applies the fictional Meridian Rule MS-R23 sequence: rate to 3 decimals and premium to the nearest dollar using half-up rounding.",
+  "description": "round kind: rate -> 3 dp and premium -> nearest dollar (half-up). ISO Rule 23 roundings as runtime nodes (ADR-0044).",
   "plan": {
     "id": "v47.round",
     "version": "1.0.0",
-    "name": "Meridian rate and premium roundings",
+    "name": "Round (ISO rate + premium roundings)",
     "line": "bop",
     "effective": "2026-01-01",
     "nodes": [

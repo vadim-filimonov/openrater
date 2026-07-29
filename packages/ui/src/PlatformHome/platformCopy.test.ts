@@ -100,7 +100,7 @@ describe("statusLineFor", () => {
     });
   });
 
-  //  — with plan facts supplied, the line is about PLANS.
+  // MVP-005 — with plan facts supplied, the line is about PLANS.
   it("leads with the plans clause when plans exist (arrival order)", () => {
     expect(
       statusLineFor(summary({}), { count: 1, liveCount: 0, readyCount: 1 }),

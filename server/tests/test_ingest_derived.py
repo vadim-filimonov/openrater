@@ -362,3 +362,59 @@ def test_book_template_plan_without_inputs_422(client) -> None:  # noqa: ANN001
     resp = client.get(f"/api/v1/plans/{plan_id}/book-template.csv")
     assert resp.status_code == 422
     assert resp.json()["error"]["code"] == "book_template_no_inputs"
+
+
+def test_book_template_includes_schedule_application_column(client) -> None:  # noqa: ANN001
+    """FCA fca-2026-07-25 #12 — the book path's schedule door: the
+    engine consumes `schedule_app_{id}` per row, so the fill-in
+    template must show the column (blank cell = no modification)."""
+    from tests._helpers import add_stage, create_plan
+
+    plan_id = create_plan(client, display_name="Sched Template Plan")[
+        "rating_plan_id"
+    ]
+    add_stage(
+        client,
+        plan_id,
+        stage_id="in_class",
+        stage_kind="input_node",
+        display_name="Class code",
+        config_json={
+            "name": "class_code",
+            "data_type": "string",
+            "source": "form",
+            "source_path": "class_code",
+            "required": True,
+        },
+        outputs=[{
+            "output_name": "value",
+            "data_type": "string",
+            "description": None,
+        }],
+    )
+    add_stage(
+        client,
+        plan_id,
+        stage_id="psm_schedule",
+        stage_kind="modifier.schedule",
+        display_name="Schedule",
+        config_json={
+            "schedule": {
+                "schedule_id": "psm_schedule",
+                "display_name": "Schedule rating",
+                "scope": "package",
+                "total_cap_pct": 25,
+                "categories": [
+                    {
+                        "category_id": "mgmt",
+                        "name": "Management",
+                        "range_pct": 10,
+                    }
+                ],
+            },
+        },
+    )
+    csv_resp = client.get(f"/api/v1/plans/{plan_id}/book-template.csv")
+    assert csv_resp.status_code == 200
+    header = next(csv.reader(io.StringIO(csv_resp.text)))
+    assert header == ["class_code", "schedule_app_psm_schedule"]

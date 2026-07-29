@@ -364,15 +364,28 @@ function LevelsTab({
   const [pasteText, setPasteText] = useState("");
 
   const customCount = levels.filter((l) => !seedIds.has(l.id)).length;
+  // FCA #26 (finding 59) — "which territory is 68847 in?" had no
+  // query surface: the Levels search found the ZIP row but never
+  // named its territory. Each row now carries its territory chip,
+  // and the filter matches territory names too, so typing a ZIP
+  // answers the question directly.
+  const territoryByMember = useMemo(() => {
+    const out = new Map<string, string>();
+    for (const t of dimension.geo_territories) {
+      for (const m of t.members) out.set(m, t.label || t.id);
+    }
+    return out;
+  }, [dimension.geo_territories]);
   const visibleLevels = useMemo(() => {
     const q = levelQuery.trim().toLowerCase();
     if (q === "") return levels;
     return levels.filter(
       (l) =>
         l.id.toLowerCase().includes(q) ||
-        (l.label ?? "").toLowerCase().includes(q),
+        (l.label ?? "").toLowerCase().includes(q) ||
+        (territoryByMember.get(l.id) ?? "").toLowerCase().includes(q),
     );
-  }, [levels, levelQuery]);
+  }, [levels, levelQuery, territoryByMember]);
 
   function handleReset(): void {
     const reseeded = getLevelsForScope(geo_granularity, geo_scope);
@@ -557,7 +570,7 @@ function LevelsTab({
           <textarea
             className="rater-geo-editor__paste-input"
             placeholder={
-              "Paste zip,territory[,label] per line — e.g.\n66101,t1,Kansas City\n66044,t2,Lawrence"
+              "Paste zip,territory[,label] per line — e.g.\n66101,701,Kansas City\n66044,702,Lawrence"
             }
             value={pasteText}
             onChange={(e) => setPasteText(e.target.value)}
@@ -681,10 +694,20 @@ function LevelsTab({
         ) : (
           visibleLevels.map((l) => {
             const isCustom = !seedIds.has(l.id);
+            const territory = territoryByMember.get(l.id);
             return (
               <li key={l.id} className="rater-geo-editor__levels-row">
                 <span className="rater-geo-editor__levels-key">{l.id}</span>
                 <span className="rater-geo-editor__levels-label">{l.label}</span>
+                {/* FCA #26 — the row answers the territory question. */}
+                {territory !== undefined && (
+                  <span
+                    className="rater-geo-editor__levels-terr"
+                    title={`Grouped into ${territory}`}
+                  >
+                    {territory}
+                  </span>
+                )}
                 {/* B1 — the 1fr label column pushes the badge + delete right; the
                     old explicit spacer made FIVE children in a FOUR-track grid,
                     so the delete ✕ wrapped onto a second line (every row 68px). */}

@@ -27,7 +27,7 @@
  *
  *   3. DTYPE COERCION — when dtypes hint at numbers / booleans /
  *      dates, coerce strings to typed values so the engine doesn't
- *      receive "1,360,000" where it expects a number. Coercion is
+ *      receive "1,247,438" where it expects a number. Coercion is
  *      best-effort; on failure, the raw string passes through.
  *
  * Pure data in / pure data out. No I/O, no React, no engine.
@@ -44,6 +44,7 @@ import {
   type GeoTransformerId,
 } from "../GeoTransformerPicker/geoTransformers";
 import { computeRatioForRow, isRatioMapping, parseRatio } from "./ratioMapping";
+import { computeTimesForRow, isTimesMapping, parseTimes } from "./timesMapping";
 
 // Banded-dim binning is owned by the runtime `derive.band` node
 // (ADR-0026), NOT this projection layer. The projector passes the raw
@@ -231,6 +232,18 @@ export function projectRow(
       if (!ratio) continue; // malformed sentinel — skip like an empty cell
       const computed = computeRatioForRow(row, ratio);
       if (computed === null) continue; // missing/non-numeric/zero-denominator
+      externalInputs[inputId] = computed;
+      continue;
+    }
+
+    // 0b. Scaled-column sentinel (FCA #23) — payroll-in-thousands
+    //     finally has a home: compute column × multiplier and project
+    //     the number. Same posture as the ratio: already typed.
+    if (isTimesMapping(columnName)) {
+      const times = parseTimes(columnName);
+      if (!times) continue; // malformed sentinel — skip like an empty cell
+      const computed = computeTimesForRow(row, times);
+      if (computed === null) continue; // missing/non-numeric component
       externalInputs[inputId] = computed;
       continue;
     }

@@ -3,8 +3,8 @@
  *
  * Renders a horizontal cloud of removable chips followed by an
  * inline text input. Used for:
- *   • Categorical dimension level aliases ("Meridian Cafe",
- *     "Meridian Cafe - dine-in" → c102)
+ *   • Categorical dimension level aliases ("Restaurant",
+ *     "Restaurant - dine-in" → 71641)
  *   • Free-text tag lists in editors that need many-strings-per-row
  *
  * Pure presentation:
@@ -58,7 +58,7 @@ export interface ChipInputProps {
   /**
    * Optional aria-label for the inline input. When omitted falls
    * back to "Add chip" — consumers should override for clarity
-   * (e.g., "Add alias for Meridian Recreation").
+   * (e.g., "Add alias for Bowling Centers").
    */
   readonly ariaLabel?: string;
   /** Disables add + remove. */

@@ -20,7 +20,7 @@
  * plan-DECLARED total output) — a synthesized sum and a filed total
  * are different facts, and surfaces label them differently.
  *
- * ── Why the resolver lives HERE (@openrater/ui), not in the scoring service ──
+ * ── Why the resolver lives HERE (labs-ui), not in the scoring service ──
  * It began in `services/scoring/src/core/derive.ts` (#482) while the
  * browser kept `resolvePremiumColumn`'s last-money leg — two answers to
  * one question. They drifted, and the drift shipped a wrong number: a
@@ -64,7 +64,7 @@ export interface PremiumPlanLike {
 
 /** The authored-stage shape carried alongside the projected plan
  *  (null for raw `source:"plan"` requests). Structurally satisfied by
- *  every @openrater/ui stage shape (`StageLike`, `InputStageLike`, the
+ *  every labs-ui stage shape (`StageLike`, `InputStageLike`, the
  *  api-client's `StageSummary`) — they all carry these two fields. */
 export interface PremiumStageLike {
   readonly stage_kind: string;

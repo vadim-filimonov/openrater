@@ -38,8 +38,7 @@ export interface PremiumBuildUpProps {
   readonly result: PolicyResult | null;
   /**
    * Optional `step.id → display label` map (from the authored tail, e.g.
-   * `first_term_credit → "First-term credit"`). Falls back to a
-   * kind-derived label, so
+   * `pioneer → "Pioneer credit"`). Falls back to a kind-derived label, so
    * the component renders correctly from a `PolicyResult` alone.
    */
   readonly labels?: Readonly<Record<string, string>>;

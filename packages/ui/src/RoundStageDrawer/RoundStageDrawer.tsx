@@ -272,7 +272,7 @@ export function RoundStageDrawer(props: RoundStageDrawerProps): JSX.Element {
               onChange={(e) =>
                 onDraftChange({ ...draft, citation_rule: e.target.value })
               }
-              placeholder="e.g., Meridian BOP §6.B.1"
+              placeholder="e.g., ISO BOP §6.B.1"
               aria-label="Citation rule"
             />
           </div>

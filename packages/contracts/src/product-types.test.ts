@@ -31,7 +31,7 @@ describe("ProductCode vocabulary", () => {
       "excess",
       "marine",
       "inland_marine",
-      // Personal lines join the product axis.
+      // Brief 94.6 (owner-gated) — personal lines join the axis.
       "homeowners",
       "dwelling",
       "other",

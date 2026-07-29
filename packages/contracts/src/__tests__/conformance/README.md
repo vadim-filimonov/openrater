@@ -59,7 +59,7 @@ A run is **conformance-passing** for a vector when:
 | V4.lookup-direct-known | class_code → factor via lookup.direct |
 | V5.lookup-range-middle-bucket | TIV $500k → middle bucket factor 1.00 (range boundary) |
 | V6.subplan-composition | outer plan calls inner doubler subplan; 21 → 42 (recursion + trace nesting) |
-| V7.bop-like-end-to-end | class lookup × TIV band × LCM = premium (the canonical Meridian BOP shape) |
+| V7.bop-like-end-to-end | class lookup × TIV band × LCM = premium (the canonical ISO BOP shape) |
 
 ### Phase B M1 additions (V8-V15)
 

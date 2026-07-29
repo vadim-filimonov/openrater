@@ -25,7 +25,7 @@
  *     <Drawer.Footer>cancel + save buttons</Drawer.Footer>
  *   </Drawer>
  *
- * Size tiers:
+ * Size tier (per docs/design-pass/design-language.md §8.1):
  *   - sm (380px) — confirmation drawers, picker drawers
  *   - md (480px, default) — edit drawers
  *   - lg (640px) — import / compare / history drawers (room for tables)

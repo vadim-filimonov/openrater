@@ -17,6 +17,9 @@
  *     in api-lab today, will expose `exposure_bases` field)
  *   - UI primitives (<ExposureBaseRow>, <ExposureBaseInput>,
  *     <ExposureBadge>; land alongside the Classification section in M4)
+ *
+ * See `docs/design-briefs/class-conditional-exposure.md` for design
+ * rationale.
  */
 
 /**
@@ -151,7 +154,7 @@ export interface ExposureBaseDeclaration {
   /** When code = "other", human-readable name of the exposure
    *  (e.g., "miles driven", "boilers"). Required for code="other". */
   readonly custom_label?: string;
-  /** Citation to a manual or source (e.g., "Meridian Rule MS-R3.4"). */
+  /** Citation to manual / source (e.g., "ISO CGL §3.4"). */
   readonly citation?: string;
 }
 

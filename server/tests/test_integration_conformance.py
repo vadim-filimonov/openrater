@@ -5,7 +5,7 @@
 # You may obtain a copy of the License at
 #
 #     http://www.apache.org/licenses/LICENSE-2.0
-"""The OpenRater-side conformance harness for the integration contract
+"""The Labs-side conformance harness for the integration contract
 (ADR-0057; `docs/specs/conformance/integration/`).
 
 Loads the portable IC*.json fixtures and replays their steps against the

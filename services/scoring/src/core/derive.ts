@@ -9,7 +9,7 @@
  * (`resolvePlanPremiumContext`), then value-shape heuristics.
  *
  * `resolvePlanPremiumContext` + the total-less helpers now live in
- * @openrater/ui's pure `AnalyticsWorkspace/premium-resolution` — the ONE
+ * labs-ui's pure `AnalyticsWorkspace/premium-resolution` — the ONE
  * authority this service and the browser surfaces share (re-exported
  * below, so `./derive` importers are unchanged). They were duplicated
  * while the browser answered the same question with `resolvePremiumColumn`'s
@@ -42,7 +42,7 @@
  * `premium` is null and `perCoverage` is empty — a consumer summing
  * per-coverage partials would reconstruct the exact silently-wrong
  * number the refusal withheld. Raw partials stay visible in `outputs`
- * and the trace for diagnosis. `tier` is ALSO withheld (): a
+ * and the trace for diagnosis. `tier` is ALSO withheld (MVP-011): a
  * tier is a verdict, and an unrateable row gets none — the gate may
  * never have evaluated, so a derived tier would be fabricated.
  * The coverage-sum view is safe against this by construction: it only
@@ -55,7 +55,7 @@ import {
   sumMoneyFields,
 } from "@openrater/ui/AnalyticsWorkspace/premium-resolution";
 
-// The plan-declaration resolver lives in @openrater/ui's pure
+// The plan-declaration resolver lives in labs-ui's pure
 // `premium-resolution` module — the LOWER layer both this service and
 // the browser surfaces share (same seam as `snapshot-plan`). It began
 // here, while the browser kept its own last-money `resolvePremiumColumn`
@@ -122,7 +122,7 @@ export function deriveViews(
   const outputs = result.outputs;
 
   // ── G8 refusal — no money views on an error row ──
-  //  — and no VERDICT either: an unrateable row's gate may
+  // MVP-011 — and no VERDICT either: an unrateable row's gate may
   // never have evaluated, so a derived tier would be fabricated from
   // partial state. tier: null end to end.
   if (result.row_status === "error") {

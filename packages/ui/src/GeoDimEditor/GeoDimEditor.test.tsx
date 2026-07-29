@@ -109,7 +109,7 @@ describe("<GeoDimEditor>", () => {
     );
     const input = screen.getByLabelText("Import a ZIP to territory CSV");
     const file = new File(
-      ["zip,territory\n66101,t1\n66102,t1\n67201,t2"],
+      ["zip,territory\n66101,701\n66102,701\n67201,702"],
       "ks.csv",
       { type: "text/csv" },
     );
@@ -121,7 +121,7 @@ describe("<GeoDimEditor>", () => {
       ReadonlyArray<{ id: string }>,
     ];
     expect(call[0].map((l) => l.id)).toEqual(["66101", "66102", "67201"]);
-    expect(call[1].map((t) => t.id).sort()).toEqual(["t1", "t2"]);
+    expect(call[1].map((t) => t.id).sort()).toEqual(["701", "702"]);
     // The import report renders (honest, role=status).
     expect(screen.getByText(/Imported 3 levels/)).toBeInTheDocument();
   });

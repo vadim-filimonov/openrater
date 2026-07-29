@@ -385,7 +385,7 @@
   text-align: right;
 }
 
-/* Brief 84 — the status cell renders <PlanStatusChip> (@openrater/ui); the
+/* Brief 84 — the status cell renders <PlanStatusChip> (labs-ui); the
    local neutral-chip + status-dot styles it replaced are deleted. */
 
 /* the ⋯ reveals on row intent (calm rows) */

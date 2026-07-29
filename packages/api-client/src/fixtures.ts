@@ -1,11 +1,18 @@
 /**
- * Fixture mode — deterministic API responses for development and tests.
+ * Fixture mode — the bridge that lets the frontend ship section
+ * editors against endpoints the backend hasn't ported yet.
  *
  * ## Why this exists
  *
- * Fixture mode lets a caller register local responses without changing
- * production request code. It supports isolated component development,
- * deterministic tests, and mixed local/network development sessions.
+ * Per the M3.4 scoping doc (`docs/API_LAB_SCOPING_M3_4.md`), 9 of
+ * Rate Lab's 13 M4 section editors depend on API Lab endpoints that
+ * land in slices 3-15. Doing those in sequence (API first, then
+ * frontend) freezes Rate Lab work for weeks; doing them with no
+ * backend at all means the frontend hits 404s.
+ *
+ * Fixture mode solves both: register a fixture for the endpoint
+ * upfront, build the section editor against it, then drop the
+ * fixture when the real backend slice lands.
  *
  * ## Wire shape
  *
@@ -127,8 +134,9 @@ const _fixtures: Fixture[] = [];
  *     to register one + you want loud failure.
  *
  *   · `"network"` — fall through to the real HTTP fetch. Right for
- *     development sessions where some endpoints use fixtures while
- *     others continue against the real backend.
+ *     DEV BOOTSTRAPS where you want to fixture-fill some endpoints
+ *     (e.g. /api/v1/class-codes before slice 3 lands) while the
+ *     others (e.g. /api/v1/plans) continue against the real backend.
  *
  * Intended for dev builds + tests only. Production builds should
  * never call this.

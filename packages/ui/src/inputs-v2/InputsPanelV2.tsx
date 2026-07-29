@@ -42,7 +42,7 @@ import {
   executePlanBatch,
   resolveEligibilityTier,
   ELIGIBILITY_TIER_LABELS,
-  // book intake — the SAME header pre-flight the chat door runs.
+  // Book-intake §2 — the SAME header pre-flight the chat door runs.
   preflightHeader,
   composePreflightSentence,
 } from "@openrater/contracts";
@@ -75,6 +75,10 @@ import {
   formatRatio,
   computeRatioForRow,
   RATIO_PREFIX,
+  isTimesMapping,
+  formatTimes,
+  parseTimes,
+  computeTimesForRow,
   emptyWebhookConfig,
   applyCohortPolicyTail,
 } from "../InputsWorkspace";
@@ -110,6 +114,8 @@ import "./inputs-v2.css";
 
 /** The source-picker option that starts a derived-ratio binding (P2.5). */
 const RATIO_OPTION = "@@ratio-new";
+/** FCA #23 — the option that starts a scaled-column binding (× units). */
+const TIMES_OPTION = "@@times-new";
 
 export interface InputStageLike {
   readonly stage_id: string;
@@ -178,7 +184,7 @@ export interface InputsPanelV2Props {
   /** Jump to the API Lab route that feeds an api-sourced input. Absent ⇒ no
    *  jump affordance on the provenance chip. */
   readonly onOpenApiLab?: (() => void) | undefined;
-  /**  — the "Fetch from an API" source door follows the API Lab
+  /** MVP-027 — the "Fetch from an API" source door follows the API Lab
    *  ship flag. Default true (existing consumers unchanged). */
   readonly showApiSourceDoor?: boolean | undefined;
   /** Paid-connector cost guardrail (Brief 62.6 PR3) — a ReactNode the mount
@@ -280,9 +286,20 @@ function typeClass(dtype: string): string {
   return "";
 }
 
-/** Trim a sample value for the preview cell. */
-function fmtSample(v: unknown): string {
+/** Trim a sample value for the preview cell. FCA #35 (finding 7) —
+ *  a currency/number-typed sample renders with thousands separators
+ *  ("600000" read as a serial, not an exposure). Identifier-shaped
+ *  dtypes (ZIPs, codes, enums) stay verbatim: "68,102" would lie
+ *  about the caller's data. */
+function fmtSample(v: unknown, dtype?: string): string {
   if (v === null || v === undefined || v === "") return "—";
+  const separable = dtype === "currency" || dtype === "number";
+  if (separable) {
+    const n = typeof v === "number" ? v : Number(String(v).trim());
+    if (Number.isFinite(n) && Math.abs(n) >= 10_000) {
+      return n.toLocaleString("en-US");
+    }
+  }
   const s = String(v);
   return s.length > 28 ? s.slice(0, 27) + "…" : s;
 }
@@ -696,7 +713,7 @@ export function InputsPanelV2({
   const [error, setError] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
-  // book intake — a fresh upload auto-applies the
+  // Book-intake §2 (MVP-004) — a fresh upload auto-applies the
   // EXACT/NORMALIZED column matches (the demo book maps 9/9 with zero
   // clicks); fuzzy hits stay amber suggestions for a person. The flag
   // arms here and the effect below (where the candidates exist) fires
@@ -877,7 +894,7 @@ export function InputsPanelV2({
   );
   const mappedCount = mappingInputs.filter((r) => columnMap[r.id]).length;
 
-  // book intake — the armed upload applies exact matches
+  // Book-intake §2 (MVP-004) — the armed upload applies exact matches
   // the moment the candidates exist. One firing per upload; existing
   // mappings are never overwritten (applyAutoMatchToMapping's law).
   useEffect(() => {
@@ -903,7 +920,7 @@ export function InputsPanelV2({
     onMappingChange,
   ]);
 
-  // book intake — the pre-flight sentence above the Match table:
+  // Book-intake §2 — the pre-flight sentence above the Match table:
   // leftovers (ignored columns), fuzzy suggestions, and missing
   // required inputs, minus whatever a person already mapped by hand.
   // Same derivation + same sentence the chat door refuses with.
@@ -938,6 +955,10 @@ export function InputsPanelV2({
         missing: p.missing.filter((i) => !mappedIds.has(i)),
         suggested,
         note: p.note,
+        // FCA #13 — duplicate headers block loudly (last-copy-wins
+        // would silently mis-rate every row); the app door prints the
+        // same clause the chat door refuses with.
+        duplicates: p.duplicates,
       }),
     };
   }, [sourceColumns, mappingInputs, dictionary?.inputs, columnMap]);
@@ -969,6 +990,26 @@ export function InputsPanelV2({
   const handleSetRatio = useCallback(
     (inputId: string, numerator: string, denominator: string) => {
       handleMapColumn(inputId, formatRatio(numerator, denominator));
+    },
+    [handleMapColumn],
+  );
+
+  // ── Scaled-column binding (FCA #23) ────────────────────────────
+  // Bind an input to column × multiplier (the `@times:` sentinel) —
+  // real extracts carry payroll in THOUSANDS while the filed divisor
+  // expects dollars. Hidden until chosen: a "Scale a column…" option
+  // seeds ×1000, then a compact column × N editor edits in place.
+  const handleStartTimes = useCallback(
+    (inputId: string) => {
+      const cols = csv?.columns ?? [];
+      if (cols.length < 1) return;
+      handleMapColumn(inputId, formatTimes(cols[0]!, 1000));
+    },
+    [csv, handleMapColumn],
+  );
+  const handleSetTimes = useCallback(
+    (inputId: string, column: string, multiplier: number) => {
+      handleMapColumn(inputId, formatTimes(column, multiplier));
     },
     [handleMapColumn],
   );
@@ -1069,7 +1110,7 @@ export function InputsPanelV2({
     const hasChain = plan.nodes?.some((n) => n.kind === "chain.mult");
     if (!hasChain) return null;
     const slice = sampleRows.slice(0, 8);
-    // book intake — the preview scores through the SAME alias
+    // Book-intake §4 — the preview scores through the SAME alias
     // vocabulary the mismatch resolve writes, so "translate → watch
     // rows go green" is one loop, not two surfaces.
     const projectOpts = {
@@ -1773,7 +1814,7 @@ export function InputsPanelV2({
                 </Button>
               ) : null}
               {/* P2.1 — the other source mode: fetch from an API.
-                  / — the door follows the API Lab flag
+                  MVP-027/MVP-030 — the door follows the API Lab flag
                   (the consumer decides; default on for back-compat). */}
               {editable && showApiSourceDoor ? (
                 <Button
@@ -2010,7 +2051,7 @@ export function InputsPanelV2({
               ) : null}
             </div>
           </div>
-          {/* book intake — ONE sentence names the leftovers: ignored
+          {/* Book-intake §2 — ONE sentence names the leftovers: ignored
               columns, fuzzy suggestions, missing required inputs. The
               chat door refuses with this same sentence. */}
           {preflightLine?.sentence ? (
@@ -2050,13 +2091,19 @@ export function InputsPanelV2({
                       : ratioPayload;
                   const ratioDen =
                     ratioSlash >= 0 ? ratioPayload.slice(ratioSlash + 1) : "";
+                  // FCA #23 — a `@times:` binding shows a column × N
+                  // editor + a computed sample (payroll-in-thousands).
+                  const timesActive = isTimesMapping(col);
+                  const timesParsed = timesActive ? parseTimes(col) : null;
                   const bucket =
-                    ratioActive || !col ? null : bucketFor(input.id, col);
-                  // book intake — an unmapped row with a fuzzy
+                    ratioActive || timesActive || !col
+                      ? null
+                      : bucketFor(input.id, col);
+                  // Book-intake §2 — an unmapped row with a fuzzy
                   // pre-flight hit shows the amber dot + names the
                   // suggested column; a person confirms via the select.
                   const suggestedColumn =
-                    !col && !ratioActive
+                    !col && !ratioActive && !timesActive
                       ? (preflightLine?.suggestionFor.get(input.id) ?? null)
                       : null;
                   const ratioSample =
@@ -2068,11 +2115,22 @@ export function InputsPanelV2({
                           { numerator: ratioNum, denominator: ratioDen },
                         )
                       : null;
+                  const timesSample =
+                    timesParsed !== null
+                      ? computeTimesForRow(
+                          (sampleRows[0] ?? {}) as Readonly<
+                            Record<string, string>
+                          >,
+                          timesParsed,
+                        )
+                      : null;
                   const sampleVal = ratioActive
                     ? (ratioSample ?? undefined)
-                    : col
-                      ? sampleRows[0]?.[col]
-                      : undefined;
+                    : timesActive
+                      ? (timesSample ?? undefined)
+                      : col
+                        ? sampleRows[0]?.[col]
+                        : undefined;
                   // Slug is the field identifier (e.g. annual_gross_sales),
                   // matching the dictionary view. Shown only when it differs
                   // from the display label (no redundant repeat).
@@ -2084,7 +2142,7 @@ export function InputsPanelV2({
                   // Brief 65 §3.5 — type-aware sample validation for
                   // non-dimension inputs (the dim machinery has its own).
                   const dtypeIssue =
-                    !mismatch && col && !ratioActive
+                    !mismatch && col && !ratioActive && !timesActive
                       ? detectDtypeMismatch(
                           inputDtypes?.[input.id] ??
                             (input.dtype === "number" ? "number" : undefined),
@@ -2214,6 +2272,63 @@ export function InputsPanelV2({
                                 />
                               ) : null}
                             </div>
+                          ) : timesActive ? (
+                            /* FCA #23 — scaled column: column × N. */
+                            <div className="rater-inputs2__ratio">
+                              <select
+                                className="rater-inputs2__select rater-inputs2__ratio-sel"
+                                value={timesParsed?.column ?? ""}
+                                disabled={!editable}
+                                onChange={(e) =>
+                                  handleSetTimes(
+                                    input.id,
+                                    e.target.value,
+                                    timesParsed?.multiplier ?? 1000,
+                                  )
+                                }
+                                aria-label={`Source column for ${input.name}`}
+                              >
+                                <option value="">—</option>
+                                {columnNames.map((c) => (
+                                  <option key={c} value={c}>
+                                    {c}
+                                  </option>
+                                ))}
+                              </select>
+                              <span
+                                className="rater-inputs2__ratio-div"
+                                aria-hidden
+                              >
+                                ×
+                              </span>
+                              <input
+                                type="number"
+                                className="rater-inputs2__times-mult"
+                                value={timesParsed?.multiplier ?? 1000}
+                                disabled={!editable}
+                                onChange={(e) => {
+                                  const m = Number(e.target.value);
+                                  if (Number.isFinite(m) && m !== 0) {
+                                    handleSetTimes(
+                                      input.id,
+                                      timesParsed?.column ?? "",
+                                      m,
+                                    );
+                                  }
+                                }}
+                                aria-label={`Multiplier for ${input.name}`}
+                              />
+                              {editable ? (
+                                <IconButton
+                                  variant="ghost"
+                                  size="xs"
+                                  icon={<X />}
+                                  onClick={() => handleMapColumn(input.id, "")}
+                                  aria-label="Use a single source column instead"
+                                  title="Use a single source column instead"
+                                />
+                              ) : null}
+                            </div>
                           ) : (
                             <>
                               <span
@@ -2238,7 +2353,9 @@ export function InputsPanelV2({
                                 onChange={(e) =>
                                   e.target.value === RATIO_OPTION
                                     ? handleStartRatio(input.id)
-                                    : handleMapColumn(input.id, e.target.value)
+                                    : e.target.value === TIMES_OPTION
+                                      ? handleStartTimes(input.id)
+                                      : handleMapColumn(input.id, e.target.value)
                                 }
                                 aria-label={`Source column for ${input.name}`}
                               >
@@ -2251,6 +2368,13 @@ export function InputsPanelV2({
                                 {columnNames.length >= 2 ? (
                                   <option value={RATIO_OPTION}>
                                     Ratio of two columns…
+                                  </option>
+                                ) : null}
+                                {columnNames.length >= 1 ? (
+                                  /* FCA #23 — units: payroll in
+                                     thousands maps as column × 1000. */
+                                  <option value={TIMES_OPTION}>
+                                    Scale a column (× units)…
                                   </option>
                                 ) : null}
                               </select>
@@ -2280,13 +2404,13 @@ export function InputsPanelV2({
                             title={`${dtypeIssue.bad} of ${dtypeIssue.total} sample values don't read as ${dtypeIssue.expectedLabel}`}
                           >
                             <AlertTriangle size={12} aria-hidden />
-                            {fmtSample(sampleVal)} — not{" "}
+                            {fmtSample(sampleVal, input.dtype)} — not{" "}
                             {dtypeIssue.expectedLabel.startsWith("n")
                               ? "a number"
                               : dtypeIssue.expectedLabel}
                           </span>
                         ) : (
-                          fmtSample(sampleVal)
+                          fmtSample(sampleVal, input.dtype)
                         )}
                       </td>
                       </tr>

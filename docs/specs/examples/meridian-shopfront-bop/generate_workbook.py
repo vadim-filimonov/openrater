@@ -1,22 +1,22 @@
-"""Generate the all-constructs example workbook.
+"""Generate the ALL-CONSTRUCTS example bundle (Brief 92 Phase 92.5).
 
-"Meridian Mutual - Shopfront BOP - Nebraska": a FICTIONAL carrier and
+"Meridian Mutual — Shopfront BOP — Nebraska": a FICTIONAL carrier and
 program with invented factors (the geography is real Nebraska ZIP
-codes - public facts; everything priced is made up). Its job is to
-exercise the richer spec-v1.0 constructs that the starter template
-does not cover:
+codes — public facts; everything priced is made up). Its job is to
+exercise every spec-v1.0 construct the nonprofit bundle can't:
 
   · exposure-rated coverage towers (per $100 of limit / per $1,000 of
     sales) with the engine's own tower rounding (rate→3dp, premium→$1)
   · a 2-D factor table (construction × protection; "row::col" cells)
   · a geographic dimension at ZIP granularity with a `geo.*` detail
     sheet (18 ZIPs → 3 territories)
-  · an interpolation=linear table (the 1-D curve interpolates between band lower
-    bounds, clamped ends - the verifier interpolates too)
+  · an interpolation=linear table (supported since registry r9 /
+    Brief 95 C5: the 1-D curve INTERPOLATES between band lower
+    bounds, clamped ends — the verifier interpolates too)
   · endorsements (a factor that FIRES on unsprinklered risks; an
     additive whose trigger never fires in the vectors)
   · a modifier schedule (filed structure; neutral without per-risk
-    applications - exactly how the vectors run)
+    applications — exactly how the vectors run)
   · loadings via `applies_to` (×1.06 on every tower, pre-round)
   · a per-coverage CLAMP (liability minimum $100) + the package round
     with a $500 floor
@@ -28,15 +28,15 @@ expected premium by MIRRORING THE ENGINE'S documented semantics
 product, rounds the rate to 3dp and the tower premium to $1;
 endorsement layering multiplies each tower tip; the sidecar sweep
 applies loadings then clamps in stage order; the tail round sums,
-floors, rounds once) - and asserts that every intended behavior
+floors, rounds once) — and asserts that every intended behavior
 actually fires across the 8 vectors (the clamp, the endorsement, the
 floor, all four tiers). If the engine and this file ever disagree,
 the live golden test catches it loudly.
 
-Run from the repository root:
+Run from api-lab/backend:
 
-    uv run --project server python \
-        docs/specs/examples/meridian-shopfront-bop/generate_workbook.py
+    uv run --with openpyxl python \
+        ../../docs/specs/examples/meridian-shopfront-bop/generate_workbook.py
 """
 
 from __future__ import annotations
@@ -49,7 +49,7 @@ from openpyxl import Workbook
 
 HERE = Path(__file__).resolve().parent
 OUT = HERE / "meridian_shopfront_bop.workbook.xlsx"
-# Real citations: every workbook row cites the rule and page
+# Brief 2 P2 — real citations: every workbook row cites the rule + PAGE
 # of the committed reference filing (generate_filing.py writes the
 # sidecar; regenerate the filing BEFORE the workbook).
 _FILING = json.loads((HERE / "meridian_filing_pages.json").read_text())
@@ -64,7 +64,7 @@ def cite(key: str) -> tuple[str, str]:
 CITE = FILING_DOC  # straggler fallback (should not appear in rows)
 
 # ---------------------------------------------------------------------------
-# The filed data - ALL INVENTED.
+# The filed data — ALL INVENTED.
 # ---------------------------------------------------------------------------
 
 CLASSES = [
@@ -81,8 +81,8 @@ CLASSES = [
     ("c110", "Print shop", 1.18, 1.06),
     ("c111", "Woodworking — light", 1.85, 1.55),
     ("c112", "Welding supply", 2.10, 1.72),
-    # The fuller main-street catalog adds filing realism. All values are
-    # invented; the worked examples reference only c101-c112, so adding
+    # Brief 2 P2 — the fuller mainstreet catalog (filing realism). All
+    # invented; the worked examples reference only c101–c112, so adding
     # classes never moves an expected premium.
     ("c113", "Grocery — neighborhood", 1.08, 1.04),
     ("c114", "Delicatessen", 1.22, 1.12),
@@ -127,7 +127,7 @@ CONSTR_X_PROT = {
     ("fr", "p1_4"): 0.72, ("fr", "p5_8"): 0.81, ("fr", "p9_10"): 0.94,
 }
 
-BUILDING_BANDS = [  # (id, label, lo, hi, ilf) - interpolation=linear (engine interpolates, r9)
+BUILDING_BANDS = [  # (id, label, lo, hi, ilf) — interpolation=linear (engine interpolates, r9)
     ("bl_0_100k", "$0–$100K", 0, 100_000, 1.00),
     ("bl_100_250k", "$100K–$250K", 100_000, 250_000, 0.93),
     ("bl_250_500k", "$250K–$500K", 250_000, 500_000, 0.87),
@@ -149,8 +149,8 @@ TERRITORIES = {
     "t1": (["68001", "68002", "68003", "68015", "68018", "68064"], 0.94, 1.02),
     "t2": (["68102", "68104", "68105", "68106", "68107", "68110"], 1.00, 1.00),
     "t3": (["68502", "68503", "68504", "68505", "68506", "68510"], 1.12, 0.95),
-    # Statewide coverage for filing realism (real Nebraska ZIPs,
-    # invented factors; no worked example rates in t4-t6).
+    # Brief 2 P2 — statewide coverage for filing realism (real NE ZIPs,
+    # invented factors; no worked example rates in t4–t6).
     "t4": (["68005", "68046", "68123", "68128", "68147", "68157"], 0.97, 1.01),
     "t5": (["68801", "68803", "68845", "68847", "68901", "68902"], 0.91, 0.93),
     "t6": (["68025", "68601", "68701", "68702", "68776", "68787"], 0.89, 0.97),
@@ -159,7 +159,7 @@ TERRITORIES = {
 BASE = {"building": 0.18, "bpp": 0.32, "liability": 1.15}
 LCM = 1.42
 LOADING = 1.06
-ENDORSEMENT_FACTOR = 1.08  # equip breakdown - fires when NOT sprinklered
+ENDORSEMENT_FACTOR = 1.08  # equip breakdown — fires when NOT sprinklered
 LIAB_MIN = 100.0
 TOTAL_FLOOR = 500.0
 
@@ -181,8 +181,8 @@ def band_of(value: float, bands) -> tuple[str, float]:
 
 
 def interp_of(value: float, bands) -> float:
-    """A 1-D `interpolation=linear` curve interpolates between band
-    lower bounds, clamped at the ends -
+    """Brief 95 C5 (registry r9) — a 1-D `interpolation=linear` curve
+    interpolates between band LOWER bounds, clamped at the ends —
     mirroring the engine's interpolate kind exactly."""
     pts = sorted((lo, factor) for _id, _lbl, lo, _hi, factor in bands)
     if value <= pts[0][0]:
@@ -236,7 +236,7 @@ def price(v: dict) -> dict:
     )
 
     fired = {"endorsement": False, "clamp": False, "floor": False}
-    # Endorsement layer (equip breakdown ×1.08 when not sprinklered) -
+    # Endorsement layer (equip breakdown ×1.08 when not sprinklered) —
     # multiplies each tower tip; the additive endorsement's trigger
     # (years_in_business < 1) never fires in these vectors.
     if not v["sprinklered"]:
@@ -443,9 +443,9 @@ def build() -> None:
     for cid, label, _p, _l in CLASSES:
         ws.append(["class_code", "categorical", cid, label, cid[1:], "", "",
                    "", *cite("classes")])
-    # Demonstrate the spec's alias vocabulary: a book that says
-    # "joisted masonry" or "Y"/"N" rates without preprocessing, and
-    # the seeded plan documents the accepted values for the column.
+    # Book-intake §4 — the fixture DEMONSTRATES the alias vocabulary
+    # (spec §4.4): a book that says "joisted masonry" or "Y"/"N"
+    # rates out of the box, and the seeded plan teaches the column.
     construction_aliases = {"jm": "joisted masonry"}
     for cid, label in CONSTRUCTION:
         ws.append(["construction_class", "categorical", cid, label,
@@ -568,7 +568,7 @@ def build() -> None:
          ENDORSEMENT_FACTOR, "", "", "",
          "form_input.sprinklered == false", *cite("endorsement_equip")),
         # A second FACTOR endorsement whose trigger never fires in the
-        # vectors - exercises the attached=false path. (An additive here
+        # vectors — exercises the attached=false path. (An additive here
         # would be registry-refused on this 3-coverage plan:
         # endorsement_additive_multi_coverage.)
         ("new_venture_surcharge", "factor", "MS 20 07", "New-venture surcharge",
@@ -645,8 +645,6 @@ def build() -> None:
          "attaches the new-venture surcharge (<1).", "inputs!years_in_business"),
     ])
 
-    wb.properties.creator = "OpenRater"
-    wb.properties.title = "OpenRater synthetic Meridian Shopfront BOP workbook"
     wb.save(OUT)
     fired = {
         "endorsement": sum(p["fired"]["endorsement"] for p in priced),
@@ -654,7 +652,7 @@ def build() -> None:
         "floor": sum(p["fired"]["floor"] for p in priced),
     }
     print(f"verified {len(VECTORS)} vectors (tiers {sorted(set(tiers))}; "
-          f"fired: {fired}) - wrote {OUT.name}")
+          f"fired: {fired}) — wrote {OUT.name}")
     print(f"sheets: {len(wb.sheetnames)}")
 
 

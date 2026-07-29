@@ -7,8 +7,12 @@
 #     http://www.apache.org/licenses/LICENSE-2.0
 """SQLite connection management + schema migration.
 
-The `Database` class carries a `Dialect` (see persistence/dialect.py),
-so callers can write portable SQL via
+Phase 0: SQLite. Single-file DB, zero ops, fully sufficient for the demo
+plus the first ~1000 accounts. Phase 8e swaps to Postgres via the same
+repository interface — the connection layer here is what changes.
+
+Phase 8b (this module): the `Database` class now carries a `Dialect`
+(see persistence/dialect.py) so callers can write portable SQL via
 `db.dialect.placeholders(n)`, `db.dialect.upsert_clause(...)`,
 `db.dialect.json_extract_text(...)`. Default dialect is SQLite —
 existing call sites are unaffected.
@@ -24,7 +28,8 @@ Design rules:
   - **Each migration is its own transaction.** A partial failure leaves
     `schema_version` consistent with the actual schema state — the next
     boot will not see "DB at v2 but tables already at v3 shape" and
-    crash with a cryptic SQLite error.
+    crash with a cryptic SQLite error. Slice 7e+ added this hardening
+    after the user hit a stale-DB boot crash.
 """
 
 from __future__ import annotations
@@ -78,11 +83,11 @@ class Database:
     ) -> None:
         self.path = Path(path)
         self._migrated = False
-        # Every Database carries a Dialect. Default is
+        # Phase 8b: every Database carries a Dialect. Default is
         # SqliteDialect (matches the existing engine). Callers
         # building a Postgres-backed Database pass `dialect=
         # PostgresDialect()` and supply a psycopg-aware
-        # Database subclass. The env var
+        # Database subclass (Phase 8e). The env var
         # `RATER_DB_DIALECT` overrides the default at boot time so
         # developers can sanity-check portability against a local
         # Postgres without code changes.
@@ -261,7 +266,7 @@ class Database:
 
     @contextmanager
     def transaction(self) -> Iterator["Database"]:
-        """One atomic scope over many domain writes.
+        """One atomic scope over MANY domain writes (Brief 92 / 92.3).
 
         Yields a `Database` whose `connection()` always returns the SAME
         underlying connection, wrapped so the domain layer's own
@@ -278,8 +283,9 @@ class Database:
         exit, and rolls the WHOLE scope back on any exception — so a
         multi-write composition (create plan + substrate + stages)
         either lands completely or not at all, with every write still
-        going through the typed domain functions. This preserves the ingest
-        builder's "one transaction, never raw SQL" contract.
+        going through the typed domain functions. This is the sanctioned
+        answer to "one transaction, never raw SQL" (the ingest builder's
+        contract; see docs/architecture/ingest-construct-audit.md gap 1).
         """
         conn = self.connection()
         scoped = _ScopedDatabase(self, conn)
@@ -438,7 +444,7 @@ def _split_sql_statements(sql: str) -> list[str]:
       - SQL block comments (`/* ... */`) — preserved (in-statement only)
       - Statements separated by `;`
       - No semicolons inside string literals (we control the SQL)
-      - **Triggers with `BEGIN ... END;` bodies**
+      - **Triggers with `BEGIN ... END;` bodies** (Phase 0d, migration 018)
 
     Trigger handling: when a chunk contains `CREATE TRIGGER`, we
     re-join with subsequent chunks (preserving the `;` separators)

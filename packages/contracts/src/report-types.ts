@@ -29,7 +29,8 @@
  * `chain.from_report` defaults to `require_acceptance: true` so
  * only accepted adjustments contribute.
  *
- * Pure types. No React, no DOM.
+ * Pure types. No React, no DOM. See `docs/design-briefs/uw-report-
+ * integration.md` for the design.
  */
 
 /**

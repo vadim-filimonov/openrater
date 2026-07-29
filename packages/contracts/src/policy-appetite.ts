@@ -7,7 +7,9 @@
  * unauthorable, and a per-row gate wrongly declines an $850k location that
  * is fine once rolled up with its $210k sibling.
  *
- * This module is the foundational primitive. It supplies three pure pieces:
+ * This module is the foundational primitive (UI deferred to the locked
+ * brief `docs/design-briefs/location-rollup-and-policy-appetite.md`). Three
+ * pure pieces:
  *
  *   (a) a COMPUTED gate field — a small, closed arithmetic expression over
  *       inputs (e.g. `tiv = building_limit + bpp_limit`). No string `eval`:

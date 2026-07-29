@@ -101,7 +101,7 @@ describe("E12 — single-coverage build persists a scoreable chain", () => {
     expect(chainMult.length).toBeGreaterThan(0); // hasRatingChain → true
 
     const compiled = compilePlan(runtime);
-    const result = runPlan(compiled, { tiv: 100000, class_code: "c101" });
+    const result = runPlan(compiled, { tiv: 100000, class_code: "73912" });
     const premium = (result.outputs as Record<string, unknown>)["premium"];
     expect(typeof premium).toBe("number");
     expect(Number.isFinite(premium as number)).toBe(true);

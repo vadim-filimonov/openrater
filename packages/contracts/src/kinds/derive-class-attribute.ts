@@ -4,7 +4,7 @@
  * base / …).
  *
  * The bridge between a `class_code` rating input and the STRUCTURAL
- * dimensions a filing derives from it. Meridian BOP rates a risk by deriving
+ * dimensions a filing derives from it. ISO BOP rates a risk by deriving
  * `prop_rate_number`, `liab_class_group`, and `liab_exposure_base` from
  * the class code (the manual's classification table), then keys factor
  * tables off those DERIVED values (`ft.rate_number_rel` on
@@ -26,7 +26,7 @@
  * Per P-N4 + P-N5: the trace records the derived value; `explainStep`
  * renders a citation-friendly line:
  *
- *   "Derived prop_rate_number of class 45101 → 07 (Meridian fictional class table)"
+ *   "Derived prop_rate_number of class 53983 → 09 (ISO BOP class table)"
  */
 
 import type { BlockKind, PortSpec } from "../block-types";
@@ -43,7 +43,7 @@ export interface DeriveClassAttributeParams {
    * projector builds this from the plan's class registry at compile time
    * (each registry row's `attributes[attributeKey]`), so the runtime
    * doesn't need the registry handle. Keys are the canonical class codes
-   * (leading zeros significant, e.g. "00101"); values are level ids of
+   * (leading zeros significant, e.g. "09015"); values are level ids of
    * the derived structural dim.
    */
   readonly table: Readonly<Record<string, string>>;
@@ -63,7 +63,7 @@ export type DeriveClassAttributeInputs = {
   class_code: string;
   /**
    * Optional DECLARED override (Brief 83 / TV-19): when wired and
-   * non-empty it supersedes the class-derived value — Meridian BOP's
+   * non-empty it supersedes the class-derived value — ISO BOP's
    * `liab_exposure_basis_override` lets an occupant-class insured elect
    * the lessors basis. Left unwired by every plan that doesn't author
    * `derived_from.override_field`, so legacy graphs are byte-identical.
@@ -75,9 +75,9 @@ export type DeriveClassAttributeOutputs = { value: string };
 /**
  * Coerce + normalize a class code the same way in `execute` and
  * `explainStep`. Class codes are case-sensitive digit-strings — leading
- * zeros matter ("00101" ≠ "101") — so we trim + stringify but do NOT
+ * zeros matter ("09015" ≠ "9015") — so we trim + stringify but do NOT
  * lowercase. `externalInputs` are `unknown`, so a CSV cell that parsed
- * to a number (45101) must still resolve.
+ * to a number (53983) must still resolve.
  */
 function normalizeCode(raw: unknown): string {
   if (typeof raw === "string") return raw.trim();
@@ -94,7 +94,7 @@ export const DeriveClassAttributeKind: BlockKind<
   category: "lookup",
   label: "Class-derived attribute",
   description:
-    "Derive a structural attribute from a class code ('45101' → rate number '07')",
+    "Derive a structural attribute from a class code ('53983' → rate number '09')",
   inputs: [
     {
       name: "class_code",

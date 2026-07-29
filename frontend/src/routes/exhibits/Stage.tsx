@@ -1,5 +1,5 @@
 /**
- * <Stage> — the workbench's center (current Exhibits design).
+ * <Stage> — the workbench's center (Brief: portfolio-redesign v2, P5).
  *
  * One variable at a time, drawn the way a graphics desk would:
  *

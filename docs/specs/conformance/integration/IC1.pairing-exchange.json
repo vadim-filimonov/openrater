@@ -5,7 +5,7 @@
   "asserts": "A pairing code exchanges once for an integrator key + descriptor, and only once.",
   "contract_version": "1.0",
   "world": {
-    "integration": { "name": "Example Integrator — fixture", "paired": false },
+    "integration": { "name": "OpenRater Front — fixture", "paired": false },
     "plans": []
   },
   "steps": [
@@ -34,7 +34,7 @@
         "path": "/api/v1/integrations/pair",
         "body": {
           "code": "{{code}}",
-          "peer_name": "Example Integrator (fixture)",
+          "peer_name": "openrater-front (fixture)",
           "catalog": [
             { "key": "rest.gross_receipts", "label": "Annual gross receipts", "dtype": "number", "unit": "USD", "example": 1250000 },
             { "key": "property.construction", "label": "Construction type", "dtype": "enum", "example": "JM" },

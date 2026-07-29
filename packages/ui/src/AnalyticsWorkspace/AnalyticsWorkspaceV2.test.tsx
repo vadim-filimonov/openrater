@@ -46,7 +46,7 @@ function renderWs(overrides: Partial<AnalyticsWorkspaceV2Props> = {}) {
     scoredResult: scored(),
     variables: VARS,
     premiumColumn: PREMIUM,
-    planLabel: "Meridian BOP · Kansas",
+    planLabel: "ISO BOP · Kansas",
     snapshots: [],
     onExport: vi.fn(),
     // Brief 93 — the report is the landing view; these acts tests

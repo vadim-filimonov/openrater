@@ -9,7 +9,7 @@
  * `plan-mutations` helper folded through `onPlanChange`, and the
  * consumer's existing autosave reverse-projects via towerPlanToStages.
  *
- * Brief 82 O-1 — NO sample-risk testing here:
+ * Brief 82 O-1 (owner, 2026-07-10) — NO sample-risk testing here:
  * the ambient sample, its editor, the browser-engine run, and the
  * running column are gone. The sheet shows AUTHORED truth only — a
  * scalar step shows its value, a table step shows its shape
@@ -135,7 +135,7 @@ export interface SheetFactorTableMeta {
   readonly range?: string;
   /** Authored cell count — the shape column reads "N values · range". */
   readonly count?: number;
-  /**  — "cited p. 6 — Rule C.5", from the table's provenance. */
+  /** MVP-016 — "cited p. 6 — Rule C.5", from the table's provenance. */
   readonly citation?: string | undefined;
 }
 
@@ -243,6 +243,20 @@ function sameSummon(
 }
 
 // ── Formatting ──────────────────────────────────────────────────────
+
+/**
+ * FCA #35 (findings 7/12) — authored scalars rendered `toFixed(3)`,
+ * so base rates read "$148.000" (thousands under dot-thousands
+ * conventions, a factor to everyone else) and an LCM of 1 read
+ * "1.000". Render the value's OWN precision, floored at the 2dp
+ * money/factor convention — never an invented third zero, never a
+ * truncation of authored precision (a $0.125 rate stays $0.125).
+ */
+function fmtAuthoredScalar(value: number): string {
+  const s = String(value);
+  const frac = s.includes(".") ? s.split(".")[1]!.length : 0;
+  return value.toFixed(Math.max(2, Math.min(frac, 6)));
+}
 
 function slugifyOutputField(name: string): string {
   const slug = name
@@ -539,6 +553,11 @@ export function BuildUpSheet(props: BuildUpSheetProps): JSX.Element {
   // reading surface, ever).
   const inputLabel = useCallback(
     (field: string): string => {
+      // FCA #34 (finding 70) — "Rated per $1 of literal:1" leaked the
+      // binding grammar. A literal binding is a constant, in words.
+      if (field.startsWith("literal:")) {
+        return `a constant ${field.slice("literal:".length)}`;
+      }
       const declared = pickerItems.find(
         (i) => i.kind === "input" && (i.field ?? i.id) === field,
       )?.title;
@@ -604,7 +623,7 @@ export function BuildUpSheet(props: BuildUpSheetProps): JSX.Element {
     [factorTableMeta, dimLabel, inputLabel, plan.ratingDimension],
   );
 
-  //  — a lookup step's title is the TABLE's display name when
+  // MVP-017 — a lookup step's title is the TABLE's display name when
   // the node's own title is just the identifier re-dressed (the
   // workbook path writes the slug into the description head). An
   // authored title that says something the id doesn't is kept.
@@ -632,6 +651,11 @@ export function BuildUpSheet(props: BuildUpSheetProps): JSX.Element {
         }`;
       }
       if (!tower.exposureInput) return "Flat — no exposure base";
+      // FCA #34 (finding 70) — a literal exposure of 1 IS the flat
+      // case; say so instead of "Rated per $1 of literal:1".
+      if (tower.exposureInput === "literal:1") {
+        return "Flat — constant exposure of 1 (no exposure base)";
+      }
       const divisor = tower.exposureUnitDivisor ?? 100;
       // R3 (D-H) — the exposure base speaks its display name.
       return `Rated per $${divisor.toLocaleString("en-US")} of ${inputLabel(
@@ -666,7 +690,7 @@ export function BuildUpSheet(props: BuildUpSheetProps): JSX.Element {
   ): ReactNode => {
     const isBase = isBaseNode(node);
     const { text, chips } = bindingSentence(node);
-    //  — steps lead with the table's display name; the slug
+    // MVP-017 — steps lead with the table's display name; the slug
     // demotes into the binding sentence. A hand-retitled step keeps
     // its author's words (only an identifier-shaped title yields).
     const displayTitle = nodeDisplayTitle(node);
@@ -727,8 +751,8 @@ export function BuildUpSheet(props: BuildUpSheetProps): JSX.Element {
           >
             {scalarRef.value !== null && scalarRef.value !== undefined
               ? scalarRef.kind === "base"
-                ? `$${scalarRef.value.toFixed(3)}`
-                : scalarRef.value.toFixed(3)
+                ? `$${fmtAuthoredScalar(scalarRef.value)}`
+                : fmtAuthoredScalar(scalarRef.value)
               : "set a value"}
           </button>
         )
@@ -1633,7 +1657,7 @@ export function BuildUpSheet(props: BuildUpSheetProps): JSX.Element {
             <span className="rater-buildup__insp-kind">
               {node.subtitle ?? ref?.kind ?? "step"}
             </span>
-            {/*  — the editor header answers "where did this
+            {/* MVP-016 — the editor header answers "where did this
                 number come from" without opening the build report. */}
             {ref?.kind === "factor-table" &&
             factorTableMeta?.get(ref.tableId)?.citation ? (

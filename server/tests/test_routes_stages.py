@@ -303,7 +303,7 @@ class TestInputNodeDictionaryConfig:
             "required": False,
             "unit": "USD",
             "category": "E. Liability exposure",
-            "citation": "Meridian Manual M-23",
+            "citation": "Sample BOP Rule 23",
             "description": "Liability exposure for SALES-based classes (per $1,000).",
             "output_field": "value",
         }
@@ -320,7 +320,7 @@ class TestInputNodeDictionaryConfig:
         assert stored["source"] == "form"
         assert stored["unit"] == "USD"
         assert stored["category"] == "E. Liability exposure"
-        assert stored["citation"] == "Meridian Manual M-23"
+        assert stored["citation"] == "Sample BOP Rule 23"
         assert stored["description"].startswith("Liability exposure")
 
     def test_required_floor_area_with_range_validation(
@@ -336,7 +336,7 @@ class TestInputNodeDictionaryConfig:
             "required": True,
             "unit": "sqft",
             "category": "G. Eligibility & policy facts",
-            "validation": {"max": 42000.0},
+            "validation": {"max": 35000.0},
         }
         add_stage(
             client,
@@ -349,7 +349,7 @@ class TestInputNodeDictionaryConfig:
         stored = self._read_config(client, plan_id, "in_floor")
         assert stored["required"] is True
         assert stored["data_type"] == "int"
-        assert stored["validation"]["max"] == 42000.0
+        assert stored["validation"]["max"] == 35000.0
 
     def test_derived_source_with_allowed_values_roundtrips(
         self, client: TestClient
@@ -361,9 +361,9 @@ class TestInputNodeDictionaryConfig:
             "data_type": "string",
             "source": "derived",
             "derived_from": "zip",
-            "derived_rule": "ZIP -> KS rating territory (t1/t2)",
+            "derived_rule": "ZIP -> KS rating territory (701/702)",
             "required": True,
-            "validation": {"enum": ["t1", "t2"]},
+            "validation": {"enum": ["701", "702"]},
         }
         add_stage(
             client,
@@ -376,7 +376,7 @@ class TestInputNodeDictionaryConfig:
         stored = self._read_config(client, plan_id, "in_territory")
         assert stored["source"] == "derived"
         assert stored["derived_from"] == "zip"
-        assert stored["validation"]["enum"] == ["t1", "t2"]
+        assert stored["validation"]["enum"] == ["701", "702"]
 
     def test_legacy_vocab_input_node_still_validates(
         self, client: TestClient

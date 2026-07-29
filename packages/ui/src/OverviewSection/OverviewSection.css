@@ -1,5 +1,5 @@
 
-/* Drift tracking: the edited-since-build suffix on the
+/* Drift honesty (MVP-008): the edited-since-build suffix on the
  * provenance row — a warn-tinted fact, not a lifecycle state. */
 .rater-overview__drift {
   color: var(--rater-accent-warning);

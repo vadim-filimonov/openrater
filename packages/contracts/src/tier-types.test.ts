@@ -148,7 +148,7 @@ describe("evaluateEligibilityComparator", () => {
       expect(evaluateEligibilityComparator("ne", "60989", 60990)).toBe(true);
     });
 
-    it("eq does NOT coerce booleans or non-numeric strings", () => {
+    it("eq does NOT coerce booleans to numbers or non-numeric strings", () => {
       expect(evaluateEligibilityComparator("eq", true, 1)).toBe(false);
       expect(evaluateEligibilityComparator("eq", "1", true)).toBe(false);
       expect(evaluateEligibilityComparator("eq", "", 0)).toBe(false);
@@ -178,6 +178,68 @@ describe("evaluateEligibilityComparator", () => {
       ).toBe(true);
     });
 
+  });
+
+  // FCA fca-2026-07-25 S0 — dead knock-out gates. Workbook gates
+  // sheets persist boolean rule values as the TEXT 'true'/'false'
+  // (spec §2.1 declares those legal boolean spellings) while schema-
+  // typed callers send JSON booleans — strict equality never matched,
+  // so every boolean knock-out silently rated ineligible risks as
+  // Standard. The comparator now bridges the boolean/boolean-literal-
+  // string seam exactly like the E3 numeric seam.
+  describe("boolean/boolean-string seam (FCA dead knock-out gates)", () => {
+    it("eq matches a boolean against its literal string (both directions)", () => {
+      expect(evaluateEligibilityComparator("eq", true, "true")).toBe(true);
+      expect(evaluateEligibilityComparator("eq", "true", true)).toBe(true);
+      expect(evaluateEligibilityComparator("eq", false, "false")).toBe(true);
+      expect(evaluateEligibilityComparator("eq", "false", false)).toBe(true);
+    });
+
+    it("bridges Excel spellings: case-insensitive, trimmed", () => {
+      expect(evaluateEligibilityComparator("eq", true, "TRUE")).toBe(true);
+      expect(evaluateEligibilityComparator("eq", "True", true)).toBe(true);
+      expect(evaluateEligibilityComparator("eq", false, " FALSE ")).toBe(true);
+    });
+
+    it("true never equals 'false' (and ne stays the inverse)", () => {
+      expect(evaluateEligibilityComparator("eq", true, "false")).toBe(false);
+      expect(evaluateEligibilityComparator("eq", "false", true)).toBe(false);
+      expect(evaluateEligibilityComparator("ne", true, "true")).toBe(false);
+      expect(evaluateEligibilityComparator("ne", true, "false")).toBe(true);
+    });
+
+    it("only the literal spellings bridge — 'yes'/'1'/1 do not", () => {
+      // Wire-spelling variants are the input-coercion seam's job
+      // (coerceInputToFieldType / coercePlanExternalInputs), never the
+      // comparator's: equating 1 ≡ true here would widen every numeric
+      // rule.
+      expect(evaluateEligibilityComparator("eq", "yes", true)).toBe(false);
+      expect(evaluateEligibilityComparator("eq", true, "yes")).toBe(false);
+      expect(evaluateEligibilityComparator("eq", 1, true)).toBe(false);
+      expect(evaluateEligibilityComparator("eq", "1", true)).toBe(false);
+    });
+
+    it("two strings still compare strictly (no boolean detour)", () => {
+      expect(evaluateEligibilityComparator("eq", "true", "true")).toBe(true);
+      expect(evaluateEligibilityComparator("eq", "true", "TRUE")).toBe(false);
+    });
+
+    it("in/nin bridge per entry (builder-split string lists)", () => {
+      // The ingest builder comma-splits 'in' values into STRING lists;
+      // a typed boolean input must still hit them.
+      expect(
+        evaluateEligibilityComparator("in", true, ["true", "maybe"]),
+      ).toBe(true);
+      expect(
+        evaluateEligibilityComparator("in", false, ["true", "maybe"]),
+      ).toBe(false);
+      expect(
+        evaluateEligibilityComparator("nin", true, ["true", "maybe"]),
+      ).toBe(false);
+    });
+  });
+
+  describe("numeric ordering — degradation", () => {
     it("ordering comparators accept numeric strings on either side", () => {
       expect(evaluateEligibilityComparator("lt", "0", 1)).toBe(true);
       expect(evaluateEligibilityComparator("ge", 1000000, "1000000")).toBe(

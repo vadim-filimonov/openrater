@@ -1,5 +1,5 @@
 /**
- * Structured row issues and unknown-key policy tests.
+ * ADR-0056 — structured row issues + the unknown-key policy.
  *
  * Pins the engine half of "refuse or resolve, never improvise":
  *   · onMiss error → RowIssueError → row_status "error", premium withheld
@@ -48,7 +48,7 @@ function lookupPlan(onMiss?: unknown): Plan {
         id: "lkp",
         kind: "lookup.direct",
         params: {
-          table: { "c202": 1.25 },
+          table: { "73912": 1.32 },
           defaultValue: 1.0,
           tableName: "class_rel",
           keySource: "class_code",
@@ -77,7 +77,7 @@ function lookupPlan(onMiss?: unknown): Plan {
 
 const OPTS = { as_of: "2024-01-01" };
 
-describe("onMiss policies", () => {
+describe("ADR-0056 · onMiss policies", () => {
   it("known key rates normally under every policy", () => {
     for (const onMiss of [
       undefined,
@@ -85,16 +85,16 @@ describe("onMiss policies", () => {
       { mode: "default", value: 2 },
       { mode: "refer" },
     ]) {
-      const r = executePlan(lookupPlan(onMiss), { class_code: "c202" }, OPTS);
-      expect(r.outputs.premium).toBe(125);
+      const r = executePlan(lookupPlan(onMiss), { class_code: "73912" }, OPTS);
+      expect(r.outputs.premium).toBe(132);
       expect(r.row_status).toBe("ok");
       expect(r.issues).toBeUndefined();
     }
   });
 
-  it("an absent policy uses the configured defaultValue", () => {
-    const r = executePlan(lookupPlan(undefined), { class_code: "c999" }, OPTS);
-    expect(r.outputs.premium).toBe(100);
+  it("absent policy keeps the LEGACY silent defaultValue (raw-engine back-compat)", () => {
+    const r = executePlan(lookupPlan(undefined), { class_code: "99999" }, OPTS);
+    expect(r.outputs.premium).toBe(100); // defaultValue 1.0 — old behavior
     expect(r.row_status).toBe("ok");
     expect(r.issues).toBeUndefined();
   });
@@ -102,7 +102,7 @@ describe("onMiss policies", () => {
   it("error policy refuses the row: no premium, structured unknown_key, trace carries the seed", () => {
     const r = executePlan(
       lookupPlan({ mode: "error" }),
-      { class_code: "c999" },
+      { class_code: "99999" },
       OPTS,
     );
     expect(r.row_status).toBe("error");
@@ -111,7 +111,7 @@ describe("onMiss policies", () => {
     expect(codes).toContain("lkp:unknown_key");
     expect(codes).toContain("out_p:unresolved_output");
     // The lookup's trace entry carries both the error and the seed.
-    expect(r.trace["lkp"]?.error?.message).toMatch(/c999/);
+    expect(r.trace["lkp"]?.error?.message).toMatch(/99999/);
     expect(r.trace["lkp"]?.issues?.[0]?.code).toBe("unknown_key");
     expect(r.trace["lkp"]?.issues?.[0]?.detail?.field).toBe("class_code");
   });
@@ -127,7 +127,7 @@ describe("onMiss policies", () => {
   it("default(x) policy applies the authored value with a visible warning", () => {
     const r = executePlan(
       lookupPlan({ mode: "default", value: 1.5 }),
-      { class_code: "c999" },
+      { class_code: "99999" },
       OPTS,
     );
     expect(r.outputs.premium).toBe(150);
@@ -140,7 +140,7 @@ describe("onMiss policies", () => {
   it("refer policy rates 1.0 indicative and escalates eligibility to submit", () => {
     const r = executePlan(
       lookupPlan({ mode: "refer" }),
-      { class_code: "c999" },
+      { class_code: "99999" },
       OPTS,
     );
     expect(r.outputs.premium).toBe(100);
@@ -153,26 +153,26 @@ describe("onMiss policies", () => {
   it("one poisoned row never aborts the batch", () => {
     const compiled = compilePlan(lookupPlan({ mode: "error" }));
     const rows = [
-      { class_code: "c202" },
-      { class_code: "c999" },
-      { class_code: "c202" },
+      { class_code: "73912" },
+      { class_code: "99999" },
+      { class_code: "73912" },
     ];
     const results = runPlanBatch(compiled, rows, OPTS);
     expect(results.map((r) => r.row_status)).toEqual(["ok", "error", "ok"]);
-    expect(results[0]!.outputs.premium).toBe(125);
-    expect(results[2]!.outputs.premium).toBe(125);
+    expect(results[0]!.outputs.premium).toBe(132);
+    expect(results[2]!.outputs.premium).toBe(132);
   });
 });
 
-describe("policy-book error facet", () => {
+describe("ADR-0056 · policy-book error facet", () => {
   it("a policy containing an error row withholds composed and surfaces row_errors", () => {
     const compiled = compilePlan(lookupPlan({ mode: "error" }));
     const results = evaluatePolicyBook(
       compiled,
       [
-        { policy_id: "P1", location_id: "L1", inputs: { class_code: "c202" } },
-        { policy_id: "P1", location_id: "L2", inputs: { class_code: "c999" } },
-        { policy_id: "P2", location_id: "L1", inputs: { class_code: "c202" } },
+        { policy_id: "P1", location_id: "L1", inputs: { class_code: "73912" } },
+        { policy_id: "P1", location_id: "L2", inputs: { class_code: "99999" } },
+        { policy_id: "P2", location_id: "L1", inputs: { class_code: "73912" } },
       ],
       {
         rollupFields: [{ field: "premium", reducer: "sum" }],
@@ -190,7 +190,7 @@ describe("policy-book error facet", () => {
   });
 });
 
-describe("resolveLookupMiss helper", () => {
+describe("ADR-0056 · resolveLookupMiss helper", () => {
   it("throws a RowIssueError carrying the structured seed on mode error", () => {
     try {
       resolveLookupMiss({ mode: "error" }, 1.0, {

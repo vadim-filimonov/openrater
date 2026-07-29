@@ -1,6 +1,7 @@
 **What + why**
 
-<!-- What changed, why it is needed, and any user-visible effect. -->
+<!-- What changed and the reason. For ports: include the manifest
+     ("Ported: […] Cut: […] Reason: […]"). -->
 
 **How it was verified**
 
@@ -15,11 +16,10 @@
 - [ ] No bureau-derived or carrier-filed rate content anywhere in
       the diff; any new fixture is synthetic **and** has a
       `docs/fixtures/FIXTURE_PROVENANCE.md` entry
-- [ ] Relevant checks are green (the full local suite is
-      `pnpm typecheck && pnpm test && pnpm design:check` plus
-      `cd server && uv run pytest`)
+- [ ] `pnpm typecheck && pnpm test && pnpm design:check` and
+      `cd server && uv run pytest` are green
 - [ ] Contract-affecting changes (engine, plan format, transcription
       spec, HTTP API) update the relevant spec + its changelog +
       conformance vectors in the same PR
-- [ ] User-facing changes include screenshots or another clear manual
-      verification note where appropriate
+- [ ] New user-facing surfaces have a validated design brief
+      (`docs/design-briefs/`)

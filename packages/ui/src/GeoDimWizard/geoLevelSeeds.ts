@@ -25,7 +25,7 @@
 
 // Brief 44 §3.1 types — mirror the canonical shapes in
 // @openrater/contracts/dimension-types + @openrater/api-client/schemas/dimensions.
-// Inlined here so this module has zero HTTP-layer dependency (@openrater/ui
+// Inlined here so this module has zero HTTP-layer dependency (labs-ui
 // does not import from @openrater/api-client per its package contract).
 export type GeoGranularity = "state" | "county" | "zip";
 export type GeoScope =

@@ -1,6 +1,6 @@
 /**
- * Preflight tests pin that the header meets the dictionary before any
- * row rates, and that the sentence
+ * preflight tests — pins book-intake §2 (MVP-004 · MVP-010): the
+ * header meets the dictionary before any row rates, and the sentence
  * names the culprit — missing column, misspelled column, foreign
  * delimiter — never a per-row lookup error.
  */
@@ -96,8 +96,90 @@ describe("preflightHeader", () => {
     expect(p.ok).toBe(true);
     expect(p.unknown).toEqual(["sq_footage"]);
     expect(p.sentence).toContain(
-      "1 of your column isn't a plan input (sq_footage) — ignored unless mapped.",
+      "1 of your columns isn't a plan input (sq_footage) — ignored unless mapped.",
     );
+  });
+
+  // FCA fca-2026-07-25 #13 — the header note called load-bearing
+  // columns 'ignored' (the engine consumed and applied them; an S7
+  // persona shipped a wrong headline number off that sentence), and
+  // duplicate headers silently rated every row with the LAST copy's
+  // values (+20% written) while the note claimed the column was
+  // ignored.
+  describe("structure-consumed columns (FCA #13)", () => {
+    it("a consumed column is named truthfully — never 'ignored'", () => {
+      const p = preflightHeader(
+        [
+          "class_code",
+          "building_limit",
+          "bpp_limit",
+          "annual_gross_sales",
+          "construction_class",
+          "protection_class",
+          "zip",
+          "schedule_app_psm_schedule",
+          "policy_ref",
+        ],
+        MERIDIAN,
+        undefined,
+        ["schedule_app_psm_schedule"],
+      );
+      expect(p.consumed).toEqual(["schedule_app_psm_schedule"]);
+      expect(p.unknown).toEqual(["policy_ref"]);
+      expect(p.ok).toBe(true);
+      expect(p.sentence).toContain(
+        "1 column (schedule_app_psm_schedule) is read directly by the " +
+          "rating structure — values apply to every row as-is.",
+      );
+      // The 'ignored' clause names ONLY the true leftover.
+      expect(p.sentence).toContain(
+        "1 of your columns isn't a plan input (policy_ref)",
+      );
+      expect(p.sentence).not.toMatch(/schedule_app[^.]*ignored/);
+    });
+
+    it("without the consumed vocabulary the old labeling stands (callers opt in)", () => {
+      const p = preflightHeader(
+        ["class_code", "schedule_app_psm_schedule"],
+        MERIDIAN,
+      );
+      expect(p.unknown).toContain("schedule_app_psm_schedule");
+      expect(p.consumed).toEqual([]);
+    });
+  });
+
+  describe("duplicate headers (FCA #13)", () => {
+    it("a duplicated column BLOCKS with the truth about last-copy-wins", () => {
+      const p = preflightHeader(
+        [
+          "class_code",
+          "building_limit",
+          "bpp_limit",
+          "annual_gross_sales",
+          "construction_class",
+          "protection_class",
+          "zip",
+          "zip",
+        ],
+        MERIDIAN,
+      );
+      expect(p.duplicates).toEqual(["zip"]);
+      expect(p.ok).toBe(false);
+      expect(p.sentence).toContain("Duplicate column (zip)");
+      expect(p.sentence).toContain("last copy's values");
+      // The duplicated column never rides the matched/ignored lists.
+      expect(p.matched.map((m) => m.column)).not.toContain("zip");
+      expect(p.unknown).not.toContain("zip");
+    });
+
+    it("duplicates detect on the NORMALIZED name (Zip vs zip)", () => {
+      const p = preflightHeader(
+        ["class_code", "Zip", "zip"],
+        MERIDIAN,
+      );
+      expect(p.duplicates).toHaveLength(1);
+      expect(p.ok).toBe(false);
+    });
   });
 });
 

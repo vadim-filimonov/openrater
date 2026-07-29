@@ -26,7 +26,7 @@ const SAMPLE_RUN: RunResult = {
     cls_factor: STUB_ENTRY({
       kindId: "lookup.classification",
       outputs: { value: 1.32 },
-      explanation: "Classified c101 → 1.32",
+      explanation: "Classified 73912 → 1.32",
     }),
     lcm: STUB_ENTRY({ outputs: { value: 1.2 } }),
     mul: STUB_ENTRY({
@@ -308,7 +308,7 @@ describe("<TracePanel> §14 — grouped cascade", () => {
     );
     expect(screen.getByText("Other steps")).toBeInTheDocument();
     // The unclaimed lookup step still renders (by its explanation).
-    expect(screen.getByText("Classified c101 → 1.32")).toBeInTheDocument();
+    expect(screen.getByText("Classified 73912 → 1.32")).toBeInTheDocument();
   });
 });
 

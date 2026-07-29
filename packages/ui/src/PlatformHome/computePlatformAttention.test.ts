@@ -221,7 +221,7 @@ describe("computePlatformAttention", () => {
     expect(isSetup("ready")).toBe(false);
   });
 
-  //  — the route is the opt-in: a fresh install (no API Lab
+  // MVP-005 — the route is the opt-in: a fresh install (no API Lab
   // route anywhere) never opens on a key nag.
   it("suppresses connector setup rows when no API Lab route exists", () => {
     const groups = computePlatformAttention(

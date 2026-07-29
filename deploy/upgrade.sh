@@ -3,8 +3,9 @@
 #
 #     ~/openrater/deploy/upgrade.sh
 #
-# This replaces a fragile pull-and-restart recipe with explicit checks for two
-# common failure modes:
+# This replaces the two-command recipe in docs/DEMO_DEPLOYMENT_RUNBOOK.md
+# (Part E), which has two silent failure modes. The live box hit BOTH on
+# 2026-07-14:
 #
 #   1. Skipping `git pull`. Docker caches `COPY . .` when the build context is
 #      unchanged, so `up --build` rebuilds nothing, restarts the SAME image,
@@ -31,7 +32,7 @@ die() { printf '\n\033[31m✗ %s\033[0m\n\n' "$1" >&2; exit 1; }
 
 [ -f "$ENV_FILE" ] || die "$ENV_FILE not found. Start from the example:
     cp $ENV_EXAMPLE $ENV_FILE
-  then fill in the documented values in that file."
+  then fill it in — see docs/DEMO_DEPLOYMENT_RUNBOOK.md (Parts A + C)."
 
 # ---------------------------------------------------------------------------
 # 1. Pull. THE step whose omission silently redeploys the old app.
@@ -103,8 +104,8 @@ if [ -n "$blocking" ]; then
   Compose reads the whole file before it starts anything, so one of these can
   kill the deploy at parse time — or, worse, build a box that starts and is
   quietly broken (an SPA baked with an empty API base, a tunnel with no token).
-  Set them in $ENV_FILE (see the comments in $ENV_EXAMPLE), then re-run this
-  script.
+  Set them in $ENV_FILE (see the comments in $ENV_EXAMPLE and
+  docs/DEMO_DEPLOYMENT_RUNBOOK.md), then re-run this script.
 
 WHY
   exit 1
@@ -127,11 +128,13 @@ fi
 # ---------------------------------------------------------------------------
 # 3. Build, sweep the data, THEN restart.
 #
-#    The integrity sweep runs with the NEWLY BUILT image
+#    The integrity sweep (Brief 95 B2) runs with the NEWLY BUILT image
 #    against the live DB, read-only, BEFORE the restart triggers this
 #    release's migrations — a box with dangling references refuses the
-#    upgrade with the rows named instead of failing mid-migration.
-#    --missing-ok keeps a fresh box (no DB yet) deployable.
+#    upgrade with the rows named instead of bricking mid-migration
+#    (rebuild migrations enforce foreign keys; the WI arc found exactly
+#    such an orphan on a long-lived box). --missing-ok keeps a fresh
+#    box (no DB yet) deployable.
 # ---------------------------------------------------------------------------
 bold "Building"
 echo "  (a real code change takes minutes here — a cache hit takes seconds)"

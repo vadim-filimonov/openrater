@@ -1,5 +1,5 @@
 /**
- * <Combobox> tests.
+ * <Combobox> tests (M2.3).
  */
 
 import { describe, it, expect, vi } from "vitest";
@@ -8,10 +8,10 @@ import { useState } from "react";
 import { Combobox, type ComboboxOption } from "./Combobox";
 
 const CLASSES: readonly ComboboxOption[] = [
-  { value: "c101", label: "Neighborhood bakery", hint: "c101 · Food" },
-  { value: "c205", label: "Hardware shop", hint: "c205 · Retail" },
-  { value: "d310", label: "Apparel shop", hint: "d310 · Retail" },
-  { value: "d999", label: "Consulting office", hint: "d999 · Professional (disabled)", disabled: true },
+  { value: "71641", label: "Restaurants", hint: "71641 · Hospitality" },
+  { value: "73912", label: "Bowling Centers", hint: "73912 · Recreation" },
+  { value: "91342", label: "Concrete contractors", hint: "91342 · Construction" },
+  { value: "97104", label: "Cement contractors", hint: "97104 · Construction (disabled)", disabled: true },
 ];
 
 function Harness({
@@ -46,8 +46,8 @@ describe("<Combobox> — closed state", () => {
   });
 
   it("shows the selected option's label when value is set", () => {
-    render(<Harness initial="c101" />);
-    expect(screen.getByRole("combobox")).toHaveValue("Neighborhood bakery");
+    render(<Harness initial="71641" />);
+    expect(screen.getByRole("combobox")).toHaveValue("Restaurants");
   });
 
   it("starts closed (no listbox in the DOM)", () => {
@@ -91,17 +91,17 @@ describe("<Combobox> — opening + filtering", () => {
     render(<Harness />);
     const input = screen.getByRole("combobox");
     fireEvent.focus(input);
-    fireEvent.change(input, { target: { value: "hardware" } });
+    fireEvent.change(input, { target: { value: "bowling" } });
     const options = screen.getAllByRole("option");
     expect(options).toHaveLength(1);
-    expect(options[0]).toHaveTextContent("Hardware shop");
+    expect(options[0]).toHaveTextContent("Bowling Centers");
   });
 
   it("filters by typing — value substring match", () => {
     render(<Harness />);
     const input = screen.getByRole("combobox");
     fireEvent.focus(input);
-    fireEvent.change(input, { target: { value: "c205" } });
+    fireEvent.change(input, { target: { value: "739" } });
     expect(screen.getAllByRole("option")).toHaveLength(1);
   });
 
@@ -109,8 +109,8 @@ describe("<Combobox> — opening + filtering", () => {
     render(<Harness />);
     const input = screen.getByRole("combobox");
     fireEvent.focus(input);
-    fireEvent.change(input, { target: { value: "retail" } });
-    // Both Hardware + Apparel match by hint "Retail"
+    fireEvent.change(input, { target: { value: "construction" } });
+    // Both Concrete + Cement match by hint "Construction"
     expect(screen.getAllByRole("option")).toHaveLength(2);
   });
 
@@ -118,7 +118,7 @@ describe("<Combobox> — opening + filtering", () => {
     render(<Harness />);
     const input = screen.getByRole("combobox");
     fireEvent.focus(input);
-    fireEvent.change(input, { target: { value: "HARDWARE" } });
+    fireEvent.change(input, { target: { value: "BOWLING" } });
     expect(screen.getAllByRole("option")).toHaveLength(1);
   });
 
@@ -138,8 +138,8 @@ describe("<Combobox> — opening + filtering", () => {
     render(<Harness filter={filter} />);
     const input = screen.getByRole("combobox");
     fireEvent.focus(input);
-    fireEvent.change(input, { target: { value: "d" } });
-    expect(screen.getAllByRole("option")).toHaveLength(2); // d310 + d999
+    fireEvent.change(input, { target: { value: "9" } });
+    expect(screen.getAllByRole("option")).toHaveLength(2); // 91342 + 97104
   });
 });
 
@@ -164,7 +164,7 @@ describe("<Combobox> — keyboard navigation", () => {
     const input = screen.getByRole("combobox");
     fireEvent.focus(input);
     // First open lands on option 0; pressing Up wraps; should skip
-    // disabled option (d999) and land on index 2 (Apparel shop)
+    // disabled option (97104) and land on index 2 (Concrete contractors)
     fireEvent.keyDown(input, { key: "ArrowUp" });
     const options = screen.getAllByRole("option");
     expect(options[2]?.className).toContain("--highlighted");
@@ -174,7 +174,7 @@ describe("<Combobox> — keyboard navigation", () => {
     render(<Harness />);
     const input = screen.getByRole("combobox");
     fireEvent.focus(input);
-    // Move to last non-disabled (index 2: Apparel)
+    // Move to last non-disabled (index 2: Concrete)
     fireEvent.keyDown(input, { key: "End" });
     const options = screen.getAllByRole("option");
     expect(options[2]?.className).toContain("--highlighted");
@@ -199,7 +199,7 @@ describe("<Combobox> — keyboard navigation", () => {
     fireEvent.focus(input);
     fireEvent.keyDown(input, { key: "End" });
     const options = screen.getAllByRole("option");
-    expect(options[2]?.className).toContain("--highlighted"); // d999 disabled, so 2
+    expect(options[2]?.className).toContain("--highlighted"); // 97104 disabled, so 2
   });
 
   it("Enter selects the highlighted option", () => {
@@ -207,21 +207,21 @@ describe("<Combobox> — keyboard navigation", () => {
     render(<Harness onChange={onChange} />);
     const input = screen.getByRole("combobox");
     fireEvent.focus(input);
-    fireEvent.keyDown(input, { key: "ArrowDown" }); // highlights Hardware shop (index 1)
+    fireEvent.keyDown(input, { key: "ArrowDown" }); // highlights Bowling Centers (index 1)
     fireEvent.keyDown(input, { key: "Enter" });
-    expect(onChange).toHaveBeenCalledWith("c205");
-    expect(input).toHaveValue("Hardware shop");
+    expect(onChange).toHaveBeenCalledWith("73912");
+    expect(input).toHaveValue("Bowling Centers");
     expect(screen.queryByRole("listbox")).toBeNull();
   });
 
   it("Escape closes WITHOUT selecting + restores input text", () => {
-    render(<Harness initial="c101" />);
+    render(<Harness initial="71641" />);
     const input = screen.getByRole("combobox");
     fireEvent.focus(input);
-    fireEvent.change(input, { target: { value: "hard" } });
-    expect(input).toHaveValue("hard");
+    fireEvent.change(input, { target: { value: "bow" } });
+    expect(input).toHaveValue("bow");
     fireEvent.keyDown(input, { key: "Escape" });
-    expect(input).toHaveValue("Neighborhood bakery"); // restored
+    expect(input).toHaveValue("Restaurants"); // restored
     expect(screen.queryByRole("listbox")).toBeNull();
   });
 
@@ -242,8 +242,8 @@ describe("<Combobox> — mouse interaction", () => {
     render(<Harness onChange={onChange} />);
     const input = screen.getByRole("combobox");
     fireEvent.focus(input);
-    fireEvent.mouseDown(screen.getByText("Hardware shop"));
-    expect(onChange).toHaveBeenCalledWith("c205");
+    fireEvent.mouseDown(screen.getByText("Bowling Centers"));
+    expect(onChange).toHaveBeenCalledWith("73912");
     expect(screen.queryByRole("listbox")).toBeNull();
   });
 
@@ -252,7 +252,7 @@ describe("<Combobox> — mouse interaction", () => {
     render(<Harness onChange={onChange} />);
     const input = screen.getByRole("combobox");
     fireEvent.focus(input);
-    fireEvent.mouseDown(screen.getByText("Consulting office"));
+    fireEvent.mouseDown(screen.getByText("Cement contractors"));
     expect(onChange).not.toHaveBeenCalled();
   });
 
@@ -260,7 +260,7 @@ describe("<Combobox> — mouse interaction", () => {
     render(<Harness />);
     const input = screen.getByRole("combobox");
     fireEvent.focus(input);
-    const conc = screen.getByText("Apparel shop").closest('[role="option"]');
+    const conc = screen.getByText("Concrete contractors").closest('[role="option"]');
     expect(conc).not.toBeNull();
     if (conc) fireEvent.pointerEnter(conc);
     expect(conc?.className).toContain("--highlighted");
@@ -295,17 +295,17 @@ describe("<Combobox> — ARIA", () => {
   });
 
   it("selected option has aria-selected=true", () => {
-    render(<Harness initial="c101" />);
+    render(<Harness initial="71641" />);
     const input = screen.getByRole("combobox");
     fireEvent.focus(input);
-    const sel = screen.getByRole("option", { name: /Neighborhood bakery/i });
+    const sel = screen.getByRole("option", { name: /Restaurants/i });
     expect(sel).toHaveAttribute("aria-selected", "true");
   });
 
   it("disabled options have aria-disabled", () => {
     render(<Harness />);
     fireEvent.focus(screen.getByRole("combobox"));
-    const disabled = screen.getByText("Consulting office").closest('[role="option"]');
+    const disabled = screen.getByText("Cement contractors").closest('[role="option"]');
     expect(disabled).toHaveAttribute("aria-disabled", "true");
   });
 });
@@ -315,14 +315,14 @@ describe("<Combobox> — outside click + portal", () => {
     render(
       <div>
         <div data-testid="outside">outside</div>
-        <Harness initial="c101" />
+        <Harness initial="71641" />
       </div>,
     );
     const input = screen.getByRole("combobox");
     fireEvent.focus(input);
-    fireEvent.change(input, { target: { value: "hard" } });
+    fireEvent.change(input, { target: { value: "bow" } });
     fireEvent.mouseDown(screen.getByTestId("outside"));
-    expect(input).toHaveValue("Neighborhood bakery");
+    expect(input).toHaveValue("Restaurants");
     expect(screen.queryByRole("listbox")).toBeNull();
   });
 
@@ -347,6 +347,6 @@ describe("<Combobox> — custom renderOption", () => {
     );
     fireEvent.focus(screen.getByRole("combobox"));
     const customs = screen.getAllByTestId("custom");
-    expect(customs[0]).toHaveTextContent("CUSTOM: Neighborhood bakery");
+    expect(customs[0]).toHaveTextContent("CUSTOM: Restaurants");
   });
 });

@@ -21,7 +21,7 @@
  *   · ≥2 money outputs, no aggregate → the dec-page sum of the
  *     coverage premiums, marked `premiumBasis: "coverage_sum"`.
  * Detection reads STAGES, never the projected graph: exposure-rated
- * towers (ADR-0044 D3) carry per-tip filed `round` NODES, so a
+ * towers (ADR-0044 D3) carry per-tip ISO `round` NODES, so a
  * graph-side "round-fed output = total" detector wrongly crowned the
  * LAST TOWER (live repro: $195 + $72 risk headlined "$72").
  * Error rows still derive NO money (Law 2 / G8), and a policy tail
@@ -130,9 +130,9 @@ describe("plan-aware premium view · total-less multi-coverage plans", () => {
     expect(body.views.premiumBasis).toBe("coverage_sum");
   });
 
-  it("EXPOSURE-RATED total-less towers sum too — per-tip filed rounds are not a total", async () => {
+  it("EXPOSURE-RATED total-less towers sum too — per-tip ISO rounds are not a total", async () => {
     // The workbook-built shape (apply_exposure + divisor): each tower
-    // tip carries its own filed round NODE. The aggregate detector must
+    // tip carries its own ISO round NODE. The aggregate detector must
     // not mistake those tips for a plan total (the live bug's shape).
     const stages = [
       {

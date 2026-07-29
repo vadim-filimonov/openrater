@@ -37,6 +37,7 @@ ingest-construct-audit.md verbatim — the notable seams:
 
 from __future__ import annotations
 
+import math
 import re
 from datetime import date, datetime
 from typing import Any
@@ -343,7 +344,7 @@ def _factor_table_requests(
         if str(ft.meta_value("interpolation") or "stepped") == "linear":
             interpolation = {"mode": "linear", "axis": row_dim}
 
-        #  — the table-level citation rides the table record
+        # MVP-016 — the table-level citation rides the table record
         # (source_page + the rule reference), so the editor header and
         # the Exhibits stage foot can answer "where did this number
         # come from" without opening the build report.
@@ -421,6 +422,46 @@ def _axis_binding(field: str, derived_inputs: dict[str, list[str]]) -> dict[str,
     return {"source": "form_input", "path": field}
 
 
+def _composite_axes_map(wb: ParsedWorkbook) -> dict[str, list[str]]:
+    """dimension slug → member axes, for shape=composite dimensions."""
+    out: dict[str, list[str]] = {}
+    for row in _rows(wb.dimensions):
+        if str(row.get("shape")) == "composite":
+            axes = _csv(row.get("axes"))
+            if axes:
+                out[str(row.get("slug"))] = axes
+    return out
+
+
+def _dim_axis_binding(
+    dim: str,
+    dim_inputs: dict[str, str],
+    derived_inputs: dict[str, list[str]],
+    composite_axes: dict[str, list[str]],
+) -> dict[str, Any]:
+    """The binding for one lookup axis, composite-aware (ADR-0025 /
+    FCA fca-2026-07-25 #21). A composite dim used to fall through to a
+    plain `form_input.<slug>` binding — an input nobody declared, so
+    the spec's OWN recommended shape built into a plan where every row
+    refused `key ∅::… not found` and the input schema disagreed with
+    the engine about the plan's input dictionary. A composite now
+    carries its MEMBERS' bindings (each member resolves through its own
+    band/territory/derived path; the projector joins the level ids
+    with '·')."""
+    axes = composite_axes.get(dim)
+    if axes:
+        return {
+            "source": "composite",
+            "axes": {
+                member: _axis_binding(
+                    dim_inputs.get(member, member), derived_inputs
+                )
+                for member in axes
+            },
+        }
+    return _axis_binding(dim_inputs.get(dim, dim), derived_inputs)
+
+
 def _chain_config(
     wb: ParsedWorkbook,
     table_defaults: dict[str, float],
@@ -429,6 +470,7 @@ def _chain_config(
 ) -> dict[str, Any]:
     dim_inputs = _input_binding_map(wb)
     derived_inputs = _derived_input_map(wb)
+    composite_axes = _composite_axes_map(wb)
     elective_coverages = wb.elective_coverages()
     blocks: dict[tuple[str, str], list[Row]] = {}
     for row in _rows(wb.chains):
@@ -538,15 +580,25 @@ def _chain_config(
                 table_slug = _table_slug(row.get("factor_table"))
                 dim = str(row.get("dimension"))
                 dims: dict[str, Any] = {
-                    dim: _axis_binding(dim_inputs.get(dim, dim), derived_inputs)
+                    dim: _dim_axis_binding(
+                        dim, dim_inputs, derived_inputs, composite_axes
+                    )
                 }
                 # 2-D tables key on BOTH declared dimensions.
                 for extra_dim in _second_axis(wb, table_slug, dim):
-                    dims[extra_dim] = _axis_binding(
-                        dim_inputs.get(extra_dim, extra_dim), derived_inputs
+                    dims[extra_dim] = _dim_axis_binding(
+                        extra_dim, dim_inputs, derived_inputs, composite_axes
                     )
+                # FCA #7 (S0): `description` is free prose the spec caps
+                # nowhere, but the label fields it feeds ARE capped
+                # (FactorLookup.name 120, description_template 500). A
+                # spec-clean workbook must never be refused for prose
+                # length — validate_workbook passed it, so the builder
+                # fits the prose instead (the full text stays in the
+                # workbook; citations carry provenance).
+                prose = str(row.get("description") or table_slug)
                 lookup: dict[str, Any] = {
-                    "name": str(row.get("description") or table_slug),
+                    "name": _fit_label(prose, 120),
                     "factor_kind": table_slug,
                     "lookup_method": _LOOKUP_METHOD_MAP.get(
                         ft_methods.get(table_slug, "direct"), "direct"
@@ -555,7 +607,8 @@ def _chain_config(
                     "citation_rule": str(row.get("citation_rule") or ""),
                     "citation_page": str(row.get("citation_page") or ""),
                     "description_template": (
-                        f"{row.get('description') or table_slug}: x{{value}}"
+                        f"{_fit_label(prose, 500 - len(': x{value}'))}"
+                        f": x{{value}}"
                     ),
                 }
                 if table_slug in table_defaults:
@@ -629,6 +682,15 @@ def _gate_config(wb: ParsedWorkbook) -> dict[str, Any] | None:
     rows = _rows(wb.gates)
     if not rows:
         return None
+    # FCA S2 follow-up — gate literals persist typed against the bound
+    # input's declared data_type instead of as raw cell values, so a
+    # boolean rule stores true (not 'true') and strict equality hits
+    # without leaning on the runtime's loose-comparator widening.
+    input_types = {
+        str(r.get("name")): str(r.get("data_type"))
+        for r in _rows(wb.inputs)
+        if r.get("name") is not None and r.get("data_type") is not None
+    }
     rows = sorted(rows, key=lambda r: _num(r.get("order")))
     rules: list[dict[str, Any]] = []
     default_tier = "standard"
@@ -653,7 +715,11 @@ def _gate_config(wb: ParsedWorkbook) -> dict[str, Any] | None:
                 {
                     "variable": str(var),
                     "op": str(row.get(f"op{suffix}")),
-                    "value": _gate_value(row.get(f"op{suffix}"), row.get(f"value{suffix}")),
+                    "value": _gate_value(
+                        row.get(f"op{suffix}"),
+                        row.get(f"value{suffix}"),
+                        input_types.get(str(var)),
+                    ),
                 }
             )
         rule: dict[str, Any] = {
@@ -679,9 +745,59 @@ def _gate_config(wb: ParsedWorkbook) -> dict[str, Any] | None:
     }
 
 
-def _gate_value(op: Any, value: Any) -> Any:
+def _fit_label(text: str, limit: int) -> str:
+    """Cap free prose to a schema label field's max_length, ellipsized
+    at the tail so the readable head survives. FCA #7: refusing a
+    build over prose length — after the checker passed the workbook
+    clean — was a dead-end naming an internal stage id; the label
+    fields are display surfaces, so fitting is the honest move."""
+    if len(text) <= limit:
+        return text
+    return text[: limit - 1].rstrip() + "…"
+
+
+def _gate_value(op: Any, value: Any, data_type: str | None = None) -> Any:
     if str(op) in ("in", "nin"):
-        return [p.strip() for p in str(value).split(",") if p.strip()]
+        return [
+            _gate_scalar_typed(p.strip(), data_type)
+            for p in str(value).split(",")
+            if p.strip()
+        ]
+    return _gate_scalar_typed(value, data_type)
+
+
+def _gate_scalar_typed(value: Any, data_type: str | None) -> Any:
+    """One gates-sheet literal against the bound input's declared
+    data_type — the workbook twin of the app-save path's
+    coerceScalarTyped (appetiteSync.ts) and this file's
+    _predicate_scalar. Declared string/enum persists verbatim
+    (zero-padded class codes stay '09035'); declared number/currency
+    parses numeric text but keeps non-parsing entries as-is; declared
+    boolean maps the spec §2.1 literal spellings. Anything that can't
+    coerce falls back to the raw cell value — the runtime's loose
+    comparator owns that seam, and the check's R-171 warns when the
+    literal can never match at all. An unknown variable (R-044's to
+    refuse) passes through untouched."""
+    if data_type in ("string", "enum"):
+        if isinstance(value, (int, float)) and not isinstance(value, bool):
+            return str(value)
+        return value
+    if data_type in ("number", "currency"):
+        if isinstance(value, str):
+            try:
+                return int(value)
+            except ValueError:
+                try:
+                    parsed = float(value)
+                except ValueError:
+                    return value
+                return parsed if math.isfinite(parsed) else value
+        return value
+    if data_type == "boolean":
+        literal = value.strip().lower() if isinstance(value, str) else None
+        if literal in ("true", "false"):
+            return literal == "true"
+        return value
     return value
 
 

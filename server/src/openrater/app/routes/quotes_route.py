@@ -35,6 +35,7 @@ from openrater.errors import NotFoundError
 from openrater.persistence import Database
 from openrater.rates.api_keys import authorize_quote
 from openrater.rates.plans.repo import get_plan
+from openrater.rates.runs.repo import insert_run
 from openrater.rates.quotes import QuoteRequest, QuoteResponse, quote_plan
 from openrater.rates.quotes.ledger import record_owner_quote
 
@@ -60,6 +61,11 @@ def create_quote(
     body: QuoteRequest = Body(...),
     snapshot_id: str | None = Query(default=None),
     draft: bool = Query(default=False),
+    record: bool = Query(
+        default=True,
+        description="FCA #27 — write this quote into the plan's run "
+        "history (default). false = ephemeral (trace views).",
+    ),
     x_api_key: str | None = Header(default=None, alias="X-API-Key"),
 ) -> QuoteResponse:
     db = _resolve_db(request)
@@ -84,6 +90,45 @@ def create_quote(
         snapshot_id=snapshot_id,
         draft=draft,
     )
+    # FCA fca-2026-07-25 #27 (finding 83) — every quote is a RUN the
+    # app can show. Chat/API quotes never entered run history: the Run
+    # tab's LAST RUN read "Not run yet" about a quote the user just
+    # watched happen, and the review link landed on nothing. The write
+    # happens in the ROUTE after compute (quote_plan still writes
+    # nothing — D-A stands); its failure never fails the quote.
+    # `?record=false` keeps ephemeral reads (the drawer's row-Trace
+    # view, finding 16's phantom-run trap) out of history.
+    if record:
+        try:
+            run = insert_run(
+                db=db,
+                rating_plan_id=rating_plan_id,
+                kind="sample",
+                status="done",
+                as_of=response.as_of,
+                snapshot_id=response.version.snapshot_id,
+                plan_content_hash=response.version.content_hash,
+                book_content_hash=None,
+                scoring_fingerprint=None,
+                job_id=None,
+                request={"inputs": body.inputs, "source": "quote_api"},
+                result={
+                    "outputs": response.outputs,
+                    "views": {
+                        "premium": response.premium,
+                        "tier": response.tier,
+                    },
+                    "composed": response.composed,
+                    "trace": response.trace,
+                    "rowIssues": response.row_issues,
+                    "planIssues": response.plan_issues,
+                    "row_status": response.row_status,
+                    "as_of": response.as_of,
+                },
+            )
+            response = response.model_copy(update={"run_id": run.run_id})
+        except Exception:  # noqa: BLE001 — history must never fail a quote
+            pass
     # ADR-0058 — the passive quote ledger. Scheduled post-response: it never
     # slows the quote, its failure never fails the quote, and `quote_plan`
     # above still writes nothing (D-A stands for the compute path).

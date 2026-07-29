@@ -30,6 +30,7 @@ import type {
 } from "./autoMatch";
 import { normalizeIdent } from "./autoMatch";
 import { isRatioMapping } from "./ratioMapping";
+import { isTimesMapping } from "./timesMapping";
 
 export interface ApplyAutoMatchResult {
   /** The next mapping — input.id → source column name. */
@@ -54,7 +55,7 @@ export interface ApplyAutoMatchOptions {
    * Which candidates to apply.
    *   - "auto"          — only top candidates with bucket "auto" (default)
    *   - "auto+suggested" — apply top candidates with bucket "auto" or "suggested"
-   *   - "exact"         — ONLY the exact-identity pass (book intake:
+   *   - "exact"         — ONLY the exact-identity pass (book-intake §2:
    *     upload auto-applies normalized name-equality; fuzzy stays a
    *     suggestion for a person to confirm)
    */
@@ -82,13 +83,18 @@ export function applyAutoMatchToMapping(
   const claimedBy = new Map<string, string>();
 
   // Seed claimedBy with existing mappings so they're respected.
-  // Derived-ratio sentinels (Brief 45 K8) are user assertions, not
-  // real source columns — don't seed them into claimedBy (they'd be
-  // phantom claims on a column name no candidate can ever match). The
-  // input itself is still preserved via the `result[input.id]` guard
-  // in the loop below, so its ratio is never overwritten.
+  // Derived-ratio / scaled-column sentinels (Brief 45 K8 / FCA #23)
+  // are user assertions, not real source columns — don't seed them
+  // into claimedBy (they'd be phantom claims on a column name no
+  // candidate can ever match). The input itself is still preserved
+  // via the `result[input.id]` guard in the loop below, so its
+  // sentinel is never overwritten.
   for (const [inputId, columnName] of Object.entries(current)) {
-    if (columnName && !isRatioMapping(columnName)) {
+    if (
+      columnName &&
+      !isRatioMapping(columnName) &&
+      !isTimesMapping(columnName)
+    ) {
       claimedBy.set(columnName, inputId);
     }
   }
@@ -105,8 +111,8 @@ export function applyAutoMatchToMapping(
   // (id / name / displayName) normalize-equals a candidate column's name
   // CLAIM that column. Without this, a column like "class_code" — which
   // name-collides at confidence 1.0 with every input that merely shares a
-  // token (`construction_class`/`liab_class_group`/`risk_class` via "class",
-  // `quality_code` via "code"), because `tokenPrefixSimilarity` returns 1.0
+  // token (`construction_class`/`liab_class_group`/`ppc` via "class",
+  // `bceg_grade` via "code"), because `tokenPrefixSimilarity` returns 1.0
   // for a single shared token and value-match is skipped when the dim has
   // no levels — is grabbed by whichever such input iterates FIRST,
   // starving the input the column actually names. The exact match is the
@@ -142,7 +148,7 @@ export function applyAutoMatchToMapping(
 
   for (const input of requiredInputs) {
     // "exact" applies the identity pass alone — fuzzy candidates stay
-    // suggestions for a person to confirm (book intake).
+    // suggestions for a person to confirm (book-intake §2).
     if (mode === "exact") break;
     // Existing mapping wins — don't overwrite (incl. exact-pass claims).
     if (result[input.id]) continue;

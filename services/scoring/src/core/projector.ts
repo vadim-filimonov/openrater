@@ -4,14 +4,14 @@
  * `stagesToRuntimePlan` is the SAME pure module the Rate Lab canvas uses
  * (`@openrater/ui/InputsWorkspace/stagesToRuntimePlan`), so server-side
  * `plan_stages` scoring inherits the E13 projector completion (ADR-0044:
- * exposure÷divisor, filed-rate roundings, banded→lookup.range, dual-input→
+ * exposure÷divisor, ISO roundings, banded→lookup.range, dual-input→
  * lookup.multi, the plan tail) with zero forking.
  *
  * The module is value-pure (its only runtime import is `normalizePath`;
  * the React-adjacent imports are `import type`, and we relocated
  * `RequiredInputCategory` to a pure module so the projector's type graph
  * carries NO React `.tsx`). This is the documented interim deep-import
- * (via an @openrater/ui subpath export); ADR-0045 records full extraction into
+ * (via a labs-ui subpath export); ADR-0045 records full extraction into
  * a pure package as the clean follow-up.
  *
  * We mirror the projector's StageLike/FactorTableLike shapes locally and

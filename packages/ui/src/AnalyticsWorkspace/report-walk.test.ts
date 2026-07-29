@@ -356,7 +356,7 @@ describe("computeReferenceWalk (Brief 93 §1.1.3)", () => {
 });
 
 describe("report facts (Brief 93 §1.1.2)", () => {
-  //  — stepCount is THE public counting (the Rating tab's rows:
+  // MVP-013 — stepCount is THE public counting (the Rating tab's rows:
   // chain build-up steps + tail-adjustment rows), never the wire stage
   // count. One chain (base + 1 factor) + a round = 3 steps.
   const stages = [

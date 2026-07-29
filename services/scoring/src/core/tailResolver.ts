@@ -6,8 +6,8 @@
  * `makeIrpmAdjustmentResolver`; this module is the SAME construction
  * minus React. Literal + column sources need no I/O.
  *
- * The `{from:"model"}` arm is retired with the model registry: a tail
- * that still carries one refuses BY NAME
+ * Detachment Brief 1 §4 S1 — the `{from:"model"}` arm is retired with
+ * the Model Lab registry: a tail that still carries one refuses BY NAME
  * (`ServiceError` here → `composition_failed` at the caller), never a
  * silent identity factor (Law 2). Scores enter plans as typed inputs
  * and resolve through the `column` source.

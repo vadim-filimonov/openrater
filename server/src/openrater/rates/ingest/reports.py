@@ -59,6 +59,16 @@ class VectorsSummary(BaseModel):
     matched: int = 0
     near: int = 0
     mismatched: int = 0
+    #: FCA fca-2026-07-25 #19 — vector coverage stops at the filing's
+    #: own examples, so '25/25 all match' coexisted with a DEAD decline
+    #: rule (nothing demanded each authored gate rule be exercised at
+    #: least once, and two personas relied on the green badges). The
+    #: runner now reads the REAL engine traces (never a side
+    #: comparator) and counts which eligibility rules actually fired
+    #: across the case set; unexercised rules are named.
+    gate_rules_total: int = 0
+    gate_rules_exercised: int = 0
+    unexercised_gate_rules: list[str] = []
 
 
 def verification_verdict(vectors: VectorsSummary) -> str:

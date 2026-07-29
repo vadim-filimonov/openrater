@@ -1,8 +1,8 @@
 /**
  * Zod schemas for the plan snapshots endpoint group (Brief 43 §4).
  *
- * Mirrors the Pydantic models in
- * `server/src/openrater/rates/snapshots/models.py`. The `body` field is opaque to the
+ * Mirrors the Pydantic models in api-lab/backend's
+ * `rates/snapshots/models.py`. The `body` field is opaque to the
  * client layer — the Analytics workspace re-rates against it via
  * the existing runtime engine, never inspects it field-by-field.
  * Typing it strictly here would force a coordinated bump whenever

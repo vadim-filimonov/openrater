@@ -1,9 +1,11 @@
 /**
  * ClassRecord — the rich, UI-facing class-library shape.
  *
- * `ClassLibraryEntry` is the runtime-minimal slice used by
- * `input.class_exposure`; `ClassRecord` is the richer aggregate used by
- * the Classification section, ClassPicker, and ClassDetailPane.
+ * Per the M3.4 scoping doc (`docs/API_LAB_SCOPING_M3_4.md` Finding #2),
+ * the substrate today defines `ClassLibraryEntry` (the runtime-minimal
+ * slice used by `input.class_exposure`) but lacks the richer aggregate
+ * that the Classification section + ClassPicker + ClassDetailPane
+ * primitives need. This file adds that shape.
  *
  * ## Two-tier design
  *
@@ -17,12 +19,19 @@
  *     ClassPicker uses the subset that fits the picker option shape.
  *
  *   · An adapter (`classRecordToLibraryEntry`) projects the rich
- *     shape down to the runtime shape, so the API Lab `class_codes`
- *     table feeds both consumers from one source of truth.
+ *     shape down to the runtime shape, so a single source of truth
+ *     (the API Lab `class_codes` table, slice 3) feeds both consumers.
  *
- * The backend's `class_codes` table is plan-scoped and filing-defined;
- * `GET /api/v1/class-codes` returns its rows in this shape. Fixture mode
- * uses the same wire contract for deterministic tests.
+ * ## Where this lives at runtime
+ *
+ * Pre-slice-3 (today): no backend endpoint exists. The
+ * `@openrater/api-client` fixture-mode bridge (M4.0) lets section editors
+ * register a static fixture for `GET /api/v1/class-codes` that returns
+ * an array of `ClassRecord`.
+ *
+ * Post-slice-3: the backend's `class_codes` table holds the 440 ISO
+ * BOP classes; `GET /api/v1/class-codes` reads from it. The wire shape
+ * matches `ClassRecord` 1:1.
  *
  * Pure types + a small adapter. No React, no DOM.
  */
@@ -38,10 +47,10 @@ import type { ClassLibraryEntry } from "./class-library-types";
  * is denormalized for fast UI display + filter.
  */
 export interface ClassRecord {
-  /** The filing-defined class code (e.g., fictional "c101"). */
+  /** The class code (e.g., "73912"). Stable identifier. */
   readonly class_code: string;
 
-  /** Display name shown in lists and detail views. */
+  /** Display name shown in lists + detail (e.g., "Bowling Centers"). */
   readonly display_name: string;
 
   /** Industry family / category (e.g., "Recreation",
@@ -49,7 +58,7 @@ export interface ClassRecord {
    *  in ClassBrowser. */
   readonly family: string;
 
-  /** Optional long-form description from the filed manual.
+  /** Optional long-form description from the ISO manual.
    *  Rendered in ClassDetailPane. */
   readonly description?: string;
 
@@ -81,13 +90,13 @@ export interface ClassRecord {
    *  different keys with no schema change. May be empty. */
   readonly attributes?: Readonly<Record<string, string>>;
 
-  /** Whether this row came from a filed library (legacy value "iso") or the
-   *  carrier authored it ("custom"). This drives the "Custom" badge.
+  /** Whether this row came from a filed library ("iso") or the carrier
+   *  authored it ("custom"). Brief 8 Q3 — drives the "Custom" badge.
    *  Treated as "custom" when absent (anything hand- or bulk-entered). */
   readonly source?: "iso" | "custom";
 
-  /** The manual rule and page this class was filed under.
-   *  Read-only for filed-library rows; editable for custom classes. */
+  /** Provenance (P-N4) — the manual rule + page this class was filed
+   *  under. Read-only for ISO; editable for custom classes. */
   readonly citation_rule?: string;
   readonly citation_page?: string;
 

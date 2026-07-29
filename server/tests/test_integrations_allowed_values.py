@@ -21,10 +21,9 @@ from openrater.integrations.service import _allowed_values_by_input
 
 
 def _body() -> dict:
-    """A miniature of the Meridian BOP shape: one chain binding four dims to
-    form inputs; tables keyed on them; a substrate that names the
-    fictional quality-grade levels directly, names construction's under an
-    opaque dim id, bands
+    """A miniature of the ISO BOP shape: one chain binding four dims to
+    form inputs; tables keyed on them; a substrate that names ppc's
+    levels directly, names construction's under an opaque dim id, bands
     building_limit, and marks zip geographic."""
     return {
         "stages": [
@@ -35,12 +34,9 @@ def _body() -> dict:
                         {
                             "factor_lookups": [
                                 {
-                                    "table": "quality_grade_rel",
+                                    "table": "ppc_rel",
                                     "dimensions": {
-                                        "quality_grade": {
-                                            "path": "quality_grade",
-                                            "source": "form_input",
-                                        },
+                                        "ppc": {"path": "ppc", "source": "form_input"},
                                     },
                                 },
                                 {
@@ -70,9 +66,9 @@ def _body() -> dict:
         ],
         "factor_tables": [
             {
-                "table_id": "quality_grade_rel",
-                "key_dimensions": ["quality_grade"],
-                "cells": {"q1": 1.0, "q2": 1.05, "q10": 1.34},
+                "table_id": "ppc_rel",
+                "key_dimensions": ["ppc"],
+                "cells": {"ppc_1": 1.0, "ppc_2": 1.05, "ppc_10": 1.34},
             },
             {
                 "table_id": "construction_rel",
@@ -87,12 +83,12 @@ def _body() -> dict:
         ],
         "dimensions": [
             {
-                "dim_id": "quality_grade",
+                "dim_id": "ppc",
                 "dimension_type": "standard",
                 "levels": [
-                    {"id": "q1", "kind": "categorical", "label": "Quality grade 1"},
-                    {"id": "q2", "kind": "categorical", "label": "Quality grade 2"},
-                    {"id": "q10", "kind": "categorical", "label": "Quality grade 10"},
+                    {"id": "ppc_1", "kind": "categorical", "label": "PPC 1"},
+                    {"id": "ppc_2", "kind": "categorical", "label": "PPC 2"},
+                    {"id": "ppc_10", "kind": "categorical", "label": "PPC 10"},
                 ],
             },
             {
@@ -124,10 +120,10 @@ def _body() -> dict:
 def test_enumerable_dims_yield_values_with_labels() -> None:
     allowed = _allowed_values_by_input(_body())
 
-    quality_grade = allowed["quality_grade"]
-    # Natural order: q2 before q10.
-    assert [a.value for a in quality_grade] == ["q1", "q2", "q10"]
-    assert quality_grade[0].label == "Quality grade 1"
+    ppc = allowed["ppc"]
+    # Natural order: ppc_2 before ppc_10.
+    assert [a.value for a in ppc] == ["ppc_1", "ppc_2", "ppc_10"]
+    assert ppc[0].label == "PPC 1"
 
     construction = allowed["construction_class"]
     assert {a.value: a.label for a in construction} == {
@@ -144,6 +140,6 @@ def test_banded_and_geographic_stay_free_form() -> None:
 
 def test_cap_keeps_huge_domains_free_form() -> None:
     body = _body()
-    body["factor_tables"][0]["cells"] = {f"q{i}": 1.0 for i in range(1, 200)}
+    body["factor_tables"][0]["cells"] = {f"ppc_{i}": 1.0 for i in range(1, 200)}
     allowed = _allowed_values_by_input(body)
-    assert "quality_grade" not in allowed
+    assert "ppc" not in allowed

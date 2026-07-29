@@ -39,7 +39,7 @@ def make_factor_table(
     table_id: str = "class_factor",
     display_name: str = "Class factor table",
     slug: str | None = None,
-    description: str | None = "Meridian BOP class-code → factor",
+    description: str | None = "ISO BOP class-code → factor",
     key_dimensions: list[str] | None = None,
     cells: dict[str, float] | None = None,
     **overrides: Any,

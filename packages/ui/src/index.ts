@@ -1,5 +1,5 @@
 /**
- * @openrater/ui — OpenRater UI components.
+ * @openrater/ui — Labs-specific components.
  *
  * The layer above @openrater/design-system that knows about insurance
  * rating concepts. Composes against @openrater/contracts for types and
@@ -226,7 +226,7 @@ export type {
 // The <DimensionsTable> render was deleted (dead since the v2 BuildUpSheet
 // / ParametrizeCanvas cutover — no JSX mount). `DimensionRow` outlived the
 // table: re-homed to DimensionsTable/types.ts, still the canonical
-// dimension row shape consumed across @openrater/ui and the app. The directory
+// dimension row shape consumed across labs-ui + rate-lab. The directory
 // barrel below keeps the import path stable. `DimensionsTableProps` (the
 // dead component's props) went with the component.
 export type { DimensionRow } from "./DimensionsTable";
@@ -494,7 +494,8 @@ export type {
 // The consistent chrome every Brief 24 workspace inherits: header
 // strip on top + ~268px tool pane on the left + content area on the
 // right. The tool pane is the *authoring* surface; the content area
-// is the *browsing* / canvas surface.
+// is the *browsing* / canvas surface. Per
+// docs/design-briefs/24f-workspace-shell.md.
 export { WorkspaceShell } from "./WorkspaceShell";
 export { WorkspaceToolPane } from "./WorkspaceShell";
 export type {
@@ -504,34 +505,40 @@ export type {
   WorkspaceToolPaneButtonProps,
 } from "./WorkspaceShell";
 
-// ── WorkspaceFrame (canonical 3-column geometry) ─
+// ── Polish PR 6 — WorkspaceFrame (canonical 3-column geometry) ─
 //
-// The shared shell locks rail=240, stage=1fr,
+// The audit-prescribed shell that locks rail=240, stage=1fr,
 // inspector=320, gap=0, no border/radius on the root. Supersedes
 // the per-workspace bespoke grids (Dimensions/Gate/Parametrize/
-// Assemble) that disagreed on column widths.
+// Assemble) that pixel-disagreed on column widths. See
+// docs/design/UI_AUDIT.md §I.
 export { WorkspaceFrame } from "./WorkspaceFrame";
 export type { WorkspaceFrameProps } from "./WorkspaceFrame";
 
 // ── 24.F2 — WorkspaceTabs (primary top-tab nav) ──────────────
 //
-// Horizontal workspace tabs for Inputs, Dimensions, Parametrize,
-// Gate, Assemble, and Verify. URL persistence happens at the route
-// layer; this primitive is pure presentation.
+// Replaces the 24.B left rail with a horizontal tab strip. Each tab
+// is a Brief-24-v3 workspace (Inputs / Dimensions / Parametrize /
+// Gate / Assemble / Verify). URL persistence happens at the route
+// layer; the primitive is pure presentation.
 export { WorkspaceTabs } from "./WorkspaceTabs";
 export type {
   WorkspaceTabsProps,
   WorkspaceTabSpec,
 } from "./WorkspaceTabs";
 
-// ── Algorithm projection substrate ─────
+// ── Brief 70 §2 — the Algorithm substrate (post-cutover) ─────
 //
-// <BuildUpSheet> is the Algorithm surface. These exports provide the
-// projection substrate used by autosave and the sheet.
+// The Brief 25/35/48 spatial canvas (CalculationTower, CalcNode,
+// the inventory rail, drop validation, TowerTabBar, TotalTowerCard,
+// the ribbon, the build-up gutter, node selection) was DELETED with
+// Brief 70 lock D2 — <BuildUpSheet> is the Algorithm surface. What
+// remains is the projection substrate both directions of the
+// autosave machinery and the sheet are built on.
 export {
   stagesToTowerPlan,
   towerPlanToStages,
-  // Shared public counting of the algorithm (chains and steps).
+  // MVP-013 — the ONE public counting of the algorithm (chains · steps).
   countPublicAlgorithm,
   countTowerPlanSteps,
   SHEET_TAIL_STAGE_KINDS,
@@ -838,7 +845,7 @@ export type { ChipInputProps } from "./ChipInput";
 // ── 26.P1 — LevelMappingRow (Brief 26 PR #6) ───────────────────
 //
 // Kind-aware per-level row: chip-cloud aliases for categorical
-// levels ("Meridian Cafe" → c102); lo/hi numeric inputs for banded
+// levels ("Restaurant" → 71641); lo/hi numeric inputs for banded
 // levels; read-only territory_ref for geographic. Pure controlled
 // component — consumed by future polish of the categorical drawer
 // (Brief 26 §16 PR 7) and the banded drawer's band table.
@@ -1415,10 +1422,17 @@ export type {
   PayloadSchemaField,
 } from "./InputsWorkspace";
 
-// ── InputsWorkspace helpers ────────────
+// ── Brief 38 PR 38.8 — InputsWorkspace orchestrator ────────────
 //
-// Shared substrate types and pure helpers used by InputsPanelV2 and
-// DictionaryTable.
+// The closure: composes all 6 prior PR primitives into a single
+// workspace primitive. Consumes a Plan + RequiredInputs +
+// Dimensions + the current PlanInputMapping; emits mapping
+// mutations through onMappingChange. Optional multi-product tab
+// support via productMode. Closes Brief 38 — cold-test rubric
+// at docs/cold-tests/brief-38-inputs-workspace.md.
+// (the v1 InputsWorkspace orchestrator COMPONENT + Brief 61 <InputTable>
+//  were deleted in the v2 cutover — InputsPanelV2 + DictionaryTable
+//  replace them; these are the shared substrate types + pure helpers)
 export {
   deriveBasicRequiredInputs,
   emptyPlanInputMapping,
@@ -1512,7 +1526,7 @@ export type {
 // auto-attaches when its trigger matches the input). Three effect
 // kinds per Brief 39 §−1 Q4 lock: factor (multiply premium),
 // additive (flat $ amount), sublimit (cap coverage). Form number
-// is free-text + suggested Meridian BOP fixtures dropdown (Q9 lock).
+// is free-text + suggested ISO BOP fixtures dropdown (Q9 lock).
 // Trigger uses single-condition v1 mirroring the substrate's
 // EndorsementTrigger shape (PR 39.1). Reuses the hard-mismatch
 // banner pattern when trigger references unmapped input fields
@@ -1768,12 +1782,12 @@ export type {
 } from "./BookCostGuardrail";
 export { PolicyLineChip } from "./PolicyLineChip";
 export type { PolicyLineChipProps } from "./PolicyLineChip";
-// current Exhibits design — <PolicyComposer> left with its only
+// Brief: portfolio-redesign v2 §6 — <PolicyComposer> left with its only
 // consumer (/portfolio/compose); the composePolicy ENGINE lives on in
 // @openrater/contracts.
 
 // Brief 65 §2/§3 — the Model Lab producer surface is now the Modeling Studio
-// (<ModelStudioApp> + the @openrater/ui Studio components above). The legacy v1
+// (<ModelStudioApp> + the labs-ui Studio components above). The legacy v1
 // registry surface (<ModelLabSurface> + <ShadowRatingDialog> + <ModelAuditTimeline>,
 // Brief 62.5) was superseded by the Studio and deleted (CLAUDE.md pref #8).
 
@@ -1806,7 +1820,7 @@ export {
   resolveInputDisplayName,
   DATA_TYPE_GROUPS,
   SOURCE_OPTIONS,
-  // Durable input-dictionary bulk-add queue.
+  // Brief 58 Pillar C — durable input-dict bulk-add queue.
   enqueuePendingDeclarations,
   peekPendingDeclarations,
   dequeuePendingDeclaration,
@@ -1814,12 +1828,13 @@ export {
   drainPendingDeclarations,
 } from "./InputDictionary";
 
-// Shared absolute-date rendering (ISO, with time when it matters).
+// MVP-019 — the one absolute date rendering (ISO; time when it matters).
 export { isoDate, isoDateTime } from "./format/dates";
-// Shared title-caser acronym allowlist (BPP, BOP, ILF, LCM).
+// MVP-017 — the title-caser's acronym allowlist (BPP, BOP, ILF, LCM).
 export { fixAcronymCase } from "./format/acronyms";
 
-// Live plan chrome: header and derived-status chip.
+// V2_INTERFACE_SPEC §2.1 — the live plan chrome (header + the Brief 84
+// derived-status chip). Re-homed from tower-v2/ at the Brief 70 cutover.
 export { PlanHeader, PlanStatusChip } from "./PlanShell";
 export type {
   PlanHeaderProps,
@@ -1827,11 +1842,20 @@ export type {
   PlanStatusChipProps,
 } from "./PlanShell";
 
-// Test tab for rating one sample risk.
+// V2_INTERFACE_SPEC §2.4 — the Test tab (rate one sample risk).
 export {
   RunSection,
   deriveRunView,
   formatRunPremium,
+  // FCA #10 — declared-dictionary field list + typed payload builder,
+  // plus the Ship try-it's wire sample and the shared seed rule.
+  deriveRunFields,
+  buildSampleRisk,
+  buildWireSampleInputs,
+  declaredRowKeys,
+  overlayVerifiedCase,
+  // FCA #14 (display half) — parts-don't-sum reconciliation line.
+  roundingReconciliationCaveat,
 } from "./RunSection";
 export type {
   RunSectionProps,
@@ -1839,9 +1863,10 @@ export type {
   RunOutput,
   RunView,
   DerivedRunView,
+  DeriveRunFieldsArgs,
 } from "./RunSection";
 
-// Plan landing section.
+// V2_INTERFACE_SPEC §2.3 — the plan's landing section.
 export { OverviewSection } from "./OverviewSection";
 export type {
   OverviewSectionProps,
@@ -1849,17 +1874,30 @@ export type {
   OverviewVersionRow,
   OverviewLastTest,
 } from "./OverviewSection";
+// FCA #11 — verification honesty on the landing surface (checklist
+// row + health-pill qualifier for mismatched builds).
+export {
+  verificationChecklistItem,
+  verificationHealthOverride,
+} from "./OverviewSection";
+export type { VerificationVectorsLike } from "./OverviewSection";
 
-// First-landing block for an empty plan, consumed by InputsPanelV2.
+// Brief 89 §2.1 (R2–R4) — the two-door first-landing block for a
+// fully-empty plan. Consumed by InputsPanelV2's genesis mode.
 export { PlanGenesis } from "./PlanGenesis";
 export type { PlanGenesisProps } from "./PlanGenesis";
 
+// Interface Guide v2 — station S2: the rebuilt Inputs body.
 // `policyHeadlinePremium` is the policy list's displayed-premium rule
-// (composed post-tail final or rolled subtotal).
+// (composed post-tail final ?? rolled subtotal) — exported so the
+// cold-test fixture gate asserts the DISPLAYED oracle headline.
 export { InputsPanelV2, policyHeadlinePremium } from "./inputs-v2";
 export type { InputsPanelV2Props } from "./inputs-v2";
 
-// Book rerating helpers used by Exhibits.
+// ── Brief: portfolio-redesign v2 §6 — the book-of-record component
+// family (Book/Map/Trends acts, KPI authoring, Save to Portfolio) left
+// with its substrate. `portfolio/rerate.ts` survives: it is the book
+// re-rate math the Exhibit's book mode (P3) reuses. ──
 export {
   portfolioBookToPolicyRows,
   policyFinalPremium,
@@ -1871,7 +1909,12 @@ export type {
   PolicyBookDislocationOptions,
 } from "./portfolio/rerate";
 
-// In-row table editor: 1-D and 2-D grids at
+// Brief 82 (D-A) — the Brief 78 Rating workspace panes (RatingRail +
+// RatingTableInspector) are DELETED: the tab is one column; the
+// catalog is a summoned menu and the editor opens in place. Standing
+// rule 8 — no dead exports left behind.
+
+// Brief 82 R2 (D-B) — the in-row table editor: 1-D and 2-D grids at
 // content width, inside the expanded step row.
 export { RatingInlineGrid } from "./RatingInlineGrid";
 export type {
@@ -1881,7 +1924,7 @@ export type {
 
 export const PACKAGE_NAME = "@openrater/ui" as const;
 
-// Policy-book config extraction (one premium, one
+// P2 G4 (ADR-0056) — policy-book config extraction (one premium, one
 // code path: the scoring service + the route compose through THIS).
 export {
   policyBookConfigFromPlan,
@@ -1891,7 +1934,7 @@ export {
   appendPlanFloor,
   PLAN_MIN_PREMIUM_STEP_ID,
   POLICY_LOCATION_COUNT,
-  // Shared plan-total resolver and named
+  // Brief 80 (finding E7) — the one plan-total resolver + the named
   // composition issues.
   planTotalOutputField,
   collectCompositionIssues,
@@ -1907,9 +1950,10 @@ export type {
   PremiumStageLike,
 } from "./AnalyticsWorkspace/premium-resolution";
 
-// ── Data Lab Browse ─────────────
+// ── Brief 86 P1 — Data Lab Browse (the reading room) ─────────────
 
-// WorkbookBuild powers the /rate-lab/new flow and shared build report.
+// WorkbookBuild — Brief 92 (build a plan from a transcription workbook:
+// the /rate-lab/new door's flow + the shared build-report view).
 export {
   WorkbookBuildPanel,
   BuildReportView,
@@ -1918,6 +1962,8 @@ export {
   groupIssuesBySheet,
   manifestTiles,
   vectorsVerdictLine,
+  // FCA #19 — one verification-verdict vocabulary, three surfaces.
+  vectorChecksSummary,
 } from "./WorkbookBuild";
 export type {
   WorkbookBuildPanelProps,

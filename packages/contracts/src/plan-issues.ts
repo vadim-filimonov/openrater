@@ -91,7 +91,22 @@ export type RowIssueCode =
   | "composition_failed"
   // Brief 95 C4 — an explicit 0 exposure on a coverage the plan does
   // NOT mark electable (zero is not an elect-out; §12.4).
-  | "zero_exposure_required";
+  | "zero_exposure_required"
+  // FCA fca-2026-07-25 #15 — a supplied value outside the input's
+  // DECLARED validation (min/max bounds, allowed_values). The row
+  // still prices (garbage-in is the caller's right); the warning is
+  // the plausibility signal the audit found missing everywhere: a
+  // $1.28B payroll and a model-year '26' both priced silently while
+  // the bounds mechanism sat unread.
+  | "implausible_input"
+  // ADR-0025 / FCA #21 — a composite dim's member axis resolved to no
+  // level, so the joined key can't be built; names the MEMBER so the
+  // refusal cites the culprit, not the downstream lookup's unknown-key.
+  | "composite_member_unresolved"
+  // FCA #23 — a bare-percentage schedule application on a multi-
+  // category schedule can't be attributed; the neutral outcome is
+  // DISCLOSED (the audited book lost six rows' filed IRPM silently).
+  | "schedule_application_unattributable";
 
 /**
  * A plan-shaped issue from projection/compile — exists before any row
@@ -237,11 +252,17 @@ export function resolveLookupMiss(
     throw new RowIssueError({
       severity: "error",
       code: absent ? "missing_input" : "unknown_key",
-      // An unknown key points home: the alias
+      // Book-intake §4 — an unknown KEY points home: the alias
       // vocabulary lives in Inputs → Match columns. (A missing input
-      // is a different disease; it keeps the plain sentence.)
+      // is a different disease; it names the absent FIELD — FCA #17:
+      // the old scaffold read 'no key (input missing) not found in
+      // `X`', garbled English that never said which field to supply.)
       message: absent
-        ? `Cannot rate: ${label} not found${table}.`
+        ? `Cannot rate: ${
+            ctx.keySource ? `\`${ctx.keySource}\` was` : "an input was"
+          } not supplied, so ${
+            ctx.tableName ? `\`${ctx.tableName}\`` : "a lookup"
+          } has no key.`
         : `Cannot rate: ${label} not found${table}. If your data uses ` +
           `different codes, translate them in Inputs → Match columns.`,
       detail: {

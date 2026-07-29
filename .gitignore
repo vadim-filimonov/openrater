@@ -12,30 +12,16 @@ coverage/
 
 # Local state
 .env
-.env.*
-!.env.example
-!**/.env.example
+.env.local
 *.db
 *.db-journal
 *.sqlite3
 .DS_Store
 
-# Local agent and editor state
-.claude/
-
 # Tooling
 .vite/
-.pytest_cache/
-.ruff_cache/
-.mypy_cache/
 playwright-report/
 test-results/
-
-# Signing credentials and private keys
-*.p12
-*.pfx
-*.pem
-*.key
 
 # Desktop packaging build output (packaging/desktop/build-*.sh)
 packaging/desktop/dist/

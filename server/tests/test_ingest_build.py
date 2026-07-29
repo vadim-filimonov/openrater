@@ -308,7 +308,7 @@ def test_build_persists_in_trigger_with_real_semantics(
     ws = wb.create_sheet("endorsements")
     ws.append(["endorsement_id", "kind", "form_number", "display_name",
                "factor", "amount", "coverage", "sublimit", "trigger"])
-    ws.append(["frame_surcharge", "factor", "MS 20 01", "Frame surcharge",
+    ws.append(["frame_surcharge", "factor", "BP 04 99", "Frame surcharge",
                1.10, "", "", "",
                "form_input.construction_class in [frame, fire_resistive]"])
     outcome = build_workbook(db=tmp_db, data=to_bytes(wb), filename="mini.xlsx")
@@ -418,7 +418,7 @@ MERIDIAN = (
 def test_meridian_all_constructs_builds_and_all_vectors_match(
     tmp_db: Database,
 ) -> None:
-    """The all-constructs golden: exposure towers (the engine's
+    """92.5 — the all-constructs golden: exposure towers (the engine's
     own tower rounding), the 2-D matrix, geo ZIP→territory resolution,
     per-tip endorsements (the shared-node fix), loadings, the
     per-coverage clamp, and the composition-seam package floor — all
@@ -449,7 +449,7 @@ def build_binding_forms() -> Workbook:
     plan sheet's value, cited per block), and an lcm bound
     `literal:<n>` — every form R-127 admits beyond `form_input.*`.
     Expected premiums are hand-computed filed math, pinned engine-side
-    by @openrater/ui `literalBindingForms.test.ts` with the same numbers."""
+    by labs-ui `literalBindingForms.test.ts` with the same numbers."""
     wb = Workbook()
     ws = wb.active
     ws.title = "plan"
@@ -579,6 +579,63 @@ def test_binding_forms_resolve_at_build(
     assert outcome.report.vectors.total_cases == 2
 
 
+def test_long_chain_description_builds_and_caps_the_label(
+    tmp_db: Database, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """FCA fca-2026-07-25 #7 (S0): a spec-clean workbook whose
+    chains-sheet free-prose `description` exceeded the internal
+    120-char label cap was REFUSED at build — AFTER validate_workbook
+    passed it with zero errors — and the refusal named an internal
+    stage id, not a cell. The spec declares no length limit on
+    description, so the builder must FIT the prose into its capped
+    label fields (full prose survives in the citation-bearing
+    columns), never refuse valid input its own checker blessed."""
+    wb = build_binding_forms()
+    # Re-emit the chains sheet with the optional `description` column,
+    # one lookup row carrying filed-manual prose far past every cap.
+    long_desc = (
+        "Class rate per $100 of gross receipts for premises and "
+        "operations liability, taken from the filed manual's premises "
+        "and operations rate pages and applied per classification, "
+        "territory, and policy aggregate limit exactly as filed. "
+    ) * 3
+    assert len(long_desc) > 500
+    rows = list(wb["chains"].values)
+    wb.remove(wb["chains"])
+    ws = wb.create_sheet("chains")
+    ws.append(list(rows[0]) + ["description"])
+    for r in rows[1:]:
+        desc = long_desc if r[2] == "lookup.direct" else None
+        ws.append(list(r) + [desc])
+
+    monkeypatch.setattr(
+        "openrater.rates.ingest.vectors.score_once",
+        _fake_score({"building_premium": 13.0}),
+    )
+    outcome = build_workbook(
+        db=tmp_db, data=to_bytes(wb), filename="long-desc.xlsx"
+    )
+
+    conn = tmp_db.connection()
+    chain_cfg = conn.execute(
+        "SELECT config_json FROM rating_plan_stages WHERE rating_plan_id = ? "
+        "AND stage_kind = 'multiplicative_chain'",
+        (outcome.rating_plan_id,),
+    ).fetchone()
+    conn.close()
+    chains = json.loads(chain_cfg["config_json"])["chains"]
+    lookups = [lk for c in chains for lk in c["factor_lookups"]]
+    assert lookups, "the lookup rows must survive the build"
+    for lk in lookups:
+        # The label fits its cap and keeps the prose's head readable.
+        assert len(lk["name"]) <= 120
+        assert lk["name"].startswith("Class rate per $100")
+        # The description template respects ITS cap too (500) and the
+        # renderer's substitution slot survives at the end.
+        assert len(lk["description_template"]) <= 500
+        assert lk["description_template"].endswith(": x{value}")
+
+
 @pytest.mark.skipif(
     os.environ.get("RATER_INGEST_LIVE_SCORING") != "1",
     reason="needs a running scoring service (set RATER_INGEST_LIVE_SCORING=1)",
@@ -608,10 +665,11 @@ def test_binding_forms_vectors_match_live(tmp_db: Database) -> None:
     reason="set RATER_ACCEPTANCE_WORKBOOK=/path/to/workbook.xlsx (needs live scoring)",
 )
 def test_acceptance_workbook_hands_off(tmp_db: Database) -> None:
-    """Optionally ingest any local spec-v1.0 workbook and print the full
-    vector table. The workbook is read by path and never enters the
-    repository. Mismatches, unavailable scoring, and error-status checks
-    all fail visibly."""
+    """The local-only acceptance gate (92.5): ingest ANY spec-v1.0
+    workbook hands-off and print the full vector table. Used for the
+    owner's private ISO run — the workbook never enters the repo; this
+    test only knows a path. Mismatches print loudly; scoring being
+    down fails; 'error'-status checks fail."""
     path = Path(os.environ["RATER_ACCEPTANCE_WORKBOOK"])
     outcome = build_workbook(db=tmp_db, data=path.read_bytes(), filename=path.name)
     v = outcome.report.vectors
@@ -629,8 +687,10 @@ def test_acceptance_workbook_hands_off(tmp_db: Database) -> None:
 
 
 def test_ingest_sources_carry_no_program_literals() -> None:
-    """The ingest pipeline contains no program-specific knowledge;
-    every program-shaped value must arrive as workbook data."""
+    """The genericity guard, backend edition (owner directive: 'will
+    running 92.5 with the ISO plan not permanently code ISO into the
+    framework?'). The ingest pipeline must contain no ISO/program
+    knowledge — everything program-shaped arrives as workbook DATA."""
     import re
 
     root = Path(__file__).resolve().parents[1] / "src" / "openrater" / "rates" / "ingest"
@@ -652,8 +712,8 @@ def test_ingest_sources_carry_no_program_literals() -> None:
 def test_template_is_alive_build_side(
     tmp_db: Database, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    """The packaged starter-kit template builds a real plan and its
-    spec-§9 vector verifies ($390.00)."""
+    """Brief 94 CT-2, build half: the packaged starter-kit template
+    builds a real plan and its spec-§9 vector verifies ($390.00)."""
     from importlib import resources
 
     monkeypatch.setattr(
@@ -675,7 +735,8 @@ def test_template_is_alive_build_side(
 
 
 # ---------------------------------------------------------------------------
-# Gate-default citation, envelope verdict, and single-parse guarantees.
+# Brief 94.5 hardening — T5 gate-default citation · T6 envelope verdict ·
+# T7 single parse.
 # ---------------------------------------------------------------------------
 
 def _add_gates_with_cited_default(wb) -> None:  # noqa: ANN001 — Workbook
@@ -695,7 +756,7 @@ def _add_gates_with_cited_default(wb) -> None:  # noqa: ANN001 — Workbook
 def test_gate_default_citation_lands_in_config(
     tmp_db: Database, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    """The filed `__default__` row's citation was
+    """Brief 94.5 (T5): the filed `__default__` row's citation was
     silently dropped (construct-audit gap 7); it now lands in the gate
     config's `default_citation` — typed, additive."""
     monkeypatch.setattr(
@@ -719,8 +780,66 @@ def test_gate_default_citation_lands_in_config(
     assert cfg["rules"][0]["citation"] == "Rule 6.A"
 
 
+def test_gate_literals_persist_typed_against_declared_inputs(
+    tmp_db: Database, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """FCA S2 follow-up: gate literals coerce against the bound input's
+    declared data_type at build time (the workbook twin of the app-save
+    path's coerceScalarTyped) — a text 'false' on a boolean input
+    persists as JSON false, numeric text on a number input parses,
+    zero-padded class codes stay verbatim strings, and a numeric cell
+    bound to a string input persists as its text form. Unparseable
+    literals fall back to the raw cell value untouched."""
+    monkeypatch.setattr(
+        "openrater.rates.ingest.vectors.score_once",
+        _fake_score({"building_premium": 390.0}, tier="standard"),
+    )
+    wb = build_mini()
+    ws = wb["inputs"]
+    ws.append(["sprinklered", "Sprinklered", "boolean", False, "", "", ""])
+    ws.append(["class_code", "Class code", "string", False, "", "", ""])
+    ws = wb.create_sheet("gates")
+    ws.append(["order", "rule_id", "variable", "op", "value",
+               "variable_2", "op_2", "value_2",
+               "variable_3", "op_3", "value_3",
+               "tier", "reasoning", "citation_rule", "citation_page"])
+    ws.append([1, "no_sprinkler", "sprinklered", "eq", "false",
+               "", "", "", "", "", "",
+               "decline", "Unsprinklered declines.", "Rule 1", "p.1"])
+    ws.append([2, "restricted_classes", "class_code", "in", "09035, 60989",
+               "", "", "", "", "", "",
+               "submit", "Restricted classes refer.", "Rule 2", "p.2"])
+    ws.append([3, "old_building", "building_age", "ge", "40",
+               "", "", "", "", "", "",
+               "submit", "Old buildings refer.", "Rule 3", "p.3"])
+    ws.append([4, "code_eq", "class_code", "eq", 60989,
+               "", "", "", "", "", "",
+               "submit", "Direct-code referral.", "Rule 4", "p.4"])
+    ws.append([5, "odd_ratio", "building_age", "eq", "n/a",
+               "", "", "", "", "", "",
+               "submit", "Unknown age refers.", "Rule 5", "p.5"])
+    ws.append([99, "__default__", "", "", "", "", "", "", "", "", "",
+               "standard", "Everything else standard.", "", ""])
+    outcome = build_workbook(db=tmp_db, data=to_bytes(wb), filename="mini.xlsx")
+
+    conn = tmp_db.connection()
+    row = conn.execute(
+        "SELECT config_json FROM rating_plan_stages WHERE rating_plan_id = ? "
+        "AND stage_kind = 'eligibility.gate'",
+        (outcome.rating_plan_id,),
+    ).fetchone()
+    conn.close()
+    assert row is not None
+    rules = {r["rule_id"]: r for r in json.loads(row["config_json"])["rules"]}
+    assert rules["no_sprinkler"]["value"] is False
+    assert rules["restricted_classes"]["value"] == ["09035", "60989"]
+    assert rules["old_building"]["value"] == 40
+    assert rules["code_eq"]["value"] == "60989"
+    assert rules["odd_ratio"]["value"] == "n/a"
+
+
 def test_verification_verdict_mapping() -> None:
-    """The envelope verdict reports each of its five states."""
+    """Brief 94.5 (T6): the envelope verdict's five states."""
     from openrater.rates.ingest.reports import VectorsSummary, verification_verdict
 
     ran = {"status": "ran", "total_cases": 2}
@@ -751,7 +870,7 @@ def test_build_response_carries_verification(
 def test_build_parses_the_bytes_once(
     tmp_db: Database, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    """The check's parsed model is the build's input —
+    """Brief 94.5 (T7): the check's parsed model IS the build's input —
     the bytes were previously parsed twice per build."""
     from openrater.rates.ingest import service as ingest_service
 
@@ -774,7 +893,7 @@ def test_build_parses_the_bytes_once(
 def test_personal_lines_product_builds_end_to_end(
     tmp_db: Database, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    """`homeowners` is a first-class product
+    """Brief 94.6 (owner-gated): `homeowners` is a first-class product
     code — the check accepts it (R-028), the builder maps it, and the
     INSERT passes migration 048's widened CHECK."""
     monkeypatch.setattr(
@@ -843,7 +962,7 @@ def test_build_stores_workbook_bytes_and_version(
 def test_workbook_export_round_trips_hash_identical(
     monkeypatch: pytest.MonkeyPatch, client  # noqa: ANN001
 ) -> None:
-    """The canonical workbook container comes back out:
+    """MVP-023 (owner O1) — the canonical container comes back out:
     GET /workbook serves the EXACT ingested bytes with the recorded
     hash, and re-ingesting the download answers already_built (the
     round-trip honesty test). A plan with no stored workbook 404s
@@ -1179,3 +1298,179 @@ def test_geo_territory_ref_join_translates_to_level_ids(
     )
     assert territories["t2"]["members"] == ["68102"]
     assert territories["t1"]["label"] == "Territory 1"
+
+
+def test_composite_dimension_builds_a_composite_binding(
+    tmp_db: Database, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """ADR-0025 / FCA fca-2026-07-25 #21 — the spec's §4.4 composite
+    shape (registry-recommended) used to build into a plan that could
+    not rate a single row: the builder had no composite branch, so the
+    composite dim projected as a plain `form_input` nobody declared
+    (`key ∅::… not found`, missing_inputs: [gd_basis], schema silent).
+    The chain lookup's binding must now carry `source: "composite"`
+    with each MEMBER's real input binding, harvested from
+    `maps_to_dimension` — the projector joins the member level ids
+    with '·'."""
+    wb = build_binding_forms()
+
+    # Re-author the inputs sheet WITH maps_to_dimension: the members
+    # are fed by real input columns named differently from their dims.
+    del wb["inputs"]
+    ws = wb.create_sheet("inputs")
+    ws.append([
+        "name", "label", "data_type", "required", "allowed_values",
+        "default_value", "unit", "maps_to_dimension",
+    ])
+    ws.append(["construction_class", "Construction class", "enum", True,
+               "frame,fire_resistive", "", "", ""])
+    ws.append(["cv", "Contents value", "currency", True, "", "", "USD", ""])
+    ws.append(["sdip_points", "SDIP points", "number", True, "", "", "",
+               "sdip_band"])
+    ws.append(["lic_years", "Years licensed", "number", True, "", "", "",
+               "lic_band"])
+
+    dims = wb["dimensions"]
+    dims.append(["sdip_band", "SDIP point band", "banded", "both", "number",
+                 "standard", "", "", ""])
+    dims.append(["lic_band", "Years licensed band", "banded", "both", "number",
+                 "standard", "", "", ""])
+    # The composite's level space is the members' cross product —
+    # dimension_levels rows are exempt (and '·' isn't a valid slug).
+    dims.append(["gd_basis", "Good-driver basis", "composite", "both",
+                 "string", "standard", "", "", "sdip_band,lic_band"])
+
+    levels = wb["dimension_levels"]
+    levels.append(["sdip_band", "banded", "pts_0", "0 points", "", "-inf", 1, ""])
+    levels.append(["sdip_band", "banded", "pts_1", "1+ points", "", 1, "+inf", ""])
+    levels.append(["lic_band", "banded", "lic_0_10", "<10 yrs", "", "-inf", 10, ""])
+    levels.append(["lic_band", "banded", "lic_10_plus", "10+ yrs", "", 10, "+inf", ""])
+
+    ws = wb.create_sheet("ft.gd_factor")
+    for row in (
+        ("table_id", "gd_factor"),
+        ("display_name", "Good-driver factor"),
+        ("dimensionality", "1d"),
+        ("row_dimension", "gd_basis"),
+        ("lookup_method", "direct"),
+        ("citation_rule", "Rule 9"),
+        ("citation_page", "p.9"),
+    ):
+        ws.append(list(row))
+    ws.append([])
+    ws.append(["level_id", "factor", "citation_rule", "citation_page"])
+    ws.append(["pts_0·lic_10_plus", 0.75, "Rule 9", "p.9"])
+    ws.append(["pts_1·lic_10_plus", 0.80, "Rule 9", "p.9"])
+
+    chains = wb["chains"]
+    chains.append(["building", 4, "lookup.direct", "bld_gd", "ft.gd_factor",
+                   "gd_basis", "", "", "", ""])
+
+    # The new required inputs need test_cases columns (R-143).
+    del wb["test_cases"]
+    ws = wb.create_sheet("test_cases")
+    ws.append(["case_id", "name", "construction_class", "cv", "sdip_points",
+               "lic_years", "expected_building_premium",
+               "expected_contents_premium"])
+    ws.append(["tc_1", "Frame, clean", "frame", 10000, 0, 12, 13.00, 165.00])
+    ws.append(["tc_2", "FR, pointed", "fire_resistive", 20000, 2, 12,
+               10.00, 257.00])
+
+    monkeypatch.setattr(
+        "openrater.rates.ingest.vectors.score_once",
+        _fake_score({"building_premium": 13.0}),
+    )
+    outcome = build_workbook(
+        db=tmp_db, data=to_bytes(wb), filename="composite.xlsx"
+    )
+
+    conn = tmp_db.connection()
+    row = conn.execute(
+        "SELECT config_json FROM rating_plan_stages WHERE rating_plan_id = ? "
+        "AND stage_kind = 'multiplicative_chain'",
+        (outcome.rating_plan_id,),
+    ).fetchone()
+    conn.close()
+    cfg = json.loads(row[0])
+    bindings = [
+        lk["dimensions"]["gd_basis"]
+        for chain in cfg["chains"]
+        for lk in chain.get("factor_lookups", [])
+        if "gd_basis" in (lk.get("dimensions") or {})
+    ]
+    assert bindings, "the gd_basis lookup never made it into the chain config"
+    binding = bindings[0]
+    assert binding["source"] == "composite"
+    assert binding["axes"]["sdip_band"] == {
+        "source": "form_input",
+        "path": "sdip_points",
+    }
+    assert binding["axes"]["lic_band"] == {
+        "source": "form_input",
+        "path": "lic_years",
+    }
+
+
+def test_vector_gate_rule_coverage_is_measured_and_named(
+    tmp_db: Database, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """FCA fca-2026-07-25 #19 — '25 of 25 match' coexisted with a DEAD
+    decline rule because vector coverage stops at the filing's own
+    examples and nothing measured per-gate-rule exercise. The runner
+    now reads the REAL engine traces: rules no case fires are counted
+    and NAMED, so an all-green scorecard can't silently vouch for a
+    rule it never touched."""
+    wb = build_binding_forms()
+    ws = wb.create_sheet("gates")
+    ws.append([
+        "order", "rule_id", "variable", "op", "value", "tier",
+        "reasoning", "citation_rule", "citation_page",
+    ])
+    ws.append([
+        0, "decline_frame", "construction_class", "eq", "frame",
+        "decline", "Rule 1.A", "", "",
+    ])
+    ws.append([
+        1, "decline_big", "cv", "gt", 1000000, "decline",
+        "Rule 1.B", "", "",
+    ])
+    ws.append([
+        2, "__default__", "", "", "", "standard", "Rule 1.C", "", "",
+    ])
+
+    def fake(*, request, base_url=None):  # noqa: ANN001, ANN202
+        # The REAL engine's trace shape: the gate node reports which
+        # rule fired. Both test cases hit decline_frame (tc_1 frame) or
+        # nothing (tc_2 fire_resistive) — decline_big never fires.
+        inputs = request.get("inputs", {})
+        fired = (
+            "decline_frame"
+            if inputs.get("construction_class") == "frame"
+            else None
+        )
+        return {
+            "outputs": {"building_premium": 13.0},
+            "views": {"premium": 13.0},
+            "row_status": "ok",
+            "trace": {
+                "gate_eligibility_gate": {
+                    "kindId": "eligibility.gate",
+                    "outputs": {
+                        "tier": "decline" if fired else "standard",
+                        "matched_rule_id": fired,
+                    },
+                }
+            },
+        }
+
+    monkeypatch.setattr("openrater.rates.ingest.vectors.score_once", fake)
+    outcome = build_workbook(
+        db=tmp_db, data=to_bytes(wb), filename="gate-coverage.xlsx"
+    )
+    v = outcome.report.vectors
+    assert v.status == "ran"
+    assert v.gate_rules_total == 2
+    assert v.gate_rules_exercised == 1
+    assert v.unexercised_gate_rules == ["decline_big"]
+    assert "decline_big" in (v.detail or "")
+    assert "never fire" in (v.detail or "")

@@ -1,5 +1,5 @@
 #!/bin/sh
-# Build the OpenRater Desktop Extension (.mcpb).
+# Build the OpenRater Desktop Extension (.mcpb) — Brief 2 §6, D12.
 #
 # Assembles every artifact into one bundle root and packs it with the
 # official mcpb toolchain:
@@ -15,8 +15,7 @@
 #     SKILL.md             (the transcription runbook, for reading)
 #
 # Output: packaging/desktop/dist/openrater-<version>-<platform>.mcpb
-# This script creates an unsigned bundle. Release CI signs the native
-# binaries, notarizes macOS artifacts, and then re-packs the bundle.
+# Unsigned — dev builds only until the D14 certificates exist.
 set -e
 cd "$(dirname "$0")/../.."
 REPO="$PWD"
@@ -44,10 +43,7 @@ echo "── [4/6] MCP server bundle (esbuild, ESM single file)"
 echo "── [5/6] assemble bundle root"
 rm -rf "$ROOT"
 mkdir -p "$ROOT/mcp" "$ROOT/scoring" "$ROOT/fixtures"
-# Each bundle carries one platform's binaries, so each manifest declares
-# exactly the platform it was built on — never its siblings'.
-MCPB_PLATFORM=$(node -p "process.platform")
-sed -e "s/{{VERSION}}/$VERSION/" -e "s/{{MCPB_PLATFORM}}/$MCPB_PLATFORM/" \
+sed "s/{{VERSION}}/$VERSION/" \
   "$REPO/packaging/desktop/manifest.template.json" > "$ROOT/manifest.json"
 # The directory-listing icon (512×512 RGBA, rendered from icon.svg —
 # see render-icon.mjs). manifest.json points at it by relative path.
@@ -57,30 +53,37 @@ cp -R "$OUT/openrater-server" "$ROOT/server"
 cp services/scoring/dist/server.mjs "$ROOT/scoring/"
 cp -R frontend/dist "$ROOT/spa"
 cp docs/fixtures/*.plan.json "$ROOT/fixtures/"
-# The guided tour includes a demo book and its matching sample filing.
+# The guided tour's content (first-run brief §5.3): the demo book the
+# tour re-rates + the sample filing the user can open beside the plan.
 cp docs/fixtures/meridian-demo-book.csv "$ROOT/fixtures/"
 cp docs/specs/examples/meridian-shopfront-bop/meridian_shopfront_bop_filing.pdf "$ROOT/fixtures/"
 cp skills/transcribe-filing/SKILL.md "$ROOT/SKILL.md"
 
-# MCP hosts may use embedded runtimes that cannot be re-spawned as Node,
-# and the destination machine may not have Node installed. Ship the build
-# platform's runtime so the extension remains self-contained.
+# The scoring worker's own Node (2026-07-18 field fix): MCP hosts run
+# this extension on embedded runtimes that can't be re-spawned as Node
+# (Claude Desktop's helper SIGTRAPs — runAsNode fuse off), and a clean
+# actuary machine has no Node at all. Ship the building platform's own
+# official Node; the CI matrix makes it right per-OS automatically.
 mkdir -p "$ROOT/runtime"
 NODE_BIN="$(node -p 'process.execPath')"
 NODE_EXT="$(node -p "process.platform === 'win32' ? '.exe' : ''")"
 cp "$NODE_BIN" "$ROOT/runtime/node$NODE_EXT"
 chmod +x "$ROOT/runtime/node$NODE_EXT"
-# Official Node.js builds are self-contained; package-manager builds may
-# link a shared libnode via @rpath — copy
+# Official nodejs builds (CI's setup-node) are self-contained; package-
+# manager builds (homebrew) may link a shared libnode via @rpath — copy
 # it beside the runtime when needed, then PROVE the runtime runs on its
 # own. A bundle whose runtime can't start must fail the build, not the
-# user.
+# actuary.
 if ! "$ROOT/runtime/node$NODE_EXT" -e 'process.exit(0)' 2>/dev/null; then
   mkdir -p "$ROOT/lib"
   cp "$(dirname "$NODE_BIN")"/../lib/libnode*.dylib "$ROOT/lib/" 2>/dev/null || true
-  "$ROOT/runtime/node$NODE_EXT" -e 'process.exit(0)' \
-    || { echo "FATAL: bundled runtime cannot run standalone ($NODE_BIN)"; exit 1; }
 fi
+# PRE-1 gate: `--version` / `exit(0)` succeed on a runtime whose
+# signature forbids JIT (they exit before V8 reserves its code range),
+# so only REAL JS proves the bundle can score. This is the pre-sign
+# run; sign-macos.sh re-runs it on the signed bytes.
+"$REPO/packaging/desktop/verify-node-runtime.sh" "$ROOT/runtime/node$NODE_EXT" \
+  || { echo "FATAL: bundled runtime cannot run standalone ($NODE_BIN)"; exit 1; }
 echo "   runtime: $(node -p 'process.version') from $NODE_BIN"
 
 echo "── [6/6] pack"

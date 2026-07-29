@@ -298,7 +298,7 @@
   pointer-events: auto;
   transition: border-color var(--rater-d-120) var(--rater-ease-snap), color var(--rater-d-120) var(--rater-ease-snap);
 }
-.rater-ft-node-coverage-split:hover:not(disabled) {
+.rater-ft-node-coverage-split:hover:not(:disabled) {
   color: var(--rater-text-default);
   border-color: var(--rater-hairline-strong);
 }
@@ -425,7 +425,7 @@
   cursor: pointer;
   transition: background var(--rater-d-120) var(--rater-ease-snap);
 }
-.rater-ft-node-cta-btn:hover:not(disabled) {
+.rater-ft-node-cta-btn:hover:not(:disabled) {
   background: var(--rater-cat-input-border);
   border-color: var(--rater-cat-input-border);
 }

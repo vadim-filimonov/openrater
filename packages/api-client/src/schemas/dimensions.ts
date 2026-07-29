@@ -2,12 +2,12 @@
  * Zod schemas for the plan-scoped dimensions endpoint group (D6.2 /
  * ADR-0027).
  *
- * Mirrors the Pydantic models in
- * server/src/openrater/rates/dimensions/models.py. Levels are a polymorphic JSON array;
+ * Mirrors the Pydantic models in api-lab/backend's
+ * rates/dimensions/models.py. Levels are a polymorphic JSON array;
  * the backend stores + returns verbatim, the frontend discriminates
  * via `kind` per ADR-0026 §1. We type the level array as
  * `Record<string, unknown>[]` so callers narrow at the consumption
- * site (the existing @openrater/ui `DimensionRow` type is the canonical
+ * site (the existing labs-ui `DimensionRow` type is the canonical
  * narrowing target).
  *
  * If the backend shape changes, this file updates first.

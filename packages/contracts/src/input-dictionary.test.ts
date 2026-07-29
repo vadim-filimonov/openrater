@@ -4,7 +4,7 @@ import {
   type InputDictionaryEntry,
 } from "./input-dictionary";
 
-// Two synthetic fields used throughout these dictionary tests.
+// The two Sample BOP fields that drive the Brief 52 acceptance.
 const DICT: readonly InputDictionaryEntry[] = [
   { fieldName: "total_floor_area_sqft", fieldType: "int", required: true },
   { fieldName: "annual_gross_sales", fieldType: "money", required: false },

@@ -26,6 +26,7 @@ from __future__ import annotations
 import csv
 import io
 import json
+import re
 from importlib import resources
 from typing import Annotated, Any
 
@@ -40,8 +41,8 @@ from openrater.errors import (
 )
 from openrater.persistence import Database
 from openrater.rates.ingest import CheckResult, check_workbook
-from openrater.rates.ingest.lint import load_registry
 from openrater.rates.ingest.builder import BuildError
+from openrater.rates.ingest.lint import load_registry
 from openrater.rates.ingest.reports import (
     BuildReport,
     BuildResponse,
@@ -96,10 +97,37 @@ async def check_workbook_endpoint(
             db=_resolve_db(request), workbook_hash=result.workbook_hash
         )
         if prior is not None:
+            # FCA #16 — when the plan these bytes built has since been
+            # edited in-app, the workbook PRE-DATES the live plan:
+            # building a what-if from it resurrects whatever the edits
+            # repaired. Stamp the staleness on the answer.
+            from openrater.rates.ingest.service import edits_since_build
+
+            source_edits = edits_since_build(
+                _resolve_db(request), str(prior["rating_plan_id"])
+            )
+            n_edits = len(source_edits.changes) + len(source_edits.stage_edits)
             result.already_built = AlreadyBuilt(
                 rating_plan_id=prior["rating_plan_id"],
                 report_id=prior["report_id"],
                 created_at=prior["created_at"],
+                edited_since_build=source_edits.edited,
+                edits_note=(
+                    (
+                        f"Plan {prior['rating_plan_id']!r} has been edited "
+                        f"in-app since this workbook built it"
+                        + (
+                            f" ({n_edits} tracked edit"
+                            f"{'s' if n_edits != 1 else ''})"
+                            if n_edits > 0
+                            else ""
+                        )
+                        + " — those edits are NOT in these bytes. A plan "
+                        "built from this workbook will not include them."
+                    )
+                    if source_edits.edited
+                    else None
+                ),
             )
         else:
             # Brief 92.R (D2) — different bytes, same workbook identity:
@@ -224,8 +252,8 @@ STARTER_KIT_ASSETS: dict[str, tuple[str, str]] = {
 
 @router.get("/plans/ingest/capability-registry")
 async def get_capability_registry_endpoint() -> dict:
-    """The packaged capability registry: the agent's copy of what the
-    platform cannot express (R-190/R-191). Same bytes the
+    """The packaged capability registry (Brief 2 §4 — the agent's copy
+    of what the platform cannot express, R-190/R-191). Same bytes the
     check enforces with; CI pins it to docs/specs/."""
     return load_registry()
 
@@ -312,6 +340,35 @@ async def get_book_template_csv(
             code="book_template_no_inputs",
         )
 
+    # FCA fca-2026-07-25 #12 — the schedule-rating door on the BOOK
+    # path: the engine consumes `schedule_app_{id}` per row, so the
+    # fill-in template shows the column (leave a cell blank for no
+    # modification; the input-schema documents the JSON cell shape).
+    conn = db.connection()
+    try:
+        sched_rows = conn.execute(
+            "SELECT config_json FROM rating_plan_stages "
+            "WHERE rating_plan_id = ? AND stage_kind = 'modifier.schedule' "
+            "ORDER BY sequence",
+            (rating_plan_id,),
+        ).fetchall()
+    finally:
+        conn.close()
+    for srow in sched_rows:
+        try:
+            scfg = json.loads(srow["config_json"] or "{}")
+        except ValueError:
+            continue
+        sched = scfg.get("schedule") if isinstance(scfg, dict) else None
+        source = sched if isinstance(sched, dict) else scfg
+        sid = source.get("schedule_id") if isinstance(source, dict) else None
+        if isinstance(sid, str) and sid:
+            hook = "schedule_app_" + re.sub(
+                r"[^a-z0-9]+", "_", sid.lower()
+            ).strip("_")
+            if hook not in fields:
+                fields.append(hook)
+
     example: dict[str, Any] = {}
     report = get_build_report_for_plan(db=db, rating_plan_id=rating_plan_id)
     if report is not None and report.vectors.cases:
@@ -353,18 +410,52 @@ async def list_build_reports_endpoint(
     )
 
 
+def _header_line(parts: list[str], cap: int = 900) -> str:
+    """A best-effort list header: latin-1-safe, newline-free, capped.
+    The counts are the reliable signal; the names are a courtesy."""
+    joined = " | ".join(p.replace("\n", " ").replace("\r", " ") for p in parts)
+    safe = joined.encode("latin-1", "replace").decode("latin-1")
+    return safe[: cap - 1] + "…" if len(safe) > cap else safe
+
+
 @router.get("/plans/{rating_plan_id}/workbook")
 async def get_plan_workbook_endpoint(
     request: Request,
     rating_plan_id: str,
+    current: Annotated[
+        bool,
+        Query(
+            description=(
+                "false (default): the EXACT build-time bytes, "
+                "hash-identical (owner O1). true: the same container "
+                "REWRITTEN to the live plan state — tracked factor-table "
+                "cells and gates!value cells carry the in-app edits, "
+                "untouched sheet entries stay byte-identical, and the "
+                "filename gains a '-current' suffix. A current export is "
+                "NOT the build identity: re-ingesting it registers as a "
+                "revision, not already_built."
+            ),
+        ),
+    ] = False,
 ) -> Response:
-    """The EXACT workbook bytes that built this plan (presentation consistency
-    §5.6 / , ): the canonical container comes back out.
+    """The EXACT workbook bytes that built this plan (mvp-tightness
+    §5.6 / MVP-023, owner O1): the canonical container comes back out.
     Serves the newest build's stored blob with `X-Workbook-Hash` (the
     sha256 the report records) — re-ingesting the download is
     hash-identical, so the round trip answers `ingest_already_built`.
     404s, BY NAME, when the plan wasn't built from a workbook or the
-    build predates blob storage."""
+    build predates blob storage.
+
+    `?current=true` (FCA #16 follow-up) serves the CURRENT-state
+    variant instead: the stored container with the live plan state
+    written into the two tracked edit classes (factor-table cells,
+    gates!value cells), so in-app repairs physically travel. Divergence
+    the rewriter cannot place is named in `X-Current-Unapplied`, never
+    silently dropped. `X-Workbook-Hash` rides only when the served
+    bytes ARE the build bytes; `X-Workbook-Sha256` always hashes what
+    was actually served."""
+    from openrater.rates.ingest.service import edits_since_build
+
     latest = get_latest_build_with_blob(
         db=_resolve_db(request), rating_plan_id=rating_plan_id
     )
@@ -385,17 +476,59 @@ async def get_plan_workbook_endpoint(
             param="rating_plan_id",
         )
     filename = report.filename or f"{rating_plan_id}.workbook.xlsx"
-    return Response(
-        content=blob,
-        media_type=(
-            "application/vnd.openxmlformats-officedocument"
-            ".spreadsheetml.sheet"
-        ),
-        headers={
-            "Content-Disposition": f'attachment; filename="{filename}"',
-            "X-Workbook-Hash": report.workbook_hash or "",
-        },
+    # FCA fca-2026-07-25 #16 — the divergence stamp. These are the
+    # BUILD-TIME bytes (owner O1: the canonical container comes back
+    # out, hash-identical). When the plan has been edited in-app since,
+    # the export must SAY so — a what-if built from a stale export
+    # silently resurrected a repaired defect.
+    edits = edits_since_build(db=_resolve_db(request), rating_plan_id=rating_plan_id)
+    edit_count = len(edits.changes) + len(edits.stage_edits)
+    media_type = (
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
+    common = {
+        "X-Edited-Since-Build": "true" if edits.edited else "false",
+        "X-Edits-Since-Build-Count": str(edit_count),
+    }
+    if not current:
+        return Response(
+            content=blob,
+            media_type=media_type,
+            headers={
+                "Content-Disposition": f'attachment; filename="{filename}"',
+                "X-Workbook-Hash": report.workbook_hash or "",
+                "X-Workbook-State": "build",
+                **common,
+            },
+        )
+    # FCA #16 follow-up — repairs physically travel. The rewrite is
+    # surgical (only touched sheet entries differ from the build
+    # export), and what cannot travel is NAMED, not dropped.
+    from openrater.rates.ingest.current import (
+        current_filename,
+        rewrite_workbook_to_current,
+    )
+
+    cw = rewrite_workbook_to_current(
+        db=_resolve_db(request), rating_plan_id=rating_plan_id, blob=blob
+    )
+    headers = {
+        "Content-Disposition": (
+            f'attachment; filename="{current_filename(filename)}"'
+        ),
+        "X-Workbook-State": "current",
+        "X-Workbook-Sha256": cw.sha256,
+        "X-Current-Rewrite-Count": str(len(cw.rewrites)),
+        "X-Current-Unapplied-Count": str(len(cw.unapplied)),
+        **common,
+    }
+    if cw.data == blob:
+        # Zero rewrites: the build bytes ARE current, and the identity
+        # claim is still true — an honest hash beats a withheld one.
+        headers["X-Workbook-Hash"] = report.workbook_hash or ""
+    if cw.unapplied:
+        headers["X-Current-Unapplied"] = _header_line(cw.unapplied)
+    return Response(content=cw.data, media_type=media_type, headers=headers)
 
 
 @router.get("/plans/{rating_plan_id}/build-report", response_model=BuildReport)
@@ -420,7 +553,7 @@ async def get_build_report_endpoint(
 
 @router.get("/plans/{rating_plan_id}/edits-since-build")
 async def edits_since_build_endpoint(request: Request, rating_plan_id: str):
-    """Drift tracking: the in-app
+    """Drift honesty (brief drift-honesty.md, MVP-008): the in-app
     edits the live plan carries relative to its latest build — the
     fact the drift chip, the re-ingest preview, and the apply gate
     share. `edited` is hash-exact on reports that stored the as-built

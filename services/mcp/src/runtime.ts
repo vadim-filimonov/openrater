@@ -6,7 +6,7 @@
 //
 //     http://www.apache.org/licenses/LICENSE-2.0
 /**
- * The packaged-runtime supervisor for the desktop extension.
+ * The packaged-runtime supervisor (Brief 2 §6, D12).
  *
  * Three modes, chosen once per process:
  *
@@ -47,8 +47,8 @@ import type { ApiConfig } from "./api.js";
 
 export type RuntimeMode = "external" | "managed";
 
-/** The bundled first-run content: the seeded reference plan plus the
- *  on-disk sample assets
+/** The bundled first-run content (design brief: first-run-experience
+ *  §5.3) — the seeded reference plan plus the on-disk sample assets
  *  the guided tour rates. Paths are absolute and exist at the moment
  *  of the status call; a field is omitted when its file isn't found
  *  (e.g. a bare `npx @openrater/mcp` against a remote server). */
@@ -64,6 +64,11 @@ export interface RuntimeStatus {
   app_url: string;
   healthy: boolean;
   detail: string;
+  /** FCA #18 — who keeps app_url alive, and how to relight it. The
+   *  managed engine is a child of the chat host: a bookmarked app_url
+   *  opened cold tomorrow is a dead page with nothing product-authored
+   *  owning that moment unless this sentence travels with the URL. */
+  app_lifecycle?: string;
   data_dir?: string;
   bundle_root?: string;
   server?: { pid: number | undefined; port: number; alive: boolean };
@@ -75,8 +80,8 @@ export interface RuntimeStatus {
     detail?: string;
   };
   boot_ms?: number;
-  /** The most recent boot failure, kept after the failed-boot promise
-   *  is cleared so runtime_status can explain it. */
+  /** The doctor's memory (MVP-015): the most recent boot failure,
+   *  kept across the failed-boot promise being cleared. */
   last_boot_failure?: {
     when: string;
     child: "server" | "scoring";
@@ -314,8 +319,8 @@ let managed: Promise<Managed> | null = null;
 let killers: (() => void) | null = null;
 /** The most recent scoring spawn/exit failure, surfaced by the doctor. */
 let lastScoringFailure: string | null = null;
-/** Retains the last failure after the boot promise is cleared, so
- *  "run runtime_status for details" has details. */
+/** The doctor's memory (MVP-015): survives the failed-boot promise
+ *  being cleared, so "run runtime_status for details" has details. */
 let lastBootFailure: RuntimeStatus["last_boot_failure"] | undefined;
 /** Consecutive scoring-boot failures — two in a row reads as
  *  environmental, and the remedy escalates accordingly. */
@@ -334,8 +339,10 @@ function scoringRemedy(): string {
   );
 }
 
-/** On a fresh install's first successful boot, open the app in the
- *  default browser once so the user can discover it. A marker in the
+/** First-run brief, sixth cliff (owner, 2026-07-18): "if you don't
+ *  know the app is there, you won't find it." Describing a door is
+ *  not opening a door — on a FRESH install's first successful boot,
+ *  the app opens itself in the default browser, once. A marker in the
  *  data dir makes it once-ever; RATER_APP_AUTOOPEN=always|first|never
  *  overrides; CI and tests never open anything. */
 export function maybeOpenApp(
@@ -495,7 +502,7 @@ async function boot(env: NodeJS.ProcessEnv): Promise<Managed> {
     killers?.();
     throw err;
   }
-  // The scoring sidecar DEGRADES, never kills the boot: the
+  // The scoring sidecar DEGRADES, never kills the boot (MVP-001): the
   // first real install died here because the host's execPath couldn't
   // run JS — and took the healthy engine down with it. Every current
   // tool computes in the engine; a dead sidecar is a named limitation,
@@ -594,7 +601,7 @@ export async function ensureRuntime(config: ApiConfig): Promise<ApiConfig> {
   if (runtimeMode() === "external") return config;
   if (managed) {
     const m = await managed;
-    // The ENGINE being alive is the reuse gate: quotes and books
+    // The ENGINE alive is the reuse gate (MVP-001): quotes and books
     // compute there, and every current tool needs only it. A dead
     // sidecar is a degraded runtime the doctor names and retries —
     // killing a healthy engine to chase the sidecar (the first real
@@ -646,10 +653,26 @@ export async function runtimeStatus(config: ApiConfig): Promise<RuntimeStatus> {
         ? "the OpenRater server is reachable."
         : `the server answered HTTP ${res.status} — check its logs.`;
     } catch {
+      // FCA fca-2026-07-25 PRE-5 — this message is read by an AI
+      // assistant with a shell. The old text ("Start yours") talked
+      // one into booting a fresh server on this port with the DEFAULT
+      // data directory — the real user's data — silently splitting
+      // the backend mid-session (H-5). The down-message must never
+      // instruct starting a server; external mode's contract is that
+      // someone else operates the backend at RATER_API_URL.
+      // FCA fca-2026-07-25 #18 — the user reading the relay of this
+      // message is an actuary, not a server operator: the actionable
+      // step must LEAD, in human terms. The old lead ("Start yours
+      // (RATER_API_URL…)") handed a non-engineer environment
+      // variables and stranded the journey at hello.
       detail =
-        `no OpenRater server at ${config.baseUrl}. Start yours ` +
-        "(RATER_API_URL points the tools at it), or install the " +
-        "desktop bundle for a managed runtime.";
+        "the OpenRater backend this chat is configured to use " +
+        `(${config.baseUrl}) isn't running right now. Tell the user ` +
+        "in plain language: ask whoever set up OpenRater here to " +
+        "start it back up, then try again. Do NOT start a new server " +
+        "to fix this yourself — a fresh server would run against a " +
+        "different data directory and silently split this user's " +
+        "work. When it's back, run runtime_status again.";
     }
     return {
       mode,
@@ -657,6 +680,12 @@ export async function runtimeStatus(config: ApiConfig): Promise<RuntimeStatus> {
       app_url: config.appUrl,
       healthy,
       detail,
+      // FCA #18 — external mode: the backend is operated out-of-band,
+      // so the app link outlives any one chat.
+      app_lifecycle:
+        "The app link is served by the standing OpenRater backend — " +
+        "it stays up (and bookmarkable) as long as that backend runs, " +
+        "independent of this chat.",
       sample: sampleAssets(),
     };
   }
@@ -667,6 +696,17 @@ export async function runtimeStatus(config: ApiConfig): Promise<RuntimeStatus> {
     app_url: config.appUrl,
     healthy: false,
     detail: "managed runtime not booted yet — it starts on the first tool call.",
+    // FCA fca-2026-07-25 #18 (finding 84) — the engine and app are
+    // children of the chat host: a bookmarked app_url opened cold
+    // after the host quits is a dead page. Nothing product-authored
+    // owned that moment; this sentence does. Share it whenever the
+    // user asks about coming back to the app later.
+    app_lifecycle:
+      "The app runs only while the chat host is open — quitting the " +
+      "desktop app takes the engine (and the app link) down with it. " +
+      "To come back later: open this chat and send any OpenRater " +
+      "message; the engine relights and the same link works again. " +
+      "The chat is the reliable door — a bookmark alone is not.",
     data_dir: dataDir(process.env),
     ...(bundleRoot(process.env) ? { bundle_root: bundleRoot(process.env)! } : {}),
     sample: sampleAssets(),
@@ -701,7 +741,7 @@ export async function runtimeStatus(config: ApiConfig): Promise<RuntimeStatus> {
       signal: AbortSignal.timeout(3_000),
     });
     // The doctor HEALS what it can: a dead sidecar gets one respawn
-    // attempt per status call: degraded, never dead.
+    // attempt per status call (MVP-001 — degraded, never dead).
     let scoringUp = m.scoringHealthy && alive(m.scoring);
     if (res.ok && !scoringUp) {
       scoringUp = await retryScoring(m, process.env);

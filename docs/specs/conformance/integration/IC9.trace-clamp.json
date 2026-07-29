@@ -5,7 +5,7 @@
   "asserts": "A trace request above the plan's policy ceiling is clamped, and the clamp is echoed — never silently honored.",
   "contract_version": "1.0",
   "world": {
-    "integration": { "name": "Example Integrator — fixture", "paired": true },
+    "integration": { "name": "OpenRater Front — fixture", "paired": true },
     "plans": ["plan-alpha"],
     "note": "plan-alpha's trace_policy ceiling is 'summary'"
   },

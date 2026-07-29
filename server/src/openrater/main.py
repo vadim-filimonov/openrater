@@ -9,14 +9,15 @@
 
 Run locally with:
 
-    cd server
+    cd api-lab/backend
     uv venv && uv sync
-    uv run uvicorn openrater.main:app --reload --port 8001
+    uvicorn openrater.main:app --reload --port 8001
 
-Routes:
+Currently mounted:
 
     GET  /health                        — liveness probe; confirms DB is reachable.
-    /api/v1/...                         — versioned OpenRater REST API.
+    /api/v1/...                         — versioned REST API: plans + drafts
+                                          + sign-off READ + wires.
 
 API versioning policy
 =====================
@@ -68,6 +69,12 @@ is called per-request with the `Request`; return the operator id
 
 See `openrater.auth` for the registration API + ContextVar pattern.
 
+Coming next (in commit order):
+    coverage-chains, curves, factor-tables, input-sources, loadings,
+    modifiers, final-adjustments, eligibility-rules, endorsements,
+    dimensions, class-codes, sample-submissions, lineage.
+
+See ../PORT_PROGRESS.md for the full porting checklist.
 """
 
 from __future__ import annotations
@@ -133,8 +140,10 @@ from openrater.observability import (
 from openrater.persistence import Database
 from openrater.rates.templates import seed_bundled_templates
 
-# Common local Vite origins. Read from env so production deployments can
-# restrict this list without code changes.
+# Local dev origins for Rate Lab's Vite server. Read from env so prod
+# deploys can lock this down without code changes. 5199 is the port the
+# committed .claude/launch.json boots vite on — without it here, the
+# out-of-the-box launch pair can't talk cross-origin (preflight 400s).
 _DEFAULT_CORS_ORIGINS = (
     "http://localhost:5173,http://localhost:5174,http://localhost:5175,"
     "http://127.0.0.1:5173,http://127.0.0.1:5174,http://127.0.0.1:5175,"
@@ -183,8 +192,8 @@ async def lifespan(app: FastAPI):
     # Maintenance sweep — drop idempotency-replay rows whose 24h TTL has
     # passed. The middleware only lazy-deletes on same-key re-lookup, so
     # untouched keys accumulate forever on a long-lived box; this bounds the
-    # table on every boot. SQLite backups and scoring job artifacts can be
-    # swept independently by host cron.
+    # table on every boot. (SQLite backups + the scoring job-artifact dir
+    # are swept by host cron — see docs/DEMO_DEPLOYMENT_RUNBOOK.md.)
     with db.connection() as conn:
         pruned_idempotency = prune_expired_keys(conn)
     log.info(

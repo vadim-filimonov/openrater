@@ -92,3 +92,10 @@ class QuoteResponse(BaseModel):
     # None for a single-risk quote.
     locations: list[dict[str, Any]] | None = None
     location_count: int | None = None
+    # FCA fca-2026-07-25 #27 (finding 83) — the run-history record this
+    # quote landed as. Chat/API quotes used to be invisible in the app:
+    # the Run tab said "Not run yet" about a quote the user just
+    # watched happen. None when the caller opted out (?record=false —
+    # ephemeral trace views) or the history write failed (the quote
+    # itself never fails for it).
+    run_id: str | None = None

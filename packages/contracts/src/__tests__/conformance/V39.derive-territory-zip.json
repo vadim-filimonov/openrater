@@ -1,10 +1,10 @@
 {
   "name": "V39.derive-territory-zip",
-  "description": "A fictional Meridian ZIP-like location key z101 resolves through `derive.territory` onto synthetic territory t1, then a territory-keyed lookup returns 1.2. The unmistakably fictional keys keep this vector independent of any bureau geography.",
+  "description": "ADR-0038 — ZIP-granularity territory rollup (the Sample BOP acceptance shape). A risk carrying ZIP '66101' resolves THROUGH a `derive.territory` node (ZIP → territory id, map built from the geo dim's geo_territories members) onto territory '701', then a territory-keyed `lookup.direct` returns 1.20. Same mechanism as V22 but at ZIP granularity instead of state — proving the territory layer is granularity-agnostic. The map self-maps an ungrouped ZIP ('67999') per the mixed model; the ungrouped-tail input case is V25.",
   "plan": {
-    "id": "v39.derive_territory_zip",
+    "id": "v24.derive_territory_zip",
     "version": "1.0.0",
-    "name": "Meridian location rollup (z101 → t1 → 1.2)",
+    "name": "ZIP territory rollup (66101 → 701 → 1.20)",
     "line": "bop",
     "effective": "2026-01-01",
     "nodes": [
@@ -20,13 +20,13 @@
         "params": {
           "dimSlug": "territory",
           "territoryMap": {
-            "z101": "t1", "z102": "t1",
-            "z201": "t2", "z202": "t2",
-            "z999": "z999"
+            "66101": "701", "66102": "701",
+            "67201": "702", "67203": "702",
+            "67999": "67999"
           },
           "territoryLabels": {
-            "t1": "Meridian demo core",
-            "t2": "Meridian demo remainder"
+            "701": "Kansas City / Wyandotte metro",
+            "702": "Remainder of state"
           }
         },
         "position": { "x": 200, "y": 0 }
@@ -35,9 +35,9 @@
         "id": "lkp_territory",
         "kind": "lookup.direct",
         "params": {
-          "table": { "t1": 1.2, "t2": 0.9, "z999": 1.05 },
+          "table": { "701": 1.20, "702": 0.90, "67999": 1.05 },
           "defaultValue": 1.0,
-          "tableName": "Meridian synthetic territory factor"
+          "tableName": "KS territory base-loss-cost factor"
         },
         "position": { "x": 400, "y": 0 }
       },
@@ -61,6 +61,6 @@
       { "from": { "node": "lkp_territory", "port": "value" },        "to": { "node": "out_factor",    "port": "value"    } }
     ]
   },
-  "externalInputs": { "zip": "z101" },
-  "expectedOutputs": { "factor": 1.2, "unmapped": false }
+  "externalInputs": { "zip": "66101" },
+  "expectedOutputs": { "factor": 1.20, "unmapped": false }
 }

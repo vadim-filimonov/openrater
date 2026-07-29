@@ -2,7 +2,9 @@
 
 The deploy pre-loads every bundled `*.plan.json` fixture so a fresh box
 boots with working, fully-rated plans in the list. The fixture set is
-the synthetic Meridian demo program. Fixtures may carry their BUILD REPORTS —
+the SYNTHETIC demo program (Detachment Brief 1 §4 S3 — the Meridian
+plans land in Phase D; until then `docs/fixtures/` ships empty and this
+seeder no-ops cleanly). Fixtures may carry their BUILD REPORTS —
 workbook hash, vector results, the gaps ledger, and the workbook bytes
 themselves (base64 in the JSON, decoded on insert) — so a seeded box
 has the "Built from workbook" provenance, the report drawer, and a
@@ -50,8 +52,8 @@ _FALSEY = {"", "0", "false", "no", "off"}
 
 
 def _decode_cell(v: Any) -> Any:
-    """Fixture cells are JSON scalars, except BLOBs such as build-report
-    workbook bytes, which travel as {"$b64": "..."} —
+    """Fixture cells are JSON scalars, except BLOBs (the build report's
+    workbook bytes, Brief 95 A1) which travel as {"$b64": "..."} —
     mirror of scripts/plan_fixture.py `encode_cell`/`decode_cell`."""
     if isinstance(v, dict) and set(v) == {"$b64"}:
         return base64.b64decode(v["$b64"])

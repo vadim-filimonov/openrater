@@ -1,5 +1,5 @@
 {
-  "$comment": "Single source of wired engine vectors. Add a vector here and import it in conformance.test.ts; the lockstep test rejects drift.",
+  "$comment": "P2 G20 (ADR-0056) \u2014 THE single source of wired engine vectors. The engine suite asserts its import list matches this EXACTLY; the scoring-service parity suite LOADS from this. Add a vector: import it in conformance.test.ts AND list it here (the lockstep assertion fails loudly on drift). V16/duplicate-prefix fixtures were pruned 2026-07-06.",
   "engine_vectors": [
     "V1.trivial-constant",
     "V2.input-passthrough",
@@ -31,8 +31,8 @@
     "V38.min-premium-floor",
     "V39.derive-territory-zip",
     "V40.derive-territory-ungrouped-tail",
-    "V41.eligibility-submit-standard-default",
-    "V42.eligibility-preferred-credit",
+    "V41.eligibility-ks-submit-standard-default",
+    "V42.eligibility-ks-preferred-credit",
     "V43.eligibility-decline-knockout-still-computes",
     "V47.round-half-up",
     "V48.lookup-multi-wired",
@@ -50,6 +50,7 @@
     "V60.boolean-input-coercion",
     "V61.interpolate-linear",
     "V62.eligibility-wire-string-inputs",
-    "V63.eligibility-portless-gate-variable"
+    "V63.eligibility-portless-gate-variable",
+    "V64.eligibility-workbook-string-knockout"
   ]
 }

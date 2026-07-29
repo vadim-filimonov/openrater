@@ -1,8 +1,13 @@
 /**
- * Empty compatibility values for retired sample-only branches in
- * PlanDetailRoute. The sentinel never matches a persisted plan, so runtime
- * data always comes from the plan API. Keep these exports only until those
- * legacy type positions are removed from the route.
+ * Detachment Brief 1 (Phase B) — the bundled ISO BOP sample refs were
+ * removed with the fixture cut (§3.2). These exports keep the
+ * PlanDetailRoute type positions (`typeof SAMPLE_*[number]`) and its
+ * fixture-fallback gates compiling with the fallback DISABLED: the
+ * sentinel plan id never matches a real plan, so every gate takes the
+ * live-data branch, and the empty arrays are dead branches.
+ *
+ * TODO(S3): either delete the gates outright in the Phase C/D cleanup
+ * or re-point them at the synthetic Meridian seed program.
  */
 
 import type {

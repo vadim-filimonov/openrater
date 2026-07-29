@@ -6,12 +6,12 @@ engine's V1–V7 vectors have to the engine contract. Both repos run it:
 
 - **openrater CI** runs each fixture against the live API Lab routes (harness provisions the world
   in the real store, then replays the steps).
-- **An integrator's CI** runs the same files against its client +
+- **The integrator's CI** (reference: openrater-front) runs the same files against its client +
   a fixture server that answers with each step's `expect` body — proving the client sends what the
   contract says and renders what it returns.
 
-Fixtures are **data, not code**: no harness ships in this directory. Their
-status and normative force follow the integration contract.
+Fixtures are **data, not code**: no harness ships in this directory. Status: drafted 2026-07-09
+alongside the contract; they become normative when ADR-0057 is Accepted.
 
 ## File format
 
@@ -32,6 +32,7 @@ Each `IC*.json` is self-contained:
       "expect": { "status": 200, "body": { …matchers… } },
       "capture": { "name": "$.json.path" }      // bind values for later {{name}} refs
     },
+    { "expect_world": { … } }          // terminal state assertion (see below)
   ]
 }
 ```
@@ -44,7 +45,7 @@ SQL — its choice) and **injects these pre-captured bindings** before step 1:
 | Binding | Meaning |
 | --- | --- |
 | `{{integration_id}}` | The provisioned integration's id |
-| `{{plan_alpha_id}}` / `{{plan_beta_id}}` | Internal ids of the world's plans (for direct plan-quote calls) |
+| `{{plan_alpha_id}}` / `{{plan_beta_id}}` | Internal ids of the world's plans (for direct Brief-76 calls) |
 | `{{plan_alpha_ref}}` / `{{plan_alpha_snapshot}}` | plan-alpha's descriptor `plan_ref` and published `snapshot_id` (for event `quote_pins`) |
 | `{{integrator_key}}` | The integration's key — **only when `world.integration.paired` is true** |
 
@@ -83,6 +84,18 @@ evolution stays green, per contract §8). Literals must equal. Non-literal asser
 Arrays of objects match **by position**. This leans on two normative ordering rules (contract
 §4.2/§5): `quotes[]` is ordered by carrier label ascending; event `acks[]` ride in request order.
 
+### The expect_world block
+
+IC7/IC8 must assert durable book state. Public query shapes belong to the portfolio contract
+(ADR-0049), so fixtures state the assertion **abstractly** and each harness implements it natively:
+
+```jsonc
+{ "expect_world": { "portfolio_row": {
+    "risk_ref": "r-fixture-0001", "carrier": "acme-mutual",
+    "count": 1, "status": "bound", "effective_on": "2026-08-15"
+} } }
+```
+
 ## The fixtures
 
 | # | File | Asserts |
@@ -99,6 +112,7 @@ Arrays of objects match **by position**. This leans on two normative ordering ru
 | IC10 | `IC10.validity-pins.json` | every member pins version + as_of + valid_until |
 | IC11 | `IC11.drift-demotion.json` | republishing a live plan without a re-test → demoted (no member, named `live_version_untested`, descriptor `paused`); sibling unaffected; re-test restores |
 | IC12 | `IC12.corrected-soft-undo.json` | `corrected` records on the ledger (`removed:true` marks recanting, `removed:false` restates); idempotent on `event_id` |
+| — | *IC13–IC17 retired* | the book-of-record projections they pinned (bind facts, risk unification, servicing) were removed with the Exhibits re-founding — events are ledger-only (contract §5 amendment) |
 | IC18 | `IC18.pinned-rerate.json` | `pins {plan_ref, snapshot_id}` → ONE member at the NAMED frozen version (kind `snapshot`), the inception computation even after the live version moved on and drift demoted unpinned serving; unknown pin/snapshot → named issue + zero members, never a 4xx |
 
 ## Versioning

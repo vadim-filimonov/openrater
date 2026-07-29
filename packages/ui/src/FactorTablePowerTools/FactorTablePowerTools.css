@@ -61,7 +61,7 @@
   border: 1px solid var(--rater-hairline-soft);
   color: var(--rater-text-muted);
 }
-.rater-ft-pt-btn:hover:not(disabled) {
+.rater-ft-pt-btn:hover:not(:disabled) {
   color: var(--rater-text-default);
   border-color: var(--rater-hairline-strong);
 }
@@ -84,7 +84,7 @@
   border: 1px solid var(--rater-cat-input);
   color: #fff;
 }
-.rater-ft-pt-btn-primary:hover:not(disabled) {
+.rater-ft-pt-btn-primary:hover:not(:disabled) {
   background: var(--rater-cat-input-border);
   border-color: var(--rater-cat-input-border);
 }

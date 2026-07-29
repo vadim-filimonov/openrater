@@ -37,7 +37,7 @@ import type {
   WorkbookCheckResultLike as WorkbookCheckResult,
 } from "./types";
 
-// The two operations are injected props (@openrater/ui never talks HTTP);
+// The two operations are injected props (labs-ui never talks HTTP);
 // these stand in for api-client's checkWorkbook / buildWorkbookPlan.
 const mockedCheck = vi.fn<CheckWorkbookFn>();
 const mockedBuild = vi.fn<BuildWorkbookFn>();
@@ -331,7 +331,10 @@ describe("WorkbookBuildPanel (Brief 92)", () => {
 describe("BuildReportView", () => {
   it("renders verdict, tints mismatches, and echoes the gaps", () => {
     render(<BuildReportView report={REPORT} />);
-    expect(screen.getByText(/3 of 4 checks match/)).toBeTruthy();
+    // FCA #19 — the ONE shared verdict vocabulary; a mismatch leads.
+    expect(
+      screen.getByText(/3 of 4 checks reproduce the filing — 1 MISMATCHED/),
+    ).toBeTruthy();
     expect(screen.getByText("np_016").closest("tr")!.className).toContain(
       "miss",
     );
@@ -355,8 +358,42 @@ describe("BuildReportView", () => {
       },
     };
     render(<BuildReportView report={allMatch} />);
-    expect(screen.getByText(/All 4 checks across 2 filing examples match/)).toBeTruthy();
+    expect(
+      screen.getByText(/4 of 4 checks reproduce the filing exactly/),
+    ).toBeTruthy();
     expect(screen.getByText(/2 more, all matching/)).toBeTruthy();
+  });
+
+  it("FCA #19 — names eligibility rules no test case exercises, and stays quiet at full coverage", () => {
+    const partial: BuildReport = {
+      ...REPORT,
+      vectors: {
+        ...REPORT.vectors,
+        gate_rules_total: 2,
+        gate_rules_exercised: 1,
+        unexercised_gate_rules: ["decline_big"],
+      },
+    };
+    const { rerender } = render(<BuildReportView report={partial} />);
+    expect(
+      screen.getByText(/1 of 2 eligibility rules exercised/),
+    ).toBeTruthy();
+    expect(screen.getByText(/decline_big/)).toBeTruthy();
+
+    rerender(
+      <BuildReportView
+        report={{
+          ...REPORT,
+          vectors: {
+            ...REPORT.vectors,
+            gate_rules_total: 2,
+            gate_rules_exercised: 2,
+            unexercised_gate_rules: [],
+          },
+        }}
+      />,
+    );
+    expect(screen.queryByText(/eligibility rules exercised/)).toBeNull();
   });
 });
 

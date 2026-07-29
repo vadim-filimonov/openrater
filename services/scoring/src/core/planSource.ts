@@ -118,8 +118,8 @@ export interface PlanBundleDeps extends PlanSourceDeps {
     planId: string,
     snapshotId: string,
   ) => Promise<Record<string, unknown>>;
-  // fetchModelVersion is retired: a legacy model-sourced tail or gate
-  // refuses by name because OpenRater has no model registry.
+  // fetchModelVersion retired (Detachment Brief 1 §4 S1) — a legacy
+  // model-sourced tail/gate refuses by name; there is no registry.
 }
 
 function tailOf(raw: readonly unknown[] | null): readonly PolicyAdjustment[] | null {

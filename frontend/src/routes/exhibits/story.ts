@@ -1,5 +1,6 @@
 /**
- * Exhibits — the stage's deterministic annotation sentence.
+ * Exhibits — the stage's annotation sentence (Brief: portfolio-redesign
+ * v2, P5 workbench).
  *
  * Every chart on the stage carries ONE editorial line telling the
  * reader what to see — the graphics-desk move. Like the lede, it is a

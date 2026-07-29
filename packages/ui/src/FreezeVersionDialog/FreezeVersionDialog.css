@@ -183,8 +183,8 @@
   min-height: 80px;
 }
 
-.rater-freeze-version-dialog__input:hover:not(disabled),
-.rater-freeze-version-dialog__textarea:hover:not(disabled) {
+.rater-freeze-version-dialog__input:hover:not(:disabled),
+.rater-freeze-version-dialog__textarea:hover:not(:disabled) {
   border-color: var(--rater-border-strong);
 }
 

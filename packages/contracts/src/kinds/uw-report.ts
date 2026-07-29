@@ -30,6 +30,8 @@
  * Per Brief 7 (no-gimmicks: NO inferred report content; NO LLM-
  * authored values without explicit underwriter acceptance — that
  * acceptance check happens DOWNSTREAM in chain.from_report).
+ *
+ * See `docs/design-briefs/uw-report-integration.md` for the design.
  */
 
 import type { BlockKind, PortSpec } from "../block-types";

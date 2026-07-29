@@ -261,7 +261,7 @@ export function FlatFactorStageDrawer(
               onChange={(e) =>
                 onDraftChange({ ...draft, citation_rule: e.target.value })
               }
-              placeholder="e.g., Meridian BOP §5.A.2"
+              placeholder="e.g., ISO BOP §5.A.2"
               aria-label="Citation rule"
             />
             <p className="rater-flat-factor-stage-drawer__hint">

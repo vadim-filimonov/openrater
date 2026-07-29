@@ -5,7 +5,7 @@
   "asserts": "A missing or unknown field is a 200 with the gap NAMED in peer vocabulary and a null premium — never a 4xx, never a fabricated number. Holds at BOTH layers: the mapping's required-field check and the engine's input preflight; a plan input the mapping never covered surfaces under unmapped_plan_inputs rather than leaking plan vocabulary or vanishing.",
   "contract_version": "1.0",
   "world": {
-    "integration": { "name": "Example Integrator — fixture", "paired": true },
+    "integration": { "name": "OpenRater Front — fixture", "paired": true },
     "plans": ["plan-alpha", "plan-gamma"],
     "note": "plan-gamma's mapping is stale against its published plan: tiv mapped optional though the plan requires it, construction_class still mapped though the plan dropped it, liab_exposure_base required by the plan but never mapped"
   },

@@ -1,10 +1,10 @@
 {
   "name": "V43.eligibility-decline-knockout-still-computes",
-  "description": "The fictional Meridian gate fires DECLINE for synthetic class c999 while a parallel premium computation still completes. This proves a decline verdict does not abort deterministic calculation.",
+  "description": "Brief 55 (decline-doesn't-halt, Brief 42 Q4): the canonical KS gate fires DECLINE on an ineligible class (99999), AND a parallel premium computation still runs to completion (constant 1000 -> premium output). Proves (a) the decline tier fires — a path no prior vector exercised — and (b) a declined risk does NOT abort the run; the premium is still produced and the consumer presents the row as out-of-appetite.",
   "plan": {
-    "id": "v43.eligibility_decline_knockout_still_computes",
+    "id": "v41.eligibility_decline_knockout_still_computes",
     "version": "1.0.0",
-    "name": "Meridian fictional appetite gate (decline still computes)",
+    "name": "Sample BOP — appetite gate (decline still computes)",
     "lines": ["bop"],
     "effective": "2025-10-01",
     "nodes": [
@@ -13,12 +13,12 @@
         "kind": "eligibility.gate",
         "params": {
           "rules": [
-            { "rule_id": "decline_ineligible_class", "variable": "class_code", "op": "in", "value": ["c999"], "tier": "decline", "reasoning": "Synthetic class c999 is outside Meridian demo appetite." },
-            { "rule_id": "floor_area_cap", "variable": "total_floor_area_sqft", "op": "gt", "value": 40000, "tier": "submit", "reasoning": "Floor area exceeds the fictional Meridian 40,000 sq ft referral threshold." },
-            { "rule_id": "preferred_protection", "variable": "protection_grade", "op": "eq", "value": "preferred", "tier": "preferred", "reasoning": "The synthetic preferred protection grade qualifies for preferred terms." }
+            { "rule_id": "decline_ineligible_class", "variable": "class_code", "op": "in", "value": ["99999"], "tier": "decline", "reasoning": "Class not in the BOP eligibility table — out of appetite." },
+            { "rule_id": "floor_area_cap", "variable": "total_floor_area_sqft", "op": "gt", "value": 35000, "tier": "submit", "reasoning": "Floor area exceeds the 35,000 sq ft BOP eligibility limit (Sample BOP Rule 22.A) — refer to underwriting." },
+            { "rule_id": "preferred_protected", "variable": "bceg_grade", "op": "eq", "value": "bceg_1", "tier": "preferred", "reasoning": "Top building-code-effectiveness grade — preferred terms." }
           ],
           "default_tier": "standard",
-          "default_reasoning": "Within the fictional Meridian appetite at standard demo rates."
+          "default_reasoning": "Within BOP appetite at standard filed rates."
         },
         "position": { "x": 0, "y": 0 }
       },
@@ -33,6 +33,6 @@
       { "from": { "node": "base", "port": "value" }, "to": { "node": "out_premium", "port": "value" } }
     ]
   },
-  "externalInputs": { "class_code": "c999", "total_floor_area_sqft": 5000, "annual_gross_sales": 100000, "protection_grade": "standard" },
+  "externalInputs": { "class_code": "99999", "total_floor_area_sqft": 5000, "annual_gross_sales": 100000, "bceg_grade": "bceg_3" },
   "expectedOutputs": { "tier": "decline", "matched_rule_id": "decline_ineligible_class", "premium": 1000 }
 }

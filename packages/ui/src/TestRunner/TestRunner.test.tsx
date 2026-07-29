@@ -79,20 +79,20 @@ describe("<TestRunner> — run flow", () => {
     render(
       <TestRunner
         plan={PLAN}
-        initialInputs={{ class_code: "c101", tiv: 250000 }}
+        initialInputs={{ class_code: "73912", tiv: 250000 }}
         onRun={onRun}
       />,
     );
     fireEvent.click(screen.getByRole("button", { name: /Run/i }));
     await waitFor(() => expect(onRun).toHaveBeenCalledOnce());
-    expect(onRun).toHaveBeenCalledWith({ class_code: "c101", tiv: 250000 });
+    expect(onRun).toHaveBeenCalledWith({ class_code: "73912", tiv: 250000 });
   });
 
   it("renders TracePanel after a successful run", async () => {
     render(
       <TestRunner
         plan={PLAN}
-        initialInputs={{ class_code: "c101" }}
+        initialInputs={{ class_code: "73912" }}
         onRun={() => makeRunResult()}
       />,
     );
@@ -135,7 +135,7 @@ describe("<TestRunner> — error handling", () => {
     render(
       <TestRunner
         plan={PLAN}
-        initialInputs={{ class_code: "c101" }}
+        initialInputs={{ class_code: "73912" }}
         onRun={onRun}
       />,
     );

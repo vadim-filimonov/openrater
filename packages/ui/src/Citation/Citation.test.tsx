@@ -1,4 +1,9 @@
-/** <Citation> rendering-contract tests. */
+/**
+ * <Citation> tests — Phase A.5 A5.3b.
+ *
+ * Verifies the contract documented at
+ * docs/design-pass/design-language.md §11.
+ */
 
 import { describe, expect, it } from "vitest";
 import { render, screen } from "@testing-library/react";
@@ -7,10 +12,10 @@ import { Citation } from "./Citation";
 describe("<Citation>", () => {
   it("renders rule + source + single page", () => {
     const { container } = render(
-      <Citation source="Meridian BOP" rule="§11.A.1" page={108} />,
+      <Citation source="ISO BOP" rule="§11.A.1" page={108} />,
     );
     expect(container.querySelector(".rater-citation__source")).toHaveTextContent(
-      "Meridian BOP",
+      "ISO BOP",
     );
     expect(container.querySelector(".rater-citation__rule")).toHaveTextContent(
       "§11.A.1",
@@ -22,7 +27,7 @@ describe("<Citation>", () => {
 
   it("formats a page range as pp.A-B", () => {
     const { container } = render(
-      <Citation source="Meridian BOP" rule="§7.B.1" page={[41, 44]} />,
+      <Citation source="ISO BOP" rule="§7.B.1" page={[41, 44]} />,
     );
     expect(container.querySelector(".rater-citation__page")).toHaveTextContent(
       "pp.41-44",
@@ -31,7 +36,7 @@ describe("<Citation>", () => {
 
   it("collapses a single-value range [N, N] to p.N", () => {
     const { container } = render(
-      <Citation source="Meridian BOP" rule="§3" page={[12, 12]} />,
+      <Citation source="ISO BOP" rule="§3" page={[12, 12]} />,
     );
     expect(container.querySelector(".rater-citation__page")).toHaveTextContent(
       "p.12",
@@ -39,7 +44,7 @@ describe("<Citation>", () => {
   });
 
   it("omits the page block entirely when page is undefined", () => {
-    const { container } = render(<Citation source="Meridian BOP" rule="§11.A.1" />);
+    const { container } = render(<Citation source="ISO BOP" rule="§11.A.1" />);
     expect(container.querySelector(".rater-citation__page")).toBeNull();
     expect(container.querySelector(".rater-citation__sep")).toBeNull();
   });
@@ -50,31 +55,27 @@ describe("<Citation>", () => {
   });
 
   it("dedupes when the rule already starts with the source name", () => {
-    // Common case: actuary types "Meridian BOP §11.A.1" as the rule + sets
-    // source="Meridian BOP". The component should not duplicate "Meridian BOP".
+    // Common case: actuary types "ISO BOP §11.A.1" as the rule + sets
+    // source="ISO BOP". The component should not duplicate "ISO BOP".
     const { container } = render(
-      <Citation source="Meridian BOP" rule="Meridian BOP §11.A.1" page={108} />,
+      <Citation source="ISO BOP" rule="ISO BOP §11.A.1" page={108} />,
     );
     expect(container.querySelector(".rater-citation__source")).toBeNull();
     expect(container.querySelector(".rater-citation__rule")).toHaveTextContent(
-      "Meridian BOP §11.A.1",
+      "ISO BOP §11.A.1",
     );
   });
 
   it("dedupe is case-insensitive and whitespace-tolerant", () => {
     const { container } = render(
-      <Citation
-        source="  meridian bop  "
-        rule="Meridian BOP §3.1"
-        page={5}
-      />,
+      <Citation source="  iso bop  " rule="ISO BOP §3.1" page={5} />,
     );
     expect(container.querySelector(".rater-citation__source")).toBeNull();
   });
 
   it("renders inline variant by default", () => {
     const { container } = render(
-      <Citation source="Meridian BOP" rule="§11.A.1" page={108} />,
+      <Citation source="ISO BOP" rule="§11.A.1" page={108} />,
     );
     const root = container.querySelector(".rater-citation");
     expect(root).toHaveClass("rater-citation--inline");
@@ -84,7 +85,7 @@ describe("<Citation>", () => {
   it("renders block variant on opt-in", () => {
     const { container } = render(
       <Citation
-        source="Meridian BOP"
+        source="ISO BOP"
         rule="§11.A.1"
         page={108}
         variant="block"
@@ -96,25 +97,25 @@ describe("<Citation>", () => {
   });
 
   it("builds a structured aria-label by default", () => {
-    render(<Citation source="Meridian BOP" rule="§11.A.1" page={108} />);
+    render(<Citation source="ISO BOP" rule="§11.A.1" page={108} />);
     expect(
-      screen.getByLabelText("Citation: Meridian BOP §11.A.1 page 108"),
+      screen.getByLabelText("Citation: ISO BOP §11.A.1 page 108"),
     ).toBeInTheDocument();
   });
 
   it("builds aria-label with page range form", () => {
     render(
-      <Citation source="Meridian BOP" rule="§7.B.1" page={[41, 44]} />,
+      <Citation source="ISO BOP" rule="§7.B.1" page={[41, 44]} />,
     );
     expect(
-      screen.getByLabelText("Citation: Meridian BOP §7.B.1 pages 41 to 44"),
+      screen.getByLabelText("Citation: ISO BOP §7.B.1 pages 41 to 44"),
     ).toBeInTheDocument();
   });
 
   it("respects ariaLabel override", () => {
     render(
       <Citation
-        source="Meridian BOP"
+        source="ISO BOP"
         rule="§11.A.1"
         page={108}
         ariaLabel="Custom label here"

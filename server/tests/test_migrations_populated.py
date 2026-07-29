@@ -7,14 +7,17 @@
 #     http://www.apache.org/licenses/LICENSE-2.0
 """The populated-migration class test.
 
-Rebuild migrations behave differently on populated databases, so an
-empty-database migration check is not sufficient. The mechanism: build a database
+The class this closes (inherited from the pre-detachment history): a
+rebuild migration passed every CI job and bricked every real box,
+because rebuild migrations behave differently on POPULATED databases
+and CI only ever migrated empty ones. The mechanism: build a database
 at a pinned OLD migration level, fill it with the committed seed
 fixtures, run the CURRENT migration chain over it, and assert the
 world survives — no MigrationError, foreign keys clean, every plan's
 substrate intact, and the newest schema semantics live.
 
-The anchor is the 001 baseline itself, so every FUTURE migration
+Post-squash (Detachment Brief 1 S4) the anchor is the 001 baseline
+itself — migration history starts there, so every FUTURE migration
 (002+) is automatically exercised against data that predates it. With
 no post-anchor migrations yet the chain step is a no-op; the test's
 value is the armed harness, not today's run.
@@ -32,7 +35,7 @@ from openrater.persistence.db import Database
 _REPO = Path(__file__).resolve().parents[2]
 _FIXTURES = _REPO / "docs" / "fixtures"
 
-#: The 001 baseline. Every future migration is
+#: The 001 baseline (the S4 squash). Every future migration is
 #: post-anchor by construction — never move this forward.
 ANCHOR = 1
 

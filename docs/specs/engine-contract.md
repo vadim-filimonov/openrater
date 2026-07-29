@@ -3,11 +3,11 @@
 | Field        | Value                                                          |
 | ------------ | -------------------------------------------------------------- |
 | **Status**   | v1 — normative                                                 |
-| **Updated**  | 2026-07-19                                                     |
+| **Updated**  | 2026-05-19                                                     |
 | **Audience** | Integrators building consumption modes (live HTTP API, queue consumers, embedded libraries, SaaS adapters) against the OpenRater re-rating engine. |
 | **Package**  | [`@openrater/contracts`](../../packages/contracts/) — `packages/contracts/src/runtime.ts` + `packages/contracts/src/plan-types.ts` + `packages/contracts/src/block-types.ts` + `packages/contracts/src/kinds/`. Zero runtime UI deps; importable from Node, browsers, Bun, Deno. |
-| **Source of truth** | The implementation linked above plus the executable conformance suite at `packages/contracts/src/__tests__/conformance.test.ts` (runs every vector named in `conformance/manifest.json`). The [`main` workflow](../../.github/workflows/main.yml) re-runs the suite on every PR. |
-| **Related** | [Plan Format Spec v1](./plan-format-v1.md), the data format this engine consumes. |
+| **Source of truth** | The implementation linked above plus the executable conformance suite at `packages/contracts/src/__tests__/conformance.test.ts` (runs V1–V7 from `./conformance/V*.json`). The CI conformance job (`.github/workflows/ci.yml`) re-runs the suite on every PR. |
+| **Related** | Plan Format Spec v1 (the data format this engine consumes). W4 amendment §0.5 (the OSS bet that motivates this contract). |
 
 ---
 
@@ -51,9 +51,11 @@ import {
   registerBlockKind,
   getBlockKind,
   listBlockKinds,
-  // Bundled kinds + opt-in registration
+  // V0 kinds + opt-in registration
   registerBuiltinKinds,
-  // Exposure vocabulary. Products use ProductCode plus opaque coverage tags.
+  // Closed vocabulary — Brief 16 (exposure). The Brief-17 LOB vocabulary
+  // (LINE_CODES / LINE_LABELS / isLineCode) was deleted in the ADR-0033
+  // axis cleanup; products use ProductCode + opaque coverage tags.
   EXPOSURE_BASE_CODES,
   EXPOSURE_BASE_LABELS,
   EXPOSURE_BASE_DEFAULT_UNIT,
@@ -64,22 +66,22 @@ import {
   slugifyCustomLabel,
   pickExposureDeclaration,
   validateExposureDeclarations,
-  // Eligibility
+  // Eligibility (Brief 10)
   ELIGIBILITY_TIERS,
   ELIGIBILITY_TIER_LABELS,
   ELIGIBILITY_TIER_DESCRIPTIONS,
   ELIGIBILITY_OPS,
   isEligibilityTier,
   evaluateEligibilityComparator,
-  // Schedule rating
+  // Schedule rating (Brief 15)
   SCHEDULE_APPLICATION_SOURCES,
-  // UW Report
+  // UW Report (Brief 7)
   isUwReport,
-  // Diff library
+  // Diff library (Brief 12)
   diffPlans,
   diffRuns,
   diffTraces,
-  // Issues + collectIssues
+  // Issues + collectIssues (Brief 13)
   ISSUE_SEVERITIES,
   ISSUE_SOURCES,
   collectIssues,
@@ -95,23 +97,23 @@ import type {
   // Closed-vocabulary types
   ExposureBaseCode,
   ExposureBaseDeclaration,
-  // Eligibility
+  // Eligibility (Brief 10)
   EligibilityTier,
   EligibilityOp,
   EligibilityRule,
-  // Schedule rating
+  // Schedule rating (Brief 15)
   Schedule,
   ScheduleCategory,
   ScheduleApplication,
   ScheduleApplicationEntry,
   ScheduleApplicationSource,
   AppliedScheduleCategory,
-  // UW Report
+  // UW Report (Brief 7)
   UwReport,
   UwAdjustment,
   UwReportSource,
   AppliedReportAdjustment,
-  // Diff library
+  // Diff library (Brief 12)
   DiffNode,
   DiffState,
   DiffSummary,
@@ -121,7 +123,7 @@ import type {
   PlanDiff,
   TraceDiff,
   RunDiff,
-  // Issues + collectIssues
+  // Issues + collectIssues (Brief 13)
   Issue,
   IssueSeverity,
   IssueSource,
@@ -178,36 +180,48 @@ export function registerBlockKind<P, I, O>(kind: BlockKind<P, I, O>): void
 export function getBlockKind(id: string): BlockKind | undefined
 export function listBlockKinds(): readonly BlockKind[]
 
-// Opt-in: register the kind set bundled with this engine (into globalRegistry)
+// Opt-in: register the V0 kind set bundled with this engine (into globalRegistry)
 export function registerBuiltinKinds(): void
 ```
 
 `registerBuiltinKinds()` is the recommended setup call for any
-integrator who wants to use the bundled kinds. It registers all **38**
+integrator who wants to use the bundled kinds. It registers all **37**
 kind IDs at once into `globalRegistry` and throws on duplicate
 registration (the authoritative list is the `registerBlockKind(...)`
 calls in `packages/contracts/src/kinds/index.ts` — count the code, not
-this prose). The set starts with the 18 canonical families from Plan
-Format Spec v1 §4.5, plus `model.rating` and the forward-compatible
-`unknown` placeholder. Specialized kinds include:
+this prose). The original core set was:
 
-- `input.class_exposure` — resolves to the bound class's declared
-  exposure value at execute time. Requires `RunOptions.classLibrary`;
-  the runtime handles it alongside `input` and `input.source`.
-- `chain.lob_sum` — sums all coverage premiums for a single line of
-  business via a cardinality-N input port.
-- `eligibility.gate` — produces a tier verdict (`preferred`,
-  `standard`, `submit`, or `decline`) by walking an ordered rule list
-  against `ctx.externalInputs`. First match wins, with `default_tier`
-  as the fallback.
-- `modifier.schedule` — evaluates judgment-driven schedule rating,
-  including per-category and total caps and per-category reasoning in
-  the trace.
-- `uw.report` — sources a structured `UwReport` from
-  `ctx.externalInputs`; downstream kinds handle missing or malformed
-  reports gracefully.
-- `chain.from_report` — expands accepted `UwReport` adjustments into a
-  cumulative factor, with optional category filters and a total cap.
+  - 20 V0 kinds (the 18 canonical families from Plan Format Spec v1
+    §4.5, plus `model.rating` as the companion to `model.glm`, plus
+    `unknown` as the forward-compat placeholder).
+  - 2 Phase B M1.2 additions:
+    - `input.class_exposure` (Brief 16) — resolves to the bound
+      class's declared exposure value at execute time. Requires
+      `RunOptions.classLibrary` to be set; the runtime special-cases
+      this kind in the same path as `input` + `input.source`.
+    - `chain.lob_sum` (Brief 17) — sums all coverage premiums for a
+      single line of business via a cardinality-N input port. Pure
+      execute; no runtime special-casing.
+  - 2 Phase B M1.3 additions:
+    - `eligibility.gate` (Brief 10) — produces a tier verdict
+      (`preferred` / `standard` / `submit` / `decline`) by walking
+      an ordered rule list against `ctx.externalInputs`. First match
+      wins; falls back to `default_tier` when nothing matches.
+    - `modifier.schedule` (Brief 15) — judgment-driven schedule
+      rating evaluator. Accepts a `ScheduleApplication` via its
+      input port + an optional tier; computes a cumulative factor
+      with per-category cap clamping + filed total cap enforcement
+      + per-category reasoning verbatim into the trace.
+  - 2 Phase B M1.4 additions:
+    - `uw.report` (Brief 7) — sources a structured UwReport
+      (AI/API-driven underwriting evidence) from `ctx.externalInputs`.
+      Returns `{ report: null }` when missing or malformed; downstream
+      kinds handle null gracefully.
+    - `chain.from_report` (Brief 7) — expands a UwReport's adjustments
+      into a cumulative multiplicative factor. Defaults to
+      `require_acceptance: true` (the no-gimmicks line: AI suggestions
+      don't apply without explicit underwriter acceptance). Optional
+      `category_filter` + `total_cap_pct`.
 
 Integrators who want a CUSTOM kind set instead just call
 `registerBlockKind()` themselves and skip `registerBuiltinKinds()`
@@ -251,21 +265,21 @@ These types from `@openrater/contracts` are **stable**:
 - `CompiledPlan` — output of `compilePlan`, input to `runPlan`
 - `RunResult` — output of `runPlan` / `executePlan`
 - `TraceEntry` — one per-node trace record on `RunResult.trace` (see §4)
-- `RunOptions` — `{ as_of?: string; classLibrary?: ClassLibrary }` (see §7 for `as_of`)
-- `ClassLibrary`, `ClassLibraryEntry` — runtime handle for class-conditional exposure
+- `RunOptions` — `{ as_of?: string; classLibrary?: ClassLibrary }` (see §7 for `as_of`; Brief 16 for `classLibrary`)
+- `ClassLibrary`, `ClassLibraryEntry` — runtime handle for class-conditional exposure (Brief 16)
 - `makeClassLibrary(entries)` — convenience factory returning a frozen Map-backed `ClassLibrary`
-- `EligibilityTier`, `EligibilityOp` — closed vocabularies
-- `Schedule`, `ScheduleCategory`, `ScheduleApplication`, `ScheduleApplicationEntry`, `ScheduleApplicationSource`, `AppliedScheduleCategory` — schedule rating shapes
-- `EligibilityRule` — one rule in an `eligibility.gate`
+- `EligibilityTier`, `EligibilityOp` — closed vocabularies (Brief 10)
+- `Schedule`, `ScheduleCategory`, `ScheduleApplication`, `ScheduleApplicationEntry`, `ScheduleApplicationSource`, `AppliedScheduleCategory` — schedule rating shapes (Brief 15)
+- `EligibilityRule` — one rule in an `eligibility.gate` (Brief 10)
 - `evaluateEligibilityComparator(op, left, right)` — pure comparator evaluator
-- `UwReport`, `UwAdjustment`, `UwReportSource`, `AppliedReportAdjustment` — UW Report shapes
+- `UwReport`, `UwAdjustment`, `UwReportSource`, `AppliedReportAdjustment` — UW Report shapes (Brief 7)
 - `isUwReport(value)` — pure type guard at the runtime boundary
-- `DiffNode`, `DiffState`, `DiffSummary`, `DiffSide`, `DiffDeeplink`, `RateImpact` — diff tree types
-- `PlanDiff`, `TraceDiff`, `RunDiff` — top-level diff results
+- `DiffNode`, `DiffState`, `DiffSummary`, `DiffSide`, `DiffDeeplink`, `RateImpact` — diff tree types (Brief 12)
+- `PlanDiff`, `TraceDiff`, `RunDiff` — top-level diff results (Brief 12)
 - `diffPlans(a, b, sides?)` — structural diff of two Plan objects
 - `diffTraces(a, b, sides?, options?)` — per-step trace diff with first-divergence detection (optional `topoOrder` for execution-order divergence)
 - `diffRuns(a, b, sides?, options?)` — full run comparison including outputs + trace + total premium impact
-- `Issue`, `IssueSeverity`, `IssueSource`, `IssueLocation`, `IssueFixHint` — diagnostic shapes
+- `Issue`, `IssueSeverity`, `IssueSource`, `IssueLocation`, `IssueFixHint` — diagnostic shapes (Brief 13)
 - `IssueSeverityCounts`, `FilingReadiness` — aggregate verdict shapes
 - `CollectIssuesInput`, `ConformanceVectorResult` — collectIssues parameters
 - `collectIssues(plan, input?)` — pure aggregator across 5 sources (compile / runtime / authoring / reference / conformance)
@@ -295,9 +309,11 @@ A `Plan` is a typed DAG of blocks. Minimum-viable structure:
   id: "meridian.bop.ne.2026",  // globally unique
   version: "1.0.0",             // semver
   name: "Meridian Shopfront BOP — NE 2026",
-  // The product axis lives on the persisted plan, not in the runtime.
-  // Plans may carry an optional legacy `line: string`; the runtime
-  // ignores it.
+  // (Historical note: a `lines: LineCode[]` multi-LOB field shipped
+  // with Brief 17 and was DELETED in the ADR-0033 axis cleanup — the
+  // product axis lives on the persisted plan, and the engine never
+  // reads it. Plans may carry an optional legacy `line: string`; the
+  // runtime ignores it.)
   effective: "2026-07-01",      // optional, ISO 8601
   nodes: [
     { id: "k", kind: "constant",
@@ -321,7 +337,7 @@ Authoritative type definition: `Plan` in `packages/contracts/src/plan-types.ts`.
 - Every `node.id` is unique within the plan
 - Every `edge.from.node` and `edge.to.node` refers to a node that
   exists in the plan
-- Every `node.kind` is a registered block kind. The bundled
+- Every `node.kind` is a registered block kind. The bundled V0
   registry (`registerBuiltinKinds()`) carries the 18 canonical
   families documented in Plan Format Spec v1 §4.5 (20 kind IDs:
   the families plus `model.rating` as the convenience companion
@@ -329,14 +345,14 @@ Authoritative type definition: `Plan` in `packages/contracts/src/plan-types.ts`.
 - The graph is acyclic (the compiler runs Kahn's algorithm; any
   cycle is rejected — including recursive `subplan` references
   caught during compile of the inner plan).
-- **Product axis:** the runtime `Plan` carries no product/LOB
+- **Product axis (ADR-0033):** the runtime `Plan` carries NO product/LOB
   axis the engine reads. A plan's product (`product: ProductCode`) lives
   on the persisted plan record for catalog/composition/analytics, never in
   the projected runtime Plan; the engine treats `product` as an opaque tag
   and never branches on it (§0 Genericity invariant). The legacy
   `plan.line` field is an optional free-text shim the engine ignores; the
-  older `plan.lines: LineCode[]` array and `getPlanLines` helper are not
-  part of the current contract.
+  multi-LOB `plan.lines: LineCode[]` array + the `getPlanLines` helper were
+  removed when multi-product moved to Policy composition (ADR-0034).
 
 Optional fields the engine ignores at runtime but persists
 verbatim through the trace:
@@ -371,7 +387,7 @@ How resolution works:
 - If neither, the output is `undefined` — downstream blocks
   receive `undefined` as the input on that port
 
-Type coercion is **narrow and unambiguous only**. At an
+Type coercion is **narrow and unambiguous only** (Brief 83.4). At an
 input node whose port declares a numeric type (`money`/`number`/
 `factor`), a clean numeric string coerces — `"500000"` becomes
 `500000` — and a boolean port maps the canonical `true`/`false`
@@ -381,8 +397,8 @@ callers. Everything else passes through untouched so the consuming
 node names the problem, and a value with no numeric meaning on a
 numeric port (`null`, `[]`, `{}`, a boolean, a non-numeric string)
 is treated as absent — the arithmetic nodes emit a non-finite result
-that the output backstop WITHHOLDS rather than improvising a premium.
-Broader type-mismatch
+that the output backstop WITHHOLDS rather than improvising a premium
+(ADR-0056; audit A-2026-07-12 P1-01). Broader type-mismatch
 validation is still the authoring layer's job (call
 `validatePlanReferences()` from `@openrater/contracts` upstream of the
 runtime).
@@ -465,9 +481,9 @@ trace panel readable. The signature:
 explainStep?: (inputs: I, params: P, outputs: O) => string
 ```
 
-Conventions used by the bundled kinds:
+Conventions, from the V0 cold-test kinds:
 
-- Actuary-readable prose, not engineer syntax. *"Classified `c202` → 1.32"*
+- Actuary-readable prose, not engineer syntax. *"Classified `73912` → 1.32"*
   beats *"table[key]=1.32"*.
 - One line. No newlines, no markdown. The trace UI owns layout.
 - Cite the operation + the values that drove it. *"1000 × 1.10 (LCM)
@@ -579,8 +595,9 @@ divide by zero), not for *missing data* (which should propagate as
 
 ### 5.4 Structured issues — refuse or resolve, never improvise
 
-*(Normative. The issue vocabulary lives in `@openrater/contracts`
-`plan-issues.ts`.)*
+*(Normative. This section records the platform's accepted decision of
+2026-07-06 — internally "ADR-0056" — as contract text; the issue
+vocabulary lives in `@openrater/contracts` `plan-issues.ts`.)*
 
 The engine's honesty law: **an input the plan can't rate must be a
 visible, structured error — never a silent neutral factor, never a
@@ -656,7 +673,7 @@ payloads.
 
 | Species | Codes |
 | --- | --- |
-| Projection | `factor_table_missing` · `factor_table_empty` · `coverage_slice_empty` · `table_unkeyable_2d` · `range_levels_unusable` · `lookup_unkeyed` · `predicate_dropped` · `stage_not_executed` · `chain_missing_base` · `package_scope_fallback` *(retired from emission)* · `multi_gate_tier_first_wins` · `orphan_stage` · `plan_compile_failed` · `grouping_missing_rollup` · `round_output_nonstandard` · `grouping_column_missing` · `endorsement_additive_multi_tower` |
+| Projection | `factor_table_missing` · `factor_table_empty` · `coverage_slice_empty` · `table_unkeyable_2d` · `range_levels_unusable` · `lookup_unkeyed` · `predicate_dropped` · `stage_not_executed` · `chain_missing_base` · `package_scope_fallback` *(retired from emission 2026-07-10)* · `multi_gate_tier_first_wins` · `orphan_stage` · `plan_compile_failed` · `grouping_missing_rollup` · `round_output_nonstandard` · `grouping_column_missing` · `endorsement_additive_multi_tower` |
 | Row | `unknown_key` · `unknown_key_defaulted` · `unknown_key_referred` · `territory_unmapped` · `class_attribute_missing` · `band_out_of_range` · `missing_input` · `unknown_input` · `unresolved_output` · `composition_failed` · `zero_exposure_required` |
 
 Conformance vectors may pin `expectedRowStatus` and `expectedIssues`
@@ -748,9 +765,11 @@ that exercises them ship together inside `@openrater/contracts`:
 - README: `packages/contracts/src/__tests__/conformance/README.md`
   (schema, encoding rules — notably the `1e308` sentinel for
   open-top range buckets — and how to add a vector)
-- CI: the JavaScript test job in
-  [`.github/workflows/main.yml`](../../.github/workflows/main.yml) runs
-  the suite on every pull request.
+- CI: the `conformance` job in `.github/workflows/ci.yml` runs the
+  suite on every PR. The job runs ONLY the conformance file so a
+  third-party port can compare its results against a single CI
+  badge without installing or understanding the rest of our test
+  infra.
 
 The fixtures encode: plan + externalInputs + expectedOutputs.
 Any runtime that consumes a fixture, executes the plan, and
@@ -758,12 +777,18 @@ matches the expected outputs (byte-for-byte) is contract-compatible
 for that vector. The same JSON schema is documented in the README
 for non-TypeScript ports.
 
-The wired set is declared once in
+The suite ships **49 wired vectors** (V1–V61; some numbers are
+unclaimed — names, not numbers, are the stable identifier; the
+authoritative count is the manifest's `engine_vectors` length, which
+this prose tracks but does not define — audit A-2026-07-12 P5-03
+caught it three revisions stale). The
+wired set is declared ONCE in
 `packages/contracts/src/__tests__/conformance/manifest.json`: the
 engine runner asserts its import list matches the manifest exactly,
 and the scoring-service parity suite LOADS its list from the same
-manifest. `expectedRowStatus`, `expectedIssues`, and
-`expectedEligibilityTier` are optional vector fields, so a vector can
+manifest — one source, zero drift (P2 G20 / ADR-0056). ADR-0056 also
+added `expectedRowStatus` / `expectedIssues` /
+`expectedEligibilityTier` as optional vector fields — a vector can
 now pin that an input REFUSES (structured row issues, withheld
 outputs), not just what it computes. The baseline 7 cover the core
 engine:
@@ -776,23 +801,17 @@ engine:
 | V4 | `V4.lookup-direct-known.json` | Direct factor-table lookup (`class_code` → factor) |
 | V5 | `V5.lookup-range-middle-bucket.json` | Bucketed range lookup with boundary case (`TIV=$500k` → middle bucket `1.00`) |
 | V6 | `V6.subplan-composition.json` | Composite plan recursion + nested trace (outer plan calls inner doubler: `21 → 42`) |
-| V7 | `V7.bop-like-end-to-end.json` | Fictional Meridian rating: class lookup × limit band × LCM = premium 1425 |
+| V7 | `V7.bop-like-end-to-end.json` | Realistic small BOP-like rating: class lookup × TIV band × LCM = premium 1504.8 |
 
-The **geographic family** (V21–V23, V39–V40) locks the canonical
-geographic-dimension lookup domain (Plan Format Spec §6.2.1).
-`derive.territory` resolves a raw geographic value (a level id or a
-territory id, idempotently) onto the dimension's lookup key before a
-territory-keyed `lookup.direct`; an unmapped value surfaces
-`unmapped: true` and scores at the lookup default (never silently wired
-to 1.0 without the diagnostic):
+The **geographic family** (V21–V23, V39–V40) locks the canonical geographic-dimension lookup domain (Plan Format Spec §6.2.1 / ADR-0028 / ADR-0038). `derive.territory` resolves a raw geographic value (a level id OR a territory id — idempotently) onto the dim's lookup key before a territory-keyed `lookup.direct`; an unmapped value surfaces `unmapped: true` and scores at the lookup default (never silently wired to 1.0 without the diagnostic):
 
 | Vector | File | What it proves |
 | ------ | ---- | -------------- |
 | V21 | `V21.geographic-dim.json` | A geographic dim with no territories rates directly on its levels (`state=WI` → 1.10) |
 | V22 | `V22.derive-territory.json` | Territory grouping drives scoring: `state=CA` → `derive.territory` → `T1` → 1.30 |
 | V23 | `V23.derive-territory-unmapped.json` | A value in no territory → `unmapped:true`, scores at the 1.0 default |
-| V39 | `V39.derive-territory-zip.json` | Synthetic location rollup: `zip=z101` → `t1` → 1.20 |
-| V40 | `V40.derive-territory-ungrouped-tail.json` | Mixed model: an ungrouped synthetic level self-maps and rates on itself (`z999` → 1.05), not the 1.0 default |
+| V39 | `V39.derive-territory-zip.json` | ZIP-granularity rollup (the Sample BOP shape): `zip=66101` → `701` → 1.20 |
+| V40 | `V40.derive-territory-ungrouped-tail.json` | Mixed model: an ungrouped level self-maps and rates on itself (`67999` → 1.05), not the 1.0 default |
 
 The runner asserts three things per vector:
 
@@ -812,7 +831,7 @@ To add a vector: drop a `V{n}.{slug}.json` file in
 array, AND list its stem in `conformance/manifest.json` — the
 lockstep assertion (engine) and the parity suite (scoring service)
 both read the manifest, so forgetting it fails loudly. PRs touching
-the bundled runtime or any bundled kind MUST keep the suite green.
+the bundled runtime or any V0 kind MUST keep the suite green.
 
 Vectors don't need to be numbered contiguously — names are the
 stable identifier; `V8.X` can ship before `V8.Y` lands.
@@ -849,7 +868,7 @@ The engine deliberately does NOT provide:
 - **Authentication, authorization, rate limiting**. Same.
 - **Persistence of plans or quotes**. The runtime is pure; the
   consuming application owns storage.
-- **Plan authoring UI**. That's [Rate Lab](../../frontend/), which
+- **Plan authoring UI**. That's [Rate Lab](../../rate-lab/), which
   is bundled but is a separate product surface from the engine
   itself. Integrators may embed Rate Lab OR build their own
   authoring UI on top of the `Plan` type.
@@ -860,6 +879,68 @@ The engine deliberately does NOT provide:
   your authoring layer, not from the runtime.
 
 These boundaries are intentional. The engine stays small and
-verifiable; integrations above it own the rest.
+verifiable; the OSS plug-ins above it own the rest.
 
 ---
+
+## Changelog
+
+- **2026-07-17** — **Documented the shipped refusal contract.** §4's
+  `RunResult`/`TraceEntry` listings now include `eligibility_tier`,
+  `issues`, `row_status`, and `skipped` (all shipped earlier as
+  additive fields); §5.2's inspection guidance leads with
+  `row_status`/`issues` and the withheld-output behavior; new §5.4
+  records the structured-issues decision (internally "ADR-0056") as
+  normative contract text, with the current append-only code
+  registries. No runtime behavior changed — this is the spec
+  catching up to the implementation.
+
+- **2026-05-19** (PR 2) — **Isolated registries.** Introduced
+  `KindRegistry` class + `globalRegistry` default instance. Added an
+  optional `registry?: KindRegistry` parameter to `compilePlan`,
+  `executePlan`, and `executePlanBatch`; `CompiledPlan` now carries
+  the registry it was compiled against (so `runPlan` can never drift
+  from compile-time validation). Subplan recursion inherits the
+  parent's registry. The pre-class module-level functions
+  (`registerBlockKind` / `getBlockKind` / `listBlockKinds` /
+  `listBlockKindsByCategory` / `findKindsAcceptingType` /
+  `_clearRegistryForTests`) remain — they now operate on
+  `globalRegistry`. Backwards-compatible: every existing call site
+  continues to work without change. Added 10 tests verifying global
+  vs isolated separation, including a "compiled-against-A, global-
+  mutated-to-B, A still wins" test. Closes the multi-tenant footgun
+  flagged in the 2026-05-19 architecture audit.
+
+- **2026-05-19** (PR 1) — **Enriched trace contract.** `TraceEntry`
+  is now a named exported type carrying `kindId` + `citation?` +
+  `explanation?` + `error?` alongside the existing `inputs` / `outputs`
+  fields. Added `kind.explainStep(inputs, params, outputs) → string`
+  to `BlockKind` (optional). The runtime catches throws from
+  `execute()` and writes them onto the trace as `{ error: { message,
+  at: "execute" } }` instead of unwinding the run — downstream nodes
+  still execute, seeing `undefined` from the failed port. §4 fully
+  rewritten with the new shape + the explainStep authoring
+  conventions; §5.2 + §5.3 updated to reflect that runs never throw.
+  10 of the 20 V0 kinds (the cold-test path) now implement
+  `explainStep`. No breaking changes to the `outputs` shape — only
+  additive fields on trace entries.
+
+- **2026-05-19** — Re-pointed to `@openrater/contracts` (the substrate
+  detached from the original prototype repo). All
+  paths under §"Source of truth", §1 (public API), §4 (Plan type
+  location), §8 (conformance suite) now reference the new
+  `packages/contracts/src/…` layout. Added `RunOptions` to the
+  stable signatures (the `as_of` parameter was previously
+  underspecified in §1). Added `registerBlockKind` + `getBlockKind`
+  + `listBlockKinds` + `registerBuiltinKinds` to the public API
+  surface — integrators wanting the bundled V0 set call
+  `registerBuiltinKinds()`. Added `BlockKind` + `PortSpec` +
+  related types to the stable types list (so integrators can
+  author CUSTOM kinds against a documented contract). Replaced
+  references to legacy V.22.A5 / V.22.S3 with the canonical names
+  for the validators + conformance suite. Activated the conformance
+  CI job — the suite runs on every PR now. No behavior changes.
+
+- **2026-05-18** — v1 normative. Documents the V.22.S3 conformance
+  suite + adds the `as_of` parameter (no-op today, forward-compat
+  for V.23 time-aware kinds).

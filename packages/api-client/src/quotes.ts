@@ -31,6 +31,10 @@ export const quoteResponseSchema = z.object({
   version: quoteVersionSchema,
   locations: z.array(z.record(z.unknown())).nullable().default(null),
   location_count: z.number().nullable().default(null),
+  // FCA #27 (finding 83) — the run-history record this quote landed
+  // as; null when ?record=false (ephemeral trace views) or on older
+  // servers.
+  run_id: z.string().nullable().default(null),
 });
 export type QuoteResponse = z.infer<typeof quoteResponseSchema>;
 
@@ -45,11 +49,19 @@ export interface QuoteRequestBody {
 export async function quotePlan(
   planId: string,
   body: QuoteRequestBody,
-  opts: { snapshotId?: string; draft?: boolean; signal?: AbortSignal } = {},
+  opts: {
+    snapshotId?: string;
+    draft?: boolean;
+    /** FCA #27 — false keeps an ephemeral quote (the drawer's
+     *  row-Trace view) OUT of run history. Default true. */
+    record?: boolean;
+    signal?: AbortSignal;
+  } = {},
 ): Promise<QuoteResponse> {
   const params = new URLSearchParams();
   if (opts.snapshotId !== undefined) params.set("snapshot_id", opts.snapshotId);
   if (opts.draft) params.set("draft", "true");
+  if (opts.record === false) params.set("record", "false");
   const qs = params.size > 0 ? `?${params.toString()}` : "";
   return request({
     method: "POST",

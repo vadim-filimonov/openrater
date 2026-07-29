@@ -1,17 +1,17 @@
 {
   "name": "V7.bop-like-end-to-end",
-  "description": "A fictional Meridian class lookup, limit band, and LCM compose into a deterministic premium.",
+  "description": "class lookup x tiv band x LCM -> premium.",
   "plan": {
     "id": "v7.bop",
     "version": "1.0.0",
-    "name": "Meridian synthetic end-to-end rate",
+    "name": "BOP-like rate",
     "line": "bop",
     "effective": "2026-01-01",
     "nodes": [
       { "id": "in_cls", "kind": "input", "params": { "fieldName": "class_code", "fieldType": "string" }, "position": { "x": 0, "y": 0 } },
       { "id": "in_tiv", "kind": "input", "params": { "fieldName": "tiv", "fieldType": "money" }, "position": { "x": 0, "y": 80 } },
       { "id": "cls_lkp", "kind": "lookup.direct",
-        "params": { "table": { "c102": 1.0, "c202": 1.25 }, "defaultValue": 1.0, "tableName": "Meridian synthetic class factor" },
+        "params": { "table": { "73911": 1.0, "73912": 1.32 }, "defaultValue": 1.0 },
         "position": { "x": 200, "y": 0 } },
       { "id": "tiv_lkp", "kind": "lookup.range",
         "params": {
@@ -37,6 +37,6 @@
       { "from": { "node": "mul",     "port": "result" }, "to": { "node": "out_p", "port": "value" } }
     ]
   },
-  "externalInputs": { "class_code": "c202", "tiv": 250000 },
-  "expectedOutputs": { "premium": 1425 }
+  "externalInputs": { "class_code": "73912", "tiv": 250000 },
+  "expectedOutputs": { "premium": 1504.8 }
 }

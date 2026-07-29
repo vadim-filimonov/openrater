@@ -25,6 +25,9 @@
  *
  * Pure. No special-casing in the runtime. Per Brief 17 P-ML8 (LOB
  * grouping is consistent + structural).
+ *
+ * See `docs/design-briefs/multi-lob-plans.md` §6 for the data shape
+ * + §7 for the rendering semantics.
  */
 
 import type { BlockKind, PortSpec } from "../block-types";

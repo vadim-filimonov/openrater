@@ -96,7 +96,7 @@ describe("tailSync (Brief 70 Phase 3)", () => {
   it("endorsement trigger values keep leading-zero strings (Brief 69)", () => {
     const draft: EndorsementDraft = {
       endorsement_id: "endo_1",
-      form_number: "MS 10 01",
+      form_number: "BP 04 17",
       display_name: "Protective safeguards",
       trigger: { variable: "class_code", op: "eq", value: "0521" },
       effect_kind: "factor",

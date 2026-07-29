@@ -10,7 +10,7 @@ import type { PolicyAdjustment } from "@openrater/contracts";
 
 const TAIL: PolicyAdjustment[] = [
   { kind: "schedule_rating", id: "irpm", display_name: "Schedule rating", cap_pct: 25, source: { from: "column", column: "irpm_total_pct" } },
-  { kind: "package_factor", id: "first_term_credit", display_name: "First-term credit", factor: 0.9, when: { field: "is_first_term", op: "eq", value: true } },
+  { kind: "package_factor", id: "pioneer", display_name: "Pioneer program", factor: 0.9, when: { field: "is_first_term", op: "eq", value: true } },
   { kind: "minimum_premium", id: "min", floor: 500 },
 ];
 
@@ -23,7 +23,7 @@ describe("FinalAdjustmentsEditor", () => {
   it("renders each row with its kind chip, name, when-note, and effect", () => {
     render(<FinalAdjustmentsEditor adjustments={TAIL} onChange={vi.fn()} />);
     expect(screen.getByText("Schedule rating")).toBeInTheDocument();
-    expect(screen.getByText("First-term credit")).toBeInTheDocument();
+    expect(screen.getByText("Pioneer program")).toBeInTheDocument();
     expect(screen.getByText("Minimum premium")).toBeInTheDocument();
     expect(screen.getByText("when is_first_term")).toBeInTheDocument();
     expect(screen.getByText("cap ±25%")).toBeInTheDocument();
@@ -43,7 +43,7 @@ describe("FinalAdjustmentsEditor", () => {
   it("removes a row", () => {
     const onChange = vi.fn();
     render(<FinalAdjustmentsEditor adjustments={TAIL} onChange={onChange} />);
-    fireEvent.click(screen.getByLabelText("Remove first_term_credit"));
+    fireEvent.click(screen.getByLabelText("Remove pioneer"));
     const next = onChange.mock.calls[0]![0] as PolicyAdjustment[];
     expect(next.map((a) => a.id)).toEqual(["irpm", "min"]);
   });
@@ -51,9 +51,9 @@ describe("FinalAdjustmentsEditor", () => {
   it("reorders rows with the up/down controls", () => {
     const onChange = vi.fn();
     render(<FinalAdjustmentsEditor adjustments={TAIL} onChange={onChange} />);
-    fireEvent.click(screen.getByLabelText("Move first_term_credit up"));
+    fireEvent.click(screen.getByLabelText("Move pioneer up")); // swap irpm/pioneer
     expect((onChange.mock.calls[0]![0] as PolicyAdjustment[]).map((a) => a.id)).toEqual([
-      "first_term_credit",
+      "pioneer",
       "irpm",
       "min",
     ]);
@@ -71,11 +71,11 @@ describe("FinalAdjustmentsEditor", () => {
   it("edits a package factor inline", () => {
     const onChange = vi.fn();
     render(<FinalAdjustmentsEditor adjustments={TAIL} onChange={onChange} />);
-    fireEvent.click(screen.getByRole("button", { name: "First-term credit" }));
+    fireEvent.click(screen.getByRole("button", { name: "Pioneer program" })); // expand
     fireEvent.change(screen.getByDisplayValue("0.9"), { target: { value: "0.85" } });
     const next = onChange.mock.calls.at(-1)![0] as PolicyAdjustment[];
-    const credit = next.find((a) => a.id === "first_term_credit");
-    expect(credit?.kind === "package_factor" && credit.factor).toBe(0.85);
+    const pioneer = next.find((a) => a.id === "pioneer");
+    expect(pioneer?.kind === "package_factor" && pioneer.factor).toBe(0.85);
   });
 
   it("switches the IRPM source from column to literal via the picker", () => {
@@ -94,7 +94,7 @@ describe("FinalAdjustmentsEditor", () => {
     expect(screen.getByRole("button", { name: /Author a connector in API Lab first/i })).toBeDisabled();
   });
 
-  it("offers NO Model segment because the source is retired", () => {
+  it("offers NO Model segment — the source is retired (Detachment Brief 1 S1)", () => {
     const onChange = vi.fn();
     const tail: PolicyAdjustment[] = [
       { kind: "schedule_rating", id: "irpm", display_name: "Schedule rating", cap_pct: 25, source: { from: "literal", total: 0 } },

@@ -9,7 +9,7 @@
  *
  * The "expected set" for a state is the canonical list of ZIPs (or
  * FIPS) USPS / Census publish. We accept it as input rather than
- * baking the data in — the caller (route or @openrater/ui consumer) loads
+ * baking the data in — the caller (route or labs-ui consumer) loads
  * the data once and passes it in. This keeps @openrater/contracts free of
  * megabyte-scale geo data.
  *

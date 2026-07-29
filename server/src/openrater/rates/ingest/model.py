@@ -282,7 +282,7 @@ class Manifest(BaseModel):
     provenance: ManifestProvenance
     counts: ManifestCounts
     gap_kinds: dict[str, int] = {}
-    # Drift tracking: the plan's
+    # Drift honesty (brief drift-honesty.md, MVP-008): the plan's
     # content_hash captured right after the build committed. The hash
     # covers metadata + stages, so live ≠ this catches gate/chain
     # edits; factor-cell edits are itemized directly against the

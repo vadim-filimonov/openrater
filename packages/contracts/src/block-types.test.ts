@@ -1,8 +1,11 @@
 /**
  * Type-system tests — `isCompatible` / `primitiveOf` / `isPrimitiveType`.
  *
- * These type-compatibility rules are the engine's wire-checking
- * contract and must stay aligned with plan validation.
+ * Ported verbatim from `<prototype>/plan-builder/src/blocks/
+ * __tests__/types.test.ts` (Phase A.1 of the original port plan). The type-
+ * compatibility rules ARE the engine's wire-checking contract; if
+ * these tests pass against the ported helpers, plans authored against
+ * either runtime produce identical wire-validation results.
  */
 
 import { describe, it, expect } from "vitest";

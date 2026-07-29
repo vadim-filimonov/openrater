@@ -8,6 +8,9 @@
  *   x op threshold → bool
  *
  * where op ∈ { eq, ne, lt, le, gt, ge }.
+ *
+ * Ported from `<prototype>/plan-builder/src/blocks/kinds/
+ * predicate.tsx` (Phase A.1 PR 8). PURE half only.
  */
 
 import type { BlockKind, PortSpec } from "../block-types";

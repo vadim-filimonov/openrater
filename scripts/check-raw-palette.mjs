@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Raw-palette discipline guard.
+ * Raw-palette discipline guard — Polish PR 9 (audit §C3).
  *
  * `tokens.css` says:
  *
@@ -17,8 +17,9 @@
  *
  * This guard scans every component file for `var(--rater-color-…)`
  * references and fails on any file not present in
- * `scripts/raw-palette-allowlist.txt`. As each file is migrated to
- * semantic tokens, it is removed from the allowlist.
+ * `scripts/raw-palette-allowlist.txt`. The allowlist documents the
+ * audit's sweep-in-progress: as each file is migrated to semantic
+ * tokens, it's removed from the allowlist.
  *
  * Exit codes:
  *   0 — every raw-palette reference is either in tokens.css or in
@@ -80,7 +81,7 @@ function isCommentLine(body) {
 /**
  * Find every `var(--rater-color-…)` reference + its file:line. Strip
  * matches in tokens.css (the only place raw refs are allowed), in
- * allowlisted files, and in comment lines (the
+ * allowlisted files (sweep in progress), and in comment lines (the
  * ref is documentation, not runtime).
  */
 function findUnallowedRefs(allowlist) {
@@ -163,7 +164,7 @@ function main() {
       `\x1b[32m✓ raw-palette-check: every var(--rater-color-…) reference is in tokens.css or allowlisted.\x1b[0m`,
     );
     console.log(
-      `  Allowlisted files: \x1b[33m${allowlist.size}\x1b[0m`,
+      `  Allowlisted files awaiting sweep: \x1b[33m${allowlist.size}\x1b[0m`,
     );
     if (cleaned.length > 0) {
       console.log("");
@@ -216,7 +217,7 @@ function main() {
   console.error("  --rater-cat-*, --rater-feedback-*, --rater-accent-*.");
   console.error("");
   console.error(
-    "  If the reference is an approved exception, add it to scripts/raw-palette-allowlist.txt.",
+    "  If the file is mid-sweep, add it to scripts/raw-palette-allowlist.txt.",
   );
 
   process.exit(1);

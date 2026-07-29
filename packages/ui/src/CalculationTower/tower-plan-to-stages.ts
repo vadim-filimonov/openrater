@@ -1,5 +1,5 @@
 /**
- * towerPlanToStages — save converter for the calculation tower.
+ * towerPlanToStages — Brief 25 §8.2 save converter (PR 12.1).
  *
  * The inverse of `stagesToTowerPlan`. Walks the editable `TowerPlan`
  * the user mutated via AssembleCanvas and emits the substrate
@@ -7,7 +7,7 @@
  * push to the backend.
  *
  * Pure data in / pure data out. No React, no I/O. Consumed by the
- * AssembleCanvas save path, which diffs the emitted stages
+ * AssembleCanvas save path (PR 12.2) which diffs the emitted stages
  * against the current server stages + fires per-stage mutations.
  *
  * ────────────────────────────────────────────────────────────────
@@ -19,10 +19,10 @@
  *     `factor-table`, `constant`, and `output` `NodeRef` variants.
  *
  *   ✓ Standalone `input_node` stages — the plan's full declared input
- *     dictionary is preserved verbatim, plus one minted for
+ *     dictionary is preserved verbatim (Brief 59), plus one minted for
  *     any chain base/exposure field not already declared (deduped). The
  *     runtime resolves `chain.base_input = "stages.<id>.value"` against
- *     these. NOTE: emitting only chain-referenced inputs (the former
+ *     these. NOTE: emitting only chain-referenced inputs (the pre-Brief-59
  *     behavior) caused the caller's diff to DELETE every other declared
  *     input on save — the input dictionary must always round-trip whole.
  *
@@ -50,7 +50,7 @@
  * `key_dimensions` (composite/2-D). Catalog missing → the converter
  * falls back to `{ class: { source: "form_input", path: table.id } }`
  * which preserves round-trip on the sample-bop fixture but is brittle
- * for user-authored tables; the real catalog keeps this
+ * for user-authored tables; PR 12.2 wires the real catalog so this
  * fallback is rarely hit.
  *
  * Round-trip property:
@@ -112,7 +112,7 @@ export interface TowerPlanToStagesOptions {
   readonly inputDtypeHints?: Readonly<Record<string, string>>;
   /**
    * Default exposure_unit_divisor when the converter can't infer
-   * one. Meridian BOP uses 100 (rate per $100); other LOBs use 1.
+   * one. ISO BOP uses 100 (rate per $100); other LOBs use 1.
    * Defaults to 100.
    */
   readonly defaultExposureUnitDivisor?: number;
@@ -131,6 +131,29 @@ export interface TowerPlanToStagesOptions {
  */
 function formInputPath(field: string): string {
   return `form_input.${field}`;
+}
+
+/**
+ * FCA fca-2026-07-25 #16 (the phantom edit) — a binding that already
+ * names its namespace stays VERBATIM. The exposure writer used to
+ * prefix `form_input.` unconditionally, so a workbook's `literal:1`
+ * round-tripped to the malformed `form_input.literal:1`: a VIEW
+ * session then persisted a hash-moving edit no user made, tripping
+ * the edited-since-build banner with a change the differ could not
+ * describe. Reader (strip `form_input.`) and writer are now inverses
+ * for every binding grammar form (R-127).
+ */
+function bindingPath(field: string): string {
+  if (
+    field.startsWith("form_input.") ||
+    field.startsWith("literal:") ||
+    field.startsWith("literal.") ||
+    field.startsWith("context.") ||
+    field.startsWith("stages.")
+  ) {
+    return field;
+  }
+  return formInputPath(field);
 }
 
 function stagePath(stageId: string): string {
@@ -265,7 +288,7 @@ function buildDimensionsForTable(
   const catalogKeys: readonly string[] =
     entry?.key_dimensions ??
     (entry?.key_dimension ? [entry.key_dimension] : [tableId]);
-  // Union the catalog's axes with any authored axis sources, so an
+  // ADR-0047 — union the catalog's axes with any authored axis sources, so an
   // authored secondary-axis source (literal / computed / derived) persists
   // even when the factor-table catalog is absent or lags the table's keys.
   const keys = new Set<string>([
@@ -304,12 +327,12 @@ interface ChainSpec {
     citation_rule: string;
     citation_page: string;
     description_template: string;
-    // Optional gate round-tripped from the factor-table reference.
+    // ADR-0047 — optional gate round-tripped from the factor-table ref.
     predicate?: { path: string; equals: boolean | number | string };
   }>;
   lcm: {
     factor_kind: string;
-    // An authored carrier LCM scalar (preferred) or a column path.
+    // ADR-0047 — an authored carrier LCM scalar (preferred) OR a column path.
     value?: number;
     input_path?: string;
     overridable?: boolean;
@@ -319,7 +342,7 @@ interface ChainSpec {
   };
   exposure_input: string;
   exposure_unit_divisor: number;
-  // Explicit opt-in to exposure-rated scoring for a per-account
+  // ADR-0047 — explicit opt-in to exposure-rated scoring for a per-account
   // tower (coverage towers auto-apply in the projector).
   apply_exposure?: boolean;
   output_field: string;
@@ -369,7 +392,7 @@ function projectTowerToChain(
       continue;
     }
     if (node.ref?.kind === "submission-field") {
-      // Normalize the field name; the load converter
+      // PR 12.1 — normalize the field name; the load converter
       // writes the chain's `base_input` verbatim onto the node's
       // ref.field, including `stages.X.value` / `form_input.X`
       // prefixes. Stripping them here keeps the save side from
@@ -396,7 +419,7 @@ function projectTowerToChain(
         citation_rule: "",
         citation_page: "",
         description_template: `${node.title}: ×{value}`,
-        // Reverse-project the gate onto FactorLookup.predicate.
+        // ADR-0047 — reverse-project the gate onto FactorLookup.predicate.
         ...(node.ref.predicate ? { predicate: node.ref.predicate } : {}),
       });
       continue;
@@ -406,7 +429,7 @@ function projectTowerToChain(
       (node.ref.role === "lcm" ||
         (node.ref.role === undefined && /lcm/i.test(node.ref.constantId)))
     ) {
-      // Prefer the authored scalar (`lcm.value`); the projector
+      // ADR-0047 — prefer the authored scalar (`lcm.value`); the projector
       // applies it AFTER the 3-dp rate round (folding it into base_value
       // rounds at the wrong point). Fall back to the legacy column path when
       // no value is authored. An overridable value keeps the column exposed
@@ -453,7 +476,7 @@ function projectTowerToChain(
   // Resolve the base_input stage id: prefer the preserved input_node
   // stage's id when one exists for this field (so a fixture's
   // `stage_id: "rate_number"` stays as-is and isn't regenerated to
-  // `input_rate_number`). The caller diffs this against the server
+  // `input_rate_number`). PR 12.2 will diff this against the server
   // stages — but inside this pure module, we just need the chain
   // path to be deterministic against the input_node we'll emit.
   const baseInputStageId = baseInputField
@@ -494,10 +517,10 @@ function projectTowerToChain(
       citation_page: "(carrier-set)",
       description_template: "Loss Cost Multiplier (carrier): {value}",
     },
-    // Prefer the tower's explicitly-authored exposure base over
+    // ADR-0047 — prefer the tower's explicitly-authored exposure base over
     // the submission-field convention; fall back to the dead placeholder.
     exposure_input: tower.exposureInput
-      ? formInputPath(tower.exposureInput)
+      ? bindingPath(tower.exposureInput)
       : exposureInputField
         ? formInputPath(exposureInputField)
         : formInputPath("exposure"),
@@ -567,7 +590,7 @@ function buildInputNodeStage(
 /**
  * Convert a TowerPlan into the substrate stage list the backend
  * stores. The diff against the current server stages happens at
- * the caller — this module just produces the desired
+ * the caller (PR 12.2) — this module just produces the desired
  * end-state shape.
  *
  * Stage emit order:
@@ -577,10 +600,10 @@ function buildInputNodeStage(
  *      clamp, round, eligibility.gate, …) in their original order
  */
 /**
- * Patch the sheet-editable fields over a clone of
+ * Brief 78 P5.3c — patch the sheet-editable fields over a clone of
  * the ORIGINAL chain spec (key order preserved), so everything the
  * tower model doesn't carry — class-conditional `exposure_options`
- * citations, description templates, unknown future
+ * (ADR-0044 D9), citations, description templates, unknown future
  * fields — survives verbatim, and an untouched chain re-emits its
  * exact original bytes.
  *
@@ -658,10 +681,10 @@ function patchChainOverOriginal(
   // (`input_path` only, no `value`): the sheet's "set a value" must
   // still persist. The old guard required the ORIGINAL to already
   // carry a numeric value, so setting one on a column-shaped chain
-  // saved a no-op while the pill said "Saved" (the 1.4 constant
+  // saved a no-op while the pill said "Saved" (the 1.401 constant
   // had to ride every book row as an `lcm` column). The value patches
   // onto the original envelope; the projector prefers an authored
-  // `value` over the column, so a stale input_path in the
+  // `value` over the column (ADR-0047), so a stale input_path in the
   // envelope is inert.
   const oLcm = original["lcm"];
   const rLcmVal = (rebuilt.lcm as Record<string, unknown> | undefined)?.[
@@ -675,7 +698,7 @@ function patchChainOverOriginal(
     ) {
       out["lcm"] = { ...(oLcm as Record<string, unknown>), value: rLcmVal };
     } else if (oLcm === undefined || oLcm === null) {
-      // No original LCM at all — take the rebuilt shape
+      // No original LCM at all — take the rebuilt ADR-0047 shape
       // wholesale so an authored constant isn't dropped.
       out["lcm"] = rebuilt.lcm as unknown as Record<string, unknown>;
     }
@@ -715,7 +738,7 @@ export function towerPlanToStages(
 ): readonly StageInput[] {
   const preserved = opts.preservedStages ?? [];
 
-  // PATCH-OVER-ORIGINAL replaces the old whole-stage
+  // Brief 78 P5.3c — PATCH-OVER-ORIGINAL replaces the old whole-stage
   // verbatim guard. Each loaded tower carries its ORIGINAL chain spec
   // (`Tower.chainVerbatim`); the save path clones it and applies only
   // the sheet-editable fields (base value · factor-lookup set +
@@ -723,7 +746,7 @@ export function towerPlanToStages(
   // Untouched chains therefore round-trip byte-identically (the
   // route's dirty signal is a raw JSON.stringify — key order
   // included), while class-conditional `exposure_options`
-  // citations and description templates survive every
+  // (ADR-0044 D9), citations, and description templates survive every
   // edit. The old guard emitted the WHOLE stage verbatim whenever ANY
   // chain carried an `exposure_options` key (even an empty `[]`),
   // which silently discarded every tower edit on such plans — the
@@ -736,7 +759,7 @@ export function towerPlanToStages(
   const inputFields = new Set<string>();
 
   // Reverse-project every tower → ChainSpec. Skip the "Total" tower
-  // (which is read-only) — it is a sum projection
+  // (which is read-only per Brief 25 §10) — it's a sum projection
   // computed from sibling towers, not its own chain.
   const chains: ChainSpec[] = [];
   const chainEmits: Array<{
@@ -751,7 +774,8 @@ export function towerPlanToStages(
     // a `coverage_value` (every "+ Add coverage" chain pre-2026-07-10)
     // projected to a tower with ratingDimensionValue undefined, and the
     // LAST one was silently DROPPED on every save — a 3-coverage plan
-    // decayed to one across routine autosaves.
+    // decayed to 1 across routine autosaves (Sample BOP platform test,
+    // finding E1; docs/stress-tests/sample-bop-platform/rating-errors.md).
     if (isTotalTower(tower)) continue;
 
     const { spec, baseInputField, exposureInputField } = projectTowerToChain(
@@ -771,7 +795,7 @@ export function towerPlanToStages(
 
   // Emit input_node stages first.
   //
-  // The Assemble save must not delete the plan's
+  // CRITICAL (Brief 59) — the Assemble save MUST NOT delete the plan's
   // declared input dictionary. The caller diffs this `desired` list
   // against the server stages and *removes* anything absent, so every
   // preserved `input_node` has to appear here — not only the handful a
@@ -813,7 +837,7 @@ export function towerPlanToStages(
 
   // Emit the chain stage (if any chains). With a preserved original,
   // keep its stage identity + config envelope and patch each chain
-  // over its verbatim spec (byte-stable when untouched,
+  // over its verbatim spec (Brief 78 P5.3c — byte-stable untouched,
   // edits flow, exposure_options survive). Born-in-the-sheet plans
   // (no preserved chain stage) emit the canonical rebuilt stage.
   const chainStage: StageInput | null = preservedChainStage

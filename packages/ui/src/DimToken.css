@@ -46,7 +46,7 @@ button.rater-dimtoken--row,
   padding: var(--rater-s-10) var(--rater-s-12);
   border-radius: var(--rater-r-8);
 }
-button.rater-dimtoken--row:hover:not(disabled),
+button.rater-dimtoken--row:hover:not(:disabled),
 .rater-dimtoken--row.is-selected {
   background: var(--rater-row-hover-bg);
 }

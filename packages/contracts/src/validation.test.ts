@@ -53,12 +53,12 @@ describe("validatePlanReferences · baselines", () => {
       ...EMPTY_PLAN_SNAPSHOT,
       dimensions: [dimFx("construction_class"), dimFx("territory")],
       sources: [srcFx("tiv"), srcFx("class_code")],
-      factorTables: [tableFx("meridian_base", [])],
+      factorTables: [tableFx("iso_base", [])],
       chains: [
         chainFx("property", [
           { name: "Base", type: "constant", ref: null },
           { name: "Construction", type: "dimension", ref: "construction_class" },
-          { name: "Meridian base", type: "factor_table", ref: "meridian_base" },
+          { name: "ISO base", type: "factor_table", ref: "iso_base" },
           { name: "TIV", type: "input", ref: "tiv" },
         ]),
       ],
@@ -112,7 +112,7 @@ describe("validatePlanReferences · chain factor references", () => {
       ...EMPTY_PLAN_SNAPSHOT,
       chains: [
         chainFx("property", [
-          { name: "Meridian base", type: "factor_table", ref: "meridian_base_v2" },
+          { name: "ISO base", type: "factor_table", ref: "iso_base_v2" },
         ]),
       ],
     };
@@ -120,7 +120,7 @@ describe("validatePlanReferences · chain factor references", () => {
     expect(result.issues).toHaveLength(1);
     expect(result.issues[0]?.brokenRef).toEqual({
       kind: "factor_table",
-      id: "meridian_base_v2",
+      id: "iso_base_v2",
     });
   });
 
@@ -191,7 +191,7 @@ describe("validatePlanReferences · factor table key bindings", () => {
     const plan: PlanEntitiesSnapshot = {
       ...EMPTY_PLAN_SNAPSHOT,
       factorTables: [
-        tableFx("meridian_base", [
+        tableFx("iso_base", [
           { name: "construction", binding_source: "dimension", binding_name: "construction_clas" },
         ]),
       ],
@@ -273,7 +273,7 @@ describe("validatePlanReferences · realistic plan", () => {
       dimensions: [dimFx("construction_class"), dimFx("territory")],
       sources: [srcFx("tiv"), srcFx("class_code")],
       factorTables: [
-        tableFx("meridian_base", [
+        tableFx("iso_base", [
           { name: "construction", binding_source: "dimension", binding_name: "construction_class" },
         ]),
       ],
@@ -282,8 +282,8 @@ describe("validatePlanReferences · realistic plan", () => {
           { name: "Base", type: "constant", ref: null },
           { name: "Construction", type: "dimension", ref: "construction_class" }, // OK
           { name: "Bad-class", type: "dimension", ref: "construction_clas" }, // typo
-          { name: "Meridian base", type: "factor_table", ref: "meridian_base" }, // OK
-          { name: "Missing-table", type: "factor_table", ref: "meridian_v2" }, // missing
+          { name: "ISO base", type: "factor_table", ref: "iso_base" }, // OK
+          { name: "Missing-table", type: "factor_table", ref: "iso_v2" }, // missing
         ]),
       ],
     };
@@ -292,7 +292,7 @@ describe("validatePlanReferences · realistic plan", () => {
     const refs = result.issues.map((i) => i.brokenRef);
     expect(refs).toEqual([
       { kind: "dimension", id: "construction_clas" },
-      { kind: "factor_table", id: "meridian_v2" },
+      { kind: "factor_table", id: "iso_v2" },
     ]);
   });
 });

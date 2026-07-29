@@ -6,7 +6,7 @@
  * Pure function; takes whatever sources the caller has available +
  * returns a deterministic-ordered list.
  *
- * The @openrater/ui `<UsedInPanel>` consumes this list to render the
+ * The labs-ui `<UsedInPanel>` consumes this list to render the
  * navigational hub in the dim editor (Brief 30 §6 / Frame 3).
  *
  * Brief 34 PR 34.7 removed the curve walk: curves no longer exist
@@ -39,9 +39,9 @@ export interface ChainStageSummary {
 }
 
 /**
- * One reference to a dimension. Mirrors the @openrater/ui
+ * One reference to a dimension. Mirrors the labs-ui
  * `DimensionReference` shape but lives in @openrater/contracts so the
- * route can compose it without importing UI types.
+ * route can compose it without importing labs-ui types.
  */
 export interface DimensionReferenceLite {
   /** Discriminator — drives the editor's icon + accent. */

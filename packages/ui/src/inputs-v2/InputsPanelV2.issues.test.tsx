@@ -3,7 +3,7 @@
  *
  * Fixture: base × class_rel(class_code) with the Law-2 `error` policy
  * stamped on the lookup (what the projector authors by default). Row 1
- * resolves (c101 → 1.32); row 2's class code is unknown → the row
+ * resolves (73912 → 1.32); row 2's class code is unknown → the row
  * REFUSES: an "Error" chip (never "—", never a dollar), a red note in
  * the headline, and the audit trace naming the unknown key. Plus the
  * projection-issues strip: a degraded plan can't sit under a confident
@@ -44,7 +44,7 @@ const PLAN: Plan = {
       id: "lk_class",
       kind: "lookup.direct",
       params: {
-        table: { "c101": 1.32 },
+        table: { "73912": 1.32 },
         defaultValue: 1.0,
         tableName: "class_rel",
         keySource: "class_code",
@@ -71,7 +71,7 @@ const MAPPING: PlanInputMapping = {
     kind: "csv",
     columns: ["base", "class_code"],
     sample_rows: [
-      { base: "1000", class_code: "c101" },
+      { base: "1000", class_code: "73912" },
       { base: "1000", class_code: "99999" },
     ],
   },

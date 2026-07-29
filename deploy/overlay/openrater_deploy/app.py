@@ -15,7 +15,7 @@ Environment:
   RATER_SPA_DIR               directory holding the built SPA (default /app/spa).
 
 All other config (DB path, CORS, logging) is read by the OSS core from its
-own environment variables — see deploy/.env.example.
+own env vars — see docs/AWS_DEPLOYMENT_PLAN.md / deploy/.env.example.
 """
 
 from __future__ import annotations
