@@ -71,9 +71,9 @@ function toCellsMap(
 }
 
 export function projectStagesToPlan(input: ProjectStagesInput): Plan {
-  // TODO(P2/G5): return the full ProjectionResult and carry `issues`
-  // into the /score response as `planIssues` (ADR-0056) — lands with
-  // the input-dictionary validation step.
+  // TODO: return the full ProjectionResult and carry `issues` into
+  // the /score response as `planIssues` — lands with the
+  // input-dictionary validation step.
   return stagesToRuntimePlan(
     input.stages as unknown as StagesArg,
     input.dimensions as unknown as Dimension[],
