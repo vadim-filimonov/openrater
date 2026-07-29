@@ -8,6 +8,36 @@ and [Semantic Versioning](https://semver.org/).
 
 Nothing yet.
 
+## [0.1.2] — 2026-07-29
+
+The 0.1.1 changes, released for real. 0.1.1 was tagged but never
+released: its build pipeline reported success while Apple returned
+`Invalid` on both macOS notarization submissions — the two script
+lineages had been hardened in parallel, and the 0.1.1 port kept one
+side's fixes while dropping the other's. Do not use artifacts from
+the v0.1.1 tag build; they are not notarized.
+
+### Fixed (release lane)
+
+- Restored the Mach-O symlink materialization (zip packing orphans
+  bundle-context signatures — the notarization rejection cause), the
+  deepest-first whole-bundle signing sweep, and the stage forensics
+  (signature spot-checks + a dlopen probe on the packed artifact).
+- Restored the honest notary flow: submit without `--wait`, a
+  transient-tolerant poll, a hard FAILURE on `Invalid`/`Rejected`
+  with Apple's detailed findings printed, and keep-the-artifact on a
+  queue timeout. `notarytool submit --wait` exits 0 on a rejection —
+  the 0.1.1 build went green on exactly that.
+- Restored the per-platform manifest declaration: each bundle now
+  declares only the platform it was built on.
+- Kept from the 0.1.1 lane: the committed comment-free JIT
+  entitlements plist for the bundled Node runtime and the real-JS
+  `verify-node-runtime` gate at build, post-sign, and on the exact
+  shipped bytes.
+
+Proof run at this lane: notarization `Accepted` on both macOS
+architectures, all gates green.
+
 ## [0.1.1] — 2026-07-29
 
 The trust release: every finding from an independent 35-problem

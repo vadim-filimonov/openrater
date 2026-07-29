@@ -1,6 +1,6 @@
 {
   "name": "openrater",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "private": true,
   "description": "Open-source operating system for property + casualty insurance rating. Four Labs (Rate · Model · API · Data) share a typed substrate. See VISION.md.",
   "type": "module",
