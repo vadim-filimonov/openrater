@@ -8,6 +8,19 @@ and [Semantic Versioning](https://semver.org/).
 
 Nothing yet.
 
+## [0.1.3] — 2026-07-29
+
+Listing-metadata completeness on top of 0.1.2 (no engine or app
+changes).
+
+### Fixed
+
+- The bundle manifest now declares all 18 tools — `compare_plans`
+  and `compare_runs` (0.1.2's headline additions) were missing from
+  the manifest's tool list, so directory listings under-advertised
+  the surface. Runtime behavior was never affected; tools are
+  discovered live.
+
 ## [0.1.2] — 2026-07-29
 
 The 0.1.1 changes, released for real. 0.1.1 was tagged but never
