@@ -1,0 +1,493 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OpenRater — turn a rate filing into a working rating engine</title>
+<meta name="description" content="OpenRater makes insurance rating manuals executable. An AI transcribes the filing into a reviewable Excel workbook; a deterministic engine rates; every number carries a citation. Local-first, open source, Apache-2.0.">
+<link rel="canonical" href="https://vadim-filimonov.github.io/openrater/">
+<link rel="icon" type="image/png" href="assets/icon.png">
+<link rel="apple-touch-icon" href="assets/icon.png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="OpenRater — turn a rate filing into a working rating engine">
+<meta property="og:description" content="An AI transcribes the filing into a reviewable workbook; a deterministic engine rates; every number carries a citation. Local-first, open source.">
+<meta property="og:url" content="https://vadim-filimonov.github.io/openrater/">
+<meta property="og:image" content="https://vadim-filimonov.github.io/openrater/assets/plan-report.png">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "OpenRater",
+  "operatingSystem": "macOS, Windows",
+  "applicationCategory": "BusinessApplication",
+  "description": "Turns insurance rate filings into working, auditable rating engines. An AI transcribes the filing into a reviewable Excel workbook; a deterministic compiler validates and builds the executable plan; every number carries a page-level citation.",
+  "url": "https://vadim-filimonov.github.io/openrater/",
+  "downloadUrl": "https://github.com/vadim-filimonov/openrater/releases/latest",
+  "license": "https://www.apache.org/licenses/LICENSE-2.0",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#f6f1e7; --paper-2:#efe8d9; --ink:#1c1915; --ink-2:#5c554a;
+    --rule:rgba(28,25,21,.22); --rule-soft:rgba(28,25,21,.1);
+    --green:#1e5c46; --red:#9e2b25; --red-soft:rgba(158,43,37,.55);
+    --frame-shadow:rgba(28,25,21,.16);
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --paper:#16130f; --paper-2:#1d1913; --ink:#ece4d3; --ink-2:#a99f8c;
+      --rule:rgba(236,228,211,.26); --rule-soft:rgba(236,228,211,.12);
+      --green:#5cb894; --red:#e06a5f; --red-soft:rgba(224,106,95,.6);
+      --frame-shadow:rgba(0,0,0,.5);
+    }
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--paper); color:var(--ink);
+    font-family:"Fraunces",Georgia,serif; font-optical-sizing:auto;
+    font-size:17px; line-height:1.6;
+    background-image:repeating-linear-gradient(to bottom, transparent 0 31px, var(--rule-soft) 31px 32px);
+  }
+  .mono{font-family:"IBM Plex Mono",ui-monospace,monospace}
+  a{color:inherit}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+  ::selection{background:var(--green);color:var(--paper)}
+
+  /* ---------- header ---------- */
+  header{border-bottom:1px solid var(--rule);background:var(--paper)}
+  .bar{display:flex;align-items:center;gap:14px;padding:14px 0}
+  .bar img{width:30px;height:30px;border-radius:7px}
+  .bar .name{font-weight:600;font-size:19px;letter-spacing:.01em}
+  .bar nav{margin-left:auto;display:flex;gap:22px;font-family:"IBM Plex Mono",monospace;font-size:12.5px;letter-spacing:.04em}
+  .bar nav a{text-decoration:none;color:var(--ink-2);text-transform:uppercase}
+  .bar nav a:hover{color:var(--ink)}
+
+  /* ---------- hero ---------- */
+  .hero{padding:72px 0 56px;position:relative;overflow:hidden}
+  .hero .wrap{display:grid;grid-template-columns:minmax(0,10fr) minmax(0,9fr);gap:56px;align-items:center}
+  .eyebrow{font-family:"IBM Plex Mono",monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-2);display:flex;align-items:center;gap:10px}
+  .eyebrow::before{content:"";width:34px;height:1px;background:var(--red)}
+  h1{font-size:clamp(38px,4.6vw,56px);line-height:1.06;font-weight:600;letter-spacing:-.015em;margin:18px 0 20px;text-wrap:balance}
+  h1 em{font-style:italic;font-weight:500;color:var(--green)}
+  .sub{font-size:18.5px;color:var(--ink-2);max-width:34em}
+  .sub sup a{color:var(--red);text-decoration:none;font-family:"IBM Plex Mono",monospace;font-size:.72em}
+  .cta{display:flex;flex-wrap:wrap;gap:14px;margin-top:30px;align-items:center}
+  .btn{font-family:"IBM Plex Mono",monospace;font-size:13.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;
+       text-decoration:none;padding:14px 22px;border:1.5px solid var(--ink);display:inline-flex;gap:10px;align-items:center;
+       transition:transform .15s ease, box-shadow .15s ease}
+  .btn:focus-visible{outline:2px solid var(--green);outline-offset:3px}
+  .btn.primary{background:var(--ink);color:var(--paper)}
+  .btn.primary:hover{transform:translate(-2px,-2px);box-shadow:4px 4px 0 var(--red-soft)}
+  .btn.ghost:hover{background:var(--paper-2)}
+  .alt-dl{margin-top:14px;font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--ink-2)}
+  .alt-dl a{color:var(--ink-2)} .alt-dl a:hover{color:var(--ink)}
+  .ver{color:var(--green);font-weight:600}
+
+  .plate{position:relative}
+  .plate .frame{border:1px solid var(--rule);background:#101014;box-shadow:14px 14px 0 var(--frame-shadow);line-height:0}
+  .plate img{width:100%;height:auto;display:block}
+  .plate figcaption{font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--ink-2);margin-top:12px;letter-spacing:.03em}
+  .stamp{
+    position:absolute;top:-26px;right:-14px;transform:rotate(6deg);
+    font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--red);border:2.5px double var(--red-soft);padding:9px 13px;background:var(--paper);
+    animation:stamp .5s cubic-bezier(.2,1.6,.4,1) .35s both;
+  }
+  @keyframes stamp{from{opacity:0;transform:rotate(6deg) scale(1.7)}to{opacity:1;transform:rotate(6deg) scale(1)}}
+
+  /* ---------- fact strip ---------- */
+  .facts{border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);background:var(--paper-2)}
+  .facts .wrap{display:flex;gap:34px;overflow-x:auto;padding-top:13px;padding-bottom:13px;white-space:nowrap;scrollbar-width:none}
+  .facts .wrap::-webkit-scrollbar{display:none}
+  .fact{font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--ink-2);letter-spacing:.02em}
+  .fact b{color:var(--ink);font-weight:600}
+  .fact .ok{color:var(--green)}
+
+  /* ---------- sections ---------- */
+  section{padding:72px 0}
+  .sec-head{display:flex;align-items:baseline;gap:18px;margin-bottom:40px}
+  .sec-no{font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--red);letter-spacing:.1em}
+  h2{font-size:clamp(26px,3vw,34px);font-weight:600;letter-spacing:-.01em}
+  .sec-note{margin-left:auto;font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--ink-2);display:none}
+  @media(min-width:760px){.sec-note{display:block}}
+
+  /* the loop — ledger rows */
+  .ledger{border-top:1px solid var(--rule)}
+  .row{display:grid;grid-template-columns:150px minmax(0,1fr) 210px;gap:22px;padding:22px 0;border-bottom:1px solid var(--rule);align-items:baseline}
+  .row .arti{font-family:"IBM Plex Mono",monospace;font-size:13.5px;font-weight:600}
+  .row .arti .n{color:var(--red);margin-right:8px;font-weight:400}
+  .row .desc{color:var(--ink-2);font-size:16px}
+  .row .desc b{color:var(--ink);font-weight:600}
+  .row .who{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--green);text-align:right}
+  .row .who.human{color:var(--red)}
+  @media(max-width:760px){.row{grid-template-columns:1fr;gap:6px}.row .who{text-align:left}}
+
+  /* trust cards */
+  .cards{display:grid;grid-template-columns:repeat(2,1fr);gap:22px}
+  @media(max-width:760px){.cards{grid-template-columns:1fr}}
+  .card{border:1px solid var(--rule);padding:26px;background:var(--paper);transition:border-color .15s ease, transform .15s ease}
+  .card:hover{border-color:var(--ink);transform:translateY(-2px)}
+  .card h3{font-size:20px;font-weight:600;margin-bottom:10px}
+  .card h3 sup{color:var(--red);font-family:"IBM Plex Mono",monospace;font-size:.6em}
+  .card p{color:var(--ink-2);font-size:15.5px}
+  .card p code{font-family:"IBM Plex Mono",monospace;font-size:.85em;background:var(--paper-2);padding:1px 5px;border:1px solid var(--rule-soft)}
+  .trust-plate{margin-top:44px;display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:40px;align-items:center}
+  @media(max-width:860px){.trust-plate{grid-template-columns:1fr}}
+  .trust-plate .blurb h3{font-size:22px;margin-bottom:12px;font-weight:600}
+  .trust-plate .blurb p{color:var(--ink-2);font-size:16px}
+  .trust-plate .blurb .big{font-family:"IBM Plex Mono",monospace;color:var(--green);font-weight:600}
+
+  /* install */
+  .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:22px;counter-reset:step}
+  @media(max-width:960px){.steps{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:560px){.steps{grid-template-columns:1fr}}
+  .step{border-top:2px solid var(--ink);padding-top:16px}
+  .step::before{counter-increment:step;content:counter(step,decimal-leading-zero);font-family:"IBM Plex Mono",monospace;color:var(--red);font-size:13px;letter-spacing:.1em}
+  .step h3{font-size:18.5px;font-weight:600;margin:6px 0 8px}
+  .step p{color:var(--ink-2);font-size:14.5px}
+  .step a{color:var(--ink)}
+  .step .say{display:block;margin-top:8px;font-style:italic;color:var(--ink)}
+  table.plat{width:100%;border-collapse:collapse;margin-top:36px;font-size:14.5px}
+  table.plat caption{text-align:left;font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-2);padding-bottom:10px}
+  table.plat td{padding:11px 0;border-top:1px solid var(--rule)}
+  table.plat td:last-child{text-align:right;font-family:"IBM Plex Mono",monospace;font-size:13px}
+  table.plat a{text-decoration:none;border-bottom:1px dotted var(--rule);color:var(--ink)}
+  table.plat a:hover{border-bottom-color:var(--ink)}
+  .plat-note{margin-top:14px;font-size:13.5px;color:var(--ink-2)}
+
+  /* personas */
+  .personas .row2{display:grid;grid-template-columns:230px minmax(0,1fr);gap:22px;padding:20px 0;border-bottom:1px solid var(--rule);align-items:baseline}
+  .personas .row2:first-of-type{border-top:1px solid var(--rule)}
+  @media(max-width:660px){.personas .row2{grid-template-columns:1fr;gap:4px}}
+  .personas .who2{font-family:"IBM Plex Mono",monospace;font-size:13px;font-weight:600}
+  .personas .how{color:var(--ink-2);font-size:15.5px}
+  .personas .how b{color:var(--ink);font-weight:600}
+  .personas .how a{color:var(--ink)}
+
+  /* leaders (dotted) */
+  .leader-row{display:flex;align-items:baseline;gap:12px}
+  .leader{flex:1;border-bottom:2px dotted var(--rule);transform:translateY(-4px)}
+
+  /* footer */
+  footer{border-top:1px solid var(--rule);padding:54px 0 60px;background:var(--paper-2)}
+  footer .cols{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,4fr);gap:48px}
+  @media(max-width:760px){footer .cols{grid-template-columns:1fr}}
+  footer h4{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-2);margin-bottom:14px}
+  footer p{font-size:14px;color:var(--ink-2);margin-bottom:12px}
+  footer p b{color:var(--ink)}
+  .fn{font-size:13.5px;color:var(--ink-2)}
+  .fn .mark{color:var(--red);font-family:"IBM Plex Mono",monospace}
+  footer ul{list-style:none}
+  footer li{padding:7px 0;border-bottom:1px solid var(--rule-soft)}
+  footer li a{font-family:"IBM Plex Mono",monospace;font-size:13px;text-decoration:none}
+  footer li a:hover{color:var(--green)}
+  .fine{margin-top:40px;padding-top:18px;border-top:1px solid var(--rule);font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--ink-2);display:flex;flex-wrap:wrap;gap:8px 26px}
+
+  /* reveal */
+  .reveal{opacity:0;transform:translateY(14px);animation:up .6s ease forwards}
+  .d1{animation-delay:.05s}.d2{animation-delay:.15s}.d3{animation-delay:.25s}
+  @keyframes up{to{opacity:1;transform:none}}
+  @media (prefers-reduced-motion: reduce){
+    .reveal,.stamp{animation:none;opacity:1;transform:none}
+    html{scroll-behavior:auto}
+    .btn.primary:hover,.card:hover{transform:none}
+  }
+  @media(max-width:900px){
+    .hero .wrap{grid-template-columns:1fr;gap:44px}
+    .stamp{right:6px}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap bar">
+    <img src="assets/icon.png" alt="" width="30" height="30">
+    <span class="name">OpenRater</span>
+    <nav aria-label="Site">
+      <a href="#install">Install</a>
+      <a href="https://github.com/vadim-filimonov/openrater">GitHub</a>
+      <a href="https://github.com/vadim-filimonov/openrater/releases">Releases</a>
+      <a href="https://github.com/vadim-filimonov/openrater/blob/main/docs/PRIVACY.md">Privacy</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+<section class="hero" aria-label="Introduction">
+  <div class="wrap">
+    <div>
+      <p class="eyebrow reveal d1">Open source · local-first · Apache-2.0</p>
+      <h1 class="reveal d1">Turn a rate filing into a working rating engine — <em>with a citation for every number.</em></h1>
+      <p class="sub reveal d2">Rating manuals are hundreds of pages of factor tables, rules, and a
+      rating order, filed as PDFs. OpenRater makes them executable: an AI transcribes the filing
+      into a reviewable Excel workbook, a deterministic compiler builds the engine, and every
+      factor traces back to its page.<sup><a href="#fn1" id="ref1">1</a></sup></p>
+      <div class="cta reveal d3">
+        <a class="btn primary" id="dl-btn" href="https://github.com/vadim-filimonov/openrater/releases/latest">↓&nbsp;<span id="dl-label">Download</span></a>
+        <a class="btn ghost" href="https://github.com/vadim-filimonov/openrater">View on GitHub</a>
+      </div>
+      <p class="alt-dl reveal d3"><span id="dl-ver" class="ver"></span>
+        <a id="alt-arm" href="https://github.com/vadim-filimonov/openrater/releases/latest">Apple&nbsp;silicon</a> ·
+        <a id="alt-x64" href="https://github.com/vadim-filimonov/openrater/releases/latest">Intel&nbsp;Mac</a> ·
+        <a id="alt-win" href="https://github.com/vadim-filimonov/openrater/releases/latest">Windows</a> ·
+        <a href="https://github.com/vadim-filimonov/openrater/releases/latest">all&nbsp;downloads&nbsp;→</a></p>
+    </div>
+    <figure class="plate reveal d2">
+      <span class="stamp" aria-hidden="true">The AI transcribes · never calculates</span>
+      <div class="frame"><img src="assets/plan-report.png" alt="OpenRater plan report: a Businessowners plan for Nebraska showing a $826 reference premium, the rating chain, and ranked price drivers" loading="eager"></div>
+      <figcaption>Fig. 1 · The plan report — the algorithm narrated, price drivers ranked, nothing hand-typed.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<div class="facts" role="note" aria-label="Project facts">
+  <div class="wrap">
+    <span class="fact"><b class="ok">40/40</b> filing worked-examples reprice exactly</span>
+    <span class="fact"><b>115</b> factor cells · every one cited to a page</span>
+    <span class="fact"><b>0</b> AI calls at rating time</span>
+    <span class="fact"><b>18</b> MCP tools for any agent</span>
+    <span class="fact"><b>127.0.0.1</b> only · no telemetry</span>
+  </div>
+</div>
+
+<section id="loop" aria-labelledby="loop-h">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-no">§ 1</span>
+      <h2 id="loop-h">The loop</h2>
+      <span class="sec-note">filing → workbook → plan → premium</span>
+    </div>
+    <div class="ledger">
+      <div class="row">
+        <span class="arti"><span class="n">a.</span>filing.pdf</span>
+        <p class="desc">The rating manual you are entitled to use — factor tables, classification
+        rules, territory definitions, the rating order. <b>You bring the document.</b> OpenRater
+        never fetches filings.</p>
+        <span class="who human">you</span>
+      </div>
+      <div class="row">
+        <span class="arti"><span class="n">b.</span>workbook.xlsx</span>
+        <p class="desc">The AI transcribes into a spec'd workbook — every cell cites its source page,
+        unsupported constructs land in a <b>gaps-and-assumptions sheet</b> instead of being
+        approximated. An ordinary Excel file an actuary can open, audit, and correct.</p>
+        <span class="who">ai transcribes · you review</span>
+      </div>
+      <div class="row">
+        <span class="arti"><span class="n">c.</span>plan + report</span>
+        <p class="desc">A deterministic compiler validates and builds the executable plan — <b>zero AI
+        from here on</b>. The filing's own worked examples run as acceptance tests; the build report
+        carries page-level provenance for every factor.</p>
+        <span class="who">platform</span>
+      </div>
+      <div class="row">
+        <span class="arti"><span class="n">d.</span>premium</span>
+        <p class="desc">Walk any risk through the algorithm step by step, quote one risk in chat,
+        serve a local quote API, or re-rate a whole book from CSV. <b>Same inputs, same answer,
+        every time.</b></p>
+        <span class="who">platform</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="trust" aria-labelledby="trust-h" style="padding-top:0">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-no">§ 2</span>
+      <h2 id="trust-h">Why trust it</h2>
+      <span class="sec-note">trust is a paper trail, not a promise</span>
+    </div>
+    <div class="cards">
+      <div class="card">
+        <h3>Every number has a citation<sup>&nbsp;p.&thinsp;n</sup></h3>
+        <p>The build report records where each factor came from, to the page. Re-ingesting a revised
+        workbook shows a cell-grain diff before anything is applied.</p>
+      </div>
+      <div class="card">
+        <h3>The filing tests itself</h3>
+        <p>Worked examples from the source document become acceptance tests in the
+        <code>test_cases</code> sheet — correctness is pinned against the filing, not against
+        anyone's opinion.</p>
+      </div>
+      <div class="card">
+        <h3>Refuse, never improvise</h3>
+        <p>An input the plan can't rate is a structured, visible error — never a silent neutral
+        factor, never a plausible-but-wrong premium.</p>
+      </div>
+      <div class="card">
+        <h3>A human seat, built in</h3>
+        <p>The workbook in the middle of the pipeline is the review gate: transcription stops there
+        until a person has looked. Corrections re-enter as a diff, not a mystery.</p>
+      </div>
+    </div>
+    <div class="trust-plate">
+      <div class="blurb">
+        <h3>The build report says so — or it says no.</h3>
+        <p>Each build replays the filing's worked examples through the production engine and prints
+        the ledger: <span class="big">40 of 40 checks</span> match to the penny, warnings are
+        itemized, and everything the transcriber assumed is flagged for review — before the first
+        real risk is rated.</p>
+      </div>
+      <figure class="plate" style="margin:0">
+        <div class="frame"><img src="assets/build-report.png" alt="OpenRater build report: 40 of 40 filing-example checks matching, plan checks itemized, and transcriber assumptions flagged for review" loading="lazy"></div>
+        <figcaption>Fig. 2 · The build report — verification against the filing's own examples.</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section id="install" aria-labelledby="install-h" style="border-top:1px solid var(--rule);background:var(--paper-2)">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-no">§ 3</span>
+      <h2 id="install-h">Install</h2>
+      <span class="sec-note">one signed file · no terminal</span>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <h3>Get Claude Desktop</h3>
+        <p><a href="https://claude.ai/download">Install Claude Desktop</a> (Mac or Windows) and
+        sign in. It's the only prerequisite.</p>
+      </div>
+      <div class="step">
+        <h3>Download one file</h3>
+        <p>Grab the <code class="mono">.mcpb</code> for your machine from the
+        <a href="https://github.com/vadim-filimonov/openrater/releases/latest">latest release</a> —
+        or use the buttons above.</p>
+      </div>
+      <div class="step">
+        <h3>Drag it in</h3>
+        <p>In Claude Desktop, open <b>Settings → Extensions</b> and drag the file in. Signed and
+        notarized — no warnings.</p>
+      </div>
+      <div class="step">
+        <h3>Ask Claude</h3>
+        <p>Start a new chat and ask:<span class="say">"What is OpenRater? Show me."</span>
+        The engine starts locally, the review app opens in your browser, and a three-minute tour
+        begins on the bundled synthetic program.</p>
+      </div>
+    </div>
+    <table class="plat">
+      <caption>Which file is mine?</caption>
+      <tbody>
+        <tr><td>Mac · Apple silicon (M-series)</td><td><a id="tbl-arm" href="https://github.com/vadim-filimonov/openrater/releases/latest">…darwin-arm64.mcpb</a></td></tr>
+        <tr><td>Mac · Intel</td><td><a id="tbl-x64" href="https://github.com/vadim-filimonov/openrater/releases/latest">…darwin-x64.mcpb</a></td></tr>
+        <tr><td>Windows</td><td><a id="tbl-win" href="https://github.com/vadim-filimonov/openrater/releases/latest">…win32-x64.mcpb</a></td></tr>
+      </tbody>
+    </table>
+    <p class="plat-note">Not sure which Mac you have? Apple menu → <b>About This Mac</b> — "Chip"
+    means Apple silicon, "Processor" means Intel. macOS builds are Developer&nbsp;ID-signed and
+    notarized; Windows builds are signed via Azure Trusted Signing.</p>
+  </div>
+</section>
+
+<section id="ways" aria-labelledby="ways-h" class="personas">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-no">§ 4</span>
+      <h2 id="ways-h">Three ways to use it</h2>
+    </div>
+    <div class="row2">
+      <span class="who2">actuary</span>
+      <p class="how"><b>Claude Desktop + the extension.</b> The full loop in chat — transcribe,
+      validate, build, review, quote, re-rate — with the review UI one click away. No terminal
+      required.</p>
+    </div>
+    <div class="row2">
+      <span class="who2">engineer</span>
+      <p class="how"><b>Claude Code, or any MCP client.</b> The same loop, scriptable, over 18 MCP
+      tools — see <a href="https://github.com/vadim-filimonov/openrater/blob/main/AGENTS.md">AGENTS.md</a>.</p>
+    </div>
+    <div class="row2">
+      <span class="who2">integrator</span>
+      <p class="how"><b>Self-hosted.</b> The REST API, the deterministic scoring engine, and the
+      integration-events ledger, headless — a Docker Compose kit ships in
+      <a href="https://github.com/vadim-filimonov/openrater/tree/main/deploy">deploy/</a>.</p>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="cols">
+      <div>
+        <h4>Local-first, by construction</h4>
+        <p>Your filings, workbooks, and rate plans stay on your machine. The engine binds to
+        <b>127.0.0.1</b> only, and the app collects no telemetry. Full policy:
+        <a href="https://github.com/vadim-filimonov/openrater/blob/main/docs/PRIVACY.md">docs/PRIVACY.md</a>.</p>
+        <p id="fn1" class="fn"><span class="mark">1.</span> OpenRater outputs are reconstructions
+        for analysis. The carrier's filed and approved rates govern — verify results against the
+        source document; the <span class="mono">test_cases</span> sheet exists for exactly this.
+        <a href="#ref1" aria-label="Back to reference">↩</a></p>
+        <p class="fn">This repository ships only synthetic rating content. Transcription profiles
+        currently cover Businessowners (BOP) and General Liability — see
+        <a href="https://github.com/vadim-filimonov/openrater/blob/main/LIMITATIONS.md">LIMITATIONS.md</a>
+        for the supported boundary. OpenRater is in the 0.x series; interfaces may change.</p>
+      </div>
+      <div>
+        <h4>Index</h4>
+        <ul>
+          <li><a href="https://github.com/vadim-filimonov/openrater">github.com/vadim-filimonov/openrater</a></li>
+          <li><a href="https://github.com/vadim-filimonov/openrater/releases">releases &amp; downloads</a></li>
+          <li><a href="https://github.com/vadim-filimonov/openrater/blob/main/CHANGELOG.md">changelog</a></li>
+          <li><a href="https://github.com/vadim-filimonov/openrater/blob/main/LIMITATIONS.md">limitations</a></li>
+          <li><a href="https://github.com/vadim-filimonov/openrater/blob/main/docs/PRIVACY.md">privacy policy</a></li>
+          <li><a href="https://github.com/vadim-filimonov/openrater/blob/main/LICENSE">license · apache-2.0</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="fine">
+      <span>OpenRater — an independent project with no affiliation to NAIC, SERFF, ISO/Verisk, AAIS, NCCI, or any insurer.</span>
+      <span>© <span id="yr">2026</span> · Apache-2.0</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  document.getElementById('yr').textContent = new Date().getFullYear();
+
+  var REPO = 'vadim-filimonov/openrater';
+  var FALLBACK = 'https://github.com/' + REPO + '/releases/latest';
+  var ua = navigator.userAgent;
+  var os = /Windows/i.test(ua) ? 'win' : (/Macintosh|Mac OS X/i.test(ua) ? 'mac' : null);
+
+  var label = document.getElementById('dl-label');
+  if (os === 'win') label.textContent = 'Download for Windows';
+  else if (os === 'mac') label.textContent = 'Download for Apple silicon';
+  else label.textContent = 'Download';
+
+  fetch('https://api.github.com/repos/' + REPO + '/releases/latest')
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(rel){
+      if (!rel || !rel.assets) return;
+      function asset(suffix){
+        for (var i = 0; i < rel.assets.length; i++)
+          if (rel.assets[i].name.indexOf(suffix) !== -1) return rel.assets[i];
+        return null;
+      }
+      var arm = asset('darwin-arm64'), x64 = asset('darwin-x64'), win = asset('win32-x64');
+      function wire(id, a){
+        var el = document.getElementById(id);
+        if (el && a) { el.href = a.browser_download_url; if (id.slice(0,4) === 'tbl-') el.textContent = a.name; }
+      }
+      wire('alt-arm', arm); wire('alt-x64', x64); wire('alt-win', win);
+      wire('tbl-arm', arm); wire('tbl-x64', x64); wire('tbl-win', win);
+      var primary = (os === 'win') ? win : (os === 'mac') ? arm : null;
+      var btn = document.getElementById('dl-btn');
+      btn.href = primary ? primary.browser_download_url : FALLBACK;
+      if (rel.tag_name) document.getElementById('dl-ver').textContent = rel.tag_name + ' · ';
+    })
+    .catch(function(){ /* fallback hrefs already point at the releases page */ });
+})();
+</script>
+</body>
+</html>
