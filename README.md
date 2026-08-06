@@ -47,12 +47,41 @@ filing PDF ──(AI transcribes, following the spec)──▶ workbook (.xlsx, 
 | A technical actuary / engineer | Claude Code (or any MCP client) + `@openrater/mcp` | The same loop, scriptable — see [`AGENTS.md`](./AGENTS.md) |
 | An integrator | This repo, self-hosted | The REST API, the scoring engine, the integration-events ledger — headless |
 
-Build the Desktop extension locally with
-[`packaging/desktop/build-mcpb.sh`](./packaging/desktop/build-mcpb.sh).
-The release workflow produces platform-specific artifacts; macOS
-artifacts are signed and notarized before release. See the
-[release test](./packaging/desktop/TESTING.md) and
-[signing runbook](./packaging/desktop/SIGNING.md).
+## Install (Claude Desktop)
+
+The extension is one signed file. No terminal, no dependencies —
+Claude Desktop is the only prerequisite.
+
+1. Install [Claude Desktop](https://claude.ai/download) (Mac or
+   Windows) and sign in.
+2. Download one file from the
+   [latest release](https://github.com/vadim-filimonov/openrater/releases/latest):
+
+   | Your machine | Pick the file ending in |
+   |---|---|
+   | Mac · Apple silicon (M-series) | `darwin-arm64.mcpb` |
+   | Mac · Intel | `darwin-x64.mcpb` |
+   | Windows | `win32-x64.mcpb` |
+
+   Not sure which Mac you have? Apple menu → **About This Mac** —
+   "Chip" means Apple silicon, "Processor" means Intel.
+3. In Claude Desktop, open **Settings → Extensions** and drag the
+   file in.
+4. Start a new chat and ask: *"What is OpenRater? Show me."* The
+   engine starts on your machine, the review app opens in your
+   browser, and Claude offers a three-minute tour of the bundled
+   synthetic program (Meridian Mutual Insurance, Shopfront BOP).
+
+macOS builds are Developer ID–signed and notarized; Windows builds
+are signed via Azure Trusted Signing. Everything runs locally — the
+engine binds to `127.0.0.1`, and nothing you rate leaves your machine
+([privacy policy](./docs/PRIVACY.md)).
+
+Prefer to build the extension yourself?
+[`packaging/desktop/build-mcpb.sh`](./packaging/desktop/build-mcpb.sh)
+does it; the [release test](./packaging/desktop/TESTING.md) and
+[signing runbook](./packaging/desktop/SIGNING.md) document the
+release lane.
 
 ## Quickstart (development)
 
